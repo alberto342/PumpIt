@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical"
+    tools:context=".SearchFoodsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/edQuery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/common_8"
+            android:layout_weight="1"
+            android:autofillHints="@string/Search"
+            android:drawableStart="@mipmap/ic_search_black_18dp"
+            android:drawableLeft="@mipmap/ic_search_black_18dp"
+            android:drawablePadding="@dimen/common_16"
+            android:hint="@string/Search"
+            android:inputType="text"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/go" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="@dimen/common_8"
+            android:layout_marginLeft="@dimen/common_8"
+            android:layout_marginTop="@dimen/common_8"
+            android:layout_marginEnd="296dp"
+            android:layout_marginRight="@dimen/common_8"
+            android:layout_marginBottom="@dimen/common_8"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/no_data_found"
+            android:visibility="gone" />
+
+
+        <Button
+            android:id="@+id/btn_save_all_food"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/rvList"
+            android:layout_marginBottom="0dp"
+            android:background="@color/background"
+            android:text="Save All"
+            android:textColor="@color/white"
+            android:visibility="invisible" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background"
+            android:padding="@dimen/common_8"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="fitness.albert.com.pumpit">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".ShowItemFoodActivity"></activity>
+        <activity
+            android:name=".WelcomeActivities.WelcomeActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".FragmentNavigationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WelcomeActivities.GoalActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WelcomeActivities.GenderActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WelcomeActivities.AgeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WelcomeActivities.WeightActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WelcomeActivities.HeightActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WelcomeActivities.BodyFatActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WelcomeActivities.FatTargetActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Register.RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Register.EmailRegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddExerciseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SearchFoodsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ShowFoodBeforeAddedActivity"
+            android:screenOrientation="portrait" />
+    </application>
+
+</manifest>

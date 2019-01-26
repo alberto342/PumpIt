@@ -4,9 +4,9 @@
     <color name="colorPrimaryDark">#00574b</color>
     <color name="colorAccent">#D81B60</color>
     <color name="background">#000000</color>
-    <color name="colorDarkBlue">#3c4397</color>
-    <color name="white">#ffffff</color>
-    <color name="myBlue">#686de0</color>
+    <color name="colorDarkBlue">#3C4397</color>
+    <color name="white">#FFFFFF</color>
+    <color name="myBlue">#686DE0</color>
     <color name="input_login">#ffffff</color>
     <color name="input_login_hint">#962f513e</color>
     <color name="btn_login_register">#961036be</color>

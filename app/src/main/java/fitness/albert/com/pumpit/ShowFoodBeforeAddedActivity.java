@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -26,6 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.SavePref;
 import fitness.albert.com.pumpit.Model.UserRegister;
@@ -39,7 +39,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             tvSodium, tvTotalCarbohydrate, tvDietaryFiber, tvSugars, tvPotassium, tvNfP, tvEnergyScroll,
             tvCrabsScroll, tvProteinScroll, tvFatScroll, tvSaturatedFat;
     private ImageView ivFoodImg, btnSaveFood;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String TAG;
     private Foods foods = new Foods();
 
@@ -215,7 +214,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             UserRegister user = new UserRegister();
 
             //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
-            db.collection("nutrition").document(user.getEmailRegister()).collection(getMeal()).document(getTodayData()).collection("fruit").add(foods)
+            FireBaseInit.getInstance(this).db.collection("nutrition").document(FireBaseInit.fireBaseInit.getEmailRegister()).collection(getMeal()).document(getTodayData()).collection("fruit").add(foods)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
@@ -237,7 +236,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     }
 
     //get Meal from SharedPreferences file
-    private String getMeal() {
+    public String getMeal() {
 
         SharedPreferences pref = getSharedPreferences(Foods.SharedPreferencesFile, Context.MODE_PRIVATE);
 

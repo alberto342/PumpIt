@@ -5,6 +5,10 @@ import io.opencensus.tags.Tags;
 public class Foods {
 
     public static final String SharedPreferencesFile = "meal";
+    public static final String dinner = "dinner";
+    public static final String breakfast = "breakfast";
+    public static final String lunch = "lunch";
+    public static final String snack = "snack";
 
 
     public Foods() {

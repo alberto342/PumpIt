@@ -10,7 +10,10 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class FireBaseInit {
@@ -42,7 +45,16 @@ public class FireBaseInit {
     }
 
     private void defineTheFireBaseUser() {
-        user= FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
+    }
+
+    public String getEmailRegister() {
+        String email = null;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            email = mAuth.getCurrentUser().getEmail();
+        }
+        return email;
     }
 
     // rest the firebase settings
@@ -55,13 +67,17 @@ public class FireBaseInit {
     }
 
 
-
-    public static FireBaseInit getInstance(Context context)
-    {
+    public static FireBaseInit getInstance(Context context) {
         if (fireBaseInit == null)
             fireBaseInit = new FireBaseInit(context);
 
         return fireBaseInit;
+    }
+
+    public String getTodayDate() {
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        return df.format(c);
     }
 
 }

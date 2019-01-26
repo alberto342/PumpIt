@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,11 +71,14 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
         holder.itemFoodSelected.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
-                mContext.startActivity(new Intent(mContext, ShowItemFoodActivity.class));
+                Intent intent = new Intent(mContext, ShowItemFoodActivity.class);
+
+                intent.putExtra("foodName", holder.tvFoodName.getText().toString());
 
 
-
+                mContext.startActivity(intent);
 
             }
         });

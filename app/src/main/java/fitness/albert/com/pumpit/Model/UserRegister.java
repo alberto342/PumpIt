@@ -1,7 +1,8 @@
 package fitness.albert.com.pumpit.Model;
 
-import com.google.firebase.auth.FirebaseAuth;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -249,6 +250,12 @@ public class UserRegister {
         return (int) (calculatorBEE().get(valueKey) * 1.1);
     }
 
+    public String getTodayData() {
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        return df.format(c);
+    }
+
 
 
 
@@ -261,14 +268,14 @@ public class UserRegister {
     }
 
 
-    public String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
-        }
-        return email;
-    }
+//    public String getEmailRegister() {
+//        String email = null;
+//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+//        if (mAuth.getCurrentUser() != null) {
+//            email = mAuth.getCurrentUser().getEmail();
+//        }
+//        return email;
+//    }
 
 
 

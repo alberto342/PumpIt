@@ -119,6 +119,7 @@ public class FragmentNavigationActivity extends AppCompatActivity {
         super.onStart();
         SharedPreferences pref = getSharedPreferences("activity", Context.MODE_PRIVATE);
         String prevActivity = pref.getString("FROM_ACTIVITY", "");
+
         //check if activity come from ShowFoodBeforeAddedActivity
         if (prevActivity.equals("ShowFoodBeforeAddedActivity")) {
             SavePref savePref = new SavePref();

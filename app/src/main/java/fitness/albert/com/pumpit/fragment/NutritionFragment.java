@@ -1,19 +1,14 @@
 package fitness.albert.com.pumpit.fragment;
 
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,28 +31,29 @@ import java.util.Date;
 import java.util.List;
 
 import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.SavePref;
-import fitness.albert.com.pumpit.Model.SwipeToDeleteCallback;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.SearchFoodsActivity;
+import fitness.albert.com.pumpit.ShowAllNutritionActivity;
 
 
 public class NutritionFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ImageView btnAddBreakfast, btnAddLunch, btnAddSnacks, btnAddDinner;
-    private ImageView btnSelectBreakfast, btnSelectLunch, btnSelectDinner, btnSelectSnacks;
-    private TextView tvGoal, tvFood, tvExersice, tvRemaining, tvFat, tvProtien, tvCarbs;
+    private TextView tvGoal, tvFood, tvExersice, tvRemaining, tvFat, tvProtien, tvCarbs, tvDetails;
     private List<Foods> foodList = new ArrayList<>();
-    private RecyclerView rvListFood;
+//    private RecyclerView rvListFood;
     private SavePref savePref = new SavePref();
     UserRegister user = new UserRegister();
-    private float kcal, fat, protien, carbs;
+    private float kcal, fat, protein, carbs;
     private String TAG;
     private FirestoreFoodListAdapter mAdapter = new FirestoreFoodListAdapter(getActivity(), foodList);
     CoordinatorLayout coordinatorLayout;
+
 
 
     //Todo finish the selected on food
@@ -88,11 +84,11 @@ public class NutritionFragment extends Fragment {
 
         init(view);
 
-        getMealFromFs("breakfast");
+//        getMealFromFs("breakfast");
 
-        getUserDataAndSetGoal();
+//        getUserDataAndSetGoal();
 
-        enableSwipeToDeleteAndUndo();
+//        enableSwipeToDeleteAndUndo();
 
     }
 
@@ -103,18 +99,14 @@ public class NutritionFragment extends Fragment {
         btnAddDinner = view.findViewById(R.id.btn_add_dinner);
         btnAddLunch = view.findViewById(R.id.btn_add_lunch);
         btnAddSnacks = view.findViewById(R.id.btn_add_snacks);
+        tvDetails = view.findViewById(R.id.tv_details);
 
         //RecyclerView
-        rvListFood = view.findViewById(R.id.rv_list_food);
+//        rvListFood = view.findViewById(R.id.rv_list_food);
 
         //coordinatorLayout
 //        coordinatorLayout = view.findViewById(R.id.coordinatorLayout);
 
-        //btn selected
-        btnSelectBreakfast = view.findViewById(R.id.breakfast);
-        btnSelectDinner = view.findViewById(R.id.dinner);
-        btnSelectLunch = view.findViewById(R.id.lunch);
-        btnSelectSnacks = view.findViewById(R.id.snacks);
 
 
         tvGoal = view.findViewById(R.id.tv_goal);
@@ -129,24 +121,19 @@ public class NutritionFragment extends Fragment {
 
 
         //disable RecyclerView scrolling
-        rvListFood.setNestedScrollingEnabled(false);
+//        rvListFood.setNestedScrollingEnabled(false);
 
 
         btnAddBreakfast.setOnClickListener(onClickListener);
         btnAddSnacks.setOnClickListener(onClickListener);
         btnAddLunch.setOnClickListener(onClickListener);
         btnAddDinner.setOnClickListener(onClickListener);
-
-
-//        btnSelectBreakfast.setOnClickListener(onClickListener);
-//        btnSelectDinner.setOnClickListener(onClickListener);
-//        btnSelectLunch.setOnClickListener(onClickListener);
-//        btnSelectSnacks.setOnClickListener(onClickListener);
+        tvDetails.setOnClickListener(onClickListener);
     }
 
 
 
-
+    //Check meal selected
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -167,19 +154,9 @@ public class NutritionFragment extends Fragment {
                 case R.id.btn_add_snacks:
                     saveMealToSP(false,false,false,true);
                     break;
-
-//                case R.id.breakfast:
-//
-//                    break;
-//                case R.id.dinner:
-//
-//                   break;
-//                case R.id.lunch:
-//
-//                    break;
-//                case R.id.snacks:
-//
-//                    break;
+                case R.id.tv_details:
+                    startActivity(new Intent(getActivity(), ShowAllNutritionActivity.class));
+                    break;
             }
         }
     };
@@ -202,7 +179,7 @@ public class NutritionFragment extends Fragment {
         progressdialog.show();
 
         //get nutrition from firestone
-        db.collection("nutrition").document(user.getEmailRegister()).collection(keyValue).document(getTodayDate()).collection("fruit").get()
+        FireBaseInit.getInstance(getActivity()).db.collection("nutrition").document(FireBaseInit.fireBaseInit.getEmailRegister()).collection(keyValue).document(getTodayDate()).collection("fruit").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -223,13 +200,12 @@ public class NutritionFragment extends Fragment {
                                 kcal += foodList.get(i).getNf_calories();
                                 carbs += foodList.get(i).getNf_total_carbohydrate();
                                 fat += foodList.get(i).getNf_total_fat();
-                                protien += foodList.get(i).getNf_protein();
+                                protein += foodList.get(i).getNf_protein();
                             }
-
 
                             tvFood.setText(String.format("%.2f", kcal));
                             tvCarbs.setText(String.format("%.2fg of 334g", carbs));
-                            tvProtien.setText(String.format("%.2fg of 25g", protien));
+                            tvProtien.setText(String.format("%.2fg of 25g", protein));
                             tvFat.setText(String.format("%.2fg of 67g", fat));
                             float remaining = kcal + 0;
                             tvRemaining.setText(String.format("%.2f", remaining));
@@ -250,7 +226,7 @@ public class NutritionFragment extends Fragment {
 
 
     private void getUserDataAndSetGoal() {
-        db.collection("users").document(user.getEmailRegister()).get()
+        db.collection("users").document(FireBaseInit.fireBaseInit.getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -268,14 +244,16 @@ public class NutritionFragment extends Fragment {
     }
 
 
+
+
     private void initRecyclerView(){
         Log.d(TAG, "initRecyclerView: init food recyclerView");
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
 
-        rvListFood.setLayoutManager(layoutManager);
+//        rvListFood.setLayoutManager(layoutManager);
         mAdapter = new FirestoreFoodListAdapter(getActivity(), foodList);
-        rvListFood.setAdapter(mAdapter);
+//        rvListFood.setAdapter(mAdapter);
     }
 
     private String getTodayDate() {
@@ -293,35 +271,36 @@ public class NutritionFragment extends Fragment {
 
 
     // Swipe to delete item
-    private void enableSwipeToDeleteAndUndo() {
-        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(getActivity()) {
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+//    private void enableSwipeToDeleteAndUndo() {
+//        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(getActivity()) {
+//            @Override
+//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+//
+//                final int position = viewHolder.getAdapterPosition();
+//                final Foods item = mAdapter.getData().get(position);
+//
+//                mAdapter.removeItem(position);
+//
+//                Snackbar snackbar = Snackbar
+//                        .make(coordinatorLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
+//                snackbar.setAction("UNDO", new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//
+//                            mAdapter.restoreItem(item, position);
+////                            rvListFood.scrollToPosition(position);
+////                    }
+////                });
+//                snackbar.setActionTextColor(Color.YELLOW);
+//                snackbar.show();
+//            }
+//        };
+//
+//
+////        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
+////        itemTouchhelper.attachToRecyclerView(rvListFood);
+//    }
 
-                final int position = viewHolder.getAdapterPosition();
-                final Foods item = mAdapter.getData().get(position);
-
-                mAdapter.removeItem(position);
-
-                Snackbar snackbar = Snackbar
-                        .make(coordinatorLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
-                snackbar.setAction("UNDO", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                            mAdapter.restoreItem(item, position);
-                            rvListFood.scrollToPosition(position);
-                    }
-                });
-                snackbar.setActionTextColor(Color.YELLOW);
-                snackbar.show();
-            }
-        };
-
-
-        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
-        itemTouchhelper.attachToRecyclerView(rvListFood);
-    }
 
 
 
@@ -335,12 +314,11 @@ public class NutritionFragment extends Fragment {
         return (int)(paddingDp * density);
     }
 
+
     //Without this method Data will be double
-    @SuppressLint("MissingSuperCall")
-    @Override
-    public void onPause() {
-        super.onPause();
-        this.foodList.clear();
-    }
+//    public void onPause() {
+//        super.onPause();
+//        this.foodList.clear();
+//    }
 }
 

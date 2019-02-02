@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,6 +39,8 @@ public class ProfileFragment extends Fragment {
     private ImageView profileImg, btnAccountSetting;
     private UserRegister userRegister = new UserRegister();
 
+    Toolbar toolbar;
+
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -55,6 +58,9 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+
+
 
         init(view);
 
@@ -174,11 +180,22 @@ public class ProfileFragment extends Fragment {
 
     private void saveUserNameInServer(final Uri data) {
         userRegister.setImagesRefPath("/profileimage.jpeg");
-
-
-
-
-
     }
+
+//
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.setting_toolbar, menu);
+//        MenuItem searchItem = menu.findItem(R.id.action_search);
+//        SearchView searchView = (SearchView) searchItem.getActionView();
+//        searchView.setOnQueryTextListener(this);
+//        searchView.setQueryHint("Search");
+//
+//
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
+
+
+
 
 }

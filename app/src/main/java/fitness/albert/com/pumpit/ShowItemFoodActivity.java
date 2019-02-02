@@ -25,6 +25,7 @@ import java.util.List;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
+import fitness.albert.com.pumpit.Model.SavePref;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
 
@@ -38,6 +39,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     private List<Foods> foodList = new ArrayList<>();
     private float kcal, fat, protein, carbs;
     private String  qty;
+    private SavePref savePref = new SavePref();
 
 
     @Override
@@ -66,15 +68,14 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
 
     private void getDataFromFirbase() {
-
         final ProgressDialog progressdialog = new ProgressDialog(this);
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
 
-        FireBaseInit.getInstance(this).db.collection("nutrition")
-                .document(FireBaseInit.fireBaseInit.getEmailRegister()).collection(getMeal())
-                .document(user.getTodayData()).collection("fruit").get()
+        FireBaseInit.getInstance(this).db.collection(Foods.nutrition)
+                .document(FireBaseInit.fireBaseInit.getEmailRegister()).collection(Foods.breakfast)
+                .document(user.getTodayData()).collection(Foods.fruit).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -152,6 +153,9 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         spinnerServingUnit.setAdapter(dataAdapter);
     }
 
+
+
+
     public String getMeal() {
         SharedPreferences pref = getSharedPreferences(Foods.SharedPreferencesFile, Context.MODE_PRIVATE);
 
@@ -186,5 +190,10 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         return null;
     }
 
-
+    @Override
+    public void onBackPressed() {
+        savePref.removeAll(this,"passMeal");
+        finish();
+        super.onBackPressed();
+    }
 }

@@ -229,7 +229,6 @@ public class UserRegister {
 
 
     public int calculatorBMR() {
-
         return (int) (isMale() ?  (66 + (this.weight) * 13.8 + (this.height) * 5 - (this.age) * 6.8)
                 :  (655 + (this.weight) * 9.6 + (this.height) * 1.8 - (this.age) * 4.7));
     }

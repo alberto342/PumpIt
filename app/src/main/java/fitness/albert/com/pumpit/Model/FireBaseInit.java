@@ -5,6 +5,7 @@ import android.content.Context;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.storage.FirebaseStorage;
@@ -27,6 +28,9 @@ public class FireBaseInit {
     public FirebaseStorage storage;
 
     public StorageReference storageRef;
+
+    public DocumentReference docRef;
+
     public FirebaseFirestore db;
     private Context context;
 

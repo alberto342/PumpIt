@@ -9,6 +9,8 @@ public class Foods {
     public static final String breakfast = "breakfast";
     public static final String lunch = "lunch";
     public static final String snack = "snack";
+    public static final String nutrition = "nutrition";
+    public static final String fruit = "fruit";
 
 
     public Foods() {

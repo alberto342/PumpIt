@@ -19,10 +19,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
@@ -214,7 +211,9 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             UserRegister user = new UserRegister();
 
             //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
-            FireBaseInit.getInstance(this).db.collection("nutrition").document(FireBaseInit.fireBaseInit.getEmailRegister()).collection(getMeal()).document(getTodayData()).collection("fruit").add(foods)
+            FireBaseInit.getInstance(this).db.collection(Foods.nutrition).document(FireBaseInit.fireBaseInit.getEmailRegister())
+                    .collection(getMeal()).document(FireBaseInit.fireBaseInit.getTodayDate())
+                    .collection(Foods.fruit).add(foods)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
@@ -261,11 +260,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         }
     }
 
-    private String getTodayData() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-        return df.format(c);
-    }
+
 
     private void onAddButtonClick() {
         btnSaveFood.setOnClickListener(new View.OnClickListener() {

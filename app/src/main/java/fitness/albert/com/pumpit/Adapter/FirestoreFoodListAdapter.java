@@ -76,10 +76,8 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                 Intent intent = new Intent(mContext, ShowItemFoodActivity.class);
 
                 intent.putExtra("foodName", holder.tvFoodName.getText().toString());
-
-
                 mContext.startActivity(intent);
-
+                foodsList.clear();
             }
         });
 
@@ -135,6 +133,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
 
         @Override
         public void onClick(View view) {
+
         }
     }
 

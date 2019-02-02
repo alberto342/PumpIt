@@ -96,5 +96,4 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.Callback {
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
 
     }
-
 }

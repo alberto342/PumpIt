@@ -39,7 +39,7 @@ public class AccountFragment extends Fragment {
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth auth;
-    private String TAG;
+    private String TAG = "AccountFragment";
     private boolean successDeleteData;
 
 
@@ -59,9 +59,10 @@ public class AccountFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         //get current user
+
         getCurrentUser();
 
-        setView(view);
+        init(view);
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
@@ -74,7 +75,7 @@ public class AccountFragment extends Fragment {
     }
 
 
-    private void setView(View view) {
+    private void init(View view) {
         btnDeleteAccount = view.findViewById(R.id.btn_delete_account);
         btnLogout = view.findViewById(R.id.btn_sign_out);
         btnChangePassword = view.findViewById(R.id.btn_change_password);
@@ -251,7 +252,7 @@ public class AccountFragment extends Fragment {
             Log.d(TAG, "GET EMAIL");
             return email;
         } else {
-            return email = null;
+            return null;
         }
     }
 

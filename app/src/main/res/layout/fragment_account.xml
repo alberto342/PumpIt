@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".fragment.profile.AccountFragment">
+    tools:context=".fragment.profile.AccountSettings.AccountFragment">
 
 
     <android.support.constraint.ConstraintLayout
@@ -17,8 +17,7 @@
             android:id="@+id/textView32"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:text="Account Settings"
+            android:text="@string/account_settings"
             android:textColor="@color/white"
             android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -26,13 +25,15 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView39"
+            android:id="@+id/btn_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:layout_marginTop="25dp"
-            android:text="Email Address"
-            android:textColor="@color/gray"
+            android:text="@string/email_address"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView32" />
 
@@ -45,8 +46,9 @@
             android:layout_marginEnd="5dp"
             android:textAlignment="textEnd"
             android:textColor="@color/white"
-            app:layout_constraintEnd_toStartOf="@+id/imageView35"
-            app:layout_constraintStart_toEndOf="@+id/textView39"
+            android:textColorHint="@color/gray"
+            app:layout_constraintEnd_toStartOf="@+id/go_to_email"
+            app:layout_constraintStart_toEndOf="@+id/btn_email"
             app:layout_constraintTop_toBottomOf="@+id/textView32" />
 
         <ImageView
@@ -57,10 +59,11 @@
             android:src="@mipmap/line"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView39" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_email"
+            android:contentDescription="TODO" />
 
         <ImageView
-            android:id="@+id/imageView35"
+            android:id="@+id/go_to_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="35dp"
@@ -71,13 +74,15 @@
             app:layout_constraintStart_toEndOf="@+id/tv_my_email" />
 
         <TextView
-            android:id="@+id/textView41"
+            android:id="@+id/btn_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
             android:layout_marginTop="20dp"
-            android:text="Password"
-            android:textColor="@color/gray"
+            android:text="@string/password"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView34" />
 
@@ -85,14 +90,15 @@
             android:id="@+id/imageView37"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="TODO"
             android:src="@mipmap/line"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView41" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_password" />
 
         <ImageView
-            android:id="@+id/imageView39"
+            android:id="@+id/go_to_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="35dp"
@@ -109,6 +115,8 @@
             android:layout_marginTop="20dp"
             android:text="Delete Account"
             android:textColor="@color/fui_bgEmail"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView37" />
 
@@ -116,21 +124,11 @@
             android:id="@+id/imageView40"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="8dp"
             android:src="@mipmap/line"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_delete_account" />
-
-        <ImageView
-            android:id="@+id/imageView41"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="35dp"
-            android:src="@mipmap/ic_next_screen"
-            app:layout_constraintBottom_toTopOf="@+id/imageView40"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView37" />
 
         <TextView
             android:id="@+id/btn_sign_out"
@@ -139,57 +137,11 @@
             android:layout_marginStart="35dp"
             android:layout_marginTop="20dp"
             android:text="Log Out"
-            android:textColor="@color/gray"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView40" />
-
-
-        <Button
-            android:id="@+id/btn_change_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="change password"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:layout_editor_absoluteY="555dp" />
-
-        <EditText
-            android:id="@+id/et_new_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="4dp"
-            android:background="@color/white"
-            android:ems="10"
-            android:hint="Enter new password"
-            android:inputType="textPersonName|textPassword"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/btn_change_password"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <EditText
-            android:id="@+id/et_new_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginBottom="68dp"
-            android:background="@color/white"
-            android:ems="10"
-            android:hint="Enter new Email"
-            android:inputType="textPersonName"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/et_new_password"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
-            android:id="@+id/btn_change_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="58dp"
-            android:text="change email"
-            app:layout_constraintBottom_toTopOf="@+id/et_new_email"
-            app:layout_constraintStart_toStartOf="parent" />
 
 
     </android.support.constraint.ConstraintLayout>

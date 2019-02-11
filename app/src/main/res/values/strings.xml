@@ -90,6 +90,18 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="details">DETAILS</string>
+    <string name="protein">Protein</string>
+    <string name="carb">Carb</string>
+    <string name="fat">Fat</string>
+    <string name="goal">Goal:</string>
+    <string name="change_password">Change Password</string>
+    <string name="profile">Profile</string>
+    <string name="city">City</string>
+    <string name="my_goals">My Goals</string>
 
 
 </resources>

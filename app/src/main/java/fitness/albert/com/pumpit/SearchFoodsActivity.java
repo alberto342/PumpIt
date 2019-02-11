@@ -48,7 +48,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
     RestApi api;
     private ArrayList<Foods> mListItem = new ArrayList<>();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String TAG;
+    private String TAG = "SearchFoodsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +71,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 getFoodList();
+
             }
         });
 
@@ -78,7 +79,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                saveAll();
-
             }
         });
     }

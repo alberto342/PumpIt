@@ -18,7 +18,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -38,10 +41,14 @@ public class NutritionFragment extends Fragment {
     private ImageView btnAddBreakfast, btnAddLunch, btnAddSnacks, btnAddDinner;
     private TextView tvGoal, tvFood, tvExersice, tvRemaining, tvFat, tvProtien, tvCarbs, tvDetails;
     private List<Foods> foodList = new ArrayList<>();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private SavePref savePref = new SavePref();
     UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs;
     private final String TAG = "NutritionFragment";
+    private boolean isOnNutrition;
+
+
 
 
     public NutritionFragment() {
@@ -70,10 +77,21 @@ public class NutritionFragment extends Fragment {
 
         getUserDataAndSetGoal();
 
-        getMealFromFs(Foods.breakfast);
-        getMealFromFs(Foods.snack);
-        getMealFromFs(Foods.lunch);
-        getMealFromFs(Foods.dinner);
+        emailIsOnNutrition();
+
+        if(isOnNutrition) {
+            ProgressDialog progressdialog = new ProgressDialog(getActivity());
+            progressdialog.setMessage("Please Wait....");
+            progressdialog.show();
+
+            getMealFromFs(Foods.breakfast);
+            getMealFromFs(Foods.snack);
+            getMealFromFs(Foods.lunch);
+            getMealFromFs(Foods.dinner);
+            progressdialog.hide();
+        }
+
+
     }
 
 
@@ -139,6 +157,31 @@ public class NutritionFragment extends Fragment {
         }
     };
 
+    //The first time the email not exist, only after add food is exists
+    private void emailIsOnNutrition() {
+       DocumentReference docRef =  db.collection(Foods.nutrition).document(getEmailRegister());
+       docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+           @Override
+           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+               if(task.isSuccessful()) {
+                   DocumentSnapshot document = task.getResult();
+                   if ((document.exists())) {
+                       Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                       isOnNutrition = true;
+                   } else {
+                       Log.d(TAG, "No such document");
+                       isOnNutrition = false;
+                   }
+               } else {
+                   Log.d(TAG, "get failed with ", task.getException());
+               }
+           }
+       });
+
+
+
+    }
+
     private void saveMealToSP(boolean dinner, boolean breakfast, boolean lunch, boolean snack) {
         savePref.saveData("dinner", dinner);
         savePref.saveData("breakfast", breakfast);
@@ -152,20 +195,15 @@ public class NutritionFragment extends Fragment {
 
     private void getMealFromFs(String keyValue) {
 
-        final ProgressDialog progressdialog = new ProgressDialog(getActivity());
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
         //get nutrition from firestone
-        FireBaseInit.getInstance(getActivity())
-                .db.collection("nutrition").document(FireBaseInit.fireBaseInit.getEmailRegister())
+        db.collection(Foods.nutrition).document(FireBaseInit.fireBaseInit.getEmailRegister())
                 .collection(keyValue).document(FireBaseInit.fireBaseInit.getTodayDate())
                 .collection("fruit").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         //hide ProgressDialog
-                        progressdialog.hide();
+
 
                         if (task.isSuccessful()) {
 
@@ -207,14 +245,21 @@ public class NutritionFragment extends Fragment {
 
 
     private void getUserDataAndSetGoal() {
-        FireBaseInit.getInstance(getActivity())
-                .db.collection("users").document(FireBaseInit.fireBaseInit.getEmailRegister()).get()
+        final ProgressDialog progressdialog = new ProgressDialog(getActivity());
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
+
+        db.collection(UserRegister.fireBaseUsers).document(getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         user = documentSnapshot.toObject(UserRegister.class);
 
-                        tvGoal.setText(String.valueOf(user.calculatorBMR()));
+
+
+                        tvGoal.setText(String.valueOf(user.thermicEffect(user.getActivityLevel())));
+
+                        progressdialog.hide();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -225,5 +270,29 @@ public class NutritionFragment extends Fragment {
                 });
     }
 
+
+    public String getEmailRegister() {
+        String email = null;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            email = mAuth.getCurrentUser().getEmail();
+        }
+        return email;
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+
+    }
+
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 }
 

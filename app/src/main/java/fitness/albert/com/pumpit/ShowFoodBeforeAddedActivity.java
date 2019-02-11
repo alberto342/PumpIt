@@ -16,16 +16,19 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.SavePref;
-import fitness.albert.com.pumpit.Model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
@@ -36,9 +39,9 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             tvSodium, tvTotalCarbohydrate, tvDietaryFiber, tvSugars, tvPotassium, tvNfP, tvEnergyScroll,
             tvCrabsScroll, tvProteinScroll, tvFatScroll, tvSaturatedFat;
     private ImageView ivFoodImg, btnSaveFood;
-    private String TAG;
+    private String TAG = "ShowFoodBeforeAddedActivity";
     private Foods foods = new Foods();
-
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
     @Override
@@ -208,11 +211,9 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     private void saveDataToFirestore() {
         try {
 
-            UserRegister user = new UserRegister();
-
             //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
-            FireBaseInit.getInstance(this).db.collection(Foods.nutrition).document(FireBaseInit.fireBaseInit.getEmailRegister())
-                    .collection(getMeal()).document(FireBaseInit.fireBaseInit.getTodayDate())
+            db.collection(Foods.nutrition).document(getEmailRegister())
+                    .collection(getMeal()).document(getTodayDate())
                     .collection(Foods.fruit).add(foods)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
@@ -272,6 +273,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                 savePref.createSharedPreferencesFiles(ShowFoodBeforeAddedActivity.this,"activity");
                 savePref.saveData("FROM_ACTIVITY", "ShowFoodBeforeAddedActivity");
                 startActivity(new Intent(ShowFoodBeforeAddedActivity.this, FragmentNavigationActivity.class));
+
             }
         });
     }
@@ -282,6 +284,20 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     public void onBackPressed() {
         super.onBackPressed();
         startActivity(new Intent(this, SearchFoodsActivity.class));
-        finish();
+    }
+
+    public String getEmailRegister() {
+        String email = null;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            email = mAuth.getCurrentUser().getEmail();
+        }
+        return email;
+    }
+
+    public String getTodayDate() {
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        return df.format(c);
     }
 }

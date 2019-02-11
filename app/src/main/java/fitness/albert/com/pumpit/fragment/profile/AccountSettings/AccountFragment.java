@@ -1,17 +1,17 @@
-package fitness.albert.com.pumpit.fragment.profile;
+package fitness.albert.com.pumpit.fragment.profile.AccountSettings;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -20,24 +20,22 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import fitness.albert.com.pumpit.LoginActivity;
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.R;
-import fitness.albert.com.pumpit.WelcomeActivities.GoalActivity;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class AccountFragment extends Fragment {
 
-    private Button btnDeleteAccount, btnLogout, btnChangePassword, btnChangeEmail;
-    private EditText etNewPassword,etNewEmail;
+
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private TextView btnEmail, btnPassword, btnDeleteAccount, btnLogout, tvMyEmail;
+    private ImageView goToEmail, goToPassword;
     private FirebaseAuth.AuthStateListener authListener;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth auth;
     private String TAG = "AccountFragment";
     private boolean successDeleteData;
@@ -58,8 +56,8 @@ public class AccountFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //get current user
 
+        //get current user
         getCurrentUser();
 
         init(view);
@@ -78,21 +76,35 @@ public class AccountFragment extends Fragment {
     private void init(View view) {
         btnDeleteAccount = view.findViewById(R.id.btn_delete_account);
         btnLogout = view.findViewById(R.id.btn_sign_out);
-        btnChangePassword = view.findViewById(R.id.btn_change_password);
-        etNewPassword = view.findViewById(R.id.et_new_password);
-        btnChangeEmail = view.findViewById(R.id.btn_change_email);
-        etNewEmail = view.findViewById(R.id.et_new_email);
+
+        btnEmail = view.findViewById(R.id.btn_email);
+        goToEmail = view.findViewById(R.id.go_to_email);
+
+        btnPassword = view.findViewById(R.id.btn_password);
+        goToPassword = view.findViewById(R.id.go_to_password);
+
+        tvMyEmail = view.findViewById(R.id.tv_my_email);
+
+        String myEmail = getEmailRegister();
+        tvMyEmail.setHint(myEmail);
+
+
     }
 
     private void btnClick() {
         btnDeleteAccount.setOnClickListener(onClickListener);
         btnLogout.setOnClickListener(onClickListener);
-        btnChangePassword.setOnClickListener(onClickListener);
-        btnChangeEmail.setOnClickListener(onClickListener);
+        btnEmail.setOnClickListener(onClickListener);
+        goToEmail.setOnClickListener(onClickListener);
+        btnPassword.setOnClickListener(onClickListener);
+        goToPassword.setOnClickListener(onClickListener);
     }
 
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
+        Fragment changeEmailFragment = new ChangeEmailFragment();
+        Fragment changePasswordFragment = new ChangePasswordFragment();
+
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
@@ -101,7 +113,7 @@ public class AccountFragment extends Fragment {
                     break;
 
                 case R.id.btn_delete_account:
-//                    alertDialog();
+                    //alertDialog();
                     deleteAllData();
                     if(successDeleteData) {
                         reAuthenticateUser();
@@ -112,17 +124,24 @@ public class AccountFragment extends Fragment {
                     signOut();
                     break;
 
-                case R.id.btn_change_password:
-                    reAuthenticateUser();
-                    setUsersPassword();
+                case R.id.btn_email:
+                    loadFragment(changeEmailFragment);
                     break;
 
-                case R.id.btn_change_email:
-                    reAuthenticateUser();
-                    setUsersEmailAddress();
+                case R.id.go_to_email:
+                    loadFragment(changeEmailFragment);
                     break;
 
+                case R.id.tv_my_email:
+                    loadFragment(changeEmailFragment);
 
+                case R.id.btn_password:
+                    loadFragment(changePasswordFragment);
+                    break;
+
+                case R.id.go_to_password:
+                    loadFragment(changePasswordFragment);
+                    break;
             }
         }
     };
@@ -147,17 +166,6 @@ public class AccountFragment extends Fragment {
         };
     }
 
-    private void setUsersPassword() {
-        user.updatePassword(etNewPassword.getText().toString().trim())
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "User password updated.");
-                        }
-                    }
-                });
-    }
 
     private void reAuthenticateUser() {
 // Get auth credentials from the user for re-authentication. The example below shows
@@ -208,7 +216,7 @@ public class AccountFragment extends Fragment {
 
     private void deleteAllData() {
         //getUserId
-        db.collection("users")
+        FireBaseInit.getInstance(getActivity()).db.collection("users")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -218,14 +226,13 @@ public class AccountFragment extends Fragment {
                                 try {
                                     if (getEmailRegister() != null && getEmailRegister().equals(document.getId())) {
                                         //deleteUser
-                                        db.collection("users")
+                                        FireBaseInit.getInstance(getActivity()).db.collection("users")
                                                 .document(document.getId())
                                                 .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 successDeleteData = true;
-//                                                Toast.makeText(getActivity(), "Data deleted !",
-//                                                        Toast.LENGTH_SHORT).show();
+                                                Log.d(TAG,"Data deleted!");
                                             }
                                         });
                                     } else {
@@ -256,27 +263,13 @@ public class AccountFragment extends Fragment {
         }
     }
 
-    private void setUsersEmailAddress() {
-        user.updateEmail(etNewEmail.getText().toString().trim())
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "User email address updated.");
-                        }
-                    }
-                });
-    }
 
 
-    private void goToLoginActivity() {
-        startActivity(new Intent(getActivity(), LoginActivity.class));
-        getActivity().getFragmentManager().popBackStack();
-    }
-
-    private void goToGoalActivity() {
-        startActivity(new Intent(getActivity(), GoalActivity.class));
-        getActivity().getSupportFragmentManager().popBackStack();
+    public void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.frame_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
 

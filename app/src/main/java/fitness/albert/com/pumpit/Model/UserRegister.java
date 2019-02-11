@@ -14,7 +14,7 @@ public class UserRegister {
     public static final String NAME_KEY = "name";
     public static final String EMAIL_KEY ="email";
     public static final String SharedPreferencesFile = "userInfo";
-    private String TAG;
+    public static final String fireBaseUsers = "users";
 
 
     private String imagesRefPath;  //profile img url
@@ -34,6 +34,7 @@ public class UserRegister {
 
     private String bodyFat;
     private String fatTarget;
+    private String activityLevel;
 
 
 
@@ -204,6 +205,14 @@ public class UserRegister {
         this.imagesRefPath = imagesRefPath;
     }
 
+    public String getActivityLevel() {
+        return activityLevel;
+    }
+
+    public void setActivityLevel(String activityLevel) {
+        this.activityLevel = activityLevel;
+    }
+
     public Map<String, Object> getDataToSave() {
         return dataToSave;
     }
@@ -226,6 +235,7 @@ public class UserRegister {
         float floatNum = Float.parseFloat(num1 + "." + num2);
         return floatNum;
     }
+
 
 
     public int calculatorBMR() {

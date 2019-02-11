@@ -12,10 +12,10 @@ import fitness.albert.com.pumpit.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChangeEmailFragment extends Fragment {
+public class ChangeMyGoalsFragment extends Fragment {
 
 
-    public ChangeEmailFragment() {
+    public ChangeMyGoalsFragment() {
         // Required empty public constructor
     }
 
@@ -24,7 +24,7 @@ public class ChangeEmailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_change_email, container, false);
+        return inflater.inflate(R.layout.fragment_change_my_goals, container, false);
     }
 
 }

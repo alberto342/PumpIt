@@ -16,11 +16,18 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
@@ -40,6 +47,8 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     private float kcal, fat, protein, carbs;
     private String  qty;
     private SavePref savePref = new SavePref();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final String TAG = "ShowItemFoodActivity";
 
 
     @Override
@@ -73,8 +82,8 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         progressdialog.show();
 
 
-        FireBaseInit.getInstance(this).db.collection(Foods.nutrition)
-                .document(FireBaseInit.fireBaseInit.getEmailRegister()).collection(Foods.breakfast)
+        db.collection(Foods.nutrition)
+                .document(getEmailRegister()).collection(Foods.breakfast)
                 .document(user.getTodayData()).collection(Foods.fruit).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -127,6 +136,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         if(newQuantity == 0) {
             newQuantity = 1;
         }
+
     }
 
     @Override
@@ -151,6 +161,31 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                 android.R.layout.simple_spinner_item, list);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerServingUnit.setAdapter(dataAdapter);
+    }
+
+
+    private void updateNutrition(String keyValue) {
+
+        FireBaseInit.getInstance(this).db.collection(Foods.nutrition).document(getEmailRegister())
+                .collection(keyValue).document(getTodayDate())
+                .collection(Foods.fruit).add(Foods.class)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+
+
+
+
+
+                        Log.d(TAG, "DocumentSnapshot added with ID: ");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
     }
 
 
@@ -188,6 +223,21 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
             return String.valueOf(bundle.get("foodName"));
         }
         return null;
+    }
+
+    public String getEmailRegister() {
+        String email = null;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            email = mAuth.getCurrentUser().getEmail();
+        }
+        return email;
+    }
+
+    public String getTodayDate() {
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        return df.format(c);
     }
 
     @Override

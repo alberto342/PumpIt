@@ -12,4 +12,6 @@ public interface RestApi {
 
     @POST(Global.NUTRIENTS)
     Call<FoodListResponse> foodList(@Header("x-app-id") String x_app_id, @Header("x-app-key") String x_app_key, @Body FoodRequest foodRequest);
+
+
 }

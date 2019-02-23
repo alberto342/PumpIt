@@ -1,6 +1,6 @@
 package fitness.albert.com.pumpit.Model;
 
-import io.opencensus.tags.Tags;
+import java.util.List;
 
 public class Foods {
 
@@ -17,43 +17,6 @@ public class Foods {
     }
 
 
-    public Foods(String serving_unit, float nf_total_carbohydrate, float nf_sodium, String lng, float nf_p, Alt_measures[] alt_measures, float nf_sugars, float nf_calories, String brand_name, String lat, Metadata metadata, Tags tags, String sub_recipe, String ndb_no, String food_name, String meal_type, float nf_saturated_fat, float nf_protein, float nf_total_fat, String consumed_at, float nf_dietary_fiber, float nf_cholesterol, Photo photo, String upc, float nf_potassium, String nix_brand_name, String nix_item_id, String source, String nix_item_name, float serving_weight_grams, String nix_brand_id, String serving_qty) {
-        this.serving_unit = serving_unit;
-        this.nf_total_carbohydrate = nf_total_carbohydrate;
-        this.nf_sodium = nf_sodium;
-        this.lng = lng;
-        this.nf_p = nf_p;
-        this.alt_measures = alt_measures;
-        this.nf_sugars = nf_sugars;
-        this.nf_calories = nf_calories;
-        this.brand_name = brand_name;
-        this.lat = lat;
-        this.metadata = metadata;
-        this.tags = tags;
-        this.sub_recipe = sub_recipe;
-        this.ndb_no = ndb_no;
-        this.food_name = food_name;
-        this.meal_type = meal_type;
-        this.nf_saturated_fat = nf_saturated_fat;
-        this.nf_protein = nf_protein;
-        this.nf_total_fat = nf_total_fat;
-        this.consumed_at = consumed_at;
-        this.nf_dietary_fiber = nf_dietary_fiber;
-        this.nf_cholesterol = nf_cholesterol;
-        this.photo = photo;
-        this.upc = upc;
-        this.nf_potassium = nf_potassium;
-        this.nix_brand_name = nix_brand_name;
-        this.nix_item_id = nix_item_id;
-        this.source = source;
-        this.nix_item_name = nix_item_name;
-        this.serving_weight_grams = serving_weight_grams;
-        this.nix_brand_id = nix_brand_id;
-        this.serving_qty = serving_qty;
-    }
-
-
-
     private String serving_unit;
 
     private float nf_total_carbohydrate;
@@ -64,7 +27,12 @@ public class Foods {
 
     private float nf_p;
 
-    private Alt_measures[] alt_measures;
+    private List<Alt_measures> alt_measures;
+
+//    private Alt_measures[] alt_measures;
+
+
+
 
     private float nf_sugars;
 
@@ -107,9 +75,10 @@ public class Foods {
     private String nix_brand_name;
 
 
-    private Full_nutrients[] full_nutrients;
 
+//    private Full_nutrients[] full_nutrients;
 
+    private List<Full_nutrients> full_nutrients;
 
 
     private String nix_item_id;
@@ -168,13 +137,17 @@ public class Foods {
         this.nf_p = nf_p;
     }
 
-    public Alt_measures[] getAlt_measures() {
+    public List<Alt_measures> getAlt_measures() {
         return alt_measures;
     }
 
-    public void setAlt_measures(Alt_measures[] alt_measures) {
-        this.alt_measures = alt_measures;
-    }
+//    public Alt_measures[] getAlt_measures() {
+//        return alt_measures;
+//    }
+//
+//    public void setAlt_measures(Alt_measures[] alt_measures) {
+//        this.alt_measures = alt_measures;
+//    }
 
     public float getNf_sugars() {
         return nf_sugars;
@@ -216,7 +189,9 @@ public class Foods {
         this.metadata = metadata;
     }
 
-    public Tags getTags() {
+
+
+        public Tags getTags() {
         return tags;
     }
 
@@ -336,13 +311,17 @@ public class Foods {
         this.nix_brand_name = nix_brand_name;
     }
 
-    public Full_nutrients[] getFull_nutrients() {
+    public List<Full_nutrients> getFull_nutrients() {
         return full_nutrients;
     }
 
-    public void setFull_nutrients(Full_nutrients[] full_nutrients) {
-        this.full_nutrients = full_nutrients;
-    }
+    //    public Full_nutrients[] getFull_nutrients() {
+//        return full_nutrients;
+//    }
+//
+//    public void setFull_nutrients(Full_nutrients[] full_nutrients) {
+//        this.full_nutrients = full_nutrients;
+//    }
 
     public String getNix_item_id() {
         return nix_item_id;

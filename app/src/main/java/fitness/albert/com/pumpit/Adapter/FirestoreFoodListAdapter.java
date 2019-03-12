@@ -1,5 +1,7 @@
 package fitness.albert.com.pumpit.Adapter;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -12,27 +14,41 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.ShowAllNutritionActivity;
 import fitness.albert.com.pumpit.ShowItemFoodActivity;
 
 public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     Context mContext;
-    private List<Foods> foodsList;
-    private String TAG;
+    public static List<Foods> foodsList;
+    private final String TAG = "FirestoreFoodListAdapter";
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    //Firebase item id
+    public static String fireId;
+    public static String foodName;
+
+
 
     public FirestoreFoodListAdapter(Context mContext, List<Foods> foodsList) {
         this.mContext = mContext;
         this.foodsList = foodsList;
     }
-
-
 
 
     @Override
@@ -48,39 +64,83 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-       bindViews((ViewHolder) holder, position);
+        bindViews((ViewHolder) holder, position);
     }
 
 
-    private void bindViews(final ViewHolder holder, int position) {
+    @SuppressLint({"LongLogTag"})
+    private void bindViews(final ViewHolder holder, final int position) {
+
 
         Picasso.get()
-                .load(foodsList.get(position).getThumb())
+                .load(foodsList.get(position).getPhoto().getThumb())
                 .placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
 
+
+
         holder.tvFoodName.setText(foodsList.get(position).getFood_name());
-        holder.tvCalories.setText(String.valueOf(foodsList.get(position).getNf_calories() + " Kcal, "
-                + foodsList.get(position).getNf_total_carbohydrate() + " Carb"));
-        holder.tvProtein.setText(foodsList.get(position).getNf_protein()
-                + " Protein");
+
+
+        holder.tvCalories.setText(String.format("%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNf_calories(), foodsList.get(position).getNf_total_carbohydrate()));
+
+        holder.tvProtein.setText(String.format("%.0f Protein",foodsList.get(position).getNf_protein()));
+
+//        holder.tvProtein.setText(foodsList.get(position).getNf_protein()
+//                + " Protein");
         holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServing_qty());
 
+
         holder.itemFoodSelected.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("LongLogTag")
             @Override
             public void onClick(View v) {
+
+                //refresh page
+                mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
+                ((ShowAllNutritionActivity) mContext).finish();
+
+                //Get Food id
+                getFoodId(position);
+
                 Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
-                Intent intent = new Intent(mContext, ShowItemFoodActivity.class);
+                foodName = holder.tvFoodName.getText().toString();
 
+                Intent intent = new Intent(mContext, ShowItemFoodActivity.class);
                 intent.putExtra("foodName", holder.tvFoodName.getText().toString());
                 mContext.startActivity(intent);
                 foodsList.clear();
+                ((Activity)mContext).finish();
             }
         });
+    }
 
+    //Get firebase food item id
+    private void getFoodId(final int position) {
+        db.collection(Foods.nutrition).document(getEmailRegister())
+                .collection(Foods.breakfast).document(getTodayDate())
+                .collection(Foods.fruit).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @SuppressLint("LongLogTag")
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                                fireId = task.getResult().getDocuments().get(position).getId();
+
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
 
@@ -106,10 +166,26 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
         return foodsList;
     }
 
+    public String getEmailRegister() {
+        String email = null;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            email = mAuth.getCurrentUser().getEmail();
+        }
+        return email;
+    }
 
 
 
-        class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    public String getTodayDate() {
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        return df.format(c);
+    }
+
+
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView ivImage;
         private TextView tvFoodName;
@@ -136,7 +212,6 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
 
         }
     }
-
 
 
     @Override

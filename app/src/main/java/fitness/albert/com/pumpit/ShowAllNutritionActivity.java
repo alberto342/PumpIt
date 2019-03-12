@@ -45,8 +45,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     private ConstraintLayout constraintLayout;
     private final String TAG = "ShowAllNutritionActivity";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
+    public static String nutritionName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +60,12 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         getMealFromFs(Foods.snack, rvListSnacks, foodListSnacks, tvTotalSnacks);
 
 
-
         enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.breakfast);
         enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.dinner);
         enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.lunch);
         enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.snack);
+
+
     }
 
     private void init() {
@@ -80,11 +80,11 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         tvTotalSnacks = findViewById(R.id.tv_total_snacks);
 
         constraintLayout = findViewById(R.id.coordinator_layout);
-
     }
 
 
     private void getMealFromFs(final String keyValue, final RecyclerView recyclerView, final List<Foods> foodList, final TextView totalMeal) {
+
         final ProgressDialog progressdialog = new ProgressDialog(this);
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
@@ -102,6 +102,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                         progressdialog.hide();
 
                         if(task.isSuccessful()) {
+
+                            nutritionName = keyValue;
 
                             for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
@@ -124,7 +126,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
-
                         }
                     }
                 })
@@ -138,11 +139,12 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
 
 
-    private void deleteFromFirebase(final String keyValue, final String foodName, final String qty) {
+    private void deleteFromFirebase(final String keyValue, final String foodName, final int qty) {
         db.collection(Foods.nutrition).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
                 .collection(Foods.fruit).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @SuppressLint("LongLogTag")
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
@@ -151,7 +153,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                             for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
 
-                                if(foodName.equals(foods.getFood_name()) && qty.equals(foods.getServing_qty())) {
+                                if(foodName.equals(foods.getFood_name()) && qty == foods.getServing_qty()) {
 
                                     String id = task.getResult().getDocuments().get(i).getId();
 
@@ -164,7 +166,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                     return;
                                 }
                             }
-
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
                         }
@@ -183,14 +184,17 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
 
 
+    @SuppressLint("LongLogTag")
     private void initRecyclerView(RecyclerView recyclerView, List<Foods> foodList) {
 
-        Log.d(TAG, "initRecyclerView: init food recyclerView");
+        Log.d(TAG, "initRecyclerView: init food recyclerView" + recyclerView);
+
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new FirestoreFoodListAdapter(this, foodList);
+
         recyclerView.setAdapter(mAdapter);
     }
 

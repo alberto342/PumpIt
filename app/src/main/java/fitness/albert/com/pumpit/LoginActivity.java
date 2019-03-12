@@ -164,6 +164,9 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
 
     public void errorMessage(EditText text, String message) {
         String strUserName = text.getText().toString();
+
+        btnLogin.setImageResource(R.mipmap.btn_login);
+
         if (TextUtils.isEmpty(strUserName)) {
             text.setError(message);
         }

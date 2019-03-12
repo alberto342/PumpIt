@@ -50,7 +50,7 @@
                         android:padding="@dimen/common_4"
                         android:textColor="@color/background"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="normal" />
 
                     <TextView
                         android:id="@+id/tv_calories"

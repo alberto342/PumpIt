@@ -1,17 +1,22 @@
 package fitness.albert.com.pumpit;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -23,18 +28,24 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
+import fitness.albert.com.pumpit.Model.Alt_measures;
 import fitness.albert.com.pumpit.Model.Foods;
+import fitness.albert.com.pumpit.Model.Photo;
 import fitness.albert.com.pumpit.Model.SavePref;
 import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
+    private ActionBar mToolbar;
     private QuantityView quantityViewCustom;
     private Spinner spinnerServingUnit;
+    private String spinnerSelectedItem;
     private TextView tvEnergy, tvCrabs, tvProtein, tvFat, tvServingWeightGrams, tvCholesterol,
             tvSodium, tvTotalCarbohydrate, tvDietaryFiber, tvSugars, tvPotassium, tvNfP, tvEnergyScroll,
             tvCrabsScroll, tvProteinScroll, tvFatScroll, tvSaturatedFat, tvCalcium,
@@ -59,7 +70,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             tvVitaminB6, tvVitaminCtotalAscorbicAcid, tvVitaminD2andD3, tvVitaminK,
             tvDihydrophylloquinone, tvWater, tvZinc;
     private ImageView ivFoodImg, btnSaveFood;
-    private String TAG = "ShowFoodBeforeAddedActivity";
+    private final String TAG = "ShowFoodBeforeAddedActivity";
     private Foods foods = new Foods();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -70,6 +81,8 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         setContentView(R.layout.activity_show_food_before_added);
 
         init();
+
+        setActionBar();
 
         getExtras(1);
 
@@ -252,9 +265,13 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         spinnerServingUnit.setAdapter(dataAdapter);
 
         spinnerServingUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @SuppressLint("LongLogTag")
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(TAG, "POSITOn: " + spinnerServingUnit.getItemAtPosition(position));
+
+                spinnerSelectedItem = String.valueOf(spinnerServingUnit.getItemAtPosition(position));
+
+                Log.d(TAG, "Spinner Item Position: " + spinnerServingUnit.getItemAtPosition(position));
             }
 
             @Override
@@ -682,7 +699,29 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             String zinc = String.format("Zinc, Zn: " + "%.2f", bundle.getFloat("Zinc") * quantity);
             this.tvZinc.setText(zinc);
 
+            String measuresName = bundle.getString("measureName");
+            String measuresQty = bundle.getString("measureQty");
+            String measuresSeq = bundle.getString("measureSeq");
+            String measuresServing_weight = bundle.getString("measureServing_weight");
 
+            Photo photo = new Photo();
+            photo.setHighres(imgHigher);
+            photo.setThumb(imgThumb);
+
+
+            Alt_measures altMeasures = new Alt_measures();
+            altMeasures.setMeasure(measuresName);
+            altMeasures.setQty(measuresQty);
+            altMeasures.setSeq(measuresSeq);
+            altMeasures.setServing_weight(measuresServing_weight);
+
+            List<Alt_measures> altMeasuresList = new ArrayList<>();
+            altMeasuresList.add(altMeasures);
+
+            foods.setAlt_measures(altMeasuresList);
+
+            foods.setPhoto(photo);
+            foods.getPhoto().setThumb(imgThumb);
             foods.setImgUrl(imgHigher);
             foods.setThumb(imgThumb);
             foods.setFood_name(foodName);
@@ -699,22 +738,41 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             foods.setNf_sugars(Float.parseFloat(sugars));
             foods.setNf_potassium(Float.parseFloat(potassium));
             foods.setNf_p(Float.parseFloat(nf_p));
-            foods.setServing_qty(String.valueOf(quantity));
+            foods.setServing_qty(Integer.valueOf(quantity));
             foods.setServing_unit(String.valueOf(bundle.get("serving_unit")));
+
+
+            foods.setValine(valine);
+            foods.setVitaminAIU(vitaminAIU);
+            foods.setVitaminARAE(vitaminARAE);
+            foods.setVitaminB122(vitaminB12_2);
+            foods.setVitaminB6(vitaminB6);
+            foods.setVitaminC(vitaminCtotalAscorbicAcid);
+            foods.setVitaminD2AndD3(vitaminD2andD3);
+            foods.setVitaminK(vitaminK);
+            foods.setDihydrophylloquinone(dihydrophylloquinone);
+            foods.setAacohol(alcohol);
+            foods.setWater(water);
+            foods.setZinc(zinc);
+
         }
     }
 
 
     //  db.collection("users").document(userRegister.getEmail()).set(saveData)
 
+    @SuppressLint("LongLogTag")
     private void saveDataToFirestore() {
         try {
+
+            SearchFoodsActivity.mListItem.get(0).setServing_unit(spinnerSelectedItem);
 
             //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
             db.collection(Foods.nutrition).document(getEmailRegister())
                     .collection(getMeal()).document(getTodayDate())
-                    .collection(Foods.fruit).add(foods)
+                    .collection(Foods.fruit).add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @SuppressLint("LongLogTag")
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
                             Log.d(TAG, "DocumentSnapshot added with ID: ");
@@ -726,7 +784,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                             Log.w(TAG, "Error adding document", e);
                         }
                     });
-
 
             Log.d(TAG, "Food data save successfully");
         } catch (Exception e) {
@@ -766,11 +823,13 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             @Override
             public void onClick(View v) {
                 saveDataToFirestore();
+
                 //save activity to sharedPreferences
                 SavePref savePref = new SavePref();
                 savePref.createSharedPreferencesFiles(ShowFoodBeforeAddedActivity.this, "activity");
                 savePref.saveData("FROM_ACTIVITY", "ShowFoodBeforeAddedActivity");
                 startActivity(new Intent(ShowFoodBeforeAddedActivity.this, FragmentNavigationActivity.class));
+                finish();
             }
         });
     }
@@ -780,7 +839,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     public void onBackPressed() {
         super.onBackPressed();
         FoodListAdapter.measure.clear();
-        startActivity(new Intent(this, SearchFoodsActivity.class));
+        //finish();
     }
 
     public String getEmailRegister() {
@@ -796,5 +855,48 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         return df.format(c);
+    }
+
+    private void setActionBar() {
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        mToolbar = getSupportActionBar();
+        String foodName = null;
+
+
+        if (bundle != null) {
+
+            foodName = String.valueOf(bundle.get("food_name"));
+        }
+        String foodNameCapitalizeFirstLetter = foodName.substring(0,1).toUpperCase() + foodName.substring(1);
+        mToolbar.setTitle(foodNameCapitalizeFirstLetter);
+
+        // Create a TextView programmatically.
+        TextView tv = new TextView(getApplicationContext());
+
+        // Create a LayoutParams for TextView
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                android.app.ActionBar.LayoutParams.MATCH_PARENT, // Width of TextView
+                android.app.ActionBar.LayoutParams.WRAP_CONTENT);
+
+        // Apply the layout parameters to TextView widget
+        tv.setLayoutParams(lp);
+
+        // Set text to display in TextView
+        tv.setText(mToolbar.getTitle());
+
+        // Set the text color of TextView
+        tv.setTextColor(Color.WHITE);
+
+        //set the text size
+        tv.setTextSize(20);
+
+        // Set TextView text alignment to center
+        tv.setGravity(Gravity.CENTER);
+
+        mToolbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+
+        //Set the newly created TextView as ActionBar custom view
+        mToolbar.setCustomView(tv);
     }
 }

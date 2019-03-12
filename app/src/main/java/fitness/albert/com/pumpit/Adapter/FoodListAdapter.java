@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -22,8 +23,10 @@ import fitness.albert.com.pumpit.ShowFoodBeforeAddedActivity;
 
 public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    Context mContext;
+    private Context mContext;
     public static ArrayList<Foods> mListItem;
+    public static int mItemPosition;
+
 
 
     private ClickListener clickListener;
@@ -55,7 +58,6 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public interface ClickListener {
         void itemClicked(View view, int position);
-
     }
 
     private void bindViews(final ViewHolder holder, final int position) {
@@ -66,17 +68,21 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
+
         holder.tvFoodName.setText(mListItem.get(position).getFood_name());
         holder.tvCalories.setText(mContext.getString(R.string.calories) + ": " + mListItem.get(position).getNf_calories());
         holder.tvServingQuantity.setText(mContext.getString(R.string.serving_qty) + ": " + mListItem.get(position).getServing_qty());
         holder.tvServingUnit.setText(mContext.getString(R.string.serving_unit) + ": " + mListItem.get(position).getServing_unit());
         holder.llSelectedItem.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
                 Intent intent = new Intent(context, ShowFoodBeforeAddedActivity.class);
                 putExtra(intent, position);
                 context.startActivity(intent);
+                ((Activity)mContext).finish();
+
             }
         });
     }
@@ -122,13 +128,15 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         Log.d(TAG, "onClick: clicked on: " + mListItem.get(position));
 
+        mItemPosition = position;
+
+
+
+
+
         int pos = position;
 
         for (int i = 0; i < mListItem.get(position).getFull_nutrients().size(); i++) {
-//            Log.d(TAG, "full nutrients getAtterId " + String.valueOf(mListItem.get(position).getFull_nutrients().get(i).getAttr_id()));
-//            Log.d(TAG, "full nutrients getValue " + String.valueOf(mListItem.get(position).getFull_nutrients().get(i).getValue()));
-
-
             String nutrientName;
 
             String atterId = mListItem.get(position).getFull_nutrients().get(i).getAttr_id();
@@ -896,6 +904,12 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     measure.add(String.valueOf(mListItem.get(position).getAlt_measures().get(i).getMeasure()));
                 }
 
+                intent.putExtra("measureName", mListItem.get(position).getAlt_measures().get(i).getMeasure());
+                intent.putExtra("measureQty", mListItem.get(position).getAlt_measures().get(i).getQty());
+                intent.putExtra("measureSeq", mListItem.get(position).getAlt_measures().get(i).getSeq());
+                intent.putExtra("measureServing_weight", mListItem.get(position).getAlt_measures().get(i).getServing_weight());
+
+
 
                 Log.d(TAG, "Alt_measures getQty" + String.valueOf(mListItem.get(position).getAlt_measures().get(i).getQty()));
                 Log.d(TAG, "Alt_measures getMeasure " + String.valueOf(mListItem.get(position).getAlt_measures().get(i).getMeasure()));
@@ -903,11 +917,6 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 Log.d(TAG, "Alt_measures getServing_weight " + String.valueOf(mListItem.get(position).getAlt_measures().get(i).getServing_weight()));
             }
         }
-
-
-
-
-
 
 
         intent.putExtra("food_name", mListItem.get(position).getFood_name());
@@ -928,6 +937,8 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         intent.putExtra("thumb", mListItem.get(position).getPhoto().getThumb());
         intent.putExtra("photoHighres", mListItem.get(position).getPhoto().getHighres());
 
+
+
         mContext.startActivity(intent);
     }
 
@@ -936,6 +947,8 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         //Auto-generated method stub
         return position;
     }
+
+
 
 
 }

@@ -202,8 +202,6 @@ public class NutritionFragment extends Fragment {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        //hide ProgressDialog
-
 
                         if (task.isSuccessful()) {
 

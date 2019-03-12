@@ -1,16 +1,23 @@
 package fitness.albert.com.pumpit;
 
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -28,9 +35,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.SavePref;
 import fitness.albert.com.pumpit.Model.UserRegister;
@@ -39,16 +48,22 @@ import me.himanshusoni.quantityview.QuantityView;
 public class ShowItemFoodActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
     private Spinner spinnerServingUnit;
+    private String spinnerSelectedItem;
     private QuantityView quantityViewCustom;
     private TextView tvEnergy, tvCarbs, tvProtein, tvFat;
     private ImageView foodItem;
     private UserRegister user = new UserRegister();
     private List<Foods> foodList = new ArrayList<>();
-    private float kcal, fat, protein, carbs;
-    private String  qty;
+    private List<String> spinnerList = new ArrayList<>();
+    private Map<String, Float> allServingWeight = new HashMap<>();
+    private List<Float> servingWeightList = new ArrayList<>();
+    private float kcal, fat, protein, carbs, servingWeightGrams;
+    private String qty;
+    private boolean testOnce = false;
     private SavePref savePref = new SavePref();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "ShowItemFoodActivity";
+    private ProgressDialog progressdialog;
 
 
     @Override
@@ -57,7 +72,6 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         setContentView(R.layout.activity_show_item_food);
         init();
 
-        addItemsOnSpinner();
         getDataFromFirbase();
     }
 
@@ -70,14 +84,51 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         tvFat = findViewById(R.id.tv_fat_item);
         foodItem = findViewById(R.id.iv_food_item);
 
+        setActionBar();
+
         quantityViewCustom = findViewById(R.id.quantity_view);
         quantityViewCustom.setOnQuantityChangeListener(this);
     }
 
+    private void setActionBar() {
+        ActionBar mToolbar;
+        mToolbar = getSupportActionBar();
+        String foodName = FirestoreFoodListAdapter.foodName;
+        String foodNameCapitalizeFirstLetter = foodName.substring(0, 1).toUpperCase() + foodName.substring(1);
+        mToolbar.setTitle(foodNameCapitalizeFirstLetter);
+
+        // Create a TextView programmatically.
+        TextView tv = new TextView(getApplicationContext());
+
+        // Create a LayoutParams for TextView
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                android.app.ActionBar.LayoutParams.MATCH_PARENT, // Width of TextView
+                android.app.ActionBar.LayoutParams.WRAP_CONTENT);
+
+        // Apply the layout parameters to TextView widget
+        tv.setLayoutParams(lp);
+
+        // Set text to display in TextView
+        tv.setText(mToolbar.getTitle());
+
+        // Set the text color of TextView
+        tv.setTextColor(Color.WHITE);
+
+        //set the text size
+        tv.setTextSize(20);
+
+        // Set TextView text alignment to center
+        tv.setGravity(Gravity.CENTER);
+
+        mToolbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+
+        //Set the newly created TextView as ActionBar custom view
+        mToolbar.setCustomView(tv);
+    }
 
 
     private void getDataFromFirbase() {
-        final ProgressDialog progressdialog = new ProgressDialog(this);
+        progressdialog = new ProgressDialog(this);
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
@@ -95,21 +146,32 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);
 
-                                if(getFoodName().equals(foodList.get(i).getFood_name())) {
+                                if (getFoodName().equals(foodList.get(i).getFood_name())) {
 
                                     Picasso.get()
-                                            .load(foodList.get(i).getImgUrl())
+                                            .load(foodList.get(i).getPhoto().getHighres())
                                             .placeholder(R.mipmap.ic_launcher)
                                             .error(R.mipmap.ic_launcher)
                                             .into(foodItem);
 
-
-                                    //Save to String
+                                    //Save to float
                                     kcal = foodList.get(i).getNf_calories();
                                     fat = foodList.get(i).getNf_total_fat();
                                     protein = foodList.get(i).getNf_protein();
                                     carbs = foodList.get(i).getNf_total_carbohydrate();
-                                    qty = foodList.get(i).getServing_qty();
+                                    servingWeightGrams = foodList.get(i).getServing_weight_grams();
+                                    qty = String.valueOf(foodList.get(i).getServing_qty());
+
+                                    quantityViewCustom.setQuantity(Integer.parseInt(qty));
+
+                                    //Get Serving Unit
+                                    spinnerList.add(foodList.get(i).getServing_unit());
+
+                                    for (int r = 0; r < foodList.get(i).getAlt_measures().size(); r++) {
+                                        spinnerList.add(foodList.get(i).getAlt_measures().get(r).getMeasure());
+
+                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAlt_measures().get(r).getServing_weight()));
+                                    }
                                 }
                             }
 
@@ -118,6 +180,8 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                             tvProtein.setText(String.format("%.2f", protein));
                             tvCarbs.setText(String.format("%.2f", carbs));
                             quantityViewCustom.setQuantity(Integer.parseInt(qty));
+
+                            addItemsOnSpinner();
                         }
                     }
                 })
@@ -128,15 +192,17 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                     }
                 });
 
+
     }
 
 
     //Calculation the quantity + -
     public void onQuantityChanged(int oldQuantity, int newQuantity, boolean programmatically) {
-        if(newQuantity == 0) {
+        if (newQuantity == 0) {
             newQuantity = 1;
         }
 
+        updateNutrition(Foods.breakfast, newQuantity, false, 1);
     }
 
     @Override
@@ -152,52 +218,127 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
     //Spinner Unit list
     public void addItemsOnSpinner() {
-        List<String> list = new ArrayList<>();
-//        String servingUnit = foods.getServing_unit();
-        list.add("list");
-        list.add("list 2");
-        list.add("list 3");
+
+        //Remove existing
+        for(int i=1; i < spinnerList.size(); i++) {
+            if(spinnerList.get(0).equals(spinnerList.get(i))) {
+                spinnerList.remove(i);
+            }
+        }
+
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, list);
+                android.R.layout.simple_spinner_item, spinnerList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerServingUnit.setAdapter(dataAdapter);
+
+
+        //add spinner to the map
+        for(int i = 0 ; i< servingWeightList.size(); i++) {
+            allServingWeight.put(spinnerList.get(i), servingWeightList.get(i));
+        }
+
+
+        onItemSelectedListener();
     }
 
 
-    private void updateNutrition(String keyValue) {
-
-        FireBaseInit.getInstance(this).db.collection(Foods.nutrition).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
-                .collection(Foods.fruit).add(Foods.class)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
+    //Wen user change the spinner selection
+    private void onItemSelectedListener() {
+        spinnerServingUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
 
 
+                spinnerSelectedItem = String.valueOf(spinnerServingUnit.getItemAtPosition(position));
+                Log.d(TAG, "Spinner Item Position: " + spinnerServingUnit.getItemAtPosition(position));
+
+                float altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams;
+
+                if(position > 0 || testOnce) {
+                    testOnce = true;
+
+                    quantityViewCustom.setQuantity(1);
+                    updateNutrition(Foods.breakfast, 1, true, altMeasures);
+                }
 
 
-                        Log.d(TAG, "DocumentSnapshot added with ID: ");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
+
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 
+    private void updateNutrition(final String keyValue, final int qty, boolean isSpinnerSelection, float altMeasures) {
+
+        final float value = isSpinnerSelection ? altMeasures: 1f;
+
+        progressdialog = new ProgressDialog(this);
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
+
+        final int newQty = spinnerSelectedItem.equals("g") ? 100 : qty;
+
+
+        if(newQty == 100) {
+            quantityViewCustom.setQuantity(newQty);
+        }
+
+
+        if (FirestoreFoodListAdapter.fireId.isEmpty() || FirestoreFoodListAdapter.fireId != null) {
+            DocumentReference doc = db.collection(Foods.nutrition).document(getEmailRegister())
+                    .collection(keyValue).document(getTodayDate())
+                    .collection(Foods.fruit).document(FirestoreFoodListAdapter.fireId);
+
+
+                doc.update("serving_unit", spinnerSelectedItem);
+
+                doc.update("serving_qty", newQty);
+                doc.update("nf_calories", kcal * qty * value);
+                doc.update("nf_total_fat", fat * qty * value);
+                doc.update("nf_protein", protein * qty * value);
+                doc.update("nf_total_carbohydrate", carbs * qty * value)
+
+
+
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            progressdialog.hide();
+                            Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
+                            tvEnergy.setText(String.format("%.2f", kcal * qty * value));
+                            tvFat.setText(String.format("%.2f", fat * qty * value));
+                            tvProtein.setText(String.format("%.2f", protein * qty * value));
+                            tvCarbs.setText(String.format("%.2f", carbs * qty * value));
+                            return;
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error updating document", e);
+                }
+            });
+        } else {
+            Log.d(TAG, "The ID is null");
+            return;
+        }
+    }
 
 
     public String getMeal() {
         SharedPreferences pref = getSharedPreferences(Foods.SharedPreferencesFile, Context.MODE_PRIVATE);
 
         boolean breakfast = pref.getBoolean("dinner", false);
-        boolean dinner = pref.getBoolean("breakfast",false);
-        boolean lunch = pref.getBoolean("lunch",false);
-        boolean snack = pref.getBoolean("snack",false);
+        boolean dinner = pref.getBoolean("breakfast", false);
+        boolean lunch = pref.getBoolean("lunch", false);
+        boolean snack = pref.getBoolean("snack", false);
 
         if (breakfast) {
             return "dinner";
@@ -219,7 +360,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     private String getFoodName() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        if(bundle != null) {
+        if (bundle != null) {
             return String.valueOf(bundle.get("foodName"));
         }
         return null;
@@ -242,8 +383,8 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
     @Override
     public void onBackPressed() {
-        savePref.removeAll(this,"passMeal");
-        finish();
         super.onBackPressed();
+        savePref.removeAll(this, "passMeal");
+        finish();
     }
 }

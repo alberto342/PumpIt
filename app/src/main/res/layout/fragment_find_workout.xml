@@ -4,16 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
     android:orientation="vertical"
     tools:context=".fragment.FindWorkoutFragment">
+
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tablayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabSelectedTextColor="@color/design_default_color_primary"
-        app:tabTextColor="@color/white">
+        app:tabIndicatorColor="@color/fui_bgFacebook"
+        app:tabSelectedTextColor="@color/fui_bgFacebook"
+        app:tabTextColor="@android:color/white">
 
         <android.support.design.widget.TabItem
             android:id="@+id/tabOne"
@@ -30,8 +31,9 @@
     </android.support.design.widget.TabLayout>
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
 </LinearLayout>
+

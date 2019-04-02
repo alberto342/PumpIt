@@ -87,9 +87,4 @@ public class SavePref {
         SharedPreferences settings = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
         settings.edit().remove(keyName).commit();
     }
-
-
-
-
-
 }

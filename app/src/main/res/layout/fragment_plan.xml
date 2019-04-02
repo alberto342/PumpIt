@@ -6,8 +6,11 @@
     tools:context=".fragment.PlanFragment">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
-
+        android:id="@+id/textView39"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="fagment plan"
+        android:textColor="@color/md_green_600"
+        android:textSize="25sp" />
 </FrameLayout>

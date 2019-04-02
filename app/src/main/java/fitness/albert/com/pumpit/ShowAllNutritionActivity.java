@@ -28,7 +28,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import fitness.albert.com.pumpit.Adapter.BreakfastListAdapter;
+import fitness.albert.com.pumpit.Adapter.DinnerListAdapter;
 import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
+import fitness.albert.com.pumpit.Adapter.LunchListAdapter;
+import fitness.albert.com.pumpit.Adapter.SnacksListAdapter;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.SwipeToDeleteCallback;
 
@@ -59,13 +63,10 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         getMealFromFs(Foods.dinner, rvListDinner, foodListDinner, tvTotalDinner);
         getMealFromFs(Foods.snack, rvListSnacks, foodListSnacks, tvTotalSnacks);
 
-
         enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.breakfast);
         enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.dinner);
         enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.lunch);
         enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.snack);
-
-
     }
 
     private void init() {
@@ -89,7 +90,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-
         //get nutrition from firestone
         db.collection(Foods.nutrition).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
@@ -109,7 +109,10 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);
 
-                                initRecyclerView(recyclerView, foodList);
+                                initRecyclerView(recyclerView, foodList,keyValue);
+                                //Disable RecyclerView scrolling
+                                recyclerView.setNestedScrollingEnabled(false);
+
 
                                 Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
 
@@ -181,23 +184,37 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
 
 
+        @SuppressLint("LongLogTag")
+    private void initRecyclerView(RecyclerView recyclerView, List<Foods> foodList, String nutrition) {
 
-
-
-    @SuppressLint("LongLogTag")
-    private void initRecyclerView(RecyclerView recyclerView, List<Foods> foodList) {
+            BreakfastListAdapter breakfastAdapter;
+            LunchListAdapter lunchAdapter;
+            DinnerListAdapter dinnerAdapter;
+            SnacksListAdapter snacksAdapter;
 
         Log.d(TAG, "initRecyclerView: init food recyclerView" + recyclerView);
 
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new FirestoreFoodListAdapter(this, foodList);
 
-        recyclerView.setAdapter(mAdapter);
+            switch (nutrition) {
+                case Foods.breakfast:
+                    breakfastAdapter = new BreakfastListAdapter(this, foodList);
+                    recyclerView.setAdapter(breakfastAdapter);
+                    break;
+                case Foods.lunch:
+                    lunchAdapter = new LunchListAdapter(this, foodList);
+                    recyclerView.setAdapter(lunchAdapter);
+                    break;
+                case Foods.dinner:
+                    dinnerAdapter = new DinnerListAdapter(this, foodList);
+                    recyclerView.setAdapter(dinnerAdapter);
+                    break;
+                case Foods.snack:
+                    snacksAdapter = new SnacksListAdapter(this, foodList);
+                    recyclerView.setAdapter(snacksAdapter);
+            }
     }
-
 
     // Swipe to delete item
     private boolean enableSwipeToDeleteAndUndo(final RecyclerView recyclerView, final List<Foods> foodList, final String keyValue) {

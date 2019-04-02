@@ -73,7 +73,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 getFoodList();
-
             }
         });
 
@@ -139,7 +138,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
 
 
 
-
     private void saveAll() {
 
         for(int i =0 ; i< mListItem.size(); i++) {
@@ -153,7 +151,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
-                                Log.d(TAG, "DocumentSnapshot added with ID: ");
+                                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -162,8 +160,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
                                 Log.w(TAG, "Error adding document", e);
                             }
                         });
-
-                Log.d(TAG, "Food data save successfully");
             } catch (Exception e) {
                 e.printStackTrace();
             }

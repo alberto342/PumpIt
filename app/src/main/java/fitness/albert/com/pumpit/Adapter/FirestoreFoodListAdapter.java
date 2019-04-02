@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.R;
@@ -35,14 +36,16 @@ import fitness.albert.com.pumpit.ShowItemFoodActivity;
 public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-    Context mContext;
+    private Context mContext;
     public static List<Foods> foodsList;
     private final String TAG = "FirestoreFoodListAdapter";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     //Firebase item id
     public static String fireId;
     public static String foodName;
-
+    public static int qty;
+    public static String unit;
+    public static String nutrition;
 
 
     public FirestoreFoodListAdapter(Context mContext, List<Foods> foodsList) {
@@ -79,17 +82,9 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                 .into(holder.ivImage);
 
 
-
-
         holder.tvFoodName.setText(foodsList.get(position).getFood_name());
-
-
-        holder.tvCalories.setText(String.format("%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNf_calories(), foodsList.get(position).getNf_total_carbohydrate()));
-
-        holder.tvProtein.setText(String.format("%.0f Protein",foodsList.get(position).getNf_protein()));
-
-//        holder.tvProtein.setText(foodsList.get(position).getNf_protein()
-//                + " Protein");
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNf_calories(), foodsList.get(position).getNf_total_carbohydrate()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNf_protein()));
         holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServing_qty());
 
 
@@ -108,12 +103,13 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                 Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
                 foodName = holder.tvFoodName.getText().toString();
+                qty = foodsList.get(position).getServing_qty();
+                unit = foodsList.get(position).getServing_unit();
 
                 Intent intent = new Intent(mContext, ShowItemFoodActivity.class);
-                intent.putExtra("foodName", holder.tvFoodName.getText().toString());
                 mContext.startActivity(intent);
                 foodsList.clear();
-                ((Activity)mContext).finish();
+                ((Activity) mContext).finish();
             }
         });
     }
@@ -128,8 +124,21 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                                fireId = task.getResult().getDocuments().get(position).getId();
+                            fireId = task.getResult().getDocuments().get(position).getId();
 
+
+                            //getDocuments splite for get nutrition
+                            String getDocuments = String.valueOf(task.getResult().getDocuments());
+                            String[] part = getDocuments.split("/");
+                            nutrition = part[2];
+
+                            Log.d(TAG, "Nutrition: " + nutrition);
+                            Log.d(TAG, "Documents: " + task.getResult().getDocuments());
+//                            SavePref savePref = new SavePref();
+//                            savePref.createSharedPreferencesFiles(mContext, "fire_id");
+//                            savePref.saveData("foodId", task.getResult().getDocuments().get(position).getId());
+
+                            Log.d(TAG, "FireId: " + fireId);
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
                         }
@@ -174,8 +183,6 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
         }
         return email;
     }
-
-
 
 
     public String getTodayDate() {

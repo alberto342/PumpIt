@@ -28,21 +28,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.Locale;
 
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
-import fitness.albert.com.pumpit.Model.Alt_measures;
 import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.Photo;
 import fitness.albert.com.pumpit.Model.SavePref;
 import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
-    private ActionBar mToolbar;
+    //Todo check if spinner is empty
+
     private QuantityView quantityViewCustom;
     private Spinner spinnerServingUnit;
     private String spinnerSelectedItem;
@@ -71,8 +69,10 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             tvDihydrophylloquinone, tvWater, tvZinc;
     private ImageView ivFoodImg, btnSaveFood;
     private final String TAG = "ShowFoodBeforeAddedActivity";
-    private Foods foods = new Foods();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private boolean testOnce = false;
+    private float fKcal, fCrabs, fProtein, fFat, fCholesterol, fDietaryFiber, fNfP, fPotassium,
+            fSaturatedFat, fSodium, fSugars;
 
 
     @Override
@@ -84,7 +84,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
         setActionBar();
 
-        getExtras(1);
+        getFoodInfo();
 
         addItemsOnSpinner();
 
@@ -237,13 +237,58 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         quantityViewCustom.setOnQuantityChangeListener(this);
     }
 
+    private void setActionBar() {
+        ActionBar mToolbar;
+        mToolbar = getSupportActionBar();
+        String foodName = null;
+
+        for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
+            foodName = FoodListAdapter.mListItem.get(i).getFood_name();
+        }
+
+        String foodNameCapitalizeFirstLetter = foodName.substring(0, 1).toUpperCase() + foodName.substring(1);
+        mToolbar.setTitle(foodNameCapitalizeFirstLetter);
+
+        // Create a TextView programmatically.
+        TextView tv = new TextView(getApplicationContext());
+
+        // Create a LayoutParams for TextView
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                android.app.ActionBar.LayoutParams.MATCH_PARENT, // Width of TextView
+                android.app.ActionBar.LayoutParams.WRAP_CONTENT);
+
+        // Apply the layout parameters to TextView widget
+        tv.setLayoutParams(lp);
+
+        // Set text to display in TextView
+        tv.setText(mToolbar.getTitle());
+
+        // Set the text color of TextView
+        tv.setTextColor(Color.WHITE);
+
+        //set the text size
+        tv.setTextSize(20);
+
+        // Set TextView text alignment to center
+        tv.setGravity(Gravity.CENTER);
+
+        mToolbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+
+        //Set the newly created TextView as ActionBar custom view
+        mToolbar.setCustomView(tv);
+    }
+
 
     //Calculation the quantity + -
     public void onQuantityChanged(int oldQuantity, int newQuantity, boolean programmatically) {
         if (newQuantity == 0) {
             newQuantity = 1;
+            quantityViewCustom.setQuantity(newQuantity);
         }
-        getExtras(newQuantity);
+
+        getFoodInfo();
+        calculateOnSpinnerChange();
+
     }
 
 
@@ -258,6 +303,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     }
 
     //Spinner Unit list
+    @SuppressLint("LongLogTag")
     public void addItemsOnSpinner() {
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, FoodListAdapter.measure);
@@ -272,500 +318,807 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                 spinnerSelectedItem = String.valueOf(spinnerServingUnit.getItemAtPosition(position));
 
                 Log.d(TAG, "Spinner Item Position: " + spinnerServingUnit.getItemAtPosition(position));
+
+                //Check if the position is change
+                if (position > 0 || testOnce) {
+                    testOnce = true;
+
+                    quantityViewCustom.setQuantity(1);
+                    calculateOnSpinnerChange();
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
     }
 
-
-
-
-
-    //get food info from searchFood
-    private void getExtras(int quantity) {
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-
-
-        if (bundle != null) {
-
-            String imgHigher = String.valueOf(bundle.get("photoHighres"));
-            String imgThumb = String.valueOf(bundle.get("thumb"));
-
-            //load img into ivFoodImg
-            Picasso.get().load(imgHigher).error(R.mipmap.ic_launcher).into(ivFoodImg);
-
-            String foodName = String.valueOf(bundle.get("food_name"));
-
-
-            String energy = String.format("%.2f", bundle.getFloat("nf_calories") * quantity);
-            this.tvEnergy.setText(energy + " kcal");
-            this.tvEnergyScroll.setText("Energy: " + energy + " kcal");
-
-
-            String crabs = String.format("%.2f", bundle.getFloat("nf_total_carbohydrate") * quantity);
-            this.tvCrabs.setText(crabs + " g");
-            this.tvCrabsScroll.setText("Crabs " + crabs + " g");
-
-
-            String protein = String.format("%.2f", bundle.getFloat("nf_protein") * quantity);
-            this.tvProtein.setText(protein + " g");
-            this.tvProteinScroll.setText("Protein: " + protein + " g");
-
-
-            String fat = String.format("%.2f", bundle.getFloat("nf_total_fat") * quantity);
-            this.tvFat.setText(fat + " g");
-            this.tvFatScroll.setText("Fat: " + fat + " g");
-
-
-            String weightGrams = String.format("%.2f", bundle.getFloat("serving_weight_grams") * quantity);
-            this.tvServingWeightGrams.setText("Weight grams: " + weightGrams + " g");
-
-            String saturatedFat = String.format("%.2f", bundle.getFloat("nf_saturated_fat") * quantity);
-            this.tvSaturatedFat.setText("Saturated fat: " + saturatedFat + " g");
-
-            String cholesterol = String.format("%.2f", bundle.getFloat("nf_cholesterol") * quantity);
-            this.tvCholesterol.setText("Cholesterol: " + cholesterol + " g");
-
-            String sodium = String.format("%.2f", bundle.getFloat("nf_sodium") * quantity);
-            this.tvSodium.setText("Sodium: " + sodium + " g");
-
-            String carbohydrate = String.format("%.2f", bundle.getFloat("nf_total_carbohydrate") * quantity);
-            this.tvTotalCarbohydrate.setText("Carbohydrate: " + carbohydrate + " g");
-
-            String dietaryFiber = String.format("%.2f", bundle.getFloat("nf_dietary_fiber") * quantity);
-            this.tvDietaryFiber.setText("Dietary fiber: " + dietaryFiber + " g");
-
-            String sugars = String.format("%.2f", bundle.getFloat("nf_sugars") * quantity);
-            this.tvSugars.setText("Sugars: " + sugars + " g");
-
-            String potassium = String.format("%.2f", bundle.getFloat("nf_potassium") * quantity);
-            this.tvPotassium.setText("Potassium: " + potassium + " g");
-
-            String nf_p = String.format("%.2f", bundle.getFloat("nf_p") * quantity);
-            this.tvNfP.setText("Nutrition Facts Panel: " + nf_p + " g");
-
-
-            String calcium = String.format("Calcium: " + "%.2f", bundle.getFloat("Calcium") * quantity);
-            this.tvCalcium.setText(calcium);
-
-
-            String totalSaturated = String.format("Total Saturated: " + "%.2f", bundle.getFloat("TotalSaturated") * quantity);
-            this.tvTotalSaturated.setText(totalSaturated);
-
-            String totalLipid = String.format("Total Lipid (fat): " + "%.2f", bundle.getFloat("TotalFat") * quantity);
-            this.tvTotalLipid.setText(totalLipid);
-
-            String totalTrans = String.format("Total Trans: " + "%.2f", bundle.getFloat("TotalTrans") * quantity);
-            this.tvTotalTrans.setText(totalTrans);
-
-            String iron = String.format("Iron: " + "%.2f", bundle.getFloat("Iron") * quantity);
-            this.tvIron.setText(iron);
-
-            String totalDietary = String.format("Total Dietary: " + "%.2f", bundle.getFloat("TotalDietary") * quantity);
-            this.tvTotalDietary.setText(totalDietary);
-
-            String sugarsAdded = String.format("Sugars Added: " + "%.2f", bundle.getFloat("SugarsAadded") * quantity);
-            this.tvSugarsAdded.setText(sugarsAdded);
-
-            String vitaminD = String.format("Vitamin D: " + "%.2f", bundle.getFloat("VitaminD") * quantity);
-            this.tvVitaminD.setText(vitaminD);
-
-            String alanine = String.format("Alanine: " + "%.2f", bundle.getFloat("Alanine") * quantity);
-            this.tvAlanine.setText(alanine);
-
-            String alcohol = String.format("Alcohol: " + "%.2f", bundle.getFloat("Alcohol") * quantity);
-            this.tvAlcohol.setText(alcohol);
-
-            String arginine = String.format("Arginine: " + "%.2f", bundle.getFloat("Arginine") * quantity);
-            this.tvArginine.setText(arginine);
-
-            String aspartic = String.format("Aspartic: " + "%.2f", bundle.getFloat("AsparticAcid") * quantity);
-            this.tvAspartic.setText(aspartic);
-
-            String betaine = String.format("Betaine: " + "%.2f", bundle.getFloat("Betaine") * quantity);
-            this.tvBetaine.setText(betaine);
-
-            String caffeine = String.format("Caffeine: " + "%.2f", bundle.getFloat("Caffeine") * quantity);
-            this.tvCaffeine.setText(caffeine);
-
-            String ash = String.format("Ash: " + "%.2f", bundle.getFloat("Ash") * quantity);
-            this.tvAsh.setText(ash);
-
-            String campesterol = String.format("Campesterol: " + "%.2f", bundle.getFloat("Campesterol") * quantity);
-            this.tvCampesterol.setText(campesterol);
-
-            String carotene = String.format("Carotene: " + "%.2f", bundle.getFloat("CaroteneAlpha") * quantity);
-            this.tvCarotene.setText(carotene);
-
-            String vitaminD3 = String.format("Vitamin D3 (Cholecalciferol): " + "%.2f", bundle.getFloat("VitaminD3") * quantity);
-            this.tvVitaminD3.setText(vitaminD3);
-
-            String choline = String.format("Choline: " + "%.2f", bundle.getFloat("Choline") * quantity);
-            this.tvCholine.setText(choline);
-
-            String cryptoxanthin = String.format("Cryptoxanthin, beta: " + "%.2f", bundle.getFloat("Cryptoxanthin") * quantity);
-            this.tvCryptoxanthin.setText(cryptoxanthin);
-
-            String copper = String.format("Copper: " + "%.2f", bundle.getFloat("Copper") * quantity);
-            this.tvCopper.setText(copper);
-
-            String cystine = String.format("Cystine: " + "%.2f", bundle.getFloat("Cystine") * quantity);
-            this.tvCystine.setText(cystine);
-
-            String vitaminD2 = String.format("vitamin D2 (Ergocalciferol): " + "%.2f", bundle.getFloat("VitaminD2") * quantity);
-            this.tvVitaminD2.setText(vitaminD2);
-
-            String v161undifferentiated = String.format("16:1 undifferentiated: " + "%.2f", bundle.getFloat("16:1undifferentiated") * quantity);
-            this.tv161undifferentiated.setText(v161undifferentiated);
-
-            String palmitoleicAcid = String.format("16:1 c (Palmitoleic Acid): " + "%.2f", bundle.getFloat("16:1c") * quantity);
-            this.tvPalmitoleicAcid.setText(palmitoleicAcid);
-
-            String v161t = String.format("16:1 t: " + "%.2f", bundle.getFloat("16:1t") * quantity);
-            this.tv161t.setText(v161t);
-
-            String v181undifferentiated = String.format("18:1 undifferentiated: " + "%.2f", bundle.getFloat("18:1undifferentiated") * quantity);
-            this.tv181undifferentiated.setText(v181undifferentiated);
-
-            String vaccenicAcid = String.format("18:1 c (Vaccenic acid): " + "%.2f", bundle.getFloat("18:1c") * quantity);
-            this.tvVaccenicAcid.setText(vaccenicAcid);
-
-            String v18111t = String.format("18:1-11t (18:1t n-7): " + "%.2f", bundle.getFloat("18:1-11t") * quantity);
-            this.tv18111t.setText(v18111t);
-
-            String v181t = String.format("18:1 t: " + "%.2f", bundle.getFloat("18:1t") * quantity);
-            this.tv181t.setText(v181t);
-
-            String v182undifferentiated = String.format("18:2 undifferentiated: " + "%.2f", bundle.getFloat("18:2undifferentiated") * quantity);
-            this.tv182undifferentiated.setText(v182undifferentiated);
-
-            String clas = String.format("18:2 CLAs: " + "%.2f", bundle.getFloat("18:2CLAs") * quantity);
-            this.tvClas.setText(clas);
-
-            String linoleicAcid = String.format("18:2 n-6 c,c (Linoleic acid): " + "%.2f", bundle.getFloat("18:2n-6") * quantity);
-            this.tvLinoleicAcid.setText(linoleicAcid);
-
-            String v182t = String.format("18:2 t,t: " + "%.2f", bundle.getFloat("18:2t") * quantity);
-            this.tv182t.setText(v182t);
-
-            String v183undifferentiated = String.format("18:3 undifferentiated: " + "%.2f", bundle.getFloat("18:3undifferentiated") * quantity);
-            this.tv183undifferentiated.setText(v183undifferentiated);
-
-            String ala = String.format("18:3 n-3 c,c,c (ALA): " + "%.2f", bundle.getFloat("18:3n-3") * quantity);
-            this.tvAla.setText(ala);
-
-            String calendicAcid = String.format("18:3 n-6 c,c,c (α-Calendic acid): " + "%.2f", bundle.getFloat("18:3n-6") * quantity);
-            this.tvCalendicAcid.setText(calendicAcid);
-
-            String eicosadienoicAcid = String.format("20:2 n-6 c,c (Eicosadienoic acid): " + "%.2f", bundle.getFloat("20:2n-6") * quantity);
-            this.tvEicosadienoicAcid.setText(eicosadienoicAcid);
-
-            String v203undifferentiated = String.format("20:3 undifferentiated: " + "%.2f", bundle.getFloat("20:3undifferentiated") * quantity);
-            this.tv203undifferentiated.setText(v203undifferentiated);
-
-            String eicosatrienoicAcid = String.format("20:3 n-3 (Eicosatrienoic acid (ETE): " + "%.2f", bundle.getFloat("20:3n-3") * quantity);
-            this.tvEicosatrienoicAcid.setText(eicosatrienoicAcid);
-
-            String dihomoGammaLinolenicAcid = String.format("Dihomo-gamma-linolenic acid (DGLA): " + "%.2f", bundle.getFloat("20:3n-6") * quantity);
-            this.tvDihomoGammaLinolenicAcid.setText(dihomoGammaLinolenicAcid);
-
-            String v204undifferentiated = String.format("20:4 undifferentiated: " + "%.2f", bundle.getFloat("20:4undifferentiate") * quantity);
-            this.tv204undifferentiated.setText(v204undifferentiated);
-
-            String adrenicAcid = String.format("20:4 n-6 (Adrenic acid (AdA)): " + "%.2f", bundle.getFloat("20:4n-6") * quantity);
-            this.tvAdrenicAcid.setText(adrenicAcid);
-
-            String epa = String.format("20:5 n-3 (EPA): " + "%.2f", bundle.getFloat("20:5n-3") * quantity);
-            this.tvEpa.setText(epa);
-
-            String v221undifferentiated = String.format("22:1 undifferentiated: " + "%.2f", bundle.getFloat("22:1undifferentiated") * quantity);
-            this.tv221undifferentiated.setText(v221undifferentiated);
-
-            String dpa = String.format("22:5 n-3 (DPA): " + "%.2f", bundle.getFloat("22:5n-3") * quantity);
-            this.tvDpa.setText(dpa);
-
-            String dha = String.format("22:6 n-3 (DHA): " + "%.2f", bundle.getFloat("22:6n-3") * quantity);
-            this.tvDha.setText(dha);
-
-            String nervonicAcid = String.format("24:1 c (Nervonic acid): " + "%.2f", bundle.getFloat("24:1c") * quantity);
-            this.tvNervonicAcid.setText(nervonicAcid);
-
-            String totalMonounsaturated = String.format("Total Monounsaturated: " + "%.2f", bundle.getFloat("TotalMnounsaturated") * quantity);
-            this.tvTotalMonounsaturated.setText(totalMonounsaturated);
-
-            String totalPolyunsaturated = String.format("Total Polyunsaturated: " + "%.2f", bundle.getFloat("TotalPolyunsaturated") * quantity);
-            this.tvTotalPolyunsaturated.setText(totalPolyunsaturated);
-
-            String totalTransMonoenoic = String.format("Total Trans Monoenoic: " + "%.2f", bundle.getFloat("TotalTransMonoenoic") * quantity);
-            this.tvTotalTransMonoenoic.setText(totalTransMonoenoic);
-
-            String totalTransPolyenoic = String.format("Total Trans Polyenoic: " + "%.2f", bundle.getFloat("TotalTransPolyenoic") * quantity);
-            this.tvTotalTransPolyenoic.setText(totalTransPolyenoic);
-
-            String fluoride = String.format("Fluoride: " + "%.2f", bundle.getFloat("Fluoride") * quantity);
-            this.tvFluoride.setText(fluoride);
-
-            String folate = String.format("Folate: " + "%.2f", bundle.getFloat("Folate") * quantity);
-            this.tvFolate.setText(folate);
-
-            String folicAcid = String.format("Folic Acid: " + "%.2f", bundle.getFloat("FolicAcid") * quantity);
-            this.tvFolicAcid.setText(folicAcid);
-
-            String folateDfe = String.format("Folate Dfe: " + "%.2f", bundle.getFloat("FolateDFE") * quantity);
-            this.tvFolateDfe.setText(folateDfe);
-
-            String folateFood = String.format("Folate Food: " + "%.2f", bundle.getFloat("FolateFood") * quantity);
-            this.tvFolateFood.setText(folateFood);
-
-            String fructose = String.format("Fructose: " + "%.2f", bundle.getFloat("Fructose") * quantity);
-            this.tvFructose.setText(fructose);
-
-            String galactose = String.format("Galactose: " + "%.2f", bundle.getFloat("Galactose") * quantity);
-            this.tvGalactose.setText(galactose);
-
-            String glutamicAcid = String.format("Glutamic Acid " + "%.2f", bundle.getFloat("GlutamicAcid") * quantity);
-            this.tvGlutamicAcid.setText(glutamicAcid);
-
-            String glucose = String.format("Glucose: " + "%.2f", bundle.getFloat("Glucose") * quantity);
-            this.tvGlucose.setText(glucose);
-
-            String glycine = String.format("Glycine: " + "%.2f", bundle.getFloat("Glycine") * quantity);
-            this.tvGlycine.setText(glycine);
-
-            String histidine = String.format("Histidine: " + "%.2f", bundle.getFloat("Histidine") * quantity);
-            this.tvHistidine.setText(histidine);
-
-            String lactose = String.format("Lactose: " + "%.2f", bundle.getFloat("Lactose") * quantity);
-            this.tvLactose.setText(lactose);
-
-            String hydroxyproline = String.format("Hydroxyproline: " + "%.2f", bundle.getFloat("Hydroxyproline") * quantity);
-            this.tvHydroxyproline.setText(hydroxyproline);
-
-            String leucine = String.format("Leucine: " + "%.2f", bundle.getFloat("Leucine") * quantity);
-            this.tvLeucine.setText(leucine);
-
-            String luteinZeaxanthin = String.format("Lutein + Zeaxanthin: " + "%.2f", bundle.getFloat("LuteinzZaxanthin") * quantity);
-            this.tvLuteinZeaxanthin.setText(luteinZeaxanthin);
-
-            String lycopene = String.format("Lycopene: " + "%.2f", bundle.getFloat("Lycopene") * quantity);
-            this.tvLycopene.setText(lycopene);
-
-            String lysine = String.format("Lysine: " + "%.2f", bundle.getFloat("Lysine") * quantity);
-            this.tvLysine.setText(lysine);
-
-            String maltose = String.format("Maltose: " + "%.2f", bundle.getFloat("Maltose") * quantity);
-            this.tvMaltose.setText(maltose);
-
-            String methionine = String.format("Methionine: " + "%.2f", bundle.getFloat("Methionine") * quantity);
-            this.tvMethionine.setText(methionine);
-
-            String magnesium = String.format("Magnesium: " + "%.2f", bundle.getFloat("Magnesium") * quantity);
-            this.tvMagnesium.setText(magnesium);
-
-            String menaquinone = String.format("Menaquinone: " + "%.2f", bundle.getFloat("Menaquinone4") * quantity);
-            this.tvMenaquinone.setText(menaquinone);
-
-            String manganese = String.format("Manganese: " + "%.2f", bundle.getFloat("Manganese") * quantity);
-            this.tvManganese.setText(manganese);
-
-            String niacin = String.format("Niacin: " + "%.2f", bundle.getFloat("Niacin") * quantity);
-            this.tvNiacin.setText(niacin);
-
-            String vitaminE = String.format("Vitamin E: " + "%.2f", bundle.getFloat("VitaminE") * quantity);
-            this.tvVitaminE.setText(vitaminE);
-
-            String vitaminB12 = String.format("Vitamin B12: " + "%.2f", bundle.getFloat("VitaminB12") * quantity);
-            this.tvVitaminB12.setText(vitaminB12);
-
-            String adjustedProtein = String.format("Adjusted Protein: " + "%.2f", bundle.getFloat("AdjustedProtein") * quantity);
-            this.tvAdjustedProtein.setText(adjustedProtein);
-
-            String v221t = String.format("22:1 t: " + "%.2f", bundle.getFloat("22:1t") * quantity);
-            this.tv221t.setText(v221t);
-
-            String v221c = String.format("22:1 c: " + "%.2f", bundle.getFloat("22:1c") * quantity);
-            this.tv221c.setText(v221c);
-
-            String v183i = String.format("18:3i: " + "%.2f", bundle.getFloat("18:3i") * quantity);
-            this.tv183i.setText(v183i);
-
-            String notNurtherDefined = String.format("18:2 t not further defined: " + "%.2f", bundle.getFloat("18:2t") * quantity);
-            this.tvnotNurtherDefined.setText(notNurtherDefined);
-
-            String v182i = String.format("18:2 i: " + "%.2f", bundle.getFloat("18:2i") * quantity);
-            this.tv182i.setText(v182i);
-
-            String phosphorus = String.format("Phosphorus, P: " + "%.2f", bundle.getFloat("Phosphorus") * quantity);
-            this.tvPhosphorus.setText(phosphorus);
-
-            String pantothenicAcid = String.format("Pantothenic acid: " + "%.2f", bundle.getFloat("PantothenicAcid") * quantity);
-            this.tvPantothenicAcid.setText(pantothenicAcid);
-
-            String phenylalanine = String.format("Phenylalanine: " + "%.2f", bundle.getFloat("Phenylalanine") * quantity);
-            this.tvPhenylalanine.setText(phenylalanine);
-
-            String phytosterols = String.format("Phytosterols: " + "%.2f", bundle.getFloat("Phytosterols") * quantity);
-            this.tvPhytosterols.setText(phytosterols);
-
-            String proline = String.format("Proline: " + "%.2f", bundle.getFloat("Proline") * quantity);
-            this.tvProline.setText(proline);
-
-            String retinol = String.format("Retinol: " + "%.2f", bundle.getFloat("Retinol") * quantity);
-            this.tvRetinol.setText(retinol);
-
-            String riboflavin = String.format("Riboflavin: " + "%.2f", bundle.getFloat("Riboflavin") * quantity);
-            this.tvRiboflavin.setText(riboflavin);
-
-            String selenium = String.format("Selenium, Se: " + "%.2f", bundle.getFloat("Selenium") * quantity);
-            this.tvSelenium.setText(selenium);
-
-            String serine = String.format("Serine: " + "%.2f", bundle.getFloat("Serine") * quantity);
-            this.tvSerine.setText(serine);
-
-            String betaSitosterol = String.format("Beta Sitosterol: " + "%.2f", bundle.getFloat("BetaSitosterol") * quantity);
-            this.tvBetaSitosterol.setText(betaSitosterol);
-
-            String starch = String.format("Starch: " + "%.2f", bundle.getFloat("Starch") * quantity);
-            this.tvStarch.setText(starch);
-
-            String stigmasterol = String.format("Stigmasterol: " + "%.2f", bundle.getFloat("Stigmasterol") * quantity);
-            this.tvStigmasterol.setText(stigmasterol);
-
-            String sucrose = String.format("Sucrose: " + "%.2f", bundle.getFloat("Sucrose") * quantity);
-            this.tvSucrose.setText(sucrose);
-
-            String theobromine = String.format("Theobromine: " + "%.2f", bundle.getFloat("Theobromine") * quantity);
-            this.tvTheobromine.setText(theobromine);
-
-            String thiamin = String.format("Thiamin: " + "%.2f", bundle.getFloat("Thiamin") * quantity);
-            this.tvThiamin.setText(thiamin);
-
-            String threonine = String.format("Threonine: " + "%.2f", bundle.getFloat("Threonine") * quantity);
-            this.tvThreonine.setText(threonine);
-
-            String vitaminEalphaTocopherol = String.format("Vitamin E (alpha-tocopherol): " + "%.2f", bundle.getFloat("VitaminE") * quantity);
-            this.tvVitaminEalphaTocopherol.setText(vitaminEalphaTocopherol);
-
-            String tocopherolBeta = String.format("Tocopherol, beta: " + "%.2f", bundle.getFloat("TocopherolBeta") * quantity);
-            this.tvTocopherolBeta.setText(tocopherolBeta);
-
-            String tocopherolDelta = String.format("Tocopherol, delta: " + "%.2f", bundle.getFloat("TocopherolDelta") * quantity);
-            this.tvTocopherolDelta.setText(tocopherolDelta);
-
-            String tocopherolGamma = String.format("Tocopherol, gamma: " + "%.2f", bundle.getFloat("TocopherolGamma") * quantity);
-            this.tvTocopherolGamma.setText(tocopherolGamma);
-
-            String tryptophan = String.format("Tryptophan: " + "%.2f", bundle.getFloat("Tryptophan") * quantity);
-            this.tvTryptophan.setText(tryptophan);
-
-            String tyrosine = String.format("Tyrosine: " + "%.2f", bundle.getFloat("Tyrosine") * quantity);
-            this.tvThreonine.setText(tyrosine);
-
-            String valine = String.format("Valine: " + "%.2f", bundle.getFloat("Valine") * quantity);
-            this.tvValine.setText(valine);
-
-            String vitaminAIU = String.format("Vitamin A, IU: " + "%.2f", bundle.getFloat("VitaminAIu") * quantity);
-            this.tvVitaminAIU.setText(vitaminAIU);
-
-            String vitaminARAE = String.format("Vitamin A, RAE: " + "%.2f", bundle.getFloat("VitaminARae") * quantity);
-            this.tvVitaminARAE.setText(vitaminARAE);
-
-            String vitaminB12_2 = String.format("Vitamin B12 2: " + "%.2f", bundle.getFloat("VitaminB12-2") * quantity);
-            this.tvVitaminB12_2.setText(vitaminB12_2);
-
-            String vitaminB6 = String.format("Vitamin B6: " + "%.2f", bundle.getFloat("VitaminB6") * quantity);
-            this.tvVitaminB6.setText(vitaminB6);
-
-            String vitaminCtotalAscorbicAcid = String.format("Vitamin C, total ascorbic acid: " + "%.2f", bundle.getFloat("VitaminC") * quantity);
-            this.tvVitaminCtotalAscorbicAcid.setText(vitaminCtotalAscorbicAcid);
-
-            String vitaminD2andD3 = String.format("Vitamin D (D2 + D3): " + "%.2f", bundle.getFloat("VitaminD") * quantity);
-            this.tvVitaminD2andD3.setText(vitaminD2andD3);
-
-            String vitaminK = String.format("Vitamin K (phylloquinone): " + "%.2f", bundle.getFloat("VitaminK") * quantity);
-            this.tvVitaminK.setText(vitaminK);
-
-            String dihydrophylloquinone = String.format("Dihydrophylloquinone: " + "%.2f", bundle.getFloat("Dihydrophylloquinone") * quantity);
-            this.tvDihydrophylloquinone.setText(dihydrophylloquinone);
-
-            String water = String.format("Water: " + "%.2f", bundle.getFloat("Water") * quantity);
-            this.tvWater.setText(water);
-
-            String zinc = String.format("Zinc, Zn: " + "%.2f", bundle.getFloat("Zinc") * quantity);
-            this.tvZinc.setText(zinc);
-
-            String measuresName = bundle.getString("measureName");
-            String measuresQty = bundle.getString("measureQty");
-            String measuresSeq = bundle.getString("measureSeq");
-            String measuresServing_weight = bundle.getString("measureServing_weight");
-
-            Photo photo = new Photo();
-            photo.setHighres(imgHigher);
-            photo.setThumb(imgThumb);
-
-
-            Alt_measures altMeasures = new Alt_measures();
-            altMeasures.setMeasure(measuresName);
-            altMeasures.setQty(measuresQty);
-            altMeasures.setSeq(measuresSeq);
-            altMeasures.setServing_weight(measuresServing_weight);
-
-            List<Alt_measures> altMeasuresList = new ArrayList<>();
-            altMeasuresList.add(altMeasures);
-
-            foods.setAlt_measures(altMeasuresList);
-
-            foods.setPhoto(photo);
-            foods.getPhoto().setThumb(imgThumb);
-            foods.setImgUrl(imgHigher);
-            foods.setThumb(imgThumb);
-            foods.setFood_name(foodName);
-            foods.setNf_calories(Float.parseFloat(energy));
-            foods.setNf_total_carbohydrate(Float.parseFloat(crabs));
-            foods.setNf_protein(Float.parseFloat(protein));
-            foods.setNf_total_fat(Float.parseFloat(fat));
-            foods.setServing_weight_grams(Float.parseFloat(weightGrams));
-            foods.setNf_saturated_fat(Float.parseFloat(saturatedFat));
-            foods.setNf_cholesterol(Float.parseFloat(cholesterol));
-            foods.setNf_sodium(Float.parseFloat(sodium));
-            foods.setNf_total_carbohydrate(Float.parseFloat(carbohydrate));
-            foods.setNf_dietary_fiber(Float.parseFloat(dietaryFiber));
-            foods.setNf_sugars(Float.parseFloat(sugars));
-            foods.setNf_potassium(Float.parseFloat(potassium));
-            foods.setNf_p(Float.parseFloat(nf_p));
-            foods.setServing_qty(Integer.valueOf(quantity));
-            foods.setServing_unit(String.valueOf(bundle.get("serving_unit")));
-
-
-            foods.setValine(valine);
-            foods.setVitaminAIU(vitaminAIU);
-            foods.setVitaminARAE(vitaminARAE);
-            foods.setVitaminB122(vitaminB12_2);
-            foods.setVitaminB6(vitaminB6);
-            foods.setVitaminC(vitaminCtotalAscorbicAcid);
-            foods.setVitaminD2AndD3(vitaminD2andD3);
-            foods.setVitaminK(vitaminK);
-            foods.setDihydrophylloquinone(dihydrophylloquinone);
-            foods.setAacohol(alcohol);
-            foods.setWater(water);
-            foods.setZinc(zinc);
-
+    @SuppressLint("LongLogTag")
+    private void calculateOnSpinnerChange() {
+
+        float kcal = 1, crabs = 1, protein = 1, fat = 1;
+        try {
+            float calAltMeasures = FoodListAdapter.measureMap.get(spinnerSelectedItem) / getServingWeightGrams() * quantityViewCustom.getQuantity();
+
+            for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
+
+                kcal = FoodListAdapter.mListItem.get(i).getNf_calories();
+                crabs = FoodListAdapter.mListItem.get(i).getNf_total_carbohydrate();
+                protein = FoodListAdapter.mListItem.get(i).getNf_protein();
+                fat = FoodListAdapter.mListItem.get(i).getNf_total_fat();
+            }
+
+            tvEnergy.setText(String.format(Locale.getDefault(), "%.0f Kcal", kcal * calAltMeasures));
+            tvCrabs.setText(String.format(Locale.getDefault(), "%.2f g", crabs * calAltMeasures));
+            tvProtein.setText(String.format(Locale.getDefault(), "%.2f g", protein * calAltMeasures));
+            tvFat.setText(String.format(Locale.getDefault(), "%.2f g", fat * calAltMeasures));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
 
-    //  db.collection("users").document(userRegister.getEmail()).set(saveData)
+    private float getServingWeightGrams() {
+        float servingWeight = 1;
+        if(!FoodListAdapter.mListItem.isEmpty()) {
+            for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
+                servingWeight = FoodListAdapter.mListItem.get(i).getServing_weight_grams();
+            }
+        }
+        return servingWeight;
+    }
+
+
+    //get food info from searchFood
+    private void getFoodInfo() {
+
+        int quantity = quantityViewCustom.getQuantity();
+
+        for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
+            String imgHigher = FoodListAdapter.mListItem.get(i).getPhoto().getHighres();
+
+            Picasso.get().load(imgHigher).error(R.mipmap.ic_launcher).into(ivFoodImg);
+
+            fKcal = FoodListAdapter.mListItem.get(i).getNf_calories();
+            String energy = String.format(Locale.getDefault(), "%.0f", fKcal * quantity);
+            this.tvEnergy.setText(energy + " kcal");
+            this.tvEnergyScroll.setText("Energy: " + energy + " fKcal");
+
+
+            fCrabs = FoodListAdapter.mListItem.get(i).getNf_total_carbohydrate();
+            String crabs = String.format(Locale.getDefault(), "%.2f", fCrabs * quantity);
+            this.tvCrabs.setText(crabs + " g");
+            this.tvCrabsScroll.setText("Crabs " + crabs + " g");
+
+            fProtein = FoodListAdapter.mListItem.get(i).getNf_protein();
+            String protein = String.format(Locale.getDefault(), "%.2f", fProtein * quantity);
+            this.tvProtein.setText(protein + " g");
+            this.tvProteinScroll.setText("Protein: " + protein + " g");
+
+            fFat = FoodListAdapter.mListItem.get(i).getNf_total_fat();
+            String fat = String.format(Locale.getDefault(), "%.2f", fFat * quantity);
+            this.tvFat.setText(fat + " g");
+            this.tvFatScroll.setText("Fat: " + fat + " g");
+
+            String weightGrams = String.format(Locale.getDefault(), "%.2f", FoodListAdapter.mListItem.get(i).getServing_weight_grams() * quantity);
+            this.tvServingWeightGrams.setText("Weight grams: " + weightGrams + " g");
+
+            fSaturatedFat = FoodListAdapter.mListItem.get(i).getNf_saturated_fat();
+            String saturatedFat = String.format(Locale.getDefault(), "%.2f", fSaturatedFat * quantity);
+            this.tvSaturatedFat.setText("Saturated fat: " + saturatedFat + " g");
+
+            fCholesterol = FoodListAdapter.mListItem.get(i).getNf_cholesterol();
+            String cholesterol = String.format(Locale.getDefault(), "%.2f", fCholesterol * quantity);
+            this.tvCholesterol.setText("Cholesterol: " + cholesterol + " g");
+
+            fSodium = FoodListAdapter.mListItem.get(i).getNf_sodium();
+            String sodium = String.format(Locale.getDefault(), "%.2f", fSodium * quantity);
+            this.tvSodium.setText("Sodium: " + sodium + " g");
+
+
+            fDietaryFiber = FoodListAdapter.mListItem.get(i).getNf_dietary_fiber();
+            String dietaryFiber = String.format(Locale.getDefault(), "%.2f", fDietaryFiber * quantity);
+            this.tvDietaryFiber.setText("Dietary fiber: " + dietaryFiber + " g");
+
+            fSugars = FoodListAdapter.mListItem.get(i).getNf_sugars();
+            String sugars = String.format(Locale.getDefault(), "%.2f", fSugars * quantity);
+            this.tvSugars.setText("Sugars: " + sugars + " g");
+
+            fPotassium = FoodListAdapter.mListItem.get(i).getNf_potassium();
+            String potassium = String.format(Locale.getDefault(), "%.2f", fPotassium * quantity);
+            this.tvPotassium.setText("Potassium: " + potassium + " g");
+
+            fNfP = FoodListAdapter.mListItem.get(i).getNf_p();
+            String nf_p = String.format(Locale.getDefault(), "%.2f", fNfP * quantity);
+            this.tvNfP.setText("Nutrition Facts Panel: " + nf_p + " g");
+
+
+            for (int r = 0; r < FoodListAdapter.mListItem.get(i).getFull_nutrients().size(); r++) {
+
+                String atterId = FoodListAdapter.mListItem.get(i).getFull_nutrients().get(r).getAttr_id();
+
+                Float value = Float.valueOf(FoodListAdapter.mListItem.get(i).getFull_nutrients().get(r).getValue());
+
+                switch (atterId) {
+                    case "301":
+                        String calcium = String.format(Locale.getDefault(), "Calcium: " + "%.2f", value * quantity);
+                        this.tvCalcium.setText(calcium);
+                        break;
+
+                    case "205":
+                        break;
+
+                    case "601":
+                        break;
+
+                    case "208":
+                        break;
+
+                    case "606":
+                        String totalSaturated = String.format(Locale.getDefault(), "Total Saturated: %.2f", value * quantity);
+                        this.tvTotalSaturated.setText(totalSaturated);
+                        break;
+
+                    case "204":
+                        String totalLipid = String.format(Locale.getDefault(), "Total lipid (fat): %.2f", value * quantity);
+                        this.tvTotalLipid.setText(totalLipid);
+                        break;
+
+                    case "605":
+                        String totalTrans = String.format(Locale.getDefault(), "Total Trans: %.2f", value * quantity);
+                        this.tvTotalTrans.setText(totalTrans);
+                        break;
+
+                    case "303":
+                        String iron = String.format(Locale.getDefault(), "Iron: %.2f", value * quantity);
+                        this.tvIron.setText(iron);
+                        break;
+
+                    case "291":
+                        String totalDietary = String.format(Locale.getDefault(), "Total Dietary: %.2f", value * quantity);
+                        this.tvTotalDietary.setText(totalDietary);
+                        break;
+
+                    case "306":
+                        break;
+
+                    case "307":
+
+                        break;
+
+                    case "203":
+
+                        break;
+
+                    case "269":
+                        //Sugars
+                        break;
+
+                    case "539":
+                        String sugarsAdded = String.format(Locale.getDefault(), "Sugars Added: %.2f", value * quantity);
+                        this.tvSugarsAdded.setText(sugarsAdded);
+                        break;
+
+                    case "324":
+                        String vitaminD = String.format(Locale.getDefault(), "Vitamin D: %.2f", value * quantity);
+                        this.tvVitaminD.setText(vitaminD);
+                        break;
+
+                    case "513":
+                        String alanine = String.format(Locale.getDefault(), "Alanine: %.2f", value * quantity);
+                        this.tvAlanine.setText(alanine);
+                        break;
+
+                    case "221":
+                        String alcohol = String.format(Locale.getDefault(), "Alcohol: %.2f", value * quantity);
+                        this.tvAlcohol.setText(alcohol);
+                        break;
+
+                    case "511":
+                        String arginine = String.format(Locale.getDefault(), "Arginine: %.2f", value * quantity);
+                        this.tvArginine.setText(arginine);
+                        break;
+
+                    case "207":
+                        String ash = String.format(Locale.getDefault(), "Ash: %.2f", value * quantity);
+                        this.tvAsh.setText(ash);
+                        break;
+
+                    case "514":
+                        String aspartic = String.format(Locale.getDefault(), "Aspartic acid: %.2f", value * quantity);
+                        this.tvAspartic.setText(aspartic);
+                        break;
+
+                    case "454":
+                        String betaine = String.format(Locale.getDefault(), "Betaine: %.2f", value * quantity);
+                        this.tvBetaine.setText(betaine);
+
+                        break;
+
+                    case "262":
+                        String caffeine = String.format(Locale.getDefault(), "Caffeine: %.2f", value * quantity);
+                        this.tvCaffeine.setText(caffeine);
+                        break;
+
+                    case "639":
+                        String campesterol = String.format(Locale.getDefault(), "Campesterol: %.2f", value * quantity);
+                        this.tvCampesterol.setText(campesterol);
+                        break;
+
+                    case "322":
+                        String carotene = String.format(Locale.getDefault(), "Carotene, alpha: %.2f", value * quantity);
+                        this.tvCarotene.setText(carotene);
+                        break;
+
+                    case "321":
+
+                        break;
+
+                    case "326":
+                        String vitaminD3 = String.format(Locale.getDefault(), "Vitamin D3 (Cholecalciferol): %.2f", value * quantity);
+                        this.tvVitaminD3.setText(vitaminD3);
+                        break;
+
+                    case "421":
+                        String choline = String.format(Locale.getDefault(), "Choline: %.2f", value * quantity);
+                        this.tvCholine.setText(choline);
+                        break;
+
+                    case "334":
+                        String cryptoxanthin = String.format(Locale.getDefault(), "Cryptoxanthin, beta: %.2f", value * quantity);
+                        this.tvCryptoxanthin.setText(cryptoxanthin);
+                        break;
+
+                    case "312":
+                        String copper = String.format(Locale.getDefault(), "Copper: %.2f", value * quantity);
+                        this.tvCopper.setText(copper);
+                        break;
+
+                    case "507":
+                        String cystine = String.format(Locale.getDefault(), "Cystine: %.2f", value * quantity);
+                        this.tvCystine.setText(cystine);
+                        break;
+
+                    case "268":
+                        break;
+
+                    case "325":
+                        String vitaminD2 = String.format(Locale.getDefault(), "vitamin D2 (Ergocalciferol): %.2f", value * quantity);
+                        this.tvVitaminD2.setText(vitaminD2);
+                        break;
+
+                    case "626":
+                        String v161undifferentiated = String.format(Locale.getDefault(), "16:1 undifferentiated: %.2f", value * quantity);
+                        this.tv161undifferentiated.setText(v161undifferentiated);
+                        break;
+
+                    case "673":
+                        String palmitoleicAcid = String.format(Locale.getDefault(), "16:1 c (Palmitoleic Acid): %.2f", value * quantity);
+                        this.tvPalmitoleicAcid.setText(palmitoleicAcid);
+                        break;
+
+                    case "662":
+                        String v161t = String.format(Locale.getDefault(), "16:1 t: %.2f", value * quantity);
+                        this.tv161t.setText(v161t);
+                        break;
+
+                    case "617":
+                        String v181undifferentiated = String.format(Locale.getDefault(), "18:1 undifferentiated: %.2f", value * quantity);
+                        this.tv181undifferentiated.setText(v181undifferentiated);
+                        break;
+
+                    case "674":
+                        String vaccenicAcid = String.format(Locale.getDefault(), "18:1 c (Vaccenic acid): %.2f", value * quantity);
+                        this.tvVaccenicAcid.setText(vaccenicAcid);
+                        break;
+
+                    case "663":
+                        String v181t = String.format(Locale.getDefault(), "18:1 t: %.2f", value * quantity);
+                        this.tv181t.setText(v181t);
+
+                        break;
+
+                    case "859":
+                        String v18111t = String.format(Locale.getDefault(), "18:1-11t (18:1t n-7): %.2f", value * quantity);
+                        this.tv18111t.setText(v18111t);
+                        break;
+
+                    case "618":
+                        String v182undifferentiated = String.format(Locale.getDefault(), "18:2 undifferentiated: %.2f", value * quantity);
+                        this.tv182undifferentiated.setText(v182undifferentiated);
+                        break;
+
+                    case "670":
+                        String clas = String.format(Locale.getDefault(), "18:2 CLAs: %.2f", value * quantity);
+                        this.tvClas.setText(clas);
+                        break;
+
+                    case "675":
+                        String linoleicAcid = String.format(Locale.getDefault(), "18:2 n-6 c,c (Linoleic acid): %.2f", value * quantity);
+                        this.tvLinoleicAcid.setText(linoleicAcid);
+                        break;
+
+                    case "669":
+                        String v182t = String.format(Locale.getDefault(), "18:2 t,t: %.2f", value * quantity);
+                        this.tv182t.setText(v182t);
+                        break;
+
+                    case "619":
+                        String v183undifferentiated = String.format(Locale.getDefault(), "18:3 undifferentiated: %.2f", value * quantity);
+                        this.tv183undifferentiated.setText(v183undifferentiated);
+                        break;
+
+                    case "851":
+                        String ala = String.format(Locale.getDefault(), "18:3 n-3 c,c,c (ALA): %.2f", value * quantity);
+                        this.tvAla.setText(ala);
+                        break;
+
+                    case "685":
+                        String calendicAcid = String.format(Locale.getDefault(), "18:3 n-6 c,c,c (α-Calendic acid): %.2f", value * quantity);
+                        this.tvCalendicAcid.setText(calendicAcid);
+                        break;
+
+                    case "672":
+                        String eicosadienoicAcid = String.format(Locale.getDefault(), "20:2 n-6 c,c (Eicosadienoic acid): %.2f", value * quantity);
+                        this.tvEicosadienoicAcid.setText(eicosadienoicAcid);
+                        break;
+
+                    case "689":
+                        String v203undifferentiated = String.format(Locale.getDefault(), "20:3 undifferentiated: %.2f", value * quantity);
+                        this.tv203undifferentiated.setText(v203undifferentiated);
+                        break;
+
+                    case "852":
+                        String eicosatrienoicAcid = String.format(Locale.getDefault(), "20:3 n-3 (Eicosatrienoic acid (ETE): %.2f", value * quantity);
+                        this.tvEicosatrienoicAcid.setText(eicosatrienoicAcid);
+                        break;
+
+                    case "853":
+                        String dihomoGammaLinolenicAcid = String.format(Locale.getDefault(), "Dihomo-gamma-linolenic acid (DGLA): %.2f", value * quantity);
+                        this.tvDihomoGammaLinolenicAcid.setText(dihomoGammaLinolenicAcid);
+                        break;
+
+                    case "620":
+                        String v204undifferentiated = String.format(Locale.getDefault(), "20:4 undifferentiated: %.2f", value * quantity);
+                        this.tv204undifferentiated.setText(v204undifferentiated);
+                        break;
+
+                    case "855":
+                        String adrenicAcid = String.format(Locale.getDefault(), "20:4 n-6 (Adrenic acid (AdA)): %.2f", value * quantity);
+                        this.tvAdrenicAcid.setText(adrenicAcid);
+                        break;
+
+                    case "629":
+                        String epa = String.format(Locale.getDefault(), "20:5 n-3 (EPA): %.2f", value * quantity);
+                        this.tvEpa.setText(epa);
+                        break;
+
+                    case "630":
+                        String v221undifferentiated = String.format(Locale.getDefault(), "22:1 undifferentiated: %.2f", value * quantity);
+                        this.tv221undifferentiated.setText(v221undifferentiated);
+                        break;
+
+
+                    case "631":
+                        String dpa = String.format(Locale.getDefault(), "22:5 n-3 (DPA): %.2f", value * quantity);
+                        this.tvDpa.setText(dpa);
+                        break;
+
+                    case "621":
+                        String dha = String.format(Locale.getDefault(), "22:6 n-3 (DHA): %.2f", value * quantity);
+                        this.tvDha.setText(dha);
+                        break;
+
+                    case "671":
+                        String nervonicAcid = String.format(Locale.getDefault(), "24:1 c (Nervonic acid): %.2f", value * quantity);
+                        this.tvNervonicAcid.setText(nervonicAcid);
+                        break;
+
+                    case "645":
+                        String totalMonounsaturated = String.format(Locale.getDefault(), "Total Monounsaturated: %.2f", value * quantity);
+                        this.tvTotalMonounsaturated.setText(totalMonounsaturated);
+                        break;
+
+                    case "646":
+                        String totalPolyunsaturated = String.format(Locale.getDefault(), "Total Polyunsaturated: %.2f", value * quantity);
+                        this.tvTotalPolyunsaturated.setText(totalPolyunsaturated);
+                        break;
+
+                    case "693":
+                        String totalTransMonoenoic = String.format(Locale.getDefault(), "Total Trans Monoenoic: %.2f", value * quantity);
+                        this.tvTotalTransMonoenoic.setText(totalTransMonoenoic);
+                        break;
+
+                    case "695":
+                        String totalTransPolyenoic = String.format(Locale.getDefault(), "Total Trans Polyenoic: %.2f", value * quantity);
+                        this.tvTotalTransPolyenoic.setText(totalTransPolyenoic);
+                        break;
+
+                    case "313":
+                        String fluoride = String.format(Locale.getDefault(), "Fluoride: %.2f", value * quantity);
+                        this.tvFluoride.setText(fluoride);
+                        break;
+
+                    case "417":
+                        String folate = String.format(Locale.getDefault(), "Folate: %.2f", value * quantity);
+                        this.tvFolate.setText(folate);
+                        break;
+
+                    case "431":
+                        String folicAcid = String.format(Locale.getDefault(), "Folic Acid: %.2f", value * quantity);
+                        this.tvFolicAcid.setText(folicAcid);
+                        break;
+
+                    case "435":
+                        String folateDfe = String.format(Locale.getDefault(), "Folate Dfe: %.2f", value * quantity);
+                        this.tvFolateDfe.setText(folateDfe);
+                        break;
+
+                    case "432":
+                        String folateFood = String.format(Locale.getDefault(), "Folate Food: %.2f", value * quantity);
+                        this.tvFolateFood.setText(folateFood);
+                        break;
+
+                    case "212":
+                        String fructose = String.format(Locale.getDefault(), "Fructose: %.2f", value * quantity);
+                        this.tvFructose.setText(fructose);
+                        break;
+
+                    case "287":
+                        String galactose = String.format(Locale.getDefault(), "Galactose: %.2f", value * quantity);
+                        this.tvGalactose.setText(galactose);
+                        break;
+
+                    case "515":
+                        String glutamicAcid = String.format(Locale.getDefault(), "Glutamic Acid: %.2f", value * quantity);
+                        this.tvGlutamicAcid.setText(glutamicAcid);
+                        break;
+
+                    case "211":
+                        String glucose = String.format(Locale.getDefault(), "Glucose: %.2f", value * quantity);
+                        this.tvGlucose.setText(glucose);
+
+                        break;
+
+                    case "516":
+                        String glycine = String.format(Locale.getDefault(), "Glycine: %.2f", value * quantity);
+                        this.tvGlycine.setText(glycine);
+                        break;
+
+                    case "512":
+                        String histidine = String.format(Locale.getDefault(), "Histidine: %.2f", value * quantity);
+                        this.tvHistidine.setText(histidine);
+                        break;
+
+                    case "521":
+                        String hydroxyproline = String.format(Locale.getDefault(), "Hydroxyproline: %.2f", value * quantity);
+                        this.tvHydroxyproline.setText(hydroxyproline);
+                        break;
+
+                    case "503":
+                        // nutrientName = "Isoleucine";
+                        break;
+
+                    case "213":
+                        String lactose = String.format(Locale.getDefault(), "Lactose: %.2f", value * quantity);
+                        this.tvLactose.setText(lactose);
+                        break;
+
+                    case "504":
+                        String leucine = String.format(Locale.getDefault(), "Leucine: %.2f", value * quantity);
+                        this.tvLeucine.setText(leucine);
+                        break;
+
+                    case "338":
+                        String luteinZeaxanthin = String.format(Locale.getDefault(), "Lutein + Zeaxanthin: %.2f", value * quantity);
+                        this.tvLuteinZeaxanthin.setText(luteinZeaxanthin);
+                        break;
+
+                    case "337":
+                        String lycopene = String.format(Locale.getDefault(), "Lycopene: %.2f", value * quantity);
+                        this.tvLycopene.setText(lycopene);
+                        break;
+
+                    case "505":
+                        String lysine = String.format(Locale.getDefault(), "Lysine: %.2f", value * quantity);
+                        this.tvLysine.setText(lysine);
+                        break;
+
+                    case "214":
+                        String maltose = String.format(Locale.getDefault(), "Maltose: %.2f", value * quantity);
+                        this.tvMaltose.setText(maltose);
+                        break;
+
+                    case "506":
+                        String methionine = String.format(Locale.getDefault(), "Methionine: %.2f", value * quantity);
+                        this.tvMethionine.setText(methionine);
+                        break;
+
+                    case "304":
+                        String magnesium = String.format(Locale.getDefault(), "Magnesium: %.2f", value * quantity);
+                        this.tvMagnesium.setText(magnesium);
+                        break;
+
+                    case "428":
+                        String menaquinone = String.format(Locale.getDefault(), "Menaquinone: %.2f", value * quantity);
+                        this.tvMenaquinone.setText(menaquinone);
+                        break;
+
+                    case "315":
+                        String manganese = String.format(Locale.getDefault(), "Manganese: %.2f", value * quantity);
+                        this.tvManganese.setText(manganese);
+                        break;
+
+                    case "406":
+                        String niacin = String.format(Locale.getDefault(), "Niacin: %.2f", value * quantity);
+                        this.tvNiacin.setText(niacin);
+                        break;
+
+                    case "573":
+                        String vitaminE = String.format(Locale.getDefault(), "Vitamin E: %.2f", value * quantity);
+                        this.tvVitaminE.setText(vitaminE);
+                        break;
+
+                    case "578":
+                        String vitaminB12 = String.format(Locale.getDefault(), "Vitamin B12: %.2f", value * quantity);
+                        this.tvVitaminB12.setText(vitaminB12);
+                        break;
+
+                    case "257":
+                        String adjustedProtein = String.format(Locale.getDefault(), "Adjusted Protein: %.2f", value * quantity);
+                        this.tvAdjustedProtein.setText(adjustedProtein);
+                        break;
+
+                    case "664":
+                        String v221t = String.format(Locale.getDefault(), "22:1 t: %.2f", value * quantity);
+                        this.tv221t.setText(v221t);
+                        break;
+
+                    case "676":
+                        String v221c = String.format(Locale.getDefault(), "22:1 c: %.2f", value * quantity);
+                        this.tv221c.setText(v221c);
+                        break;
+
+                    case "856":
+                        String v183i = String.format(Locale.getDefault(), "18:3i: %.2f", value * quantity);
+                        this.tv183i.setText(v183i);
+                        break;
+
+                    case "665":
+                        String notNurtherDefined = String.format(Locale.getDefault(), "18:2 t not further defined: %.2f", value * quantity);
+                        this.tvnotNurtherDefined.setText(notNurtherDefined);
+                        break;
+
+                    case "666":
+                        String v182i = String.format(Locale.getDefault(), "18:2 i: %.2f", value * quantity);
+                        this.tv182i.setText(v182i);
+                        break;
+
+                    case "305":
+                        String phosphorus = String.format(Locale.getDefault(), "Phosphorus, P: %.2f", value * quantity);
+                        this.tvPhosphorus.setText(phosphorus);
+                        break;
+
+                    case "410":
+                        String pantothenicAcid = String.format(Locale.getDefault(), "Pantothenic acid: %.2f", value * quantity);
+                        this.tvPantothenicAcid.setText(pantothenicAcid);
+                        break;
+
+                    case "508":
+                        String phenylalanine = String.format(Locale.getDefault(), "Phenylalanine: %.2f", value * quantity);
+                        this.tvPhenylalanine.setText(phenylalanine);
+                        break;
+
+                    case "636":
+                        String phytosterols = String.format(Locale.getDefault(), "Phytosterols: %.2f", value * quantity);
+                        this.tvPhytosterols.setText(phytosterols);
+                        break;
+
+                    case "517":
+                        String proline = String.format(Locale.getDefault(), "Proline: %.2f", value * quantity);
+                        this.tvProline.setText(proline);
+                        break;
+
+                    case "319":
+                        String retinol = String.format(Locale.getDefault(), "Retinol: %.2f", value * quantity);
+                        this.tvRetinol.setText(retinol);
+                        break;
+
+                    case "405":
+                        String riboflavin = String.format(Locale.getDefault(), "Riboflavin: %.2f", value * quantity);
+                        this.tvRiboflavin.setText(riboflavin);
+                        break;
+
+                    case "317":
+                        String selenium = String.format(Locale.getDefault(), "Selenium, Se: %.2f", value * quantity);
+                        this.tvSelenium.setText(selenium);
+                        break;
+
+                    case "518":
+                        String serine = String.format(Locale.getDefault(), "Serine: %.2f", value * quantity);
+                        this.tvSerine.setText(serine);
+                        break;
+
+                    case "641":
+                        String betaSitosterol = String.format(Locale.getDefault(), "Beta Sitosterol: %.2f", value * quantity);
+                        this.tvBetaSitosterol.setText(betaSitosterol);
+                        break;
+
+                    case "209":
+                        String starch = String.format(Locale.getDefault(), "Starch: %.2f", value * quantity);
+                        this.tvStarch.setText(starch);
+                        break;
+
+                    case "638":
+                        String stigmasterol = String.format(Locale.getDefault(), "Stigmasterol: %.2f", value * quantity);
+                        this.tvStigmasterol.setText(stigmasterol);
+                        break;
+
+                    case "210":
+                        String sucrose = String.format(Locale.getDefault(), "Sucrose: %.2f", value * quantity);
+                        this.tvSucrose.setText(sucrose);
+                        break;
+
+                    case "263":
+                        String theobromine = String.format(Locale.getDefault(), "Theobromine: %.2f", value * quantity);
+                        this.tvTheobromine.setText(theobromine);
+                        break;
+
+                    case "404":
+                        String thiamin = String.format(Locale.getDefault(), "Thiamin: %.2f", value * quantity);
+                        this.tvThiamin.setText(thiamin);
+                        break;
+
+                    case "502":
+                        String threonine = String.format(Locale.getDefault(), "Threonine: %.2f", value * quantity);
+                        this.tvThreonine.setText(threonine);
+                        break;
+
+                    case "323":
+                        String vitaminEalphaTocopherol = String.format(Locale.getDefault(), "Vitamin E (alpha-tocopherol): %.2f", value * quantity);
+                        this.tvVitaminEalphaTocopherol.setText(vitaminEalphaTocopherol);
+                        break;
+
+                    case "341":
+                        String tocopherolBeta = String.format(Locale.getDefault(), "Tocopherol, beta: %.2f", value * quantity);
+                        this.tvTocopherolBeta.setText(tocopherolBeta);
+                        break;
+
+                    case "343":
+                        String tocopherolDelta = String.format(Locale.getDefault(), "Tocopherol, delta: %.2f", value * quantity);
+                        this.tvTocopherolDelta.setText(tocopherolDelta);
+                        break;
+
+                    case "342":
+                        String tocopherolGamma = String.format(Locale.getDefault(), "Tocopherol, gamma: %.2f", value * quantity);
+                        this.tvTocopherolGamma.setText(tocopherolGamma);
+
+                        break;
+
+                    case "501":
+                        String tryptophan = String.format(Locale.getDefault(), "Tryptophan: %.2f", value * quantity);
+                        this.tvTryptophan.setText(tryptophan);
+                        break;
+
+                    case "509":
+                        String tyrosine = String.format(Locale.getDefault(), "Tyrosine: %.2f", value * quantity);
+                        this.tvTyrosine.setText(tyrosine);
+                        break;
+
+                    case "510":
+                        String valine = String.format(Locale.getDefault(), "Valine: %.2f", value * quantity);
+                        this.tvValine.setText(valine);
+                        break;
+
+                    case "318":
+                        String vitaminAIU = String.format(Locale.getDefault(), "Vitamin A, IU: %.2f", value * quantity);
+                        this.tvVitaminAIU.setText(vitaminAIU);
+                        break;
+
+                    case "320":
+                        String vitaminARAE = String.format(Locale.getDefault(), "Vitamin A, RAE: %.2f", value * quantity);
+                        this.tvVitaminARAE.setText(vitaminARAE);
+
+                        break;
+
+                    case "418":
+                        String vitaminB12_2 = String.format(Locale.getDefault(), "Vitamin B12 2: %.2f", value * quantity);
+                        this.tvVitaminB12_2.setText(vitaminB12_2);
+                        break;
+
+                    case "415":
+                        String vitaminB6 = String.format(Locale.getDefault(), "Vitamin B6: %.2f", value * quantity);
+                        this.tvVitaminB6.setText(vitaminB6);
+                        break;
+
+                    case "401":
+                        String vitaminCtotalAscorbicAcid = String.format(Locale.getDefault(), "Vitamin C, total ascorbic acid: %.2f", value * quantity);
+                        this.tvVitaminCtotalAscorbicAcid.setText(vitaminCtotalAscorbicAcid);
+                        break;
+
+                    case "328":
+                        String vitaminD2andD3 = String.format(Locale.getDefault(), "Vitamin D (D2 + D3): %.2f", value * quantity);
+                        this.tvVitaminD2andD3.setText(vitaminD2andD3);
+                        break;
+
+                    case "430":
+                        String vitaminK = String.format(Locale.getDefault(), "Vitamin K (phylloquinone): %.2f", value * quantity);
+                        this.tvVitaminK.setText(vitaminK);
+                        break;
+
+                    case "429":
+                        String dihydrophylloquinone = String.format(Locale.getDefault(), "Dihydrophylloquinone: %.2f", value * quantity);
+                        this.tvDihydrophylloquinone.setText(dihydrophylloquinone);
+                        break;
+
+                    case "255":
+                        String water = String.format(Locale.getDefault(), "Water: %.2f", value * quantity);
+                        this.tvWater.setText(water);
+                        break;
+
+                    case "309":
+                        String zinc = String.format(Locale.getDefault(), "Zinc, Zn: %.2f", value * quantity);
+                        this.tvZinc.setText(zinc);
+                        break;
+                }
+            }
+        }
+    }
+
 
     @SuppressLint("LongLogTag")
     private void saveDataToFirestore() {
-        try {
 
-            SearchFoodsActivity.mListItem.get(0).setServing_unit(spinnerSelectedItem);
+        float measureMapIsNull = FoodListAdapter.measureMap.get(spinnerSelectedItem) == null ? 1 : FoodListAdapter.measureMap.get(spinnerSelectedItem);
+
+        float calAltMeasures = measureMapIsNull / getServingWeightGrams() * quantityViewCustom.getQuantity();
+
+        float kcal = 1, crabs = 1, protein = 1, fat = 1, cholesterol = 1, dietaryFiber = 1,
+                nfp = 1, potassium = 1, saturatedFat = 1, sodium = 1, sugars = 1;
+
+        for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
+
+            kcal = FoodListAdapter.mListItem.get(i).getNf_calories();
+            crabs = FoodListAdapter.mListItem.get(i).getNf_total_carbohydrate();
+            protein = FoodListAdapter.mListItem.get(i).getNf_protein();
+            fat = FoodListAdapter.mListItem.get(i).getNf_total_fat();
+            cholesterol = FoodListAdapter.mListItem.get(i).getNf_cholesterol();
+            dietaryFiber = FoodListAdapter.mListItem.get(i).getNf_dietary_fiber();
+            nfp = FoodListAdapter.mListItem.get(i).getNf_p();
+            potassium = FoodListAdapter.mListItem.get(i).getNf_potassium();
+            saturatedFat = FoodListAdapter.mListItem.get(i).getNf_saturated_fat();
+            sodium = FoodListAdapter.mListItem.get(i).getNf_sodium();
+            sugars = FoodListAdapter.mListItem.get(i).getNf_sugars();
+        }
+
+        try {
+            for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
+                if (!FoodListAdapter.mListItem.get(i).getAlt_measures().isEmpty()) {
+                    FoodListAdapter.mListItem.get(i).setServing_weight_grams(FoodListAdapter.measureMap.get(spinnerSelectedItem));
+                    FoodListAdapter.mListItem.get(i).setServing_unit(spinnerSelectedItem);
+                    FoodListAdapter.mListItem.get(i).setNf_calories(kcal * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_total_carbohydrate(crabs * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_protein(protein * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_total_fat(fat * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_cholesterol(cholesterol * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_dietary_fiber(dietaryFiber * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_p(nfp * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_potassium(potassium * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_saturated_fat(saturatedFat * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_sodium(sodium * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setNf_sugars(sugars * calAltMeasures);
+                    FoodListAdapter.mListItem.get(i).setServing_qty(quantityViewCustom.getQuantity());
+                }
+                for (int j = 0; j < FoodListAdapter.mListItem.get(i).getAlt_measures().size(); j++) {
+                    String atterId = FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).getAttr_id();
+
+                    if (atterId == FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).getAttr_id()) {
+                        Float value = Float.valueOf(FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).getValue());
+                        FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).setValue(String.valueOf(value * calAltMeasures));
+                    }
+                }
+            }
 
             //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
             db.collection(Foods.nutrition).document(getEmailRegister())
@@ -775,17 +1128,18 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                         @SuppressLint("LongLogTag")
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            Log.d(TAG, "DocumentSnapshot added with ID: ");
+                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                            FoodListAdapter.measure.clear();
+                            finish();
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error adding document", e);
+                            Log.w(TAG, "Error adding document ", e);
                         }
                     });
-
-            Log.d(TAG, "Food data save successfully");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -855,48 +1209,5 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         return df.format(c);
-    }
-
-    private void setActionBar() {
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        mToolbar = getSupportActionBar();
-        String foodName = null;
-
-
-        if (bundle != null) {
-
-            foodName = String.valueOf(bundle.get("food_name"));
-        }
-        String foodNameCapitalizeFirstLetter = foodName.substring(0,1).toUpperCase() + foodName.substring(1);
-        mToolbar.setTitle(foodNameCapitalizeFirstLetter);
-
-        // Create a TextView programmatically.
-        TextView tv = new TextView(getApplicationContext());
-
-        // Create a LayoutParams for TextView
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                android.app.ActionBar.LayoutParams.MATCH_PARENT, // Width of TextView
-                android.app.ActionBar.LayoutParams.WRAP_CONTENT);
-
-        // Apply the layout parameters to TextView widget
-        tv.setLayoutParams(lp);
-
-        // Set text to display in TextView
-        tv.setText(mToolbar.getTitle());
-
-        // Set the text color of TextView
-        tv.setTextColor(Color.WHITE);
-
-        //set the text size
-        tv.setTextSize(20);
-
-        // Set TextView text alignment to center
-        tv.setGravity(Gravity.CENTER);
-
-        mToolbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-
-        //Set the newly created TextView as ActionBar custom view
-        mToolbar.setCustomView(tv);
     }
 }

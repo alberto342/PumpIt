@@ -12,7 +12,6 @@ public class Foods {
     public static final String nutrition = "nutrition";
     public static final String fruit = "fruit";
 
-
     public Foods() {
     }
 
@@ -158,9 +157,6 @@ public class Foods {
     String dihydrophylloquinone;
     String water;
     String zinc;
-
-
-
 
 
 

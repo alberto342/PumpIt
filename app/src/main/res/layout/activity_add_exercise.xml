@@ -2,205 +2,216 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:orientation="vertical"
     tools:context=".AddExerciseActivity">
 
-
-
-
-
-
-    <SearchView
-        android:id="@+id/searchView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:voiceIcon="@mipmap/mic_icon"
-        app:layout_constraintBottom_toTopOf="@+id/guideline51"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline51"
+    <ImageView
+        android:id="@+id/btn_front"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.10" />
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/btn_front_view" />
 
     <ImageView
-        android:id="@+id/btn_back_view"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginEnd="25dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline52"
+        android:id="@+id/btn_back"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline51"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@mipmap/btn_back_view" />
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline52"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.16" />
-
     <ImageView
-        android:id="@+id/imageView25"
+        android:id="@+id/iv_img_face"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline52"
+        app:layout_constraintTop_toBottomOf="@+id/btn_back"
         app:srcCompat="@mipmap/front_view_exercise" />
 
     <TextView
-        android:id="@+id/btn_chest"
+        android:id="@+id/tv_chest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="90dp"
+        android:layout_marginTop="148dp"
+        android:layout_marginEnd="160dp"
         android:text="CHEST"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/guideline54"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline60"
-        app:layout_constraintTop_toTopOf="@+id/guideline52" />
+        app:layout_constraintTop_toTopOf="@+id/iv_img_face"
+        tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/btn_shoulder"
+        android:id="@+id/tv_shoulder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
+        android:layout_marginTop="92dp"
+        android:layout_marginEnd="92dp"
         android:text="SHOULDER"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/guideline55"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline60"
-        app:layout_constraintTop_toBottomOf="@+id/guideline54" />
+        app:layout_constraintTop_toTopOf="@+id/iv_img_face" />
 
     <TextView
-        android:id="@+id/btn_biceps"
+        android:id="@+id/tv_abs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BICEPS"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/guideline55"
-        app:layout_constraintEnd_toStartOf="@+id/guideline60"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline54" />
-
-    <TextView
-        android:id="@+id/btn_abs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="90dp"
+        android:layout_marginTop="136dp"
+        android:layout_marginEnd="184dp"
         android:text="ABS"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/guideline57"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline60"
-        app:layout_constraintTop_toTopOf="@+id/guideline56" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_shoulder" />
 
     <TextView
-        android:id="@+id/btn_forearm"
+        android:id="@+id/tv_thigh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="50dp"
-        android:text="FOREARM"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/guideline58"
-        app:layout_constraintEnd_toStartOf="@+id/guideline60"
-        app:layout_constraintStart_toStartOf="@+id/imageView25"
-        app:layout_constraintTop_toTopOf="@+id/guideline57" />
-
-    <TextView
-        android:id="@+id/btn_thigh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
+        android:layout_marginTop="124dp"
+        android:layout_marginEnd="96dp"
         android:text="THIGH"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/guideline58"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline60"
-        app:layout_constraintTop_toTopOf="@+id/guideline57" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_abs" />
 
     <TextView
-        android:id="@+id/btn_cardio"
+        android:id="@+id/tv_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        android:text="SHOW ALL"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.814"
+        app:layout_constraintStart_toEndOf="@+id/tv_cardio" />
+
+    <TextView
+        android:id="@+id/tv_biceps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="148dp"
+        android:text="BICEPS"
+        android:textColor="@color/white"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_img_face" />
+
+    <TextView
+        android:id="@+id/tv_forearm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:text="FOREARM"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_biceps" />
+
+    <TextView
+        android:id="@+id/tv_cardio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginBottom="148dp"
         android:text="CARDIO"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline60"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline59" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/btn_all_exercise"
+        android:id="@+id/tv_triceps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ALL"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="148dp"
+        android:text="TRICEPS"
         android:textColor="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_img_face" />
+
+    <TextView
+        android:id="@+id/tv_glutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="148dp"
+        android:text="GLUTES"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_triceps" />
+
+    <TextView
+        android:id="@+id/tv_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="156dp"
+        android:layout_marginEnd="176dp"
+        android:text="BACK"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_shoulder" />
+
+    <TextView
+        android:id="@+id/tv_calf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="120dp"
+        android:layout_marginBottom="168dp"
+        android:text="CALF"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_stretch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="308dp"
+        android:layout_marginBottom="88dp"
+        android:text="STRETCH"
+        android:textColor="@color/white"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline60"
-        app:layout_constraintTop_toTopOf="@+id/guideline59" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline54"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.3" />
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline55"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.35" />
+    <!--<FrameLayout-->
+    <!--android:id="@+id/frame_container"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="0dp"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/btn_back_front" >-->
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline56"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.45" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline57"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.55" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline58"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.65" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline59"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.90" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline60"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+    <!--<ImageView-->
+    <!--android:id="@+id/imageView2"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center"-->
+    <!--app:srcCompat="@mipmap/front_view_exercise" />-->
+    <!--</FrameLayout>-->
 
 </android.support.constraint.ConstraintLayout>

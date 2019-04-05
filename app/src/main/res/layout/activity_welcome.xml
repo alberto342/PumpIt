@@ -4,22 +4,4 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".WelcomeActivities.WelcomeActivity">
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="94dp" />
-
-    <Button
-        android:id="@+id/skip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Skip"
-        tools:layout_editor_absoluteX="269dp"
-        tools:layout_editor_absoluteY="31dp" />
-</android.support.constraint.ConstraintLayout>
+    tools:context=".WelcomeActivities.WelcomeActivity"/>

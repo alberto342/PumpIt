@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="@dimen/common_8"
         app:cardUseCompatPadding="true"
         app:contentPadding="@dimen/common_4">
 

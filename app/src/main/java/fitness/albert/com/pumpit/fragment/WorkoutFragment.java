@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import fitness.albert.com.pumpit.AddExerciseActivity;
+import fitness.albert.com.pumpit.CustomPlanActivity;
 import fitness.albert.com.pumpit.R;
 
 /**
@@ -47,7 +47,7 @@ public class WorkoutFragment extends Fragment {
             btnAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(getActivity(), AddExerciseActivity.class));
+                    startActivity(new Intent(getActivity(), CustomPlanActivity.class));
                 }
             });
         }

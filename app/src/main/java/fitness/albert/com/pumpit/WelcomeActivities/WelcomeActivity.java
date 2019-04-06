@@ -18,6 +18,7 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
+
 public class WelcomeActivity extends AppCompatActivity {
 
     private Realm realm;

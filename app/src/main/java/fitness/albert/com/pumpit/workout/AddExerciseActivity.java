@@ -1,4 +1,4 @@
-package fitness.albert.com.pumpit;
+package fitness.albert.com.pumpit.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import fitness.albert.com.pumpit.R;
 
 public class AddExerciseActivity extends AppCompatActivity implements View.OnClickListener {
 

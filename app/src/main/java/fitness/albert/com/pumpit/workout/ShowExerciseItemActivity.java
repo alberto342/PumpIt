@@ -1,4 +1,4 @@
-package fitness.albert.com.pumpit;
+package fitness.albert.com.pumpit.workout;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
+import fitness.albert.com.pumpit.R;
 
 public class ShowExerciseItemActivity extends AppCompatActivity {
 

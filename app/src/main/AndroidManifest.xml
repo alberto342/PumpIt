@@ -12,9 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CustomPlanActivity"></activity>
-        <activity android:name=".ShowExerciseResult" />
-        <activity android:name=".ShowExerciseItemActivity" />
+        <activity android:name=".workout.WorkoutPlansActivity"></activity>
+        <activity android:name=".workout.CustomPlanActivity" />
+        <activity android:name=".workout.ShowExerciseResult" />
+        <activity android:name=".workout.ShowExerciseItemActivity" />
         <activity android:name=".ShowSnackActivity" />
         <activity android:name=".ShowLunchActivity" />
         <activity android:name=".ShowDinnerActivity" />
@@ -65,7 +66,7 @@
             android:name=".Register.EmailRegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AddExerciseActivity"
+            android:name=".workout.AddExerciseActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SearchFoodsActivity"

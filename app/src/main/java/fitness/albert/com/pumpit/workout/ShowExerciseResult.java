@@ -1,4 +1,4 @@
-package fitness.albert.com.pumpit;
+package fitness.albert.com.pumpit.workout;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import java.util.List;
 
 import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.Model.Exercise;
+import fitness.albert.com.pumpit.R;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;

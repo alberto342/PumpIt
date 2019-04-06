@@ -22,7 +22,7 @@ import java.util.List;
 
 import fitness.albert.com.pumpit.Model.Exercise;
 import fitness.albert.com.pumpit.R;
-import fitness.albert.com.pumpit.ShowExerciseItemActivity;
+import fitness.albert.com.pumpit.workout.ShowExerciseItemActivity;
 
 
 public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> implements SearchView.OnQueryTextListener {

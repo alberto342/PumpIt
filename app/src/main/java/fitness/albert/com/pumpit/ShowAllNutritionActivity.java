@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import fitness.albert.com.pumpit.Adapter.BreakfastListAdapter;
 import fitness.albert.com.pumpit.Adapter.DinnerListAdapter;
@@ -123,7 +124,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                 protein += foodList.get(i).getNf_protein();
                             }
 
-                            totalMeal.setText(String.format("Total: %.2f" + " Kcal.  " + "%.2f" + " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ", kcal, carbs, protein, fat));
+                            totalMeal.setText(String.format(Locale.US,"Total: %.2f" + " Kcal.  " + "%.2f" + " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ", kcal, carbs, protein, fat));
 
                             kcal = carbs = fat = protein = 0;
 

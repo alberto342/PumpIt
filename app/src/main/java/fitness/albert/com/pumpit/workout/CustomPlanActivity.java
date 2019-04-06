@@ -1,5 +1,6 @@
-package fitness.albert.com.pumpit;
+package fitness.albert.com.pumpit.workout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -21,8 +22,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
+import fitness.albert.com.pumpit.R;
 
 public class CustomPlanActivity extends AppCompatActivity {
 
@@ -37,7 +40,7 @@ public class CustomPlanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_plan);
 
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         init();
         addItemsIntoSpinner();
@@ -131,6 +134,8 @@ public class CustomPlanActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addDataIntoFireBase();
+                startActivity(new Intent(CustomPlanActivity.this, WorkoutPlansActivity.class));
+                finish();
             }
         });
     }

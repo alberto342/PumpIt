@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit.WelcomeActivities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +44,13 @@ public class WelcomeActivity extends AppCompatActivity {
         boolean getPref = savePref.getBoolean("realm", false);
 
         if (!getPref) {
+            final ProgressDialog progressdialog = new ProgressDialog(this);
+            progressdialog.setMessage("Please Wait....");
+            progressdialog.show();
+
             readTxtFile();
+
+            progressdialog.hide();
         } else {
             startActivity(new Intent(this, GoalActivity.class));
             finish();

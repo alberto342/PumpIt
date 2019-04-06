@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import fitness.albert.com.pumpit.CustomPlanActivity;
+import fitness.albert.com.pumpit.workout.CustomPlanActivity;
 import fitness.albert.com.pumpit.R;
 
 /**

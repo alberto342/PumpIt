@@ -11,19 +11,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
+import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 
@@ -96,7 +95,6 @@ public class CustomPlanActivity extends AppCompatActivity {
     }
 
 
-
     private void addDataIntoFireBase() {
 
         String daysWeek = null, difficultyLevel = null, dayType = null, routineDescription, routineName;
@@ -104,20 +102,26 @@ public class CustomPlanActivity extends AppCompatActivity {
         if (spDaysWeek.getSelectedItem() != null && spDifficultyLevel.getSelectedItem() != null && spDayType.getSelectedItem() != null) {
             daysWeek = spDaysWeek.getSelectedItem().toString();
             difficultyLevel = spDifficultyLevel.getSelectedItem().toString();
+
+            Log.d(TAG, "Get spinner index" + spDaysWeek.getSelectedItemPosition());
+
             dayType = spDayType.getSelectedItem().toString();
         }
 
+
+        int dayWeekPosition = spDaysWeek.getSelectedItemPosition() + 1;
         routineDescription = etRoutineDescription.getText().toString();
         routineName = etRoutineName.getText().toString();
 
-        WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel, dayType, routineDescription, getTodayDate());
+        WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel, dayType, routineDescription, UserRegister.getTodayData(), dayWeekPosition);
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS)
-                .add(workoutPlans)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).add(workoutPlans)
+
+               // .set(workoutPlans)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        Log.d(TAG, "DocumentSnapshot written with ID: " + task.getResult());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -127,7 +131,6 @@ public class CustomPlanActivity extends AppCompatActivity {
                     }
                 });
     }
-
 
     private void onClick() {
         btnCreateWorkout.setOnClickListener(new View.OnClickListener() {
@@ -140,12 +143,7 @@ public class CustomPlanActivity extends AppCompatActivity {
         });
     }
 
-
-    private String getTodayDate() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
-        return df.format(c);
+    @Override
+    public void onBackPressed() {
     }
-
-
 }

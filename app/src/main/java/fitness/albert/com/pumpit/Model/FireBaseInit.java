@@ -52,7 +52,7 @@ public class FireBaseInit {
         user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
-    public String getEmailRegister() {
+    public static String getEmailRegister() {
         String email = null;
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {

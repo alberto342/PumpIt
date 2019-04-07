@@ -12,8 +12,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/iv_plan_icon"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
+            android:layout_width="66dp"
+            android:layout_height="66dp"
             android:src="@mipmap/ic_launcher_round"
             app:civ_border_color="@color/colorPrimary"
             app:civ_border_width="2dp" />

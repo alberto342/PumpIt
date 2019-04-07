@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -15,7 +16,6 @@ public class UserRegister {
     public static final String EMAIL_KEY ="email";
     public static final String SharedPreferencesFile = "userInfo";
     public static final String fireBaseUsers = "users";
-
 
     private String imagesRefPath;  //profile img url
     private String fullName;
@@ -35,10 +35,7 @@ public class UserRegister {
     private String bodyFat;
     private String fatTarget;
     private String activityLevel;
-
-
-
-    final Map<String, Object> dataToSave = new HashMap<>();
+    private final Map<String, Object> dataToSave = new HashMap<>();
 
 
     public enum TrainingType {
@@ -232,8 +229,8 @@ public class UserRegister {
 
 
     public float customFloatNum(int num1, int num2) {
-        float floatNum = Float.parseFloat(num1 + "." + num2);
-        return floatNum;
+        return Float.parseFloat(num1 + "." + num2);
+       // return floatNum;
     }
 
 
@@ -259,9 +256,9 @@ public class UserRegister {
         return (int) (calculatorBEE().get(valueKey) * 1.1);
     }
 
-    public String getTodayData() {
+    public static String getTodayData() {
         Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
         return df.format(c);
     }
 

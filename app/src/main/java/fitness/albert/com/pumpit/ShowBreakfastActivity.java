@@ -50,7 +50,6 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     private QuantityView quantityViewCustom;
     private TextView tvEnergy, tvCarbs, tvProtein, tvFat;
     private ImageView foodItem;
-    private UserRegister user = new UserRegister();
     private List<Foods> foodList = new ArrayList<>();
     private List<String> spinnerList = new ArrayList<>();
     private Map<String, Float> allServingWeight = new HashMap<>();
@@ -90,6 +89,9 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
         mToolbar = getSupportActionBar();
         String foodName = BreakfastListAdapter.foodName;
         String foodNameCapitalizeFirstLetter = foodName.substring(0, 1).toUpperCase() + foodName.substring(1);
+
+
+        assert mToolbar != null;
         mToolbar.setTitle(foodNameCapitalizeFirstLetter);
 
         // Create a TextView programmatically.
@@ -129,13 +131,13 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
         db.collection(Foods.nutrition)
                 .document(getEmailRegister()).collection(Foods.breakfast)
-                .document(user.getTodayData()).collection(Foods.fruit)
+                .document(UserRegister.getTodayData()).collection(Foods.fruit)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         progressdialog.hide();
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful() && task.getResult() != null) {
                             for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);

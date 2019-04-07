@@ -27,6 +27,16 @@
         android:layout_marginStart="50dp"
         android:layout_marginTop="10dp"
         android:text="LEVEL 1"
+        android:textColor="@color/white"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/tv_see_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="60dp"
+        android:paddingTop="135dp"
+        android:text="See Programs"
         android:textColor="@color/white" />
 
     <TextView
@@ -38,7 +48,8 @@
         android:text="Elementary"
         android:textColor="@color/white"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/workout_complate"
@@ -47,7 +58,8 @@
         android:layout_marginStart="50dp"
         android:layout_marginTop="110dp"
         android:text="0/6 Workout complate"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/empty_exersis"
@@ -57,7 +69,8 @@
         android:layout_marginTop="10dp"
         android:text="You don't have exercise"
         android:textColor="@android:color/white"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:visibility="invisible" />
 
     <ImageView
         android:id="@+id/btn_add"
@@ -65,7 +78,8 @@
         android:layout_height="wrap_content"
         android:paddingStart="60dp"
         android:paddingTop="50dp"
-        android:src="@mipmap/btn_add_button_blue" />
+        android:src="@mipmap/btn_add_button_blue"
+        android:visibility="invisible" />
 
     <ImageView
         android:id="@+id/btn_workout"

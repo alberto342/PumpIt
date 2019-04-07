@@ -44,13 +44,7 @@ public class WelcomeActivity extends AppCompatActivity {
         boolean getPref = savePref.getBoolean("realm", false);
 
         if (!getPref) {
-            final ProgressDialog progressdialog = new ProgressDialog(this);
-            progressdialog.setMessage("Please Wait....");
-            progressdialog.show();
-
             readTxtFile();
-
-            progressdialog.hide();
         } else {
             startActivity(new Intent(this, GoalActivity.class));
             finish();
@@ -58,6 +52,10 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void readTxtFile() {
+
+        final ProgressDialog progressdialog = new ProgressDialog(this);
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
 
         final String TAG = "ShowExerciseResult";
         boolean realmExisting;
@@ -93,6 +91,8 @@ public class WelcomeActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        progressdialog.hide();
     }
 
 

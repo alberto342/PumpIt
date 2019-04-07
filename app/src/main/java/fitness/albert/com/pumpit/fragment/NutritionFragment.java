@@ -49,8 +49,6 @@ public class NutritionFragment extends Fragment {
     private boolean isOnNutrition;
 
 
-
-
     public NutritionFragment() {
         // Required empty public constructor
     }
@@ -196,7 +194,7 @@ public class NutritionFragment extends Fragment {
     private void getMealFromFs(String keyValue) {
 
         //get nutrition from firestone
-        db.collection(Foods.nutrition).document(FireBaseInit.fireBaseInit.getEmailRegister())
+        db.collection(Foods.nutrition).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(FireBaseInit.fireBaseInit.getTodayDate())
                 .collection("fruit").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

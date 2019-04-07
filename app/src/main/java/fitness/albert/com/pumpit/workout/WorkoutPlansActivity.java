@@ -18,17 +18,18 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 
-public class WorkoutPlansActivity extends AppCompatActivity  {
+public class WorkoutPlansActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "WorkoutPlansActivity";
-    private List<WorkoutPlans> workoutPlansList;
+    public static List<WorkoutPlans> workoutPlansList;
+    public static List<WorkoutPlans> workoutList;
 
 
     @Override
@@ -45,7 +46,7 @@ public class WorkoutPlansActivity extends AppCompatActivity  {
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main_add, menu);
-       // MenuItem menuItem = menu.findItem(R.id.add_plans);
+        // MenuItem menuItem = menu.findItem(R.id.add_plans);
         return true;
     }
 
@@ -58,23 +59,24 @@ public class WorkoutPlansActivity extends AppCompatActivity  {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS).get()
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                         progressdialog.hide();
 
-                        if (task.isSuccessful()) {
-
-                            for (int i = 0; i < Objects.requireNonNull(task.getResult()).getDocuments().size(); i++) {
+                        if(task.isSuccessful() && task.getResult() != null) {
+                            for(int i=0; i<task.getResult().getDocuments().size(); i++) {
                                 WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
                                 workoutPlansList.add(workoutPlans);
-
                                 initRecyclerView();
-
-                                Log.d(TAG, "DocumentSnapshot data: " + Objects.requireNonNull(task.getResult()).getDocuments());
                             }
+
+
+
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 })
@@ -88,7 +90,6 @@ public class WorkoutPlansActivity extends AppCompatActivity  {
 
 
     private void initRecyclerView() {
-
         RecyclerView view;
 
         view = findViewById(R.id.rv_workout_plans);

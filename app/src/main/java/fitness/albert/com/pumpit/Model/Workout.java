@@ -2,22 +2,23 @@ package fitness.albert.com.pumpit.Model;
 
 public class Workout extends WorkoutPlans {
 
+    public static final String WORKOUT = "workout";
     private String workoutDayName;
-    private int workoutDay;
+    private String workoutDay;
     private int numOfExercise;
     private int lengthTraining;
 
     public Workout() {
     }
 
-    public Workout(String workoutDayName, int workoutDay, int numOfExercise, int lengthTraining) {
+    public Workout(String workoutDayName, String workoutDay, int numOfExercise, int lengthTraining) {
         this.workoutDayName = workoutDayName;
         this.workoutDay = workoutDay;
         this.numOfExercise = numOfExercise;
         this.lengthTraining = lengthTraining;
     }
 
-    public Workout(String routineName, String daysWeek, String difficultyLevel, String dayType, String routineDescription, String date, int daysWeekPosition, String workoutDayName, int workoutDay, int numOfExercise, int lengthTraining) {
+    public Workout(String routineName, String daysWeek, String difficultyLevel, String dayType, String routineDescription, String date, int daysWeekPosition, String workoutDayName, String workoutDay, int numOfExercise, int lengthTraining) {
         super(routineName, daysWeek, difficultyLevel, dayType, routineDescription, date, daysWeekPosition);
         this.workoutDayName = workoutDayName;
         this.workoutDay = workoutDay;
@@ -33,11 +34,11 @@ public class Workout extends WorkoutPlans {
         this.workoutDayName = workoutDayName;
     }
 
-    public int getWorkoutDay() {
+    public String getWorkoutDay() {
         return workoutDay;
     }
 
-    public void setWorkoutDay(int workoutDay) {
+    public void setWorkoutDay(String workoutDay) {
         this.workoutDay = workoutDay;
     }
 

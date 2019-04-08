@@ -33,7 +33,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static String fireId;
     public static int posit;
 
-
     public WorkoutPlanAdapter(Context mContext, List<WorkoutPlans> plansList) {
         this.mContext = mContext;
         this.plansList = plansList;
@@ -64,6 +63,7 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         holder.tvPlanName.setText(plansList.get(position).getRoutineName());
         holder.tvGeneral.setText(plansList.get(position).getDaysWeek());
+
 
 
 

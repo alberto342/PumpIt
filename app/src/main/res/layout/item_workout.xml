@@ -1,78 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <LinearLayout
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/background"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textView54"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            card_view:cardBackgroundColor="@color/colorPrimary"
+            card_view:cardCornerRadius="6dp"
+            android:layout_marginBottom="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/imageView39"
-                    android:layout_height="19dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@mipmap/weightlifting" />
+                android:background="@color/colorPrimary"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_exercise_conut"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textView54"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="10"
-                    android:textColor="@color/white" />
+                    android:layout_weight="1" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/imageView39"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        app:srcCompat="@mipmap/weightlifting"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:id="@+id/tv_exercise_conut"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="10"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_exercise_name_work"
+                        android:layout_width="220dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="TextView"
+                        android:textAlignment="textStart"
+                        android:textColor="@color/white" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/tv_exercise_name_work"
-                    android:layout_width="220dp"
+                    android:id="@+id/textView53"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:id="@+id/tv_day"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="@color/white"
                     android:text="TextView"
-                    android:textAlignment="textStart"
-                    android:textColor="@color/white" />
+                    android:textAlignment="center"
+                    android:textColor="@color/background" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView53"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@color/background"
-                android:text="TextView"
-                android:textAlignment="center" />
-
-            <TextView
-                android:id="@+id/tv_day"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                android:background="@color/white"
-                android:text="TextView"
-                android:textAlignment="center"
-                android:textColor="@color/background" />
-
-        </LinearLayout>
-
+        </android.support.v7.widget.CardView>
     </LinearLayout>
 
 </LinearLayout>

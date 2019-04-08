@@ -10,15 +10,15 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import fitness.albert.com.pumpit.Model.WorkoutPlans;
+import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.R;
 
 public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context mContext;
-    private List<WorkoutPlans> workoutList;
+    private List<Workout> workoutList;
 
-    public WorkoutAdapter(Context mContext, List<WorkoutPlans> workoutList) {
+    public WorkoutAdapter(Context mContext, List<Workout> workoutList) {
         this.mContext = mContext;
         this.workoutList = workoutList;
     }
@@ -43,8 +43,9 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void bindViews(final ViewHolder holder, final int position) {
 
-       holder.tvDay.setText(workoutList.get(position).getDaysWeek());
-       holder.tvExerciseName.setText(workoutList.get(position).getRoutineName());
+       holder.tvDay.setText(workoutList.get(position).getWorkoutDay());
+       holder.tvExerciseName.setText(workoutList.get(position).getWorkoutDayName());
+       holder.tvExerciseCount.setText(String.valueOf(workoutList.get(position).getNumOfExercise()));
     }
 
 

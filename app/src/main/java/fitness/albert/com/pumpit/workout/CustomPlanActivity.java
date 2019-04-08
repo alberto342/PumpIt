@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.UserRegister;
+import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 
@@ -33,7 +34,6 @@ public class CustomPlanActivity extends AppCompatActivity {
     private ImageView btnCreateWorkout;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "CustomPlanActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,7 +109,7 @@ public class CustomPlanActivity extends AppCompatActivity {
         }
 
 
-        int dayWeekPosition = spDaysWeek.getSelectedItemPosition() + 1;
+        final int dayWeekPosition = spDaysWeek.getSelectedItemPosition() + 1;
         routineDescription = etRoutineDescription.getText().toString();
         routineName = etRoutineName.getText().toString();
 
@@ -117,11 +117,32 @@ public class CustomPlanActivity extends AppCompatActivity {
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).add(workoutPlans)
 
-               // .set(workoutPlans)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
-                        Log.d(TAG, "DocumentSnapshot written with ID: " + task.getResult());
+
+                        Log.d(TAG, "DocumentSnapshot written with ID: " + Objects.requireNonNull(task.getResult()).getId());
+
+                        for (int i = 1; i <= dayWeekPosition; i++) {
+
+                            Workout workout = new Workout("Workout " + i, "Day " + i, 0, 0);
+
+                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(Objects.requireNonNull(task.getResult()).getId()).collection(Workout.WORKOUT)
+                                    .add(workout)
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentReference> task) {
+
+                                            Log.d(TAG, "DocumentSnapshot written with ID: " + Objects.requireNonNull(task.getResult()).getId());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error adding document", e);
+                                        }
+                                    });
+                        }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

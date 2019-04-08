@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit.workout;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -7,13 +8,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import fitness.albert.com.pumpit.Adapter.WorkoutAdapter;
-import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 
@@ -26,46 +32,56 @@ public class WorkoutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
-    }
 
-    private void setWorkout() {
-
-        int position = WorkoutPlanAdapter.posit;
-
-            int dayPosition = WorkoutPlansActivity.workoutPlansList.get(position).getDaysWeekPosition();
-
-            for(int i = 1 ; i <= dayPosition ; i++) {
-
-                WorkoutPlans plans = new WorkoutPlans();
-
-                plans.setDaysWeek("Day " + i);
-
-            }
-
-
-
+        getPlanFormFb();
 
     }
 
 
-    private void saveToFb() {
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(WorkoutPlanAdapter.fireId).set(WorkoutPlans.class)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+
+    private void getPlanFormFb() {
+        final List<Workout> workoutList = new ArrayList<>();
+
+        final ProgressDialog progressdialog = new ProgressDialog(this);
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
+
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document("znAnjovxgohOx3g47BrN").collection(Workout.WORKOUT)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully written!");
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        progressdialog.hide();
+
+                        if(task.isSuccessful() && task.getResult() != null) {
+
+                            for(int i = 0 ; i<task.getResult().size(); i++) {
+
+                                Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
+                                workoutList.add(workout);
+
+                                initRecyclerView(workoutList);
+
+
+                                Log.d(TAG, "DocumentSnapshot written with ID: " + task.getResult().getDocuments().get(i).getData());
+                            }
+                        }
                     }
                 })
+
+
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
+                        e.printStackTrace();
                     }
                 });
     }
 
 
-    private void initRecyclerView() {
+
+
+    private void initRecyclerView(List<Workout>workoutList) {
 
         final String TAG = "WorkoutActivity";
         RecyclerView view;
@@ -79,7 +95,7 @@ public class WorkoutActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         view.setLayoutManager(layoutManager);
 
-        workoutAdapter = new WorkoutAdapter(this, WorkoutPlansActivity.workoutPlansList);
+        workoutAdapter = new WorkoutAdapter(this, workoutList);
         view.setAdapter(workoutAdapter);
     }
 }

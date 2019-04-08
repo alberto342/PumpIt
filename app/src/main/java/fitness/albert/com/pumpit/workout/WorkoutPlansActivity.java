@@ -29,8 +29,6 @@ public class WorkoutPlansActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "WorkoutPlansActivity";
     public static List<WorkoutPlans> workoutPlansList;
-    public static List<WorkoutPlans> workoutList;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +50,6 @@ public class WorkoutPlansActivity extends AppCompatActivity {
 
 
     private void getPlanFormFb() {
-
         workoutPlansList = new ArrayList<>();
 
         final ProgressDialog progressdialog = new ProgressDialog(this);
@@ -72,9 +69,6 @@ public class WorkoutPlansActivity extends AppCompatActivity {
                                 workoutPlansList.add(workoutPlans);
                                 initRecyclerView();
                             }
-
-
-
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }

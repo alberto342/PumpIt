@@ -18,9 +18,9 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView46"
+            android:id="@+id/tv_name_of_plan"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_marginEnd="8dp"
             android:text="name of paln"
             android:textAlignment="center"
@@ -32,7 +32,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView42"
+            android:id="@+id/tv_name_of_plan_s"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -41,10 +41,10 @@
             android:textColor="@color/light_green"
             app:layout_constraintEnd_toStartOf="@+id/guideline101"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView43" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_active_workout" />
 
         <TextView
-            android:id="@+id/textView43"
+            android:id="@+id/tv_active_workout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -56,7 +56,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView44"
+            android:id="@+id/tv_change_plan"
             android:layout_width="wrap_content"
             android:layout_height="19dp"
             android:layout_marginEnd="20dp"
@@ -79,7 +79,7 @@
         android:id="@+id/rv_workout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cl_change_plan">

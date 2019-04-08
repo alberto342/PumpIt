@@ -166,5 +166,6 @@ public class CustomPlanActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        finish();
     }
 }

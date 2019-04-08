@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.workout;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,6 +31,7 @@ public class WorkoutPlansActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "WorkoutPlansActivity";
     public static List<WorkoutPlans> workoutPlansList;
+    public static String planName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +47,20 @@ public class WorkoutPlansActivity extends AppCompatActivity {
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main_add, menu);
-        // MenuItem menuItem = menu.findItem(R.id.add_plans);
         return true;
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_plans:
+                startActivity(new Intent(this, CustomPlanActivity.class));
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void getPlanFormFb() {
         workoutPlansList = new ArrayList<>();
@@ -67,6 +80,11 @@ public class WorkoutPlansActivity extends AppCompatActivity {
                             for(int i=0; i<task.getResult().getDocuments().size(); i++) {
                                 WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
                                 workoutPlansList.add(workoutPlans);
+
+
+                                assert workoutPlans != null;
+                                planName = workoutPlans.getRoutineName();
+
                                 initRecyclerView();
                             }
                         } else {

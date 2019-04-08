@@ -3,8 +3,7 @@
 
     <item
         android:id="@+id/add_plans"
-        android:icon="@mipmap/add"
+        android:icon="@drawable/ic_add_action"
         android:title="Add"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="ifRoom|collapseActionView" />
+        app:showAsAction="never|always|collapseActionView" />
 </menu>

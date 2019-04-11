@@ -67,7 +67,6 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
         progressBar = findViewById(R.id.progress_login);
 
         btnLogin.setImageResource(R.mipmap.btn_login_active);
-
     }
 
     private void setOnClickListener() {

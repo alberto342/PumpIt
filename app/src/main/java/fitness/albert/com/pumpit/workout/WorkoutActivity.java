@@ -57,9 +57,6 @@ public class WorkoutActivity extends AppCompatActivity {
         tvNameOfPlanSmall = findViewById(R.id.tv_name_of_plan_s);
         tvActiveWorkout = findViewById(R.id.tv_active_workout);
         tvChangePlan = findViewById(R.id.tv_change_plan);
-
-        tvNameOfPlan.setText(WorkoutPlansActivity.planName);
-        tvNameOfPlanSmall.setText(WorkoutPlansActivity.planName);
     }
 
 
@@ -96,13 +93,12 @@ public class WorkoutActivity extends AppCompatActivity {
                         if(task.isSuccessful() && task.getResult() != null) {
                             workoutId = task.getResult().getDocuments().get(WorkoutPlanAdapter.posit).getId();
 
-
                             //set plan name
                               WorkoutPlans workoutPlans = task.getResult().getDocuments().get(WorkoutPlanAdapter.posit).toObject(WorkoutPlans.class);
                               assert workoutPlans != null;
                               tvNameOfPlan.setText(workoutPlans.getRoutineName());
                               tvNameOfPlanSmall.setText(workoutPlans.getRoutineName());
-                              
+
 
                                 db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(workoutId).collection(Workout.WORKOUT)
                                         .get()
@@ -129,7 +125,6 @@ public class WorkoutActivity extends AppCompatActivity {
                                                 e.printStackTrace();
                                             }
                                         });
-
                             Log.d(TAG, "Successful id: " + task.getResult().getDocuments().get(WorkoutPlanAdapter.posit).getId());
 
                         } else {
@@ -151,7 +146,7 @@ public class WorkoutActivity extends AppCompatActivity {
 
         WorkoutAdapter workoutAdapter;
 
-        Log.d(TAG, "initRecyclerView: init food recyclerView" + view);
+        Log.d(TAG, "initRecyclerView: init workout recyclerView" + view);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         view.setLayoutManager(layoutManager);

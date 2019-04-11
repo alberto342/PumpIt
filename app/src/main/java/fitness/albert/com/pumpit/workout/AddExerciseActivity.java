@@ -7,12 +7,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Objects;
+
 import fitness.albert.com.pumpit.R;
 
 public class AddExerciseActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView btnBack, btnFront, imgFace;
-    private TextView chest, shoulder, abs, thigh, allExerise, biceps, forearm, cardio, stretch;
+    private TextView chest, shoulder, abs, thigh, allExercise, biceps, forearm, cardio, stretch;
     private TextView triceps, glutes, back, calf;
     public static String categorySelected;
     public static String category2Selected;
@@ -22,7 +24,7 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_exercise);
 
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         init();
         onClickListener();
@@ -36,7 +38,7 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
         shoulder = findViewById(R.id.tv_shoulder);
         abs = findViewById(R.id.tv_abs);
         thigh = findViewById(R.id.tv_thigh);
-        allExerise = findViewById(R.id.tv_all);
+        allExercise = findViewById(R.id.tv_all);
         biceps = findViewById(R.id.tv_biceps);
         forearm = findViewById(R.id.tv_forearm);
         cardio = findViewById(R.id.tv_cardio);
@@ -56,7 +58,7 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
         shoulder.setOnClickListener(this);
         abs.setOnClickListener(this);
         thigh.setOnClickListener(this);
-        allExerise.setOnClickListener(this);
+        allExercise.setOnClickListener(this);
         biceps.setOnClickListener(this);
         forearm.setOnClickListener(this);
         cardio.setOnClickListener(this);

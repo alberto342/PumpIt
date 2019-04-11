@@ -14,7 +14,6 @@ import android.widget.Spinner;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ public class CustomPlanActivity extends AppCompatActivity {
     private ImageView btnCreateWorkout;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "CustomPlanActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,9 +95,14 @@ public class CustomPlanActivity extends AppCompatActivity {
     }
 
 
-    private void addDataIntoFireBase() {
 
-        String daysWeek = null, difficultyLevel = null, dayType = null, routineDescription, routineName;
+
+    private void addDataIntoFireBase() {
+        String daysWeek = null;
+        String difficultyLevel = null;
+        String dayType = null;
+        String routineDescription;
+        final String routineName;
 
         if (spDaysWeek.getSelectedItem() != null && spDifficultyLevel.getSelectedItem() != null && spDayType.getSelectedItem() != null) {
             daysWeek = spDaysWeek.getSelectedItem().toString();
@@ -108,38 +113,35 @@ public class CustomPlanActivity extends AppCompatActivity {
             dayType = spDayType.getSelectedItem().toString();
         }
 
-
         final int dayWeekPosition = spDaysWeek.getSelectedItemPosition() + 1;
         routineDescription = etRoutineDescription.getText().toString();
         routineName = etRoutineName.getText().toString();
 
         WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel, dayType, routineDescription, UserRegister.getTodayData(), dayWeekPosition);
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).add(workoutPlans)
-
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName)
+                .set(workoutPlans)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-
-                        Log.d(TAG, "DocumentSnapshot written with ID: " + Objects.requireNonNull(task.getResult()).getId());
+                    public void onComplete(@NonNull Task<Void> task) {
+                    Log.d(TAG, "DocumentSnapshot successfully saved");
 
                         for (int i = 1; i <= dayWeekPosition; i++) {
 
                             Workout workout = new Workout("Workout " + i, "Day " + i, 0, 0);
 
-                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(Objects.requireNonNull(task.getResult()).getId()).collection(Workout.WORKOUT)
-                                    .add(workout)
-                                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName).collection(Workout.WORKOUT)
+                                    .document("Workout " + i).set(workout)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
-                                        public void onComplete(@NonNull Task<DocumentReference> task) {
-
-                                            Log.d(TAG, "DocumentSnapshot written with ID: " + Objects.requireNonNull(task.getResult()).getId());
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Log.d(TAG, "DocumentSnapshot successfully saved");
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error adding document", e);
+
                                         }
                                     });
                         }
@@ -148,10 +150,11 @@ public class CustomPlanActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
+
                     }
                 });
     }
+
 
     private void onClick() {
         btnCreateWorkout.setOnClickListener(new View.OnClickListener() {

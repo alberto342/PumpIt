@@ -45,7 +45,7 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
     private void initRecyclerView() {
 
         //SETUP RECYCLERVIEW
-        recyclerView = findViewById(R.id.rv);
+        recyclerView = findViewById(R.id.rv_exercise_result);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
@@ -122,6 +122,4 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
         AddExerciseActivity.category2Selected = "null";
         finish();
     }
-
-
 }

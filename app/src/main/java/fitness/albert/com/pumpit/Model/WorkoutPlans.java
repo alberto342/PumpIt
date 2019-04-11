@@ -25,6 +25,8 @@ public class WorkoutPlans {
         this.daysWeekPosition = daysWeekPosition;
     }
 
+
+
     public int getDaysWeekPosition() {
         return daysWeekPosition;
     }

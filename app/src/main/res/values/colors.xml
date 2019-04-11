@@ -12,11 +12,11 @@
     <color name="btn_login_register">#C723C2E6</color>
     <color name="btn_register">#3c4397</color>
     <color name="md_green_600">#43A047</color>
-    <color name="md_green_500">#4caf50</color>
+    <color name="md_green_500">#4CAF50</color>
     <color name="md_white_1000">#ffffff</color>
     <color name="md_red_600">#E53935</color>
     <color name="md_red_500">#F44336</color>
-    <color name="yellow_dolly">#ffff7e</color>
+    <color name="yellow_dolly">#FFFF7E</color>
     <color name="gray">#546E7A</color>
     <color name="dark_blue">#042543</color>
     <color name="light_green">#7ED321</color>

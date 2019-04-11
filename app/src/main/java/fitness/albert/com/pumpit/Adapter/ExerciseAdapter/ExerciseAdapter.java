@@ -2,9 +2,7 @@ package fitness.albert.com.pumpit.Adapter.ExerciseAdapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -15,14 +13,13 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.Model.Exercise;
 import fitness.albert.com.pumpit.R;
-import fitness.albert.com.pumpit.workout.ShowExerciseItemActivity;
+import fitness.albert.com.pumpit.helper.BitmapFromAssent;
+import fitness.albert.com.pumpit.workout.ExerciseDetailActivity;
 
 
 public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> implements SearchView.OnQueryTextListener {
@@ -50,7 +47,8 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
 
         final String TAG = "ExerciseAdapter";
 
-        Bitmap bitmap = getBitmapFromAsset(mContext, exerciseList.get(position).getImg_name());
+
+        Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, exerciseList.get(position).getImg_name());
 
         Glide.with(mContext)
                 .load(bitmap)
@@ -64,7 +62,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
              int position =  holder.getAdapterPosition();
                 exerciseImg = exerciseList.get(position).getImg_name();
                 exerciseName = exerciseList.get(position).getName();
-                mContext.startActivity(new Intent(mContext, ShowExerciseItemActivity.class));
+                mContext.startActivity(new Intent(mContext, ExerciseDetailActivity.class));
                 Log.d(TAG,"Exercise position: " + exerciseList.get(position).getName());
             }
         });
@@ -93,17 +91,19 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
         return false;
     }
 
-    private Bitmap getBitmapFromAsset(Context context, String filePath) {
-        AssetManager assetManager = context.getAssets();
 
-        InputStream istr;
-        Bitmap bitmap = null;
-        try {
-            istr = assetManager.open("images/" +filePath);
-            bitmap = BitmapFactory.decodeStream(istr);
-        } catch (IOException e) {
-            // handle exception
-        }
-        return bitmap;
-    }
+
+//    private Bitmap getBitmapFromAsset(Context context, String filePath) {
+//        AssetManager assetManager = context.getAssets();
+//
+//        InputStream istr;
+//        Bitmap bitmap = null;
+//        try {
+//            istr = assetManager.open("images/" +filePath);
+//            bitmap = BitmapFactory.decodeStream(istr);
+//        } catch (IOException e) {
+//            // handle exception
+//        }
+//        return bitmap;
+//    }
 }

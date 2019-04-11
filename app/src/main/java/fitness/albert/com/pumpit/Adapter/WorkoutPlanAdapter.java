@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Model.SavePref;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.WorkoutActivity;
@@ -30,7 +31,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Context mContext;
     private List<WorkoutPlans> plansList;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    public static String fireId;
     public static int posit;
 
     public WorkoutPlanAdapter(Context mContext, List<WorkoutPlans> plansList) {
@@ -65,9 +65,7 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         holder.tvGeneral.setText(plansList.get(position).getDaysWeek());
 
 
-
-
-        Log.d(TAG, "Plan name: " + plansList.get(position).getRoutineName() + " Days/Week: " + plansList.get(position).getDaysWeek());
+        Log.d(TAG, "Plan name: " + plansList.get(position).getRoutineName() + " Workout day Name: " + plansList.get(position).getDaysWeek());
 
         holder.itemPlanSelected.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,10 +98,14 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
 
-                            fireId = task.getResult().getDocuments().get(position).getId();
+                       //     fireId = task.getResult().getDocuments().get(position).getId();
 
                             Log.d(TAG, "Documents: " + task.getResult().getDocuments() +
-                                    "\nFireId: " + fireId);
+                                    "\nFireId: " + task.getResult().getDocuments().get(position).getId());
+
+                            SavePref savePref = new SavePref();
+                            savePref.createSharedPreferencesFiles(mContext, "exercise");
+                            savePref.saveData("planName",task.getResult().getDocuments().get(position).getId());
                         }
                     }
                 })

@@ -14,11 +14,11 @@ public class ExerciseViewHolder extends RecyclerView.ViewHolder {
     ImageView image;
     LinearLayout layout;
 
-    public ExerciseViewHolder(View itemView) {
+    ExerciseViewHolder(View itemView) {
         super(itemView);
 
         nameTxt =  itemView.findViewById(R.id.tv_exercise_name);
-        image  = itemView.findViewById(R.id.iv_image);
-        layout = itemView.findViewById(R.id.item_food_selected);
+        image  = itemView.findViewById(R.id.exercise_img);
+        layout = itemView.findViewById(R.id.item_exe_selected);
     }
 }

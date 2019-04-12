@@ -52,16 +52,16 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, trainingList.get(position).getImgName());
 
-        int set = trainingList.get(position).getSetNumber();
-        int rep = trainingList.get(position).getRepNumber();
+       // int set = trainingList.get(position).getSetNumber();
+       // int rep = trainingList.get(position).getRepNumber();
 
         Glide.with(mContext)
                 .load(bitmap)
                 .into(holder.ivTraining);
 
         holder.trainingName.setText(trainingList.get(position).getExerciseName());
-        holder.tvSetAndRep.setText(String.format(Locale.US,"%d SET(s) of %d REPs", set, rep));
-        holder.tvRestTime.setText(String.format(Locale.US, "Rest: %d + s", trainingList.get(position).getRestTime()));
+       // holder.tvSetAndRep.setText(String.format(Locale.US,"%d SET(s) of %d REPs", set, rep));
+        holder.tvRestTime.setText(String.format(Locale.US, "Rest: %d + s", trainingList.get(position).getRestBetweenSet()));
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

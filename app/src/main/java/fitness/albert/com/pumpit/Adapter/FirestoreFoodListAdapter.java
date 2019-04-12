@@ -116,9 +116,9 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
 
     //Get firebase food item id
     private void getFoodId(final int position) {
-        db.collection(Foods.nutrition).document(getEmailRegister())
-                .collection(Foods.breakfast).document(getTodayDate())
-                .collection(Foods.fruit).get()
+        db.collection(Foods.NUTRITION).document(getEmailRegister())
+                .collection(Foods.BREAKFAST).document(getTodayDate())
+                .collection(Foods.FRUIT).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override
@@ -127,7 +127,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                             fireId = task.getResult().getDocuments().get(position).getId();
 
 
-                            //getDocuments splite for get nutrition
+                            //getDocuments splite for get NUTRITION
                             String getDocuments = String.valueOf(task.getResult().getDocuments());
                             String[] part = getDocuments.split("/");
                             nutrition = part[2];

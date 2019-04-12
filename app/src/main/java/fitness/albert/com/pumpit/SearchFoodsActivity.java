@@ -144,9 +144,9 @@ public class SearchFoodsActivity extends AppCompatActivity {
 
             try {
                 arrayListIntoClass();
-                db.collection(Foods.nutrition)
-                        .document(getEmailRegister()).collection(Foods.breakfast)
-                        .document(getTodayDate()).collection(Foods.fruit).add(mListItem.get(i))
+                db.collection(Foods.NUTRITION)
+                        .document(getEmailRegister()).collection(Foods.BREAKFAST)
+                        .document(getTodayDate()).collection(Foods.FRUIT).add(mListItem.get(i))
 
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
@@ -172,24 +172,24 @@ public class SearchFoodsActivity extends AppCompatActivity {
     //get Meal from SharedPreferences file
     private String getMeal() {
 
-        SharedPreferences pref = getSharedPreferences(Foods.SharedPreferencesFile, Context.MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-        boolean breakfast = pref.getBoolean("dinner", false);
-        boolean dinner = pref.getBoolean("breakfast",false);
-        boolean lunch = pref.getBoolean("lunch",false);
-        boolean snack = pref.getBoolean("snack",false);
+        boolean breakfast = pref.getBoolean("DINNER", false);
+        boolean dinner = pref.getBoolean("BREAKFAST",false);
+        boolean lunch = pref.getBoolean("LUNCH",false);
+        boolean snack = pref.getBoolean("SNACK",false);
 
         if (breakfast) {
-            return "breakfast";
+            return "BREAKFAST";
         }
         if (dinner) {
-            return "dinner";
+            return "DINNER";
         }
         if (lunch) {
-            return "lunch";
+            return "LUNCH";
         }
         if (snack) {
-            return "snack";
+            return "SNACK";
         } else {
             return null;
         }

@@ -115,9 +115,9 @@ public class SnacksListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     //Get firebase food item id
     private void getFoodId(final int position) {
-        db.collection(Foods.nutrition).document(getEmailRegister())
-                .collection(Foods.snack).document(getTodayDate())
-                .collection(Foods.fruit).get()
+        db.collection(Foods.NUTRITION).document(getEmailRegister())
+                .collection(Foods.SNACK).document(getTodayDate())
+                .collection(Foods.FRUIT).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override

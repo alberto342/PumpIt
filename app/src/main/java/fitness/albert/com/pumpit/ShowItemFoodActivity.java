@@ -141,9 +141,9 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         Log.d(TAG, "fooooood id: " + id);
 
 
-//        db.collection(Foods.nutrition)
-//                .document(getEmailRegister()).collection(Foods.breakfast)
-//                .document(user.getTodayData()).collection(Foods.fruit).document(id)
+//        db.collection(Foods.NUTRITION)
+//                .document(getEmailRegister()).collection(Foods.BREAKFAST)
+//                .document(user.getTodayData()).collection(Foods.FRUIT).document(id)
 //                .get()
 //                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 //                    @Override
@@ -197,9 +197,9 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 //                })
 
 
-        db.collection(Foods.nutrition)
-                .document(getEmailRegister()).collection(Foods.breakfast)
-                .document(user.getTodayData()).collection(Foods.fruit)
+        db.collection(Foods.NUTRITION)
+                .document(getEmailRegister()).collection(Foods.BREAKFAST)
+                .document(user.getTodayData()).collection(Foods.FRUIT)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -279,7 +279,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         float altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams * quantityViewCustom.getQuantity();
 
 
-        updateNutrition(Foods.breakfast, altMeasures);
+        updateNutrition(Foods.BREAKFAST, altMeasures);
     }
 
     @Override
@@ -336,14 +336,14 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                     testOnce = true;
 
                     quantityViewCustom.setQuantity(1);
-                    updateNutrition(Foods.breakfast, altMeasures);
+                    updateNutrition(Foods.BREAKFAST, altMeasures);
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 //                if (spinnerSelectedItem.contains("g")) {
-//                    spinnerIsGram(Foods.breakfast);
+//                    spinnerIsGram(Foods.BREAKFAST);
 //                }
             }
         });
@@ -355,9 +355,9 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        DocumentReference doc = db.collection(Foods.nutrition).document(getEmailRegister())
+        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.fruit).document(FirestoreFoodListAdapter.fireId);
+                .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());
         doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
@@ -393,9 +393,9 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        DocumentReference doc = db.collection(Foods.nutrition).document(getEmailRegister())
+        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.fruit).document(FirestoreFoodListAdapter.fireId);
+                .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
 
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());
@@ -425,24 +425,24 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
 
     public String getMeal() {
-        SharedPreferences pref = getSharedPreferences(Foods.SharedPreferencesFile, Context.MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-        boolean breakfast = pref.getBoolean("dinner", false);
-        boolean dinner = pref.getBoolean("breakfast", false);
-        boolean lunch = pref.getBoolean("lunch", false);
-        boolean snack = pref.getBoolean("snack", false);
+        boolean breakfast = pref.getBoolean("DINNER", false);
+        boolean dinner = pref.getBoolean("BREAKFAST", false);
+        boolean lunch = pref.getBoolean("LUNCH", false);
+        boolean snack = pref.getBoolean("SNACK", false);
 
         if (breakfast) {
-            return "dinner";
+            return "DINNER";
         }
         if (dinner) {
-            return "breakfast";
+            return "BREAKFAST";
         }
         if (lunch) {
-            return "lunch";
+            return "LUNCH";
         }
         if (snack) {
-            return "snack";
+            return "SNACK";
         } else {
             return null;
         }

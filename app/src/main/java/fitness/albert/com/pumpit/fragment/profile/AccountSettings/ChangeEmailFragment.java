@@ -164,13 +164,13 @@ public class ChangeEmailFragment extends Fragment {
 
         final DocumentReference newUserRef = db.collection(UserRegister.fireBaseUsers).document(etMyEmail.getText().toString());
 
-        final DocumentReference oldNutrition = db.collection(Foods.nutrition).document(getEmailRegister());
+        final DocumentReference oldNutrition = db.collection(Foods.NUTRITION).document(getEmailRegister());
 
-        final DocumentReference newNutrition = db.collection(Foods.nutrition).document(etMyEmail.getText().toString());
+        final DocumentReference newNutrition = db.collection(Foods.NUTRITION).document(etMyEmail.getText().toString());
 
         Log.d(TAG, "users -> emailRegister: " + userRef.getId() + "New emailRegister: " + etMyEmail.getText().toString());
 
-        Log.d(TAG, "nutrition-> email: " + oldNutrition.getId() + "New nutrition: " + etMyEmail.getText().toString());
+        Log.d(TAG, "NUTRITION-> email: " + oldNutrition.getId() + "New NUTRITION: " + etMyEmail.getText().toString());
 
 
         user.updateEmail(etMyEmail.getText().toString().trim())

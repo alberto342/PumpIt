@@ -4,13 +4,13 @@ import java.util.List;
 
 public class Foods {
 
-    public static final String SharedPreferencesFile = "meal";
-    public static final String dinner = "dinner";
-    public static final String breakfast = "breakfast";
-    public static final String lunch = "lunch";
-    public static final String snack = "snack";
-    public static final String nutrition = "nutrition";
-    public static final String fruit = "fruit";
+    public static final String SHARED_PREFERENCES_FILE = "meal";
+    public static final String DINNER = "DINNER";
+    public static final String BREAKFAST = "BREAKFAST";
+    public static final String LUNCH = "LUNCH";
+    public static final String SNACK = "SNACK";
+    public static final String NUTRITION = "NUTRITION";
+    public static final String FRUIT = "FRUIT";
 
     public Foods() {
     }

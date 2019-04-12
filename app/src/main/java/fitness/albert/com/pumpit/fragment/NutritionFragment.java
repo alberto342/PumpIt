@@ -82,10 +82,10 @@ public class NutritionFragment extends Fragment {
             progressdialog.setMessage("Please Wait....");
             progressdialog.show();
 
-            getMealFromFs(Foods.breakfast);
-            getMealFromFs(Foods.snack);
-            getMealFromFs(Foods.lunch);
-            getMealFromFs(Foods.dinner);
+            getMealFromFs(Foods.BREAKFAST);
+            getMealFromFs(Foods.SNACK);
+            getMealFromFs(Foods.LUNCH);
+            getMealFromFs(Foods.DINNER);
             progressdialog.hide();
         }
 
@@ -129,7 +129,7 @@ public class NutritionFragment extends Fragment {
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            savePref.createSharedPreferencesFiles(getActivity(), Foods.SharedPreferencesFile);
+            savePref.createSharedPreferencesFiles(getActivity(), Foods.SHARED_PREFERENCES_FILE);
 
 
             switch (v.getId()) {
@@ -157,7 +157,7 @@ public class NutritionFragment extends Fragment {
 
     //The first time the email not exist, only after add food is exists
     private void emailIsOnNutrition() {
-       DocumentReference docRef =  db.collection(Foods.nutrition).document(getEmailRegister());
+       DocumentReference docRef =  db.collection(Foods.NUTRITION).document(getEmailRegister());
        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
            @Override
            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -181,10 +181,10 @@ public class NutritionFragment extends Fragment {
     }
 
     private void saveMealToSP(boolean dinner, boolean breakfast, boolean lunch, boolean snack) {
-        savePref.saveData("dinner", dinner);
-        savePref.saveData("breakfast", breakfast);
-        savePref.saveData("lunch", lunch);
-        savePref.saveData("snack", snack);
+        savePref.saveData("DINNER", dinner);
+        savePref.saveData("BREAKFAST", breakfast);
+        savePref.saveData("LUNCH", lunch);
+        savePref.saveData("SNACK", snack);
 
         startActivity(new Intent(getActivity(), SearchFoodsActivity.class));
         getActivity().getFragmentManager().popBackStack();
@@ -193,10 +193,10 @@ public class NutritionFragment extends Fragment {
 
     private void getMealFromFs(String keyValue) {
 
-        //get nutrition from firestone
-        db.collection(Foods.nutrition).document(FireBaseInit.getEmailRegister())
+        //get NUTRITION from firestone
+        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(FireBaseInit.fireBaseInit.getTodayDate())
-                .collection("fruit").get()
+                .collection("FRUIT").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -210,7 +210,7 @@ public class NutritionFragment extends Fragment {
 
                                 Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
 
-                                //set nutrition to float
+                                //set NUTRITION to float
                                 kcal += foodList.get(i).getNf_calories();
                                 carbs += foodList.get(i).getNf_total_carbohydrate();
                                 fat += foodList.get(i).getNf_total_fat();

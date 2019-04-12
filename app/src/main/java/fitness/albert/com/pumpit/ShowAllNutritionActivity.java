@@ -59,15 +59,15 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
         init();
 
-        getMealFromFs(Foods.breakfast, rvListBreakfast, foodListBreakfast, tvTotalBreakfast);
-        getMealFromFs(Foods.lunch, rvListLunch, foodListLunch, tvTotalLunch);
-        getMealFromFs(Foods.dinner, rvListDinner, foodListDinner, tvTotalDinner);
-        getMealFromFs(Foods.snack, rvListSnacks, foodListSnacks, tvTotalSnacks);
+        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast);
+        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch);
+        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner);
+        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks);
 
-        enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.breakfast);
-        enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.dinner);
-        enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.lunch);
-        enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.snack);
+        enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.BREAKFAST);
+        enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
+        enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.LUNCH);
+        enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.SNACK);
     }
 
     private void init() {
@@ -91,10 +91,10 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        //get nutrition from firestone
-        db.collection(Foods.nutrition).document(getEmailRegister())
+        //get NUTRITION from firestone
+        db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.fruit).get()
+                .collection(Foods.FRUIT).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override
@@ -117,7 +117,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
                                 Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
 
-                                //set nutrition to float
+                                //set NUTRITION to float
                                 kcal += foodList.get(i).getNf_calories();
                                 carbs += foodList.get(i).getNf_total_carbohydrate();
                                 fat += foodList.get(i).getNf_total_fat();
@@ -144,9 +144,9 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
 
     private void deleteFromFirebase(final String keyValue, final String foodName, final int qty) {
-        db.collection(Foods.nutrition).document(getEmailRegister())
+        db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.fruit).get()
+                .collection(Foods.FRUIT).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override
@@ -162,9 +162,9 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                     String id = task.getResult().getDocuments().get(i).getId();
 
                                     //delete from firebase
-                                    db.collection(Foods.nutrition).document(getEmailRegister())
+                                    db.collection(Foods.NUTRITION).document(getEmailRegister())
                                             .collection(keyValue).document(getTodayDate())
-                                            .collection(Foods.fruit).document(id).delete();
+                                            .collection(Foods.FRUIT).document(id).delete();
 
                                     Log.d(TAG, "DocumentSnapshot " + task.getResult().getDocuments().get(i).getId()   + " successfully deleted!");
                                     return;
@@ -199,19 +199,19 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
             switch (nutrition) {
-                case Foods.breakfast:
+                case Foods.BREAKFAST:
                     breakfastAdapter = new BreakfastListAdapter(this, foodList);
                     recyclerView.setAdapter(breakfastAdapter);
                     break;
-                case Foods.lunch:
+                case Foods.LUNCH:
                     lunchAdapter = new LunchListAdapter(this, foodList);
                     recyclerView.setAdapter(lunchAdapter);
                     break;
-                case Foods.dinner:
+                case Foods.DINNER:
                     dinnerAdapter = new DinnerListAdapter(this, foodList);
                     recyclerView.setAdapter(dinnerAdapter);
                     break;
-                case Foods.snack:
+                case Foods.SNACK:
                     snacksAdapter = new SnacksListAdapter(this, foodList);
                     recyclerView.setAdapter(snacksAdapter);
             }

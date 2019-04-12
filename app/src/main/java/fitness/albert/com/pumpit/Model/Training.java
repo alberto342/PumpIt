@@ -1,37 +1,60 @@
 package fitness.albert.com.pumpit.Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Training {
 
     private String imgName;
     private String exerciseName;
-    private int setNumber;
-    private int repNumber;
-    private float weight;
-    private int restTime;
+    private int restBetweenSet;
+    private int restAfterExercise;
     private boolean isFavorite;
     private String date;
+    private int sizeOfRept;
+    private List<TrackerExercise> trackerExercises;
+
 
     public Training() {
     }
 
-    public Training(String exerciseName, int setNumber, int repNumber, int restTime, String imgName, String date, boolean isFavorite, float weight) {
+    public Training(String exerciseName, List<TrackerExercise> trackerExercises, int sizeOfRept, int restBetweenSet, int restAfterExercise, String imgName, String date, boolean isFavorite) {
         this.exerciseName = exerciseName;
-        this.setNumber = setNumber;
-        this.repNumber = repNumber;
-        this.restTime = restTime;
+        this.restBetweenSet = restBetweenSet;
+        this.restAfterExercise = restAfterExercise;
         this.imgName = imgName;
         this.isFavorite = isFavorite;
         this.date = date;
-        this.weight = weight;
+        this.sizeOfRept = sizeOfRept;
+        this.trackerExercises = new ArrayList<>();
+        this.trackerExercises = trackerExercises;
     }
 
-    public float getWeight() {
-        return weight;
+
+    public int getSizeOfRept() {
+        return sizeOfRept;
     }
 
-    public void setWeight(float weight) {
-        this.weight = weight;
+    public void setSizeOfRept(int sizeOfRept) {
+        this.sizeOfRept = sizeOfRept;
     }
+
+    public List<TrackerExercise> getTrackerExercises() {
+        return trackerExercises;
+    }
+
+    public void setTrackerExercises(List<TrackerExercise> trackerExercises) {
+        this.trackerExercises = trackerExercises;
+    }
+
+    public int getRestAfterExercise() {
+        return restAfterExercise;
+    }
+
+    public void setRestAfterExercise(int restAfterExercise) {
+        this.restAfterExercise = restAfterExercise;
+    }
+
 
     public String getDate() {
         return date;
@@ -65,27 +88,12 @@ public class Training {
         this.exerciseName = exerciseName;
     }
 
-    public int getSetNumber() {
-        return setNumber;
+
+    public int getRestBetweenSet() {
+        return restBetweenSet;
     }
 
-    public void setSetNumber(int setNumber) {
-        this.setNumber = setNumber;
-    }
-
-    public int getRepNumber() {
-        return repNumber;
-    }
-
-    public void setRepNumber(int repNumber) {
-        this.repNumber = repNumber;
-    }
-
-    public int getRestTime() {
-        return restTime;
-    }
-
-    public void setRestTime(int restTime) {
-        this.restTime = restTime;
+    public void setRestBetweenSet(int restBetweenSet) {
+        this.restBetweenSet = restBetweenSet;
     }
 }

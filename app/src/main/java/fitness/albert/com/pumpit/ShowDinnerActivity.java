@@ -127,9 +127,9 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        db.collection(Foods.nutrition)
-                .document(getEmailRegister()).collection(Foods.dinner)
-                .document(user.getTodayData()).collection(Foods.fruit)
+        db.collection(Foods.NUTRITION)
+                .document(getEmailRegister()).collection(Foods.DINNER)
+                .document(user.getTodayData()).collection(Foods.FRUIT)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -213,7 +213,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         float altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams * quantityViewCustom.getQuantity();
 
 
-        updateNutrition(Foods.breakfast, altMeasures);
+        updateNutrition(Foods.BREAKFAST, altMeasures);
     }
 
     @Override
@@ -270,14 +270,14 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
                     testOnce = true;
 
                     quantityViewCustom.setQuantity(1);
-                    updateNutrition(Foods.breakfast, altMeasures);
+                    updateNutrition(Foods.BREAKFAST, altMeasures);
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 //                if (spinnerSelectedItem.contains("g")) {
-//                    spinnerIsGram(Foods.breakfast);
+//                    spinnerIsGram(Foods.BREAKFAST);
 //                }
             }
         });
@@ -289,9 +289,9 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        DocumentReference doc = db.collection(Foods.nutrition).document(getEmailRegister())
+        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.fruit).document(FirestoreFoodListAdapter.fireId);
+                .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());
         doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
@@ -327,9 +327,9 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        DocumentReference doc = db.collection(Foods.nutrition).document(getEmailRegister())
+        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.fruit).document(DinnerListAdapter.fireId);
+                .collection(Foods.FRUIT).document(DinnerListAdapter.fireId);
 
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());

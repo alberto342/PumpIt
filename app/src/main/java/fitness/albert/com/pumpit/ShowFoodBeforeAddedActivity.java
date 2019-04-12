@@ -1121,9 +1121,9 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             }
 
             //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
-            db.collection(Foods.nutrition).document(getEmailRegister())
+            db.collection(Foods.NUTRITION).document(getEmailRegister())
                     .collection(getMeal()).document(getTodayDate())
-                    .collection(Foods.fruit).add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
+                    .collection(Foods.FRUIT).add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @SuppressLint("LongLogTag")
                         @Override
@@ -1148,24 +1148,24 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     //get Meal from SharedPreferences file
     public String getMeal() {
 
-        SharedPreferences pref = getSharedPreferences(Foods.SharedPreferencesFile, Context.MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-        boolean breakfast = pref.getBoolean("dinner", false);
-        boolean dinner = pref.getBoolean("breakfast", false);
-        boolean lunch = pref.getBoolean("lunch", false);
-        boolean snack = pref.getBoolean("snack", false);
+        boolean breakfast = pref.getBoolean("DINNER", false);
+        boolean dinner = pref.getBoolean("BREAKFAST", false);
+        boolean lunch = pref.getBoolean("LUNCH", false);
+        boolean snack = pref.getBoolean("SNACK", false);
 
         if (breakfast) {
-            return "dinner";
+            return "DINNER";
         }
         if (dinner) {
-            return "breakfast";
+            return "BREAKFAST";
         }
         if (lunch) {
-            return "lunch";
+            return "LUNCH";
         }
         if (snack) {
-            return "snack";
+            return "SNACK";
         } else {
             return null;
         }

@@ -25,9 +25,12 @@ import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
+import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
 
-public class WorkoutPlansActivity extends AppCompatActivity {
+public class WorkoutPlansActivity extends AppCompatActivity
+        implements RecyclerViewSwipeHelper.RecyclerViewSwipeHelperDelegate {
 
+    private RecyclerView view;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "WorkoutPlansActivity";
     public static List<WorkoutPlans> workoutPlansList;
@@ -39,6 +42,15 @@ public class WorkoutPlansActivity extends AppCompatActivity {
         setContentView(R.layout.activity_workout_plans);
 
         getPlanFormFb();
+
+        initRecyclerView();
+
+        setupSwipeMenu();
+    }
+
+
+    private void setupSwipeMenu() {
+        new RecyclerViewSwipeHelper(this, view, this);
     }
 
 
@@ -62,6 +74,59 @@ public class WorkoutPlansActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    @Override
+    public boolean showButton(int rowPosition, int buttonIndex) {
+        return true;
+    }
+
+    @Override
+    public int buttonWidth() {
+        return 0;
+    }
+
+    @Override
+    public void setupSwipeButtons(RecyclerView.ViewHolder viewHolder,
+                                  List<RecyclerViewSwipeHelper.SwipeButton> swipeButtons) {
+        //swipe delete
+        swipeButtons.add(new RecyclerViewSwipeHelper.SwipeButton(
+                getBaseContext(),
+                0,
+                0,
+
+                R.drawable.ic_delete,
+                R.dimen.ic_delete_size,
+                R.color.colorAccent,
+                new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
+                    @Override
+                    public void onClick(int pos) {
+                        Log.d(TAG, "pos: " + pos);
+
+                    }
+                }
+        ));
+        //swipe edit
+        swipeButtons.add(new RecyclerViewSwipeHelper.SwipeButton(
+                getBaseContext(),
+                0,
+                0,
+                R.drawable.ic_edit_action,
+                R.dimen.ic_delete_size,
+                R.color.md_green_500,
+                new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
+                    @Override
+                    public void onClick(int pos) {
+                        Log.d(TAG, "pos: " + pos);
+
+                        Intent i = new Intent(getBaseContext(), TrainingActivity.class);
+                        startActivity(i);
+                    }
+                }
+        ));
+    }
+
+
+
     private void getPlanFormFb() {
         workoutPlansList = new ArrayList<>();
 
@@ -80,7 +145,6 @@ public class WorkoutPlansActivity extends AppCompatActivity {
                             for(int i=0; i<task.getResult().getDocuments().size(); i++) {
                                 WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
                                 workoutPlansList.add(workoutPlans);
-
 
                                 assert workoutPlans != null;
                                 planName = workoutPlans.getRoutineName();
@@ -102,7 +166,7 @@ public class WorkoutPlansActivity extends AppCompatActivity {
 
 
     private void initRecyclerView() {
-        RecyclerView view;
+       // RecyclerView view;
 
         view = findViewById(R.id.rv_workout_plans);
 

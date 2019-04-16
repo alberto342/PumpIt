@@ -31,7 +31,7 @@ public class WorkoutActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "WorkoutActivity";
     private TextView tvNameOfPlan, tvNameOfPlanSmall, tvActiveWorkout, tvChangePlan;
-    private String workoutId;
+    public static String workoutId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +45,7 @@ public class WorkoutActivity extends AppCompatActivity {
         progressdialog.show();
 
         getPlanFormFb();
+
 
         progressdialog.hide();
 
@@ -76,14 +77,9 @@ public class WorkoutActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
     private void getPlanFormFb() {
 
         final List<Workout> workoutList = new ArrayList<>();
-
 
         //get workout id
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
@@ -98,7 +94,6 @@ public class WorkoutActivity extends AppCompatActivity {
                               assert workoutPlans != null;
                               tvNameOfPlan.setText(workoutPlans.getRoutineName());
                               tvNameOfPlanSmall.setText(workoutPlans.getRoutineName());
-
 
                                 db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(workoutId).collection(Workout.WORKOUT)
                                         .get()
@@ -137,13 +132,14 @@ public class WorkoutActivity extends AppCompatActivity {
 
 
 
+
+
     private void initRecyclerView(List<Workout> workoutList) {
 
         final String TAG = "WorkoutActivity";
         RecyclerView view;
 
         view = findViewById(R.id.rv_workout);
-
         WorkoutAdapter workoutAdapter;
 
         Log.d(TAG, "initRecyclerView: init workout recyclerView" + view);

@@ -47,7 +47,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
 
         final String TAG = "ExerciseAdapter";
 
-
         Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, exerciseList.get(position).getImg_name());
 
         Glide.with(mContext)
@@ -66,7 +65,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
                 Log.d(TAG,"Exercise position: " + exerciseList.get(position).getName());
             }
         });
-
     }
 
     @Override
@@ -91,19 +89,4 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
         return false;
     }
 
-
-
-//    private Bitmap getBitmapFromAsset(Context context, String filePath) {
-//        AssetManager assetManager = context.getAssets();
-//
-//        InputStream istr;
-//        Bitmap bitmap = null;
-//        try {
-//            istr = assetManager.open("images/" +filePath);
-//            bitmap = BitmapFactory.decodeStream(istr);
-//        } catch (IOException e) {
-//            // handle exception
-//        }
-//        return bitmap;
-//    }
 }

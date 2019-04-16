@@ -3,6 +3,7 @@ package fitness.albert.com.pumpit.workout;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,7 +21,6 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -180,10 +180,8 @@ public class TrackerExerciseFragment extends Fragment {
 
         final SavePref savePref = new SavePref();
 
-        Log.d(TAG, "Get SharedPreferencesFiles  - exercise");
-
         savePref.createSharedPreferencesFiles(getActivity(), "exercise");
-        String getPlanId = savePref.getString("planName", "");
+        final String getPlanId = savePref.getString("planName", "");
 
         String rest = setsRest.getText().toString();
         String[] parts = rest.split(" ");
@@ -194,7 +192,7 @@ public class TrackerExerciseFragment extends Fragment {
         int restAfterExercise = Integer.parseInt(part[0]);
 
 
-        List<TrackerExercise> weightList = new ArrayList<>();
+        final List<TrackerExercise> weightList = new ArrayList<>();
         List<TrackerExercise> repNumberList = new ArrayList<>();
         List<TrackerExercise> trackerExerciseList = new ArrayList<>();
 
@@ -214,16 +212,19 @@ public class TrackerExerciseFragment extends Fragment {
             trackerExerciseList.add(new TrackerExercise(repNumberList.get(i).getRepNumber(), weightList.get(i).getWeight()));
         }
 
-
         Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2, restBetweenSet, restAfterExercise, ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT).
-                document(WorkoutAdapter.workoutDayName).collection(ExerciseAdapter.exerciseName)
-                .add(training).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                document(WorkoutAdapter.workoutDayName).collection(Workout.EXERCISE_NAME).document(ExerciseAdapter.exerciseName)
+                .set(training).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
+            public void onComplete(@NonNull Task<Void> task) {
                 Log.d(TAG, "DocumentSnapshot successfully written!");
-                savePref.removeSingle(getActivity(), "exercise", "planName");
+
+
+                startActivity(new Intent(getActivity(), TrainingActivity.class));
+                Objects.requireNonNull(getActivity()).finish();
+                //savePref.removeSingle(getActivity(), "exercise", "planName");
             }
         })
                 .addOnFailureListener(new OnFailureListener() {
@@ -232,7 +233,6 @@ public class TrackerExerciseFragment extends Fragment {
                         Log.d(TAG, "Error writing document", e);
                     }
                 });
-
     }
 
 

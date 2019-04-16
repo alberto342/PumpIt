@@ -50,6 +50,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private void bindViews(final ViewHolder holder, final int position) {
 
        holder.tvDay.setText(workoutList.get(position).getWorkoutDay());
+       holder.tvDate.setText(workoutList.get(position).getDate());
        holder.tvExerciseName.setText(workoutList.get(position).getWorkoutDayName());
        holder.tvExerciseCount.setText(String.valueOf(workoutList.get(position).getNumOfExercise()));
        holder.layout.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +61,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
                mContext.startActivity(new Intent(mContext, TrainingActivity.class));
 
-               Log.d(TAG, "Workout day name: " + workoutList.get(position).getWorkoutDayName());
+               Log.d(TAG, "Workout day name: " + workoutDayName);
            }
        });
     }
@@ -74,13 +75,14 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView tvExerciseCount, tvExerciseName, tvDay;
+        private TextView tvExerciseCount, tvExerciseName, tvDay, tvDate;
         private LinearLayout layout;
 
         public ViewHolder(View rowView) {
             super(rowView);
             rowView.setOnClickListener(this);
 
+            this.tvDate = rowView.findViewById(R.id.tv_recently);
             this.tvExerciseCount = rowView.findViewById(R.id.tv_exercise_conut);
             this.tvExerciseName = rowView.findViewById(R.id.tv_exercise_name_work);
             this.tvDay = rowView.findViewById(R.id.tv_day);

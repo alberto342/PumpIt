@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".workout.ExerciseLogsActivity"></activity>
+        <activity android:name=".workout.EditCustomPlanActivity"></activity>
+        <activity android:name=".workout.ExerciseLogsActivity" />
         <activity android:name=".workout.TrainingActivity" />
         <activity android:name=".workout.WorkoutActivity" />
         <activity android:name=".workout.WorkoutPlansActivity" />

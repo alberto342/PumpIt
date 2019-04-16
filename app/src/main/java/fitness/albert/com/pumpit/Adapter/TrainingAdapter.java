@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 import java.util.Locale;
 
+import fitness.albert.com.pumpit.Model.TrackerExercise;
 import fitness.albert.com.pumpit.Model.Training;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.helper.BitmapFromAssent;
@@ -24,10 +26,12 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private Context mContext;
     private List<Training> trainingList;
+    private List<TrackerExercise> trackerList;
 
-    public TrainingAdapter(Context mContext, List<Training> trainingList) {
+    public TrainingAdapter(Context mContext, List<Training> trainingList, List<TrackerExercise> trackerList) {
         this.mContext = mContext;
         this.trainingList = trainingList;
+        this.trackerList = trackerList;
     }
 
     @NonNull
@@ -50,18 +54,21 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private void bindViews(final ViewHolder holder, final int position) {
 
-        Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, trainingList.get(position).getImgName());
+        String TAG = "TrainingAdapter";
 
-       // int set = trainingList.get(position).getSetNumber();
-       // int rep = trainingList.get(position).getRepNumber();
+        Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, trainingList.get(position).getImgName());
 
         Glide.with(mContext)
                 .load(bitmap)
                 .into(holder.ivTraining);
 
+       // int rep = trackerList.get(position).getRepNumber();
+        int set = trainingList.get(position).getSizeOfRept();
+
         holder.trainingName.setText(trainingList.get(position).getExerciseName());
-       // holder.tvSetAndRep.setText(String.format(Locale.US,"%d SET(s) of %d REPs", set, rep));
-        holder.tvRestTime.setText(String.format(Locale.US, "Rest: %d + s", trainingList.get(position).getRestBetweenSet()));
+        holder.tvSetAndRep.setText(String.format(Locale.US, "%d SET(s)", set));
+        holder.tvRestTime.setText(String.format(Locale.US, "Rest: %ds", trainingList.get(position).getRestBetweenSet()));
+
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,10 +76,9 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         });
 
-
-
+        Log.d(TAG, "REP: " + trackerList.get(position).getRepNumber() + " SET: " +
+                trainingList.get(position).getSizeOfRept() + " Exercise name: " + trainingList.get(position).getExerciseName());
     }
-
 
 
     @Override
@@ -102,8 +108,6 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         }
     }
-
-
 
 
 }

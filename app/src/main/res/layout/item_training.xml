@@ -40,13 +40,13 @@
                     android:id="@+id/tv_training_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TextView"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -54,7 +54,6 @@
                         android:layout_width="85dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="h4ll0"
                         android:textColor="@color/gray" />
 
                     <LinearLayout
@@ -79,7 +78,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="10dp"
                             android:layout_weight="1"
-                            android:text="TextView"
                             android:textColor="@color/gray" />
                     </LinearLayout>
 

@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
-import fitness.albert.com.pumpit.Adapter.WorkoutAdapter;
 import fitness.albert.com.pumpit.R;
 
 public class ExerciseDetailActivity extends AppCompatActivity implements View.OnClickListener {
@@ -37,11 +36,8 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
         assert toolbar != null;
         toolbar.setTitle(ExerciseAdapter.exerciseName);
 
-
         imgFavorite = findViewById(R.id.iv_add_favorite);
-
         imgFavorite.setOnClickListener(this);
-
 
         imgExerciseFragment = new ImgExerciseFragment();
         instructionsExerciseFragment = new InstructionsExerciseFragment();
@@ -94,13 +90,12 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
                     isFavoriteSelected = false;
                 }
                 break;
-
-
         }
     }
 
 
-//    private void setDataIntoFb() {
+    //method for save exercise and favorite, if selected, need to see if save button is click
+//    private void saveDataIntoFb() {
 //
 //        final SavePref savePref = new SavePref();
 //
@@ -134,7 +129,6 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 
     @Override
     public void onBackPressed() {
-        WorkoutAdapter.workoutDayName = "null";
         finish();
     }
 }

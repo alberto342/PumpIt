@@ -3,6 +3,7 @@ package fitness.albert.com.pumpit.Model;
 public class Workout extends WorkoutPlans {
 
     public static final String WORKOUT = "workoutDayName";
+    public static final String EXERCISE_NAME = "exerciseName";
     private String workoutDayName;
     private String workoutDay;
     private int numOfExercise;

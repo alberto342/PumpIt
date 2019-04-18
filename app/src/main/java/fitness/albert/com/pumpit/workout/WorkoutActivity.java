@@ -62,7 +62,7 @@ public class WorkoutActivity extends AppCompatActivity {
 
 
     private void isActivatedPlan() {
-        boolean isActivate = false;
+        boolean isActivate = true;
 
         if (isActivate) {
             tvChangePlan.setVisibility(View.VISIBLE);

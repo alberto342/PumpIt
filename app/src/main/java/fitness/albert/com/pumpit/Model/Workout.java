@@ -20,7 +20,7 @@ public class Workout extends WorkoutPlans {
     }
 
     public Workout(String routineName, String daysWeek, String difficultyLevel, String dayType, String routineDescription, String date, int daysWeekPosition, String workoutDayName, String workoutDay, int numOfExercise, int lengthTraining) {
-        super(routineName, daysWeek, difficultyLevel, dayType, routineDescription, date, daysWeekPosition);
+        super(routineName, daysWeek, difficultyLevel,routineName, dayType, routineDescription, date, daysWeekPosition);
         this.workoutDayName = workoutDayName;
         this.workoutDay = workoutDay;
         this.numOfExercise = numOfExercise;

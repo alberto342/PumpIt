@@ -48,67 +48,39 @@
             app:layout_constraintGuide_percent="0.10" />
 
         <android.support.constraint.Guideline
-            android:id="@+id/guideline98"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.15" />
-
-        <android.support.constraint.Guideline
             android:id="@+id/guideline90"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.24" />
+            app:layout_constraintGuide_percent="0.22" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline91"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.31" />
-
-        <android.support.constraint.Guideline
-            android:id="@+id/guideline92"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.38" />
+            app:layout_constraintGuide_percent="0.34" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline93"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.45" />
+            app:layout_constraintGuide_percent="0.46" />
 
         <android.support.constraint.Guideline
-            android:id="@+id/guideline94"
+            android:id="@+id/guideline92"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.52" />
+            app:layout_constraintGuide_percent="0.58" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline95"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.59" />
-
-        <android.support.constraint.Guideline
-            android:id="@+id/guideline96"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.68" />
-
-        <android.support.constraint.Guideline
-            android:id="@+id/guideline97"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.73" />
+            app:layout_constraintGuide_percent="0.70" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline99"
@@ -134,33 +106,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginTop="8dp"
             android:text="Difficulty Level"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/guideline93"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline91" />
 
         <Spinner
             android:id="@+id/spinner_difficulty_level"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/white"
             android:minWidth="@dimen/browser_actions_context_menu_min_padding"
-            app:layout_constraintBottom_toTopOf="@+id/guideline94"
+            app:layout_constraintBottom_toTopOf="@+id/guideline93"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline93"
+            app:layout_constraintTop_toBottomOf="@+id/tv_difficulty_level"
             tools:ignore="MissingConstraints" />
 
 
         <EditText
             android:id="@+id/et_routine_name"
             android:layout_width="0dp"
-            android:layout_height="43dp"
-            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             android:ems="10"
             android:hint="(e.g Richard's Summer Exercise Plan)"
             android:inputType="textPersonName"
@@ -172,7 +146,7 @@
             app:layout_constraintBottom_toTopOf="@+id/guideline90"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline98" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_routine_name" />
 
 
         <TextView
@@ -180,11 +154,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginTop="8dp"
             android:text="Days/Week"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/guideline91"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline90" />
 
         <Spinner
             android:id="@+id/spinner_days_week"
@@ -192,14 +166,15 @@
             android:layout_height="0dp"
 
             android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/white"
             android:minWidth="@dimen/browser_actions_context_menu_min_padding"
-            app:layout_constraintBottom_toTopOf="@+id/guideline92"
+            app:layout_constraintBottom_toTopOf="@+id/guideline91"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline91"
+            app:layout_constraintTop_toBottomOf="@+id/tv_days_week"
             tools:ignore="MissingConstraints" />
 
         <TextView
@@ -207,11 +182,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginTop="8dp"
             android:text="Day Type"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/guideline95"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline92" />
 
 
         <Spinner
@@ -219,14 +194,42 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/white"
             android:minWidth="@dimen/browser_actions_context_menu_min_padding"
-            app:layout_constraintBottom_toTopOf="@+id/guideline96"
+            app:layout_constraintBottom_toTopOf="@+id/guideline95"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline95"
+            app:layout_constraintTop_toBottomOf="@+id/tv_day_type"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/tv_day_type2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="8dp"
+            android:text="Routine Type"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinner_difficulty_level" />
+
+        <Spinner
+            android:id="@+id/sp_routine_type"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/white"
+            android:minWidth="@dimen/browser_actions_context_menu_min_padding"
+            app:layout_constraintBottom_toTopOf="@+id/guideline92"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_day_type2"
             tools:ignore="MissingConstraints" />
 
         <TextView
@@ -235,12 +238,10 @@
             android:layout_height="0dp"
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:text="Routine Description:"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/guideline97"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline96" />
+            app:layout_constraintTop_toTopOf="@+id/guideline95" />
 
 
         <EditText
@@ -248,6 +249,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="5dp"
             android:ems="10"
             android:hint="Enter a description..."
             android:inputType="textPersonName"
@@ -257,9 +260,10 @@
             android:textColor="@color/white"
             android:textColorHint="@color/btn_login_register"
             android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline99"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline97"
+            app:layout_constraintTop_toBottomOf="@+id/tv_routine_description"
             tools:ignore="MissingConstraints" />
 
 

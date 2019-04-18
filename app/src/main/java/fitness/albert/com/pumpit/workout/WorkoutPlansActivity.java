@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -35,6 +36,8 @@ public class WorkoutPlansActivity extends AppCompatActivity
     private final String TAG = "WorkoutPlansActivity";
     public static List<WorkoutPlans> workoutPlansList;
     public static String planName;
+    public static String routineName; // chack in EditCustomPlanActivity
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +103,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
                 new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
                     @Override
                     public void onClick(int pos) {
+
                         Log.d(TAG, "pos: " + pos);
 
                     }
@@ -116,15 +120,75 @@ public class WorkoutPlansActivity extends AppCompatActivity
                 new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
                     @Override
                     public void onClick(int pos) {
-                        Log.d(TAG, "pos: " + pos);
+                        routineName = workoutPlansList.get(pos).getRoutineName();
+                        Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlansList.get(pos).getRoutineName());
 
-                        Intent i = new Intent(getBaseContext(), TrainingActivity.class);
+                        Intent i = new Intent(getBaseContext(), EditCustomPlanActivity.class);
                         startActivity(i);
                     }
                 }
         ));
     }
 
+//    private void setEditLayout() {
+//        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+//        LayoutInflater inflater = getLayoutInflater();
+//        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.edit_workout_days, null);
+//
+//        dialogBuilder.setView(dialogView);
+//
+//        final EditText editWorkoutDay = dialogView.findViewById(R.id.et_edit_workout_day_name);
+//        final Spinner pickWorkoutDay = dialogView.findViewById(R.id.sp_pick_a_workout_day);
+//        final ImageView save = dialogView.findViewById(R.id.btn_ok_workout_day);
+//        final ImageView cancel = dialogView.findViewById(R.id.iv_exit_custom_plan);
+//
+//        final AlertDialog dialog = dialogBuilder.create();
+//
+//        editWorkoutDay.setText(routineName);
+//
+//        //set spinner
+//        List<String> workoutDayList = new ArrayList<>();
+//        workoutDayList.add("Monday");
+//        workoutDayList.add("Tuesday");
+//        workoutDayList.add("Wednesday");
+//        workoutDayList.add("Thursday");
+//        workoutDayList.add("Friday");
+//        workoutDayList.add("Saturday");
+//        workoutDayList.add("Sunday");
+//        workoutDayList.add("No Specific Day");
+//
+//        ArrayAdapter<String> daysWeekAdapter = new ArrayAdapter<>(this,
+//                android.R.layout.simple_spinner_item, workoutDayList);
+//        daysWeekAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        pickWorkoutDay.setAdapter(daysWeekAdapter);
+//
+//
+//        save.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        cancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//            }
+//        });
+//        dialog.show();
+//    }
+
+
+    private void updateDataFb(String newRoutineName) {
+        DocumentReference workoutRef = db.collection(WorkoutPlans.WORKOUT_PLANS).
+                document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName);
+
+        WorkoutPlans workoutPlans = new WorkoutPlans();
+
+        workoutRef.update(workoutPlans.getRoutineName(), newRoutineName);
+    }
 
 
     private void getPlanFormFb() {
@@ -141,8 +205,8 @@ public class WorkoutPlansActivity extends AppCompatActivity
 
                         progressdialog.hide();
 
-                        if(task.isSuccessful() && task.getResult() != null) {
-                            for(int i=0; i<task.getResult().getDocuments().size(); i++) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
                                 workoutPlansList.add(workoutPlans);
 
@@ -166,7 +230,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
 
 
     private void initRecyclerView() {
-       // RecyclerView view;
+        // RecyclerView view;
 
         view = findViewById(R.id.rv_workout_plans);
 

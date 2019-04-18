@@ -7,6 +7,7 @@ public class WorkoutPlans {
     private String routineName;
     private String daysWeek;
     private String difficultyLevel;
+    private String routineType;
     private String dayType;
     private String routineDescription;
     private String date;
@@ -15,7 +16,7 @@ public class WorkoutPlans {
     public WorkoutPlans() {
     }
 
-    public WorkoutPlans(String routineName, String daysWeek, String difficultyLevel, String dayType, String routineDescription, String date, int daysWeekPosition) {
+    public WorkoutPlans(String routineName, String daysWeek, String difficultyLevel, String routineType, String dayType, String routineDescription, String date, int daysWeekPosition) {
         this.routineName = routineName;
         this.daysWeek = daysWeek;
         this.difficultyLevel = difficultyLevel;
@@ -23,9 +24,16 @@ public class WorkoutPlans {
         this.routineDescription = routineDescription;
         this.date = date;
         this.daysWeekPosition = daysWeekPosition;
+        this.routineType = routineType;
     }
 
+    public String getRoutineType() {
+        return routineType;
+    }
 
+    public void setRoutineType(String routineType) {
+        this.routineType = routineType;
+    }
 
     public int getDaysWeekPosition() {
         return daysWeekPosition;

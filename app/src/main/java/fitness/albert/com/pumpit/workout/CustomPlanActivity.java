@@ -28,7 +28,7 @@ import fitness.albert.com.pumpit.R;
 
 public class CustomPlanActivity extends AppCompatActivity {
 
-    private Spinner spDaysWeek, spDifficultyLevel, spDayType;
+    private Spinner spDaysWeek, spDifficultyLevel, spDayType, spRoutineType;
     private EditText etRoutineDescription, etRoutineName;
     private ImageView btnCreateWorkout;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -53,6 +53,7 @@ public class CustomPlanActivity extends AppCompatActivity {
         etRoutineDescription = findViewById(R.id.et_routine_description);
         etRoutineName = findViewById(R.id.et_routine_name);
         btnCreateWorkout = findViewById(R.id.btn_create_workout);
+        spRoutineType = findViewById(R.id.sp_routine_type);
     }
 
     public void addItemsIntoSpinner() {
@@ -60,6 +61,7 @@ public class CustomPlanActivity extends AppCompatActivity {
         List<String> daysWeekList = new ArrayList<>();
         List<String> difficultyLevelList = new ArrayList<>();
         List<String> dayTypeList = new ArrayList<>();
+        List<String> routineTypeList = new ArrayList<>();
 
         daysWeekList.add("1 day / week");
         daysWeekList.add("2 day / week");
@@ -76,22 +78,24 @@ public class CustomPlanActivity extends AppCompatActivity {
         dayTypeList.add("Day of Week (eg. Monday-Friday)");
         dayTypeList.add("Numerical (eg. Day 1, Day 2)");
 
-        ArrayAdapter<String> daysWeekAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, daysWeekList);
-        daysWeekAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spDaysWeek.setAdapter(daysWeekAdapter);
+        routineTypeList.add("General Fitness");
+        routineTypeList.add("Bulking");
+        routineTypeList.add("Cutting");
+        routineTypeList.add("Sport Specific");
 
 
-        ArrayAdapter<String> difficultyAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, difficultyLevelList);
-        difficultyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spDifficultyLevel.setAdapter(difficultyAdapter);
+        addIntoSpinner(daysWeekList, spDaysWeek);
+        addIntoSpinner(difficultyLevelList, spDifficultyLevel);
+        addIntoSpinner(dayTypeList,spDayType );
+        addIntoSpinner(routineTypeList, spRoutineType);
+    }
 
 
-        ArrayAdapter<String> dayTypeAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, dayTypeList);
-        dayTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spDayType.setAdapter(dayTypeAdapter);
+    private void addIntoSpinner(List<String> list, Spinner spinner) {
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, list);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arrayAdapter);
     }
 
 
@@ -101,14 +105,17 @@ public class CustomPlanActivity extends AppCompatActivity {
         String daysWeek = null;
         String difficultyLevel = null;
         String dayType = null;
+        String routineType = null;
         String routineDescription;
         final String routineName;
 
-        if (spDaysWeek.getSelectedItem() != null && spDifficultyLevel.getSelectedItem() != null && spDayType.getSelectedItem() != null) {
+
+        if (spDaysWeek.getSelectedItem() != null && spDifficultyLevel.getSelectedItem() != null && spDayType.getSelectedItem() != null && spRoutineType != null) {
             daysWeek = spDaysWeek.getSelectedItem().toString();
             difficultyLevel = spDifficultyLevel.getSelectedItem().toString();
+            routineType = spRoutineType.getSelectedItem().toString();
 
-            Log.d(TAG, "Get spinner index" + spDaysWeek.getSelectedItemPosition());
+                    Log.d(TAG, "Get spinner index" + spDaysWeek.getSelectedItemPosition());
 
             dayType = spDayType.getSelectedItem().toString();
         }
@@ -117,7 +124,8 @@ public class CustomPlanActivity extends AppCompatActivity {
         routineDescription = etRoutineDescription.getText().toString();
         routineName = etRoutineName.getText().toString();
 
-        WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel, dayType, routineDescription, UserRegister.getTodayData(), dayWeekPosition);
+
+        WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel, routineType,dayType, routineDescription, UserRegister.getTodayData(), dayWeekPosition);
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName)
                 .set(workoutPlans)

@@ -14,8 +14,8 @@ import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -24,6 +24,7 @@ import java.util.List;
 
 import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
@@ -37,6 +38,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
     public static List<WorkoutPlans> workoutPlansList;
     public static String planName;
     public static String routineName; // chack in EditCustomPlanActivity
+    private WorkoutPlanAdapter workoutAdapter;
 
 
     @Override
@@ -68,11 +70,9 @@ public class WorkoutPlansActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.add_plans:
-                startActivity(new Intent(this, CustomPlanActivity.class));
-                finish();
-                break;
+        if (item.getItemId() == R.id.add_plans) {
+            startActivity(new Intent(this, CustomPlanActivity.class));
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -103,9 +103,8 @@ public class WorkoutPlansActivity extends AppCompatActivity
                 new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
                     @Override
                     public void onClick(int pos) {
-
-                        Log.d(TAG, "pos: " + pos);
-
+                        deleteItem(pos);
+                        deleteFromFirebase(pos);
                     }
                 }
         ));
@@ -130,64 +129,65 @@ public class WorkoutPlansActivity extends AppCompatActivity
         ));
     }
 
-//    private void setEditLayout() {
-//        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-//        LayoutInflater inflater = getLayoutInflater();
-//        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.edit_workout_days, null);
-//
-//        dialogBuilder.setView(dialogView);
-//
-//        final EditText editWorkoutDay = dialogView.findViewById(R.id.et_edit_workout_day_name);
-//        final Spinner pickWorkoutDay = dialogView.findViewById(R.id.sp_pick_a_workout_day);
-//        final ImageView save = dialogView.findViewById(R.id.btn_ok_workout_day);
-//        final ImageView cancel = dialogView.findViewById(R.id.iv_exit_custom_plan);
-//
-//        final AlertDialog dialog = dialogBuilder.create();
-//
-//        editWorkoutDay.setText(routineName);
-//
-//        //set spinner
-//        List<String> workoutDayList = new ArrayList<>();
-//        workoutDayList.add("Monday");
-//        workoutDayList.add("Tuesday");
-//        workoutDayList.add("Wednesday");
-//        workoutDayList.add("Thursday");
-//        workoutDayList.add("Friday");
-//        workoutDayList.add("Saturday");
-//        workoutDayList.add("Sunday");
-//        workoutDayList.add("No Specific Day");
-//
-//        ArrayAdapter<String> daysWeekAdapter = new ArrayAdapter<>(this,
-//                android.R.layout.simple_spinner_item, workoutDayList);
-//        daysWeekAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        pickWorkoutDay.setAdapter(daysWeekAdapter);
-//
-//
-//        save.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                dialog.dismiss();
-//            }
-//        });
-//
-//        cancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                dialog.dismiss();
-//            }
-//        });
-//        dialog.show();
-//    }
+
+    private void deleteItem(final int position) {
+        workoutAdapter = new WorkoutPlanAdapter(this, workoutPlansList);
+        workoutPlansList.remove(position);
+        view.removeViewAt(position);
+        workoutAdapter.notifyItemRemoved(position);
+        workoutAdapter.notifyItemRangeChanged(position, workoutPlansList.size());
+    }
 
 
-    private void updateDataFb(String newRoutineName) {
-        DocumentReference workoutRef = db.collection(WorkoutPlans.WORKOUT_PLANS).
-                document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName);
+    private void deleteFromFirebase(final int position) {
 
-        WorkoutPlans workoutPlans = new WorkoutPlans();
+        db.collection(WorkoutPlans.WORKOUT_PLANS).
+                document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
 
-        workoutRef.update(workoutPlans.getRoutineName(), newRoutineName);
+                            final String id = task.getResult().getDocuments().get(position).getId();
+
+                            //find all
+                            db.collection(WorkoutPlans.WORKOUT_PLANS).
+                                    document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
+                                    .document(id).collection(Workout.WORKOUT_DAY_NAME).get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful() && task.getResult() != null) {
+                                        for(int i=0; i<task.getResult().size();i++) {
+                                            String workoutDayId = task.getResult().getDocuments().get(i).getId();
+
+                                            db.collection(WorkoutPlans.WORKOUT_PLANS).
+                                                    document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
+                                                    .document(id).collection(Workout.WORKOUT_DAY_NAME).document(workoutDayId).delete();
+                                        }
+                                    }
+                                }
+                            });
+
+                            db.collection(WorkoutPlans.WORKOUT_PLANS).
+                                    document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
+                                    .document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                                }
+                            });
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "isFailure: " + e);
+                    }
+                });
     }
 
 
@@ -234,9 +234,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
 
         view = findViewById(R.id.rv_workout_plans);
 
-        WorkoutPlanAdapter workoutAdapter;
-
-        Log.d(TAG, "initRecyclerView: init food recyclerView" + view);
+        Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + view);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         view.setLayoutManager(layoutManager);

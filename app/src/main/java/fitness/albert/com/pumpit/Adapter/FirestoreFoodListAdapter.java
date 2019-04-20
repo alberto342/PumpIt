@@ -54,6 +54,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
 
+    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(mContext).inflate(R.layout.item_food_nutrition, parent, false);
@@ -71,7 +72,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
 
-    @SuppressLint({"LongLogTag"})
+    @SuppressLint({"LongLogTag", "SetTextI18n"})
     private void bindViews(final ViewHolder holder, final int position) {
 
 
@@ -123,7 +124,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                     @SuppressLint("LongLogTag")
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful() && task.getResult() != null) {
                             fireId = task.getResult().getDocuments().get(position).getId();
 
 
@@ -187,7 +188,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public String getTodayDate() {
         Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
         return df.format(c);
     }
 

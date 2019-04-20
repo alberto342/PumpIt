@@ -49,6 +49,9 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
 
         Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, exerciseList.get(position).getImg_name());
 
+
+
+
         Glide.with(mContext)
                 .load(bitmap)
                 .into(holder.image);

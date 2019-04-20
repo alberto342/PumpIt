@@ -11,6 +11,11 @@
 
     <string name="food_name">Food name</string>
 
+    <string name="general_fitness">General Fitness</string>
+    <string name="bulking">Bulking</string>
+    <string name="cutting">Cutting</string>
+    <string name="sport_specific">Sport Specific</string>
+
     //food nutrition
     <string name="calories">Calories</string>
     <string name="calcium">Calcium</string>

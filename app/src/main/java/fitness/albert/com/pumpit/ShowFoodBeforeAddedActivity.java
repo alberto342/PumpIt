@@ -1207,7 +1207,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
     public String getTodayDate() {
         Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
         return df.format(c);
     }
 }

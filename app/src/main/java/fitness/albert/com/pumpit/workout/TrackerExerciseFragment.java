@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +88,6 @@ public class TrackerExerciseFragment extends Fragment {
                 addNewView(weight.getText().toString(), reps.getText().toString());
                 weight.setText("");
                 reps.setText("");
-
             }
         });
     }
@@ -150,7 +150,6 @@ public class TrackerExerciseFragment extends Fragment {
 
         ImageButton buttonRemove = newView.findViewById(R.id.iv_remove_tracker);
         buttonRemove.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 ((LinearLayout) newView.getParent()).removeView(newView);
@@ -162,7 +161,6 @@ public class TrackerExerciseFragment extends Fragment {
         trackerList.add(newText);
         trackerList.add(newTex2);
     }
-
 
 
     //save all date into firebase
@@ -191,7 +189,6 @@ public class TrackerExerciseFragment extends Fragment {
         String[] part = restExercise.split(" ");
         int restAfterExercise = Integer.parseInt(part[0]);
 
-
         final List<TrackerExercise> weightList = new ArrayList<>();
         List<TrackerExercise> repNumberList = new ArrayList<>();
         List<TrackerExercise> trackerExerciseList = new ArrayList<>();
@@ -212,27 +209,62 @@ public class TrackerExerciseFragment extends Fragment {
             trackerExerciseList.add(new TrackerExercise(repNumberList.get(i).getRepNumber(), weightList.get(i).getWeight()));
         }
 
-        Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2, restBetweenSet, restAfterExercise, ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
+        final Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2, restBetweenSet, restAfterExercise, ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT).
-                document(WorkoutAdapter.workoutDayName).collection(Workout.EXERCISE_NAME).document(ExerciseAdapter.exerciseName)
-                .set(training).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG, "DocumentSnapshot successfully written!");
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful() && task.getResult() != null) {
+               String workoutDayNameId =  task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
+
+                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                            .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME)
+                            .document(workoutDayNameId).collection(Workout.EXERCISE_NAME)
+                            .document(ExerciseAdapter.exerciseName)
+                            .set(training).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            startActivity(new Intent(getActivity(), TrainingActivity.class));
+                            Objects.requireNonNull(getActivity()).finish();
+                        }
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "Error writing document", e);
+                                }
+                            });
+                }
 
 
-                startActivity(new Intent(getActivity(), TrainingActivity.class));
-                Objects.requireNonNull(getActivity()).finish();
-                //savePref.removeSingle(getActivity(), "exercise", "planName");
+
             }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Error writing document", e);
-                    }
-                });
+        });
+
+//
+//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+//                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME)
+//                .document(WorkoutAdapter.workoutDayName).collection(Workout.EXERCISE_NAME)
+//                .document(ExerciseAdapter.exerciseName)
+//                .set(training).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                Log.d(TAG, "DocumentSnapshot successfully written!");
+//
+//
+//                startActivity(new Intent(getActivity(), TrainingActivity.class));
+//                Objects.requireNonNull(getActivity()).finish();
+//                //savePref.removeSingle(getActivity(), "exercise", "planName");
+//            }
+//        })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.d(TAG, "Error writing document", e);
+//                    }
+//                });
     }
 
 

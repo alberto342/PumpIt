@@ -2,7 +2,7 @@ package fitness.albert.com.pumpit.Model;
 
 public class Workout extends WorkoutPlans {
 
-    public static final String WORKOUT = "workoutDayName";
+    public static final String WORKOUT_DAY_NAME = "workoutDayName";
     public static final String EXERCISE_NAME = "exerciseName";
     private String workoutDayName;
     private String workoutDay;
@@ -12,7 +12,17 @@ public class Workout extends WorkoutPlans {
     public Workout() {
     }
 
+
+    public Workout(String date, String workoutDayName, String workoutDay, int numOfExercise, int lengthTraining) {
+        super(date);
+        this.workoutDayName = workoutDayName;
+        this.workoutDay = workoutDay;
+        this.numOfExercise = numOfExercise;
+        this.lengthTraining = lengthTraining;
+    }
+
     public Workout(String workoutDayName, String workoutDay, int numOfExercise, int lengthTraining) {
+
         this.workoutDayName = workoutDayName;
         this.workoutDay = workoutDay;
         this.numOfExercise = numOfExercise;

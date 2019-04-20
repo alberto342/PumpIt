@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class CustomPlanActivity extends AppCompatActivity {
     private ImageView btnCreateWorkout;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "CustomPlanActivity";
+    private String workoutNameId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,34 +129,77 @@ public class CustomPlanActivity extends AppCompatActivity {
 
         WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel, routineType,dayType, routineDescription, UserRegister.getTodayData(), dayWeekPosition);
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName)
-                .set(workoutPlans)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                    Log.d(TAG, "DocumentSnapshot successfully saved");
 
-                        for (int i = 1; i <= dayWeekPosition; i++) {
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
+                .add(workoutPlans).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
 
-                            Workout workout = new Workout("Workout " + i, "Day " + i, 0, 0);
+                if(task.isSuccessful() && task.getResult() != null) {
+                    workoutNameId = task.getResult().getId();
+                }
 
-                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName).collection(Workout.WORKOUT)
-                                    .document("Workout " + i).set(workout)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            Log.d(TAG, "DocumentSnapshot successfully saved");
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
 
-                                        }
-                                    });
-                        }
-                    }
-                })
+                for (int i = 1; i <= dayWeekPosition; i++) {
+
+                    Workout workout = new Workout("Workout " + i, "Day " + i, 0, 0);
+
+                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
+                            .document("Workout " + i).set(workout)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    Log.d(TAG, "DocumentSnapshot successfully saved");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "Failed to save " + e);
+                                }
+                            });
+                }
+            }
+        })
+
+
+
+
+
+
+
+
+
+
+
+//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName)
+//                .set(workoutPlans)
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                    Log.d(TAG, "DocumentSnapshot successfully saved");
+//
+//                        for (int i = 1; i <= dayWeekPosition; i++) {
+//
+//                            Workout workout = new Workout("Workout " + i, "Day " + i, 0, 0);
+//
+//                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName).collection(Workout.WORKOUT_DAY_NAME)
+//                                    .document("Workout " + i).set(workout)
+//                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                        @Override
+//                                        public void onComplete(@NonNull Task<Void> task) {
+//                                            Log.d(TAG, "DocumentSnapshot successfully saved");
+//                                        }
+//                                    })
+//                                    .addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception e) {
+//
+//                                        }
+//                                    });
+//                        }
+//                    }
+//                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {

@@ -80,16 +80,14 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()) {
-            case R.id.iv_add_favorite:
-                if (!isFavoriteSelected) {
-                    imgFavorite.setImageResource(R.mipmap.ic_star_black);
-                    isFavoriteSelected = true;
-                } else {
-                    imgFavorite.setImageResource(R.mipmap.ic_star_white);
-                    isFavoriteSelected = false;
-                }
-                break;
+        if (v.getId() == R.id.iv_add_favorite) {
+            if (!isFavoriteSelected) {
+                imgFavorite.setImageResource(R.mipmap.ic_star_black);
+                isFavoriteSelected = true;
+            } else {
+                imgFavorite.setImageResource(R.mipmap.ic_star_white);
+                isFavoriteSelected = false;
+            }
         }
     }
 
@@ -109,7 +107,7 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 //
 //        // Training training = new Training(ExerciseAdapter.exerciseName,0,0,20, ExerciseAdapter.exerciseImg, UserRegister.getTodayData(),false, 5.6f);
 //
-//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT).
+//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).
 //                document(WorkoutAdapter.workoutDayName).collection(ExerciseAdapter.exerciseName)
 //                .add(trainingList).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
 //            @Override

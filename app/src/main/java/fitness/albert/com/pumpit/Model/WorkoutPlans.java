@@ -16,6 +16,10 @@ public class WorkoutPlans {
     public WorkoutPlans() {
     }
 
+    public WorkoutPlans(String date) {
+        this.date = date;
+    }
+
     public WorkoutPlans(String routineName, String daysWeek, String difficultyLevel, String routineType, String dayType, String routineDescription, String date, int daysWeekPosition) {
         this.routineName = routineName;
         this.daysWeek = daysWeek;

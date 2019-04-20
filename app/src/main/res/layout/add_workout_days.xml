@@ -45,10 +45,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="e.g My Legs Day"
             android:inputType="textPersonName"
-            android:text="Name"
             android:textAlignment="center"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textColorHint="@color/gray" />
 
         <TextView
             android:id="@+id/textView45"

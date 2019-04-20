@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:id="@+id/item_plan_selected"
@@ -52,7 +52,7 @@
                     android:letterSpacing="0.1"
                     android:padding="@dimen/common_4"
                     android:paddingStart="@dimen/common_16"
-                    android:textColor="@color/colorDarkBlue"
+                    android:textColor="@color/md_green_500"
                     android:textSize="14sp" />
 
 

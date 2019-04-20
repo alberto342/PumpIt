@@ -35,7 +35,7 @@
             android:layout_marginBottom="15dp"
             android:text="Routine Name"
             android:textColor="@color/md_green_500"
-            android:textSize="18sp"
+            android:textSize="@dimen/common_font_16"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </LinearLayout>
@@ -55,9 +55,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
+            android:hint="Name"
             android:inputType="textPersonName"
             android:paddingStart="25dp"
-            android:text="Name"
             android:textColor="@color/white" />
     </LinearLayout>
 
@@ -81,7 +81,7 @@
             android:layout_weight="1"
             android:text="Difficulty"
             android:textColor="@color/md_green_500"
-            android:textSize="18sp" />
+            android:textSize="@dimen/common_font_16" />
     </LinearLayout>
 
     <LinearLayout
@@ -98,21 +98,21 @@
         <ImageView
             android:id="@+id/iv_difficulty_1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_star" />
 
         <ImageView
             android:id="@+id/iv_difficulty_2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_star" />
 
         <ImageView
             android:id="@+id/iv_difficulty_3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_star" />
     </LinearLayout>
@@ -137,7 +137,7 @@
             android:layout_weight="1"
             android:text="Type"
             android:textColor="@color/md_green_500"
-            android:textSize="18sp" />
+            android:textSize="@dimen/common_font_16" />
 
     </LinearLayout>
 
@@ -157,7 +157,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:srcCompat="@mipmap/ic_general_fitness_selected" />
+            app:srcCompat="@mipmap/ic_general_fitness" />
 
         <ImageView
             android:id="@+id/iv_bulking"
@@ -276,7 +276,7 @@
             android:paddingStart="25dp"
             android:text="Day Type"
             android:textColor="@color/md_green_500"
-            android:textSize="18sp" />
+            android:textSize="@dimen/common_font_16" />
     </LinearLayout>
 
     <LinearLayout
@@ -290,11 +290,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout14">
 
+
+
+
+        <!--<Spinner-->
+            <!--android:id="@+id/spinner_days_week"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_marginStart="10dp"-->
+            <!--android:layout_marginTop="8dp"-->
+            <!--android:layout_marginEnd="10dp"-->
+            <!--android:layout_marginBottom="5dp"-->
+            <!--android:background="@color/white"-->
+            <!--android:minWidth="@dimen/browser_actions_context_menu_min_padding"-->
+            <!--app:layout_constraintBottom_toTopOf="@+id/guideline91"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/tv_days_week"-->
+            <!--tools:ignore="MissingConstraints" />-->
+
+
         <Spinner
             android:id="@+id/sp_edit_day_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
             android:layout_weight="1"
+            android:background="@color/white"
             android:paddingTop="15dp"
             android:paddingBottom="15dp" />
     </LinearLayout>
@@ -319,7 +342,7 @@
             android:paddingStart="25dp"
             android:text="Routine Description"
             android:textColor="@color/md_green_500"
-            android:textSize="18sp" />
+            android:textSize="16dp" />
     </LinearLayout>
 
     <LinearLayout

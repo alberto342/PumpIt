@@ -102,7 +102,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                         //hide ProgressDialog
                         progressdialog.hide();
 
-                        if(task.isSuccessful()) {
+                        if(task.isSuccessful() && task.getResult() != null) {
 
                             nutritionName = keyValue;
 
@@ -152,11 +152,12 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                        if(task.isSuccessful()) {
+                        if(task.isSuccessful() && task.getResult() != null) {
 
                             for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
 
+                                assert foods != null;
                                 if(foodName.equals(foods.getFood_name()) && qty == foods.getServing_qty()) {
 
                                     String id = task.getResult().getDocuments().get(i).getId();
@@ -218,7 +219,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     }
 
     // Swipe to delete item
-    private boolean enableSwipeToDeleteAndUndo(final RecyclerView recyclerView, final List<Foods> foodList, final String keyValue) {
+    private void enableSwipeToDeleteAndUndo(final RecyclerView recyclerView, final List<Foods> foodList, final String keyValue) {
         final SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
             @Override
             public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int i) {
@@ -256,7 +257,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
         itemTouchhelper.attachToRecyclerView(recyclerView);
 
-        return true;
     }
 
 
@@ -285,7 +285,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
     public String getTodayDate() {
         Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
         return df.format(c);
     }
 

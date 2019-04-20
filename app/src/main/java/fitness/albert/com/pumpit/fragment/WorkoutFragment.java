@@ -59,6 +59,12 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
         loadExerciseFromFb();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        loadExerciseFromFb();
+    }
+
     private void init(View view) {
         seeWorkout = view.findViewById(R.id.tv_see_workout);
         findWorkout = view.findViewById(R.id.btn_find_workout);

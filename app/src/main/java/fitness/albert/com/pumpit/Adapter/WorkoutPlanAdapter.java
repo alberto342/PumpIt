@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -64,7 +66,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         holder.tvPlanName.setText(plansList.get(position).getRoutineName());
         holder.tvGeneral.setText(plansList.get(position).getDaysWeek());
 
-
         Log.d(TAG, "Plan name: " + plansList.get(position).getRoutineName() + " Workout day Name: " + plansList.get(position).getDaysWeek());
 
         holder.itemPlanSelected.setOnClickListener(new View.OnClickListener() {
@@ -78,18 +79,42 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
         });
 
+        String type = plansList.get(position).getRoutineType();
 
-//        Picasso.get()
-//                .load()
-//                .placeholder(R.mipmap.ic_launcher)
-//                .error(R.mipmap.ic_launcher)
-//                .into(holder.ivImage);
+        switch (type) {
+            case "General Fitness":
 
-
+                Picasso.get()
+                        .load(R.mipmap.ic_general_fitness)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.mipmap.ic_launcher)
+                        .into(holder.ivPlanIcon);
+                break;
+            case "Bulking":
+                Picasso.get()
+                        .load(R.mipmap.ic_bulking)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.mipmap.ic_launcher)
+                        .into(holder.ivPlanIcon);
+                break;
+            case "Cutting":
+                Picasso.get()
+                        .load(R.mipmap.ic_scale)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.mipmap.ic_launcher)
+                        .into(holder.ivPlanIcon);
+                break;
+            case "Sport Specific":
+                Picasso.get()
+                        .load(R.mipmap.ic_sport_specific)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.mipmap.ic_launcher)
+                        .into(holder.ivPlanIcon);
+        }
     }
 
 
-    //Get firebase item id
+    //Get workoutName item id
     private void getWorkPlanId(final int position) {
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                 .collection(WorkoutPlans.WORKOUT_NAME).get()
@@ -98,14 +123,14 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
 
-                       //     fireId = task.getResult().getDocuments().get(position).getId();
+                            //     fireId = task.getResult().getDocuments().get(position).getId();
 
                             Log.d(TAG, "Documents: " + task.getResult().getDocuments() +
                                     "\nFireId: " + task.getResult().getDocuments().get(position).getId());
 
                             SavePref savePref = new SavePref();
                             savePref.createSharedPreferencesFiles(mContext, "exercise");
-                            savePref.saveData("planName",task.getResult().getDocuments().get(position).getId());
+                            savePref.saveData("planName", task.getResult().getDocuments().get(position).getId());
                         }
                     }
                 })
@@ -124,12 +149,13 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
 
-//    public void removeItem(int position) {
-//        notifyItemRemoved(position);
-//    }
+    public List<WorkoutPlans> getData() {
+        return plansList;
+    }
 
 
-//    public void restoreItem(Foods item, int position) {
+//    public void restoreItem(WorkoutPlans item, int position) {
+//        plansList.add(position, item);
 //        notifyItemInserted(position);
 //    }
 
@@ -139,6 +165,7 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         //   private ImageView ivImage;
         private TextView tvPlanName, tvGeneral;
         private LinearLayout itemPlanSelected;
+        private ImageView ivPlanIcon;
 
         public ViewHolder(View rowView) {
             super(rowView);
@@ -148,6 +175,7 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvPlanName = rowView.findViewById(R.id.tv_workout_plan_name);
             itemPlanSelected = rowView.findViewById(R.id.item_plan_selected);
             tvGeneral = rowView.findViewById(R.id.tv_general);
+            ivPlanIcon = rowView.findViewById(R.id.iv_plan_icon);
         }
 
         @Override

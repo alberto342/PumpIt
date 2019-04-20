@@ -98,35 +98,85 @@ public class TrainingActivity extends AppCompatActivity {
     }
 
     private void getTrainingFromFb() {
+
+
         db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
-                .document(WorkoutActivity.workoutId).collection(Workout.WORKOUT).document(WorkoutAdapter.workoutDayName)
-                .collection(Workout.EXERCISE_NAME).get()
+                .document(WorkoutActivity.workoutId).collection(Workout.WORKOUT_DAY_NAME).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
+                        if(task.isSuccessful() && task.getResult() != null) {
+                           String workoutDayNameId =  task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
 
-                            for(int i = 0 ; i < task.getResult().size(); i++) {
-                                Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
-                                trainingList.add(training);
-                                TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
-                                trackerExerciseList.add(trackerExercise);
+                            db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                                    .document(WorkoutActivity.workoutId).collection(Workout.WORKOUT_DAY_NAME).document(workoutDayNameId)
+                                    .collection(Workout.EXERCISE_NAME).get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if (task.isSuccessful() && task.getResult() != null) {
 
-                                initRecyclerView(trainingList, trackerExerciseList);
-                            }
+                                                for(int i = 0 ; i < task.getResult().size(); i++) {
+                                                    Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
+                                                    trainingList.add(training);
+                                                    TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
+                                                    trackerExerciseList.add(trackerExercise);
 
-                            Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
-                        } else {
-                            Log.d(TAG, "No such document");
+                                                    initRecyclerView(trainingList, trackerExerciseList);
+                                                }
+
+                                                Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
+                                            } else {
+                                                Log.d(TAG, "No such document");
+                                            }
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d(TAG, "get failed with ", e);
+                                        }
+                                    });
+
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "get failed with ", e);
+
                     }
                 });
+
+
+
+
+
+
+//        db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+//                .document(WorkoutActivity.workoutId).collection(Workout.WORKOUT_DAY_NAME).document(WorkoutAdapter.workoutDayName)
+//                .collection(Workout.EXERCISE_NAME).get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful() && task.getResult() != null) {
+//
+//                            for(int i = 0 ; i < task.getResult().size(); i++) {
+//                                Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
+//                                trainingList.add(training);
+//                                TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
+//                                trackerExerciseList.add(trackerExercise);
+//
+//                                initRecyclerView(trainingList, trackerExerciseList);
+//                            }
+//
+//                            Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
+//                        } else {
+//                            Log.d(TAG, "No such document");
+//                        }
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.d(TAG, "get failed with ", e);
+//                    }
+//                });
     }
 
 
@@ -139,7 +189,7 @@ public class TrainingActivity extends AppCompatActivity {
         savePref.createSharedPreferencesFiles(this, "exercise");
         String getPlanId = savePref.getString("planName", "");
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT).
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).
                 document(WorkoutAdapter.workoutDayName).collection(Workout.EXERCISE_NAME).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override

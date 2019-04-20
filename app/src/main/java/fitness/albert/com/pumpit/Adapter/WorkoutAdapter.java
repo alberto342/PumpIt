@@ -23,6 +23,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Workout> workoutList;
     private final String TAG = "WorkoutAdapter";
     public static String workoutDayName;
+    public static int pos;
 
     public WorkoutAdapter(Context mContext, List<Workout> workoutList) {
         this.mContext = mContext;
@@ -56,6 +57,8 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
        holder.layout.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
+
+               pos = position;
 
                workoutDayName = workoutList.get(position).getWorkoutDayName();
 

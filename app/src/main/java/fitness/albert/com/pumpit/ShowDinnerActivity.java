@@ -90,6 +90,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         mToolbar = getSupportActionBar();
         String foodName = DinnerListAdapter.foodName;
         String foodNameCapitalizeFirstLetter = foodName.substring(0, 1).toUpperCase() + foodName.substring(1);
+        assert mToolbar != null;
         mToolbar.setTitle(foodNameCapitalizeFirstLetter);
 
         // Create a TextView programmatically.

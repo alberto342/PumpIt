@@ -6,4 +6,20 @@
     tools:context=".fragment.MyPlansFragment">
 
 
+    <TextView
+        android:id="@+id/tv_no_found_plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No plan found Please add"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="21dp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_my_plans"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </FrameLayout>

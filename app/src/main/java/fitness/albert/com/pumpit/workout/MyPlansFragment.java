@@ -1,16 +1,21 @@
 package fitness.albert.com.pumpit.workout;
 
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -21,6 +26,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
@@ -30,10 +36,12 @@ import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
 
-public class WorkoutPlansActivity extends AppCompatActivity
+
+public class MyPlansFragment extends Fragment
         implements RecyclerViewSwipeHelper.RecyclerViewSwipeHelperDelegate {
 
-    private RecyclerView view;
+    private RecyclerView mRecyclerView;
+    private TextView noFoundPlan;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "WorkoutPlansActivity";
     public static List<WorkoutPlans> workoutPlansList;
@@ -42,38 +50,49 @@ public class WorkoutPlansActivity extends AppCompatActivity
     private WorkoutPlanAdapter workoutAdapter;
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_workout_plans);
 
+    public MyPlansFragment() {
+        // Required empty public constructor
+    }
+
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_my_plans, container, false);
+
+        mRecyclerView = view.findViewById(R.id.rv_my_plans);
+        noFoundPlan = view.findViewById(R.id.tv_no_found_plan);
+
+        setHasOptionsMenu(true);
         getPlanFormFb();
 
         initRecyclerView();
 
-        setupSwipeMenu();
+      //  setupSwipeMenu();
+
+        return view;
     }
 
 
-    private void setupSwipeMenu() {
-        new RecyclerViewSwipeHelper(this, view, this);
-    }
+//    private void setupSwipeMenu() {
+//        new RecyclerViewSwipeHelper(this, mRecyclerView, this);
+//    }
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main_add, menu);
-        return true;
+        super.onCreateOptionsMenu(menu, inflater);
     }
-
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.add_plans) {
-            startActivity(new Intent(this, CustomPlanActivity.class));
-            finish();
+            startActivity(new Intent(getActivity(), CustomPlanActivity.class));
+           Objects.requireNonNull(getActivity()).finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -94,7 +113,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
                                   List<RecyclerViewSwipeHelper.SwipeButton> swipeButtons) {
         //swipe delete
         swipeButtons.add(new RecyclerViewSwipeHelper.SwipeButton(
-                getBaseContext(),
+                Objects.requireNonNull(getActivity()).getBaseContext(),
                 0,
                 0,
 
@@ -111,7 +130,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
         ));
         //swipe edit
         swipeButtons.add(new RecyclerViewSwipeHelper.SwipeButton(
-                getBaseContext(),
+                getActivity().getBaseContext(),
                 0,
                 0,
                 R.drawable.ic_edit_action,
@@ -123,7 +142,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
                         routineName = workoutPlansList.get(pos).getRoutineName();
                         Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlansList.get(pos).getRoutineName());
 
-                        Intent i = new Intent(getBaseContext(), EditCustomPlanActivity.class);
+                        Intent i = new Intent(Objects.requireNonNull(getActivity()).getBaseContext(), EditCustomPlanActivity.class);
                         startActivity(i);
                     }
                 }
@@ -132,9 +151,9 @@ public class WorkoutPlansActivity extends AppCompatActivity
 
 
     private void deleteItem(final int position) {
-        workoutAdapter = new WorkoutPlanAdapter(this, workoutPlansList);
+        workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
         workoutPlansList.remove(position);
-        view.removeViewAt(position);
+        mRecyclerView.removeViewAt(position);
         workoutAdapter.notifyItemRemoved(position);
         workoutAdapter.notifyItemRangeChanged(position, workoutPlansList.size());
     }
@@ -156,19 +175,19 @@ public class WorkoutPlansActivity extends AppCompatActivity
                                     document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
                                     .document(id).collection(Workout.WORKOUT_DAY_NAME).get()
                                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if(task.isSuccessful() && task.getResult() != null) {
-                                        for(int i=0; i<task.getResult().size();i++) {
-                                            String workoutDayId = task.getResult().getDocuments().get(i).getId();
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if(task.isSuccessful() && task.getResult() != null) {
+                                                for(int i=0; i<task.getResult().size();i++) {
+                                                    String workoutDayId = task.getResult().getDocuments().get(i).getId();
 
-                                            db.collection(WorkoutPlans.WORKOUT_PLANS).
-                                                    document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
-                                                    .document(id).collection(Workout.WORKOUT_DAY_NAME).document(workoutDayId).delete();
+                                                    db.collection(WorkoutPlans.WORKOUT_PLANS).
+                                                            document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
+                                                            .document(id).collection(Workout.WORKOUT_DAY_NAME).document(workoutDayId).delete();
+                                                }
+                                            }
                                         }
-                                    }
-                                }
-                            });
+                                    });
 
                             db.collection(WorkoutPlans.WORKOUT_PLANS).
                                     document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
@@ -195,7 +214,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
     private void getPlanFormFb() {
         workoutPlansList = new ArrayList<>();
 
-        final ProgressDialog progressdialog = new ProgressDialog(this);
+        final ProgressDialog progressdialog = new ProgressDialog(getActivity());
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
@@ -214,14 +233,17 @@ public class WorkoutPlansActivity extends AppCompatActivity
 
                                 initRecyclerView();
                             }
+
                             if(workoutPlansList.size() == 1) {
                                 SavePref savePref = new SavePref();
-                                savePref.createSharedPreferencesFiles(WorkoutPlansActivity.this, "exercise");
+                                savePref.createSharedPreferencesFiles(getActivity(), "exercise");
                                 savePref.saveData("default_plan", workoutPlansList.get(0).getRoutineName());
                             }
 
+                            if(workoutPlansList.size() == 0 ) {
+                               noFoundPlan.setVisibility(View.VISIBLE);
+                            }
                             progressdialog.hide();
-
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
@@ -238,15 +260,12 @@ public class WorkoutPlansActivity extends AppCompatActivity
 
     private void initRecyclerView() {
         // RecyclerView view;
+        Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + mRecyclerView);
 
-        view = findViewById(R.id.rv_workout_plans);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
 
-        Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + view);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        view.setLayoutManager(layoutManager);
-
-        workoutAdapter = new WorkoutPlanAdapter(this, workoutPlansList);
-        view.setAdapter(workoutAdapter);
+        workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
+        mRecyclerView.setAdapter(workoutAdapter);
     }
 }

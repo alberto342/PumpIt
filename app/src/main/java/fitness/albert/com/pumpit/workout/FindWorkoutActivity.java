@@ -1,55 +1,44 @@
-package fitness.albert.com.pumpit.fragment;
-
+package fitness.albert.com.pumpit.workout;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.fragment.FeaturedFragment;
 
-
-public class FindWorkoutFragment extends Fragment {
-    
-    public FindWorkoutFragment() {
-        // Required empty public constructor
-    }
-
+public class FindWorkoutActivity extends AppCompatActivity {
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_find_workout, container, false);
-        TabLayout tabLayout = view.findViewById(R.id.tablayout);
-        ViewPager viewPager = view.findViewById(R.id.view_pager);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_find_workout);
+
+        init();
+    }
+
+    private void init() {
+
+        TabLayout tabs = findViewById(R.id.tablayout_workout);
+        ViewPager viewPager = findViewById(R.id.vp_plans);
 
         setupViewPager(viewPager);
 
-        tabLayout.setupWithViewPager(viewPager);
-        return view;
+        tabs.setupWithViewPager(viewPager);
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
-        adapter.addFragment(new PlanFragment(), "My Plans");
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new MyPlansFragment(), "My Plans");
         adapter.addFragment(new FeaturedFragment(), "Featured");
         viewPager.setAdapter(adapter);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
 
@@ -82,5 +71,6 @@ public class FindWorkoutFragment extends Fragment {
             return mFragmentTitleList.get(position);
         }
     }
+
 
 }

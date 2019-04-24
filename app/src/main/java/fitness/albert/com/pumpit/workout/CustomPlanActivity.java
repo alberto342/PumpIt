@@ -161,45 +161,6 @@ public class CustomPlanActivity extends AppCompatActivity {
                 }
             }
         })
-
-
-
-
-
-
-
-
-
-
-
-//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName)
-//                .set(workoutPlans)
-//                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                    Log.d(TAG, "DocumentSnapshot successfully saved");
-//
-//                        for (int i = 1; i <= dayWeekPosition; i++) {
-//
-//                            Workout workout = new Workout("Workout " + i, "Day " + i, 0, 0);
-//
-//                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(routineName).collection(Workout.WORKOUT_DAY_NAME)
-//                                    .document("Workout " + i).set(workout)
-//                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                        @Override
-//                                        public void onComplete(@NonNull Task<Void> task) {
-//                                            Log.d(TAG, "DocumentSnapshot successfully saved");
-//                                        }
-//                                    })
-//                                    .addOnFailureListener(new OnFailureListener() {
-//                                        @Override
-//                                        public void onFailure(@NonNull Exception e) {
-//
-//                                        }
-//                                    });
-//                        }
-//                    }
-//                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {

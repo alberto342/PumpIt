@@ -2,6 +2,7 @@ package fitness.albert.com.pumpit.workout;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -47,7 +51,6 @@ public class WorkoutActivity extends AppCompatActivity
     /**
      *
      */
-    private ImageView btnAddDayIntoWorkout;
     private RecyclerView view;
     private WorkoutAdapter workoutAdapter;
     public static String workoutId;
@@ -59,21 +62,13 @@ public class WorkoutActivity extends AppCompatActivity
 
         init();
 
-//        final ProgressDialog progressdialog = new ProgressDialog(this);
-//        progressdialog.setMessage("Please Wait....");
-//        progressdialog.show();
-
         getPlanFormFb();
-
-//        progressdialog.hide();
 
         isActivatedPlan();
 
         initRecyclerView();
 
         setupSwipeMenu();
-
-        addDayOnCLick();
     }
 
     private void init() {
@@ -82,7 +77,23 @@ public class WorkoutActivity extends AppCompatActivity
         tvNameOfPlanSmall = findViewById(R.id.tv_name_of_plan_s);
         tvActiveWorkout = findViewById(R.id.tv_active_workout);
         tvChangePlan = findViewById(R.id.tv_change_plan);
-        btnAddDayIntoWorkout = findViewById(R.id.btn_add_day_to_workout);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.menu_main_add, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(R.id.add_plans == item.getItemId()) {
+            setEditLayout("");
+        }
+        return true;
     }
 
 
@@ -102,7 +113,12 @@ public class WorkoutActivity extends AppCompatActivity
         }
     }
 
+
     private void getPlanFormFb() {
+
+        final ProgressDialog progressdialog = new ProgressDialog(this);
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
 
         //get workout id
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
@@ -133,6 +149,7 @@ public class WorkoutActivity extends AppCompatActivity
 
                                                     Log.d(TAG, "Workout - DocumentSnapshot written with ID: " + task.getResult().getDocuments().get(i).getData());
                                                 }
+                                                progressdialog.hide();
                                             }
                                         }
                                     })
@@ -149,16 +166,6 @@ public class WorkoutActivity extends AppCompatActivity
                         }
                     }
                 });
-    }
-
-
-    private void addDayOnCLick() {
-        btnAddDayIntoWorkout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setEditLayout("");
-            }
-        });
     }
 
 

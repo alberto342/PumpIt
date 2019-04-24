@@ -24,6 +24,8 @@ import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.CustomPlanActivity;
+import fitness.albert.com.pumpit.workout.FindWorkoutActivity;
+import fitness.albert.com.pumpit.workout.StartWorkoutActivity;
 import fitness.albert.com.pumpit.workout.WorkoutPlansActivity;
 
 
@@ -33,7 +35,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     //private final String TAG = "WorkoutFragment";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView exerciseName, level, workoutComplete, emptyExercise, seeWorkout;
-    private ImageView btnAdd, findWorkout;
+    private ImageView btnAdd, findWorkout, btnStartWorkout;
 
     public WorkoutFragment() {
         // Required empty public constructor
@@ -55,6 +57,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
         seeWorkout.setOnClickListener(this);
         findWorkout.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
+        btnStartWorkout.setOnClickListener(this);
 
         loadExerciseFromFb();
     }
@@ -73,6 +76,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
         workoutComplete = view.findViewById(R.id.workout_complate);
         exerciseName = view.findViewById(R.id.workout_name);
         btnAdd = view.findViewById(R.id.btn_add);
+        btnStartWorkout = view.findViewById(R.id.btn_workout);
     }
 
 
@@ -92,11 +96,17 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), CustomPlanActivity.class));
                 break;
             case R.id.btn_find_workout:
-                Fragment fragment = new FindWorkoutFragment();
-                loadFragment(fragment);
+
+                startActivity(new Intent(getActivity(), FindWorkoutActivity.class));
+//
+//                Fragment fragment = new FindWorkoutFragment();
+//                loadFragment(fragment);
                 break;
             case R.id.tv_see_workout:
                 startActivity(new Intent(getActivity(), WorkoutPlansActivity.class));
+                break;
+            case R.id.btn_workout:
+                startActivity(new Intent(getActivity(), StartWorkoutActivity.class));
                 break;
         }
     }

@@ -35,6 +35,7 @@ import fitness.albert.com.pumpit.Adapter.WorkoutAdapter;
 import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.Training;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
@@ -189,7 +190,6 @@ public class WorkoutActivity extends AppCompatActivity
                         }
                     });
         }
-
     }
 
 
@@ -238,7 +238,6 @@ public class WorkoutActivity extends AppCompatActivity
         daysWeekAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         pickWorkoutDay.setAdapter(daysWeekAdapter);
 
-
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -248,9 +247,7 @@ public class WorkoutActivity extends AppCompatActivity
                 }
 
                 if (!isEditSelected[0]) {
-
                     saveDay(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString());
-
                 } else {
                     updateItem(workoutDayName, workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString());
                     isEditSelected[0] = false;
@@ -258,7 +255,6 @@ public class WorkoutActivity extends AppCompatActivity
                 dialog.dismiss();
             }
         });
-
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -285,6 +281,7 @@ public class WorkoutActivity extends AppCompatActivity
     }
 
 
+    //todo its not removed after deleted items
     @Override
     public void setupSwipeButtons(RecyclerView.ViewHolder viewHolder,
                                   List<RecyclerViewSwipeHelper.SwipeButton> swipeButtons) {
@@ -293,7 +290,6 @@ public class WorkoutActivity extends AppCompatActivity
                 getBaseContext(),
                 0,
                 0,
-
                 R.drawable.ic_delete,
                 R.dimen.ic_delete_size,
                 R.color.colorAccent,
@@ -302,6 +298,7 @@ public class WorkoutActivity extends AppCompatActivity
                     public void onClick(int pos) {
                         deleteFromFirebase(pos);
                         deleteItem(pos);
+                        initRecyclerView();
                     }
                 }
         ));
@@ -334,7 +331,9 @@ public class WorkoutActivity extends AppCompatActivity
 
 
     private void deleteFromFirebase(final int position) {
+        final List<Training> trainingList = new ArrayList<>();
 
+        //find exercise id
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                 .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -342,20 +341,57 @@ public class WorkoutActivity extends AppCompatActivity
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
 
-                            String id = task.getResult().getDocuments().get(position).getId();
+                            final String id = task.getResult().getDocuments().get(position).getId();
 
+                            Log.d(TAG, "Workout day name id: " + id);
+
+                            //deleted the workout days
                             db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                                     .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME)
                                     .document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "DocumentSnapshot successfully deleted!");
+
+
+
+                                //find exercise in workout day name
+                                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                                            .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME)
+                                            .document(id).collection(Workout.EXERCISE_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if(task.isSuccessful() && task.getResult() != null) {
+                                                for(int i =0 ; i< task.getResult().size(); i++) {
+                                                    Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
+                                                    trainingList.add(training);
+                                                }
+                                            }
+                                            //delete exercise from workout days
+                                            for(int i=0 ; i< trainingList.size(); i++) {
+                                                db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                                                        .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME)
+                                                        .document(id).collection(Workout.EXERCISE_NAME).document(trainingList.get(i).getExerciseName()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "Exercise successfully deleted!");
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e(TAG, "Failure: " + e);
+                                                }
+                                            });
                                 }
                             })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Log.d(TAG, "isFailure: " + e);
+                                            Log.e(TAG, "isFailure: " + e);
                                         }
                                     });
                         }

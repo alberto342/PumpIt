@@ -84,7 +84,6 @@ public class TrackerExerciseFragment extends Fragment {
                     setError(reps, "Enter reps");
                     return;
                 }
-
                 addNewView(weight.getText().toString(), reps.getText().toString());
                 weight.setText("");
                 reps.setText("");

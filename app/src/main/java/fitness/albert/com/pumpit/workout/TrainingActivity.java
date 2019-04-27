@@ -98,8 +98,6 @@ public class TrainingActivity extends AppCompatActivity {
     }
 
     private void getTrainingFromFb() {
-
-
         db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
                 .document(WorkoutActivity.workoutId).collection(Workout.WORKOUT_DAY_NAME).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

@@ -5,12 +5,12 @@ import java.util.List;
 public class Foods {
 
     public static final String SHARED_PREFERENCES_FILE = "meal";
-    public static final String DINNER = "DINNER";
-    public static final String BREAKFAST = "BREAKFAST";
-    public static final String LUNCH = "LUNCH";
-    public static final String SNACK = "SNACK";
-    public static final String NUTRITION = "NUTRITION";
-    public static final String FRUIT = "FRUIT";
+    public static final String DINNER = "dinner";
+    public static final String BREAKFAST = "breakfast";
+    public static final String LUNCH = "lunch";
+    public static final String SNACK = "Snack";
+    public static final String NUTRITION = "nutrition";
+    public static final String FRUIT = "fruit";
 
     public Foods() {
     }

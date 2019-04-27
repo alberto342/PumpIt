@@ -27,6 +27,7 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Context mContext;
     private List<Training> trainingList;
     private List<TrackerExercise> trackerList;
+    public static int posit;
 
     public TrainingAdapter(Context mContext, List<Training> trainingList, List<TrackerExercise> trackerList) {
         this.mContext = mContext;
@@ -72,6 +73,7 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                posit = position;
 
             }
         });

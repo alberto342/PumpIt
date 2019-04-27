@@ -44,6 +44,9 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private TextView emptyWorkout;
     private ProgressDialog progressdialog;
     private ImageView btnStartWorkout;
+    private List<TrackerExercise> trackerExerciseList;
+    public static List<Training> trainingList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +93,8 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private void getDayWorkout() {
         final List<WorkoutPlans> workoutPlansList = new ArrayList<>();
         final List<Workout> workoutList = new ArrayList<>();
-        final List<Training> trainingList = new ArrayList<>();
-        final List<TrackerExercise> trackerExerciseList = new ArrayList<>();
+        trainingList = new ArrayList<>();
+        trackerExerciseList = new ArrayList<>();
 
         final String[] day = new String[1];
         final String[] part1 = new String[1];
@@ -127,6 +130,8 @@ public class StartWorkoutActivity extends AppCompatActivity {
                             Log.d(TAG, "Successfully get workout Name Id: " + workoutNameId);
 
 
+
+                            //todo if the user logout.. its not working
                             db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                                     .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId)
                                     .collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -174,13 +179,15 @@ public class StartWorkoutActivity extends AppCompatActivity {
                                                                         trackerExerciseList.add(trackerExercise);
                                                                         trainingList.add(training);
 
+
+
                                                                         initRecyclerView(trainingList, trackerExerciseList);
 
                                                                         Log.d(TAG, "getWorkoutDay: " + workoutList.get(i).getWorkoutDay() + "\n" + "Exercise Size: " + trainingList.size());
                                                                     }
                                                                 }
-
-                                                                if (trainingList.size() > 0) {
+                                                                //if have exercise today
+                                                                if (!trainingList.isEmpty()) {
                                                                     btnStartWorkout.setVisibility(View.VISIBLE);
                                                                     emptyWorkout.setVisibility(View.INVISIBLE);
                                                                 } else {
@@ -211,6 +218,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
                         } else {
                             Log.d(TAG, "ERROR to received Id");
                         }
+
                         progressdialog.hide();
                     }
                 });

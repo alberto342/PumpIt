@@ -49,6 +49,7 @@ public class WorkoutActivity extends AppCompatActivity
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private List<Workout> workoutList;
     private TextView tvNameOfPlan, tvNameOfPlanSmall, tvActiveWorkout, tvChangePlan;
+    private ImageView ivActivityPlan;
     /**
      *
      */
@@ -78,6 +79,7 @@ public class WorkoutActivity extends AppCompatActivity
         tvNameOfPlanSmall = findViewById(R.id.tv_name_of_plan_s);
         tvActiveWorkout = findViewById(R.id.tv_active_workout);
         tvChangePlan = findViewById(R.id.tv_change_plan);
+        ivActivityPlan = findViewById(R.id.btn_set_as_activity_plan);
     }
 
 
@@ -99,18 +101,28 @@ public class WorkoutActivity extends AppCompatActivity
 
 
     private void isActivatedPlan() {
-        boolean isActivate = true;
 
-        if (isActivate) {
+        SavePref savePref = new SavePref();
+        savePref.createSharedPreferencesFiles(this, "exercise");
+        boolean defaultExercise = savePref.getBoolean("defaultExercise", false);
+
+        String routineName = savePref.getString("default_plan", "");
+
+        Log.d(TAG, "See if equal: " + "routineName: " + tvNameOfPlanSmall.getText().toString()  + "default_plan: " + routineName);
+
+        if (defaultExercise && tvNameOfPlan.getText().toString().equals(routineName)) {
             tvChangePlan.setVisibility(View.VISIBLE);
             tvActiveWorkout.setVisibility(View.VISIBLE);
             tvNameOfPlanSmall.setVisibility(View.VISIBLE);
             tvNameOfPlan.setVisibility(View.INVISIBLE);
+            ivActivityPlan.setVisibility(View.INVISIBLE);
         } else {
+            Log.d(TAG, "IS IN");
             tvChangePlan.setVisibility(View.INVISIBLE);
             tvActiveWorkout.setVisibility(View.INVISIBLE);
             tvNameOfPlanSmall.setVisibility(View.INVISIBLE);
             tvNameOfPlan.setVisibility(View.VISIBLE);
+            ivActivityPlan.setVisibility(View.VISIBLE);
         }
     }
 
@@ -135,15 +147,15 @@ public class WorkoutActivity extends AppCompatActivity
                             tvNameOfPlan.setText(workoutPlans.getRoutineName());
                             tvNameOfPlanSmall.setText(workoutPlans.getRoutineName());
 
-                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(workoutId).collection(Workout.WORKOUT_DAY_NAME)
-                                    .get()
+                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
+                                    .document(workoutId).collection(Workout.WORKOUT_DAY_NAME).get()
                                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                             if (task.isSuccessful() && task.getResult() != null) {
 
                                                 for (int i = 0; i < task.getResult().size(); i++) {
-                                                    Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
+                                                   Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
                                                     workoutList.add(workout);
 
                                                     initRecyclerView();
@@ -168,6 +180,27 @@ public class WorkoutActivity extends AppCompatActivity
                     }
                 });
     }
+
+//
+//    private boolean checkDefRoutineName(String routineName) {
+//
+//        final boolean[] isDef = new boolean[1];
+//
+//        CollectionReference reference = db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME);
+//
+//
+//       reference.whereEqualTo("routineName", routineName).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//            @Override
+//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//               isDef[0] = true;
+//               Log.d(TAG, "Success this routineName is def");
+//            }
+//        });
+//        return isDef[0];
+//    }
+
+
+
 
 
     private void saveDay(String workoutDayName, String workoutDay) {
@@ -353,8 +386,6 @@ public class WorkoutActivity extends AppCompatActivity
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "DocumentSnapshot successfully deleted!");
 
-
-
                                 //find exercise in workout day name
                                     db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                                             .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME)
@@ -429,7 +460,6 @@ public class WorkoutActivity extends AppCompatActivity
                                     workoutRef.update("workoutDay", workoutDay);
 
                                     Log.d(TAG, "WorkoutDayName: " + workoutName + " Successfully update");
-
 
                                     workoutList.clear();
 

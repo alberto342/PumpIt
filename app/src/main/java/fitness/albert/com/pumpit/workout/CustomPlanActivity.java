@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Model.SavePref;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
@@ -88,7 +89,7 @@ public class CustomPlanActivity extends AppCompatActivity {
 
         addIntoSpinner(daysWeekList, spDaysWeek);
         addIntoSpinner(difficultyLevelList, spDifficultyLevel);
-        addIntoSpinner(dayTypeList,spDayType );
+        addIntoSpinner(dayTypeList, spDayType);
         addIntoSpinner(routineTypeList, spRoutineType);
     }
 
@@ -99,8 +100,6 @@ public class CustomPlanActivity extends AppCompatActivity {
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
     }
-
-
 
 
     private void addDataIntoFireBase() {
@@ -117,7 +116,7 @@ public class CustomPlanActivity extends AppCompatActivity {
             difficultyLevel = spDifficultyLevel.getSelectedItem().toString();
             routineType = spRoutineType.getSelectedItem().toString();
 
-                    Log.d(TAG, "Get spinner index" + spDaysWeek.getSelectedItemPosition());
+            Log.d(TAG, "Get spinner index" + spDaysWeek.getSelectedItemPosition());
 
             dayType = spDayType.getSelectedItem().toString();
         }
@@ -126,8 +125,17 @@ public class CustomPlanActivity extends AppCompatActivity {
         routineDescription = etRoutineDescription.getText().toString();
         routineName = etRoutineName.getText().toString();
 
+        //check if have default exercise
+        SavePref savePref = new SavePref();
+        savePref.createSharedPreferencesFiles(this, "exercise");
 
-        WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel, routineType,dayType, routineDescription, UserRegister.getTodayData(), dayWeekPosition);
+//        if(savePref.getBoolean("defaultExercise", false)) {
+//            savePref.saveData("defRoutineName",routineName);
+//        }
+
+
+        WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel,
+                routineType, dayType, routineDescription, UserRegister.getTodayData(), dayWeekPosition);
 
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
@@ -135,16 +143,16 @@ public class CustomPlanActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<DocumentReference> task) {
 
-                if(task.isSuccessful() && task.getResult() != null) {
+                if (task.isSuccessful() && task.getResult() != null) {
                     workoutNameId = task.getResult().getId();
                 }
-
 
                 for (int i = 1; i <= dayWeekPosition; i++) {
 
                     Workout workout = new Workout("Workout " + i, "Day " + i, 0, 0);
 
-                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
+                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                            .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
                             .document("Workout " + i).set(workout)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override

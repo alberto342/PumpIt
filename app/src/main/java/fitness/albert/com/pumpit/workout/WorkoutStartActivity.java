@@ -31,10 +31,13 @@ import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.Adapter.TrainingAdapter;
 import fitness.albert.com.pumpit.Model.FinishTraining;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Model.TrackerExercise;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
 public class WorkoutStartActivity extends AppCompatActivity implements View.OnClickListener {
+
+    //android dynamically
 
     private final String TAG = "WorkoutStartActivity";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -49,8 +52,8 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     private int countAddSets = 0, countExercisesLeft = 1;
     private EditText weight, reps;
     private View rowView;
-    private List<Float> WeightSetList;
-    private List<Integer> repsSetList;
+    private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
+    private TrackerExercise trackerExercise = new TrackerExercise();
 
 
     @Override
@@ -61,14 +64,14 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         init();
 
         setupChronometer();
+
+
+        onAddField(rowView);
+
     }
 
     @SuppressLint("SetTextI18n")
     private void init() {
-
-        WeightSetList = new ArrayList<>();
-        repsSetList = new ArrayList<>();
-
         mChronometer = findViewById(R.id.chronometer);
         timeRest = findViewById(R.id.iv_time_rest);
         editStartWorkout = findViewById(R.id.iv_edite_start_workout);
@@ -83,7 +86,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         btnRemoveSte = findViewById(R.id.tv_remove_set);
         exercisesLeft = findViewById(R.id.tv_exercise_left);
 
-        onAddField(container);
+        // onAddField(container);
 
         assert StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName() != null;
         exerciseName.setText(StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName());
@@ -102,7 +105,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //exercise left
         exercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
 
@@ -114,7 +116,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         btnAddNewSet.setOnClickListener(this);
         btnRemoveSte.setOnClickListener(this);
     }
-
 
     private void initRestTimerLayout(View dialogView) {
         //layout object
@@ -428,16 +429,24 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
 
     private void setExerciseIntoFb() {
-        FinishTraining finishTraining = new FinishTraining(StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName(),
-                StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getTrackerExercises(),
-                StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getSizeOfRept(),
-                StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getRestBetweenSet(),
-                StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getRestAfterExercise(),
-                StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getImgName(),
-                UserRegister.getTodayData(), StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).isFavorite(),
+
+        if (weight.getText().toString().isEmpty() || weight.getText() == null && reps.getText().toString().isEmpty() || reps.getText() == null) {
+            countAddSets--;
+        }
+
+        for (int i = 0; i < trackerExerciseList.size(); i++) {
+            Log.d(TAG, "exercise recording: " + trackerExerciseList.get(i).getWeight());
+        }
+        FinishTraining finishTraining = new FinishTraining(exerciseName.getText().toString(),
+                trackerExerciseList, 0,
+                StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestBetweenSet(),
+                StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise(),
+                StartWorkoutActivity.trainingList.get(countExercisesLeft).getImgName(),
+                UserRegister.getTodayData(), StartWorkoutActivity.trainingList.get(countExercisesLeft).isFavorite(),
                 mChronometer.getText().toString(), 0, "", "", "", 0f, 0);
+
         db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-                .collection(FinishTraining.TRAINING_NAME).add(finishTraining).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                .collection(UserRegister.getTodayData()).add(finishTraining).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 Log.d(TAG, "Document successfully written!");
@@ -457,7 +466,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.layout_select_rest_time, null);
 
         dialogBuilder.setView(dialogView);
-
         initRestTimerLayout(dialogView);
 
         dialog = dialogBuilder.create();
@@ -468,10 +476,15 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     @SuppressLint("SetTextI18n")
     private void nextExerciseClicked() {
 
+        //save into fb
+        setExerciseIntoFb();
+
         if (countExercisesLeft == StartWorkoutActivity.trainingList.size()) {
             onClick(stopWorkout);
-            countDownTimer.cancel();
-            countDownTimer.onFinish();
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+                countDownTimer.onFinish();
+            }
         } else {
             //exercise name
             exerciseName.setText(StartWorkoutActivity.trainingList.get(countExercisesLeft).getExerciseName());
@@ -489,49 +502,55 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 e.printStackTrace();
             }
             container.removeAllViews();
+            //set timer
             countDownTimer(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getRestAfterExercise() * 1000);
+
+            //count for exercise left
             countExercisesLeft++;
             exercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
 
+            trackerExerciseList.clear();
             countAddSets = 0;
-
             onAddField(rowView);
         }
     }
 
 
-    private boolean setWeightAndReptsIntoList() {
+    private boolean setWeightAndReptIntoList() {
 
-        Log.d(TAG, "weight: " + weight.getText().toString());
+        boolean weightIsText = weight.getText() == null || weight.getText().toString().isEmpty();
 
-        Log.d(TAG, "reps: " + reps.getText().toString());
+        boolean repsIsText = reps.getText() == null || reps.getText().toString().isEmpty();
 
-        if (weight.getText().toString().isEmpty() && Float.valueOf(weight.getHint().toString()) <= 0.0) {
+        if (weight.getText() == null || weight.getText().toString().isEmpty() && weight.getHint() == null) {
             weight.setError("please enter weight");
             return false;
         }
 
-
-        if (reps.getText().toString().isEmpty() && Integer.valueOf(reps.getHint().toString()) <= 0) {
+        if (reps.getText() == null || reps.getText().toString().isEmpty() && reps.getHint() == null) {
             reps.setError("please enter reps");
             return false;
         }
 
-        if(!weight.getText().toString().isEmpty()) {
-            WeightSetList.add(Float.valueOf(weight.getText().toString()));
+
+        if (weightIsText) {
+            trackerExercise.setWeight(Float.valueOf(weight.getHint().toString()));
+        } else {
+            trackerExercise.setWeight(Float.valueOf(weight.getText().toString()));
         }
 
-        if(Float.valueOf(weight.getHint().toString()) > 0.0f) {
-            WeightSetList.add(Float.valueOf(weight.getHint().toString()));
 
+        if (repsIsText) {
+            trackerExercise.setRepNumber(Integer.valueOf(reps.getHint().toString()));
+        } else {
+            trackerExercise.setRepNumber(Integer.valueOf(reps.getText().toString()));
         }
 
-        if(!reps.getText().toString().isEmpty()) {
-            repsSetList.add(Integer.valueOf(reps.getText().toString()));
-        }
+        trackerExerciseList.add(trackerExercise);
 
-        if(Integer.valueOf(reps.getHint().toString()) > 0) {
-            repsSetList.add(Integer.valueOf(reps.getHint().toString()));
+
+        for (int i = 0; i < trackerExerciseList.size(); i++) {
+            Log.d(TAG, "trackerExerciseList: " + trackerExerciseList.get(i).getWeight());
         }
         return true;
     }
@@ -563,11 +582,12 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         btnRemoveSte.setVisibility(View.VISIBLE);
         btnAddNewSet.setVisibility(View.INVISIBLE);
 
+        Log.d(TAG, "countAddSets: " + countAddSets);
+
         ivIsFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (finishIsOkSelected && setWeightAndReptsIntoList()) {
+                if (finishIsOkSelected && setWeightAndReptIntoList()) {
                     ivIsFinish.setImageResource(R.mipmap.ic_ok_selected);
                     onAddField(findViewById(R.id.ll_container_reps));
                     countDownTimer(StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getRestBetweenSet() * 1000);
@@ -582,7 +602,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
-
         Log.d(TAG, "trainingList : " + StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName()
                 + "\nImg Name: " + StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getImgName());
     }

@@ -157,7 +157,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
                                                 day[0] = getDayOfTheWeek();
                                             }
 
-
                                             if (workoutList.get(i).getWorkoutDay().equals(day[0])) {
 
                                                 String workoutId = task.getResult().getDocuments().get(i).getId();
@@ -179,11 +178,9 @@ public class StartWorkoutActivity extends AppCompatActivity {
                                                                         trackerExerciseList.add(trackerExercise);
                                                                         trainingList.add(training);
 
-
-
                                                                         initRecyclerView(trainingList, trackerExerciseList);
 
-                                                                        Log.d(TAG, "getWorkoutDay: " + workoutList.get(i).getWorkoutDay() + "\n" + "Exercise Size: " + trainingList.size());
+                                                                        Log.d(TAG, "Exercise Size: " + trainingList.size());
                                                                     }
                                                                 }
                                                                 //if have exercise today

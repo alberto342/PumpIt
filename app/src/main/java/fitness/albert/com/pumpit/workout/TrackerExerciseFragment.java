@@ -101,7 +101,11 @@ public class TrackerExerciseFragment extends Fragment {
         saveTracker = view.findViewById(R.id.btn_save_tracker);
         setsRest = view.findViewById(R.id.et_rest_between_sets);
         exerciseRest = view.findViewById(R.id.et_sec_rest_after_exercise);
+
+
     }
+
+
 
 
     @Override
@@ -180,13 +184,13 @@ public class TrackerExerciseFragment extends Fragment {
         savePref.createSharedPreferencesFiles(getActivity(), "exercise");
         final String getPlanId = savePref.getString("planName", "");
 
-        String rest = setsRest.getText().toString();
-        String[] parts = rest.split(" ");
-        int restBetweenSet = Integer.parseInt(parts[0]);
-
-        String restExercise = exerciseRest.getText().toString();
-        String[] part = restExercise.split(" ");
-        int restAfterExercise = Integer.parseInt(part[0]);
+//        String rest = setsRest.getText().toString();
+//        String[] parts = rest.split(" ");
+//        int restBetweenSet = Integer.parseInt(parts[0]);
+//
+//        String restExercise = exerciseRest.getText().toString();
+//        String[] part = restExercise.split(" ");
+//        int restAfterExercise = Integer.parseInt(part[0]);
 
         final List<TrackerExercise> weightList = new ArrayList<>();
         List<TrackerExercise> repNumberList = new ArrayList<>();
@@ -208,15 +212,15 @@ public class TrackerExerciseFragment extends Fragment {
             trackerExerciseList.add(new TrackerExercise(repNumberList.get(i).getRepNumber(), weightList.get(i).getWeight()));
         }
 
-        final Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2, restBetweenSet, restAfterExercise, ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
+        final Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2, Integer.valueOf(setsRest.getText().toString()), Integer.valueOf(exerciseRest.getText().toString()), ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
 
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
                 .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful() && task.getResult() != null) {
-               String workoutDayNameId =  task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
+                if (task.isSuccessful() && task.getResult() != null) {
+                    final String workoutDayNameId = task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
 
                     db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
                             .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME)
@@ -225,7 +229,10 @@ public class TrackerExerciseFragment extends Fragment {
                             .set(training).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            startActivity(new Intent(getActivity(), TrainingActivity.class));
+
+                            Intent intent = new Intent(getActivity(), TrainingActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                            startActivity(intent);
                             Objects.requireNonNull(getActivity()).finish();
                         }
                     })
@@ -236,9 +243,6 @@ public class TrackerExerciseFragment extends Fragment {
                                 }
                             });
                 }
-
-
-
             }
         });
 

@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Locale;
 
 import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.R;
@@ -50,25 +51,33 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void bindViews(final ViewHolder holder, final int position) {
 
-       holder.tvDay.setText(workoutList.get(position).getWorkoutDay());
-       holder.tvDate.setText(workoutList.get(position).getDate());
-       holder.tvExerciseName.setText(workoutList.get(position).getWorkoutDayName());
-       holder.tvExerciseCount.setText(String.valueOf(workoutList.get(position).getNumOfExercise()));
-       holder.layout.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
+        double sLengthTraining = (double) workoutList.get(position).getLengthTraining() / 60;  // 294 / 60 = 4.9
 
-               pos = position;
+       // double sec = sLengthTraining %1  * 60;
 
-               workoutDayName = workoutList.get(position).getWorkoutDayName();
+        int min =  (int) sLengthTraining; // 9 / 10
 
-               mContext.startActivity(new Intent(mContext, TrainingActivity.class));
 
-               Log.d(TAG, "Workout day name: " + workoutDayName);
-           }
-       });
+        holder.tvDay.setText(workoutList.get(position).getWorkoutDay());
+        holder.tvDate.setText(workoutList.get(position).getDate());
+        holder.tvExerciseName.setText(workoutList.get(position).getWorkoutDayName());
+        holder.tvExerciseCount.setText(String.valueOf(workoutList.get(position).getNumOfExercise()));
+        holder.tvExerciseTime.setText(String.format(Locale.getDefault(), "%d min(s)", min));
+      //  holder.tvExerciseTime.setText(String.valueOf(workoutList.get(position).getLengthTraining()));
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                pos = position;
+
+                workoutDayName = workoutList.get(position).getWorkoutDayName();
+
+                mContext.startActivity(new Intent(mContext, TrainingActivity.class));
+
+                Log.d(TAG, "Workout day name: " + workoutDayName);
+            }
+        });
     }
-
 
 
     @Override
@@ -78,7 +87,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView tvExerciseCount, tvExerciseName, tvDay, tvDate;
+        private TextView tvExerciseCount, tvExerciseName, tvDay, tvDate, tvExerciseTime;
         private LinearLayout layout;
 
         public ViewHolder(View rowView) {
@@ -89,6 +98,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             this.tvExerciseCount = rowView.findViewById(R.id.tv_exercise_conut);
             this.tvExerciseName = rowView.findViewById(R.id.tv_exercise_name_work);
             this.tvDay = rowView.findViewById(R.id.tv_day);
+            this.tvExerciseTime = rowView.findViewById(R.id.tv_time_workout);
             this.layout = rowView.findViewById(R.id.ll_wokout_selected);
         }
 

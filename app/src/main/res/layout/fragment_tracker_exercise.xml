@@ -150,11 +150,12 @@
             android:layout_weight="1"
             android:background="@color/gray"
             android:ems="10"
+            android:hint="25 Sec"
             android:inputType="number"
             android:numeric="integer"
             android:padding="10dp"
-            android:text="25 Sec"
             android:textColor="@color/white"
+            android:textColorHint="@color/fui_bgPhone"
             android:textStyle="bold" />
 
         <TextView
@@ -181,11 +182,12 @@
             android:layout_weight="1"
             android:background="@color/gray"
             android:ems="10"
+            android:hint="25 Sec"
             android:inputType="number"
             android:numeric="integer"
             android:padding="10dp"
-            android:text="25 Sec"
             android:textColor="@color/white"
+            android:textColorHint="@color/fui_bgPhone"
             android:textStyle="bold" />
 
         <TextView

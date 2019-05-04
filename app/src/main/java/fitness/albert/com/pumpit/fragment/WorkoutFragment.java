@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Model.SavePref;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.CustomPlanActivity;
@@ -80,14 +80,14 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    private void loadFragment(Fragment fragment) {
-        if (getFragmentManager() != null) {
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.frame_container, fragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        }
-    }
+//    private void loadFragment(Fragment fragment) {
+//        if (getFragmentManager() != null) {
+//            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//            transaction.replace(R.id.frame_container, fragment);
+//            transaction.addToBackStack(null);
+//            transaction.commit();
+//        }
+//    }
 
     @Override
     public void onClick(View v) {
@@ -145,6 +145,10 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
             level.setVisibility(TextView.VISIBLE);
             workoutComplete.setVisibility(TextView.VISIBLE);
             exerciseName.setVisibility(TextView.VISIBLE);
+
+            SavePref savePref = new SavePref();
+            savePref.createSharedPreferencesFiles(getActivity(), "exercise");
+            savePref.saveData("defaultExercise",true);
 
         } else {
             btnAdd.setVisibility(View.VISIBLE);

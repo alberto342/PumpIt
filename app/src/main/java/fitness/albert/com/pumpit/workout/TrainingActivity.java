@@ -15,8 +15,8 @@ import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -57,7 +57,7 @@ public class TrainingActivity extends AppCompatActivity {
 
         countExercise();
 
-       // itemTouchHelper();
+        // itemTouchHelper();
     }
 
     private void init() {
@@ -81,7 +81,7 @@ public class TrainingActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_edit, menu);
-       // MenuItem menuItem = menu.findItem(R.id.menu_edit_training);
+        // MenuItem menuItem = menu.findItem(R.id.menu_edit_training);
         return true;
     }
 
@@ -90,7 +90,7 @@ public class TrainingActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if(id == R.id.menu_edit_training) {
+        if (id == R.id.menu_edit_training) {
             itemTouchHelper();
         }
 
@@ -103,8 +103,8 @@ public class TrainingActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful() && task.getResult() != null) {
-                           String workoutDayNameId =  task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            String workoutDayNameId = task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
 
                             db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
                                     .document(WorkoutActivity.workoutId).collection(Workout.WORKOUT_DAY_NAME).document(workoutDayNameId)
@@ -114,7 +114,7 @@ public class TrainingActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                             if (task.isSuccessful() && task.getResult() != null) {
 
-                                                for(int i = 0 ; i < task.getResult().size(); i++) {
+                                                for (int i = 0; i < task.getResult().size(); i++) {
                                                     Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
                                                     trainingList.add(training);
                                                     TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
@@ -140,10 +140,6 @@ public class TrainingActivity extends AppCompatActivity {
 
                     }
                 });
-
-
-
-
 
 
 //        db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
@@ -178,26 +174,72 @@ public class TrainingActivity extends AppCompatActivity {
     }
 
 
-
-
     private void countExercise() {
-
         final SavePref savePref = new SavePref();
 
         savePref.createSharedPreferencesFiles(this, "exercise");
-        String getPlanId = savePref.getString("planName", "");
+        final String getPlanId = savePref.getString("planName", "");
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).
-                document(WorkoutAdapter.workoutDayName).collection(Workout.EXERCISE_NAME).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                .collection(Workout.WORKOUT_NAME).document(getPlanId)
+                .collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    for (int i = 0; i < task.getResult().size(); i++) {
+                        Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
+                        assert workout != null;
+                        if (workout.getWorkoutDayName().equals(WorkoutAdapter.workoutDayName)) {
 
-                        if(!queryDocumentSnapshots.isEmpty()) {
-                            Log.d(TAG, "Exercise workout count: " + queryDocumentSnapshots.size());
+                            final String id = task.getResult().getDocuments().get(i).getId();
+
+                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                                    .collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).document(id)
+                                    .collection(Workout.EXERCISE_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    int totalTimeTraining = 0;
+
+                                    if (task.isSuccessful() && task.getResult() != null) {
+
+                                        for (int i = 0; i < task.getResult().size(); i++) {
+                                            int countRestAfterExercise = 0;
+                                            int countRestBetweenSet = 0;
+                                            int sizeOfRept = 0;
+                                            int exerciseTime = 33;
+
+                                            Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
+                                            countRestAfterExercise += training.getRestAfterExercise();
+                                            countRestBetweenSet += training.getRestBetweenSet();
+                                            sizeOfRept += training.getSizeOfRept();
+
+                                            totalTimeTraining += (exerciseTime * sizeOfRept) + (countRestBetweenSet * sizeOfRept) + countRestAfterExercise;
+
+                                            Log.d(TAG, "totalTimeTraining: " + totalTimeTraining + " countRestAfterExercise: "
+                                                    + countRestAfterExercise + " countRestBetweenSet " + countRestBetweenSet + " sizeOfRept: " + sizeOfRept);
+                                        }
+
+
+
+                                        DocumentReference documentReference = db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                                                .collection(Workout.WORKOUT_NAME).document(getPlanId)
+                                                .collection(Workout.WORKOUT_DAY_NAME).document(id);
+
+                                        documentReference.update("lengthTraining", totalTimeTraining);
+                                        documentReference.update("numOfExercise", task.getResult().size());
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG, "Failed to get all exercise size: " + e);
+                                }
+                            });
                         }
                     }
-                });
+                }
+            }
+        });
     }
 
 
@@ -216,8 +258,8 @@ public class TrainingActivity extends AppCompatActivity {
     //method for move and del item
     private void itemTouchHelper() {
 
-        ItemTouchHelper helper=new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT |
-                ItemTouchHelper.DOWN | ItemTouchHelper.UP,ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT) {
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT |
+                ItemTouchHelper.DOWN | ItemTouchHelper.UP, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
 

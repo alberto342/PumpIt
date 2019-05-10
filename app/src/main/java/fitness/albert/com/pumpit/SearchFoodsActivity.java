@@ -17,19 +17,17 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.Api.RestApi;
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.FoodListResponse;
 import fitness.albert.com.pumpit.Model.Foods;
+import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.RetroRequest.FoodRequest;
 import fitness.albert.com.pumpit.Utils.Global;
 import retrofit2.Call;
@@ -145,8 +143,8 @@ public class SearchFoodsActivity extends AppCompatActivity {
             try {
                 arrayListIntoClass();
                 db.collection(Foods.NUTRITION)
-                        .document(getEmailRegister()).collection(Foods.BREAKFAST)
-                        .document(getTodayDate()).collection(Foods.FRUIT).add(mListItem.get(i))
+                        .document(FireBaseInit.getEmailRegister()).collection(Foods.BREAKFAST)
+                        .document(UserRegister.getTodayData()).collection(Foods.FRUIT).add(mListItem.get(i))
 
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
@@ -204,20 +202,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
     }
 
 
-    private String getTodayDate() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-        return df.format(c);
-    }
 
-    public String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
-        }
-        return email;
-    }
 
 
     public int getListSize() {

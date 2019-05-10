@@ -3,6 +3,9 @@ package fitness.albert.com.pumpit.Model;
 import io.realm.RealmObject;
 
 public class Exercise extends RealmObject {
+
+    public static final String REALM_FILE_GYM = "gym.realm";
+
     private int id;
     private String name;
     private String category;

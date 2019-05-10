@@ -131,7 +131,6 @@ public class NutritionFragment extends Fragment {
         public void onClick(View v) {
             savePref.createSharedPreferencesFiles(getActivity(), Foods.SHARED_PREFERENCES_FILE);
 
-
             switch (v.getId()) {
                 case R.id.btn_add_dinner:
                     saveMealToSP(true, false, false, false);
@@ -201,8 +200,7 @@ public class NutritionFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                        if (task.isSuccessful()) {
-
+                        if (task.isSuccessful() && task.getResult() != null) {
                             for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);
@@ -280,8 +278,6 @@ public class NutritionFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-
     }
 
 

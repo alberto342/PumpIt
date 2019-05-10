@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.workout;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,7 +14,9 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import fitness.albert.com.pumpit.Adapter.CustomExerciseAdapter;
 import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
+import fitness.albert.com.pumpit.Model.CustomExerciseName;
 import fitness.albert.com.pumpit.Model.Exercise;
 import fitness.albert.com.pumpit.R;
 import io.realm.Realm;
@@ -35,21 +38,28 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
         setContentView(R.layout.activity_show_exercise_result);
 
         //SETUP REEALM
-        RealmConfiguration config = new RealmConfiguration.Builder().name("gym.realm").deleteRealmIfMigrationNeeded().build();
-        Realm.setDefaultConfiguration(config);
+        RealmConfiguration config = new RealmConfiguration.Builder().name(Exercise.REALM_FILE_GYM).deleteRealmIfMigrationNeeded().build();
+        realm = Realm.getInstance(config);
+        //Realm.setDefaultConfiguration(config);
 
-        initRecyclerView();
+        //  initRecyclerView();
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initRecyclerView();
+        getCustomExercise();
+    }
 
     private void initRecyclerView() {
 
-        //SETUP RECYCLERVIEW
         recyclerView = findViewById(R.id.rv_exercise_result);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        realm = Realm.getDefaultInstance();
+        // realm = Realm.getDefaultInstance();
 
         recyclerView(this, realmList, AddExerciseActivity.categorySelected, AddExerciseActivity.category2Selected);
     }
@@ -58,6 +68,7 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
     public void recyclerView(Context context, List<Exercise> exerciseList, String category, String category2) {
 
         final String TAG = "ShowExerciseResult";
+        //realm.getSchema();
         RealmQuery<Exercise> query = realm.where(Exercise.class);
 
         if (category.contains("All")) {
@@ -75,8 +86,32 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
         exerciseAdapter = new ExerciseAdapter(context, exerciseList);
         recyclerView.setAdapter(exerciseAdapter);
 
-        Log.d(TAG, "initRecyclerView: init recyclerView" + recyclerView + "\n" +
-                "IMAGE TEST: " + realmList.get(0).getImg_name());
+        Log.d(TAG, "initRecyclerView: init recyclerView" + recyclerView);
+    }
+
+    private void getCustomExercise() {
+        //SETUP REEALM
+        RealmConfiguration config = new RealmConfiguration.Builder().name(CustomExerciseName.REALM_FILE_EXERCISE).deleteRealmIfMigrationNeeded().build();
+        Realm realmExercise = Realm.getInstance(config);
+
+        String category = AddExerciseActivity.categorySelected;
+
+        RealmQuery<CustomExerciseName> query = realmExercise.where(CustomExerciseName.class);
+
+        query.equalTo("muscle_group", category);
+
+        RealmResults<CustomExerciseName> result = query.findAll();
+
+        List<CustomExerciseName> customExerciseNameList = new ArrayList<>(result);
+
+        RecyclerView recyclerView = findViewById(R.id.rv_custom_exercise);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        if (!customExerciseNameList.isEmpty()) {
+            CustomExerciseAdapter customExerciseAdapter = new CustomExerciseAdapter(this, customExerciseNameList);
+            recyclerView.setAdapter(customExerciseAdapter);
+        }
     }
 
 
@@ -89,12 +124,14 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
         return true;
     }
 
-
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //realm.close();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.menu_cus_add_exercise == item.getItemId()) {
+            startActivity(new Intent(this, CustomAddExerciseActivity.class));
+        }
+        return true;
     }
+
 
     @Override
     public boolean onQueryTextSubmit(String query) {
@@ -114,6 +151,12 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
         }
         exerciseAdapter.updateList(newList);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 
     @Override

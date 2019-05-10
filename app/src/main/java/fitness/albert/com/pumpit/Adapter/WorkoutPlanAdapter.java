@@ -60,7 +60,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
     private void bindViews(final ViewHolder holder, final int position) {
-
         final String TAG = "WorkoutPlanAdapter";
 
         holder.tvPlanName.setText(plansList.get(position).getRoutineName());

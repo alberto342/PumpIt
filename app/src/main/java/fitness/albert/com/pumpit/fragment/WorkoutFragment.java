@@ -3,10 +3,12 @@ package fitness.albert.com.pumpit.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +33,8 @@ import fitness.albert.com.pumpit.workout.WorkoutPlansActivity;
 
 public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
+
     private boolean exerciseExist;
-    //private final String TAG = "WorkoutFragment";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView exerciseName, level, workoutComplete, emptyExercise, seeWorkout;
     private ImageView btnAdd, findWorkout, btnStartWorkout;
@@ -127,6 +129,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                             exerciseExist = task.getResult().getDocuments().size() > 0;
 
                         haveExercise(exerciseExist);
+                        progressdialog.hide();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -138,7 +141,14 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     }
 
     private void haveExercise(boolean exerciseExist) {
+
+        final String routineName;
+        final String TAG = "WorkoutFragment";
+
         if (exerciseExist) {
+            SavePref savePref = new SavePref();
+            savePref.createSharedPreferencesFiles(getContext(), SavePref.EXERCISE);
+
             seeWorkout.setVisibility(TextView.VISIBLE);
             emptyExercise.setVisibility(TextView.INVISIBLE);
             btnAdd.setVisibility(View.INVISIBLE);
@@ -146,9 +156,15 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
             workoutComplete.setVisibility(TextView.VISIBLE);
             exerciseName.setVisibility(TextView.VISIBLE);
 
-            SavePref savePref = new SavePref();
-            savePref.createSharedPreferencesFiles(getActivity(), "exercise");
-            savePref.saveData("defaultExercise",true);
+            if (!savePref.getString(SavePref.DEFAULT_PLAN, "").isEmpty()) {
+                routineName = savePref.getString(SavePref.DEFAULT_PLAN, "");
+                Log.d(TAG, "routineName: " + routineName);
+
+                exerciseName.setText(routineName);
+                exerciseName.setTextColor(Color.WHITE);
+            }
+
+            savePref.saveData("defaultExercise", true);
 
         } else {
             btnAdd.setVisibility(View.VISIBLE);

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,9 +76,6 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             }
         });
-
-        Log.d(TAG, "REP: " + trackerList.get(position).getRepNumber() + " SET: " +
-                trainingList.get(position).getSizeOfRept() + " Exercise name: " + trainingList.get(position).getExerciseName());
     }
 
 

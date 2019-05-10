@@ -3,6 +3,7 @@ package fitness.albert.com.pumpit.workout;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +44,7 @@ import fitness.albert.com.pumpit.R;
 import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
 
 public class WorkoutActivity extends AppCompatActivity
-        implements RecyclerViewSwipeHelper.RecyclerViewSwipeHelperDelegate {
+        implements RecyclerViewSwipeHelper.RecyclerViewSwipeHelperDelegate, View.OnClickListener {
 
     private final String TAG = "WorkoutActivity";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -56,6 +57,7 @@ public class WorkoutActivity extends AppCompatActivity
     private RecyclerView view;
     private WorkoutAdapter workoutAdapter;
     public static String workoutId;
+    private SavePref savePref = new SavePref();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +67,6 @@ public class WorkoutActivity extends AppCompatActivity
         init();
 
         getPlanFormFb();
-
-        isActivatedPlan();
 
         initRecyclerView();
 
@@ -80,12 +80,21 @@ public class WorkoutActivity extends AppCompatActivity
         tvActiveWorkout = findViewById(R.id.tv_active_workout);
         tvChangePlan = findViewById(R.id.tv_change_plan);
         ivActivityPlan = findViewById(R.id.btn_set_as_activity_plan);
+
+        tvChangePlan.setOnClickListener(this);
+        ivActivityPlan.setOnClickListener(this);
     }
 
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        initRecyclerView();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main_add, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -93,7 +102,7 @@ public class WorkoutActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(R.id.add_plans == item.getItemId()) {
+        if (R.id.add_plans == item.getItemId()) {
             setEditLayout("");
         }
         return true;
@@ -102,13 +111,10 @@ public class WorkoutActivity extends AppCompatActivity
 
     private void isActivatedPlan() {
 
-        SavePref savePref = new SavePref();
-        savePref.createSharedPreferencesFiles(this, "exercise");
-        boolean defaultExercise = savePref.getBoolean("defaultExercise", false);
+        savePref.createSharedPreferencesFiles(this, SavePref.EXERCISE);
+        boolean defaultExercise = savePref.getBoolean(SavePref.DEFAULT_EXERCISE, false);
 
-        String routineName = savePref.getString("default_plan", "");
-
-        Log.d(TAG, "See if equal: " + "routineName: " + tvNameOfPlanSmall.getText().toString()  + "default_plan: " + routineName);
+        String routineName = savePref.getString(SavePref.DEFAULT_PLAN, "");
 
         if (defaultExercise && tvNameOfPlan.getText().toString().equals(routineName)) {
             tvChangePlan.setVisibility(View.VISIBLE);
@@ -117,7 +123,6 @@ public class WorkoutActivity extends AppCompatActivity
             tvNameOfPlan.setVisibility(View.INVISIBLE);
             ivActivityPlan.setVisibility(View.INVISIBLE);
         } else {
-            Log.d(TAG, "IS IN");
             tvChangePlan.setVisibility(View.INVISIBLE);
             tvActiveWorkout.setVisibility(View.INVISIBLE);
             tvNameOfPlanSmall.setVisibility(View.INVISIBLE);
@@ -147,6 +152,9 @@ public class WorkoutActivity extends AppCompatActivity
                             tvNameOfPlan.setText(workoutPlans.getRoutineName());
                             tvNameOfPlanSmall.setText(workoutPlans.getRoutineName());
 
+                            //check the default
+                            isActivatedPlan();
+
                             db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
                                     .document(workoutId).collection(Workout.WORKOUT_DAY_NAME).get()
                                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -155,7 +163,7 @@ public class WorkoutActivity extends AppCompatActivity
                                             if (task.isSuccessful() && task.getResult() != null) {
 
                                                 for (int i = 0; i < task.getResult().size(); i++) {
-                                                   Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
+                                                    Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
                                                     workoutList.add(workout);
 
                                                     initRecyclerView();
@@ -180,27 +188,6 @@ public class WorkoutActivity extends AppCompatActivity
                     }
                 });
     }
-
-//
-//    private boolean checkDefRoutineName(String routineName) {
-//
-//        final boolean[] isDef = new boolean[1];
-//
-//        CollectionReference reference = db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME);
-//
-//
-//       reference.whereEqualTo("routineName", routineName).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//               isDef[0] = true;
-//               Log.d(TAG, "Success this routineName is def");
-//            }
-//        });
-//        return isDef[0];
-//    }
-
-
-
 
 
     private void saveDay(String workoutDayName, String workoutDay) {
@@ -228,8 +215,8 @@ public class WorkoutActivity extends AppCompatActivity
 
     private String getWorkPlanId() {
         SavePref savePref = new SavePref();
-        savePref.createSharedPreferencesFiles(this, "exercise");
-        return savePref.getString("planName", "null");
+        savePref.createSharedPreferencesFiles(this, SavePref.EXERCISE);
+        return savePref.getString(SavePref.PLAN_NAME, "null");
     }
 
 
@@ -278,7 +265,6 @@ public class WorkoutActivity extends AppCompatActivity
                 if (workoutName.getText().toString().isEmpty()) {
                     workoutName.setError("Please enter Workout Day Name");
                 }
-
                 if (!isEditSelected[0]) {
                     saveDay(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString());
                 } else {
@@ -386,20 +372,20 @@ public class WorkoutActivity extends AppCompatActivity
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "DocumentSnapshot successfully deleted!");
 
-                                //find exercise in workout day name
+                                    //find exercise in workout day name
                                     db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                                             .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME)
                                             .document(id).collection(Workout.EXERCISE_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if(task.isSuccessful() && task.getResult() != null) {
-                                                for(int i =0 ; i< task.getResult().size(); i++) {
+                                            if (task.isSuccessful() && task.getResult() != null) {
+                                                for (int i = 0; i < task.getResult().size(); i++) {
                                                     Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
                                                     trainingList.add(training);
                                                 }
                                             }
                                             //delete exercise from workout days
-                                            for(int i=0 ; i< trainingList.size(); i++) {
+                                            for (int i = 0; i < trainingList.size(); i++) {
                                                 db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                                                         .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME)
                                                         .document(id).collection(Workout.EXERCISE_NAME).document(trainingList.get(i).getExerciseName()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -473,6 +459,13 @@ public class WorkoutActivity extends AppCompatActivity
                 });
     }
 
+    private void changeDefault() {
+        savePref.createSharedPreferencesFiles(this, "exercise");
+        savePref.removeSingle(this,"exercise","default_plan");
+        savePref.saveData("default_plan", tvNameOfPlan.getText().toString());
+
+    }
+
 
     private void initRecyclerView() {
 
@@ -487,5 +480,26 @@ public class WorkoutActivity extends AppCompatActivity
 
         workoutAdapter = new WorkoutAdapter(this, workoutList);
         view.setAdapter(workoutAdapter);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.tv_change_plan:
+                startActivity(new Intent(WorkoutActivity.this, WorkoutPlansActivity.class));
+                finish();
+                break;
+            case R.id.btn_set_as_activity_plan:
+                changeDefault();
+                finish();
+                startActivity(getIntent());
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

@@ -227,12 +227,9 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                 mAdapter = new FirestoreFoodListAdapter(ShowAllNutritionActivity.this, foodList);
 
                 final int position = viewHolder.getAdapterPosition();
-
                 final Foods item = mAdapter.getData().get(position);
 
-
                deleteFromFirebase(keyValue, item.getFood_name(), item.getServing_qty());
-
 
                 foodList.remove(position);
                 recyclerView.removeViewAt(position);

@@ -212,6 +212,8 @@ public class TrackerExerciseFragment extends Fragment {
             trackerExerciseList.add(new TrackerExercise(repNumberList.get(i).getRepNumber(), weightList.get(i).getWeight()));
         }
 
+
+
         final Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2, Integer.valueOf(setsRest.getText().toString()), Integer.valueOf(exerciseRest.getText().toString()), ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
 
 

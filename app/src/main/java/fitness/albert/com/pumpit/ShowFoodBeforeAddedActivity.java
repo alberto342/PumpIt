@@ -1078,7 +1078,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                 nfp = 1, potassium = 1, saturatedFat = 1, sodium = 1, sugars = 1;
 
         for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
-
             kcal = FoodListAdapter.mListItem.get(i).getNf_calories();
             crabs = FoodListAdapter.mListItem.get(i).getNf_total_carbohydrate();
             protein = FoodListAdapter.mListItem.get(i).getNf_protein();
@@ -1113,7 +1112,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                 for (int j = 0; j < FoodListAdapter.mListItem.get(i).getAlt_measures().size(); j++) {
                     String atterId = FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).getAttr_id();
 
-                    if (atterId == FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).getAttr_id()) {
+                    if (atterId.equals(FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).getAttr_id())) {
                         Float value = Float.valueOf(FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).getValue());
                         FoodListAdapter.mListItem.get(i).getFull_nutrients().get(j).setValue(String.valueOf(value * calAltMeasures));
                     }

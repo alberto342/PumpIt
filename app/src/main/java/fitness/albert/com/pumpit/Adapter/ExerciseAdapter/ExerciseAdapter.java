@@ -49,9 +49,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
 
         Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, exerciseList.get(position).getImg_name());
 
-
-
-
         Glide.with(mContext)
                 .load(bitmap)
                 .into(holder.image);
@@ -61,14 +58,15 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             int position =  holder.getAdapterPosition();
+                int position = holder.getAdapterPosition();
                 exerciseImg = exerciseList.get(position).getImg_name();
                 exerciseName = exerciseList.get(position).getName();
                 mContext.startActivity(new Intent(mContext, ExerciseDetailActivity.class));
-                Log.d(TAG,"Exercise position: " + exerciseList.get(position).getName());
+                Log.d(TAG, "Exercise position: " + exerciseList.get(position).getName());
             }
         });
     }
+
 
     @Override
     public int getItemCount() {

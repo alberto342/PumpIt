@@ -16,8 +16,10 @@ import android.widget.Spinner;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.List;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.fragment.PlanFragment;
 
 public class EditCustomPlanActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -107,32 +110,29 @@ public class EditCustomPlanActivity extends AppCompatActivity implements View.On
 
 
     private void getDataFromFb() {
-        db.collection(WorkoutPlans.WORKOUT_PLANS).
-                document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            for (int i = 0; i < task.getResult().size(); i++) {
-                                WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
-                                workoutPlansList.add(workoutPlans);
 
-                                if(WorkoutPlansActivity.routineName.equals(workoutPlansList.get(i).getRoutineName())) {
+        CollectionReference reference = db.collection(WorkoutPlans.WORKOUT_PLANS).
+                document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME);
 
-                                    workoutPlanId = task.getResult().getDocuments().get(i).getId();
-                                    etRoutineName.setText(workoutPlansList.get(i).getRoutineName());
-                                    etRoutineDescription.setText(workoutPlansList.get(i).getRoutineDescription());
-                                    getDifficultyLevel(workoutPlansList.get(i).getDifficultyLevel());
-                                    getType(workoutPlansList.get(i).getRoutineType());
-                                    Log.d(TAG, "Doc ID: " + task.getResult().getDocuments().get(i).getId() + "\ngetAllData: " + task.getResult().getDocuments());
-                                }
-                            }
-                        }
+        Query query = reference.whereEqualTo("routineName", PlanFragment.routineName);
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    for (int i = 0; i < task.getResult().size(); i++) {
+                        WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
+                        workoutPlansList.add(workoutPlans);
+
+                        etRoutineName.setText(workoutPlansList.get(i).getRoutineName());
+                        etRoutineDescription.setText(workoutPlansList.get(i).getRoutineDescription());
+                        getDifficultyLevel(workoutPlansList.get(i).getDifficultyLevel());
+                        getType(workoutPlansList.get(i).getRoutineType());
+                        Log.d(TAG, "Doc ID: " + task.getResult().getDocuments().get(i).getId() + "\ngetAllData: " + task.getResult().getDocuments());
                     }
-                })
-
-
-
+                }
+            }
+        })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {

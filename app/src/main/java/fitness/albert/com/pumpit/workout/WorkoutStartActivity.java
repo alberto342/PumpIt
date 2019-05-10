@@ -65,9 +65,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
         setupChronometer();
 
-
         onAddField(rowView);
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -561,7 +559,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     public void onAddField(View v) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         rowView = inflater.inflate(R.layout.layout_start_workout_reps, null);
-
         initLayoutReps(rowView);
 
         container.addView(rowView, container.getChildCount() - 1);

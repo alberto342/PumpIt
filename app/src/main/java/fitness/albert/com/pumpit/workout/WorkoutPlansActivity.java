@@ -33,12 +33,12 @@ import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
 public class WorkoutPlansActivity extends AppCompatActivity
         implements RecyclerViewSwipeHelper.RecyclerViewSwipeHelperDelegate {
 
-    private RecyclerView view;
+    private RecyclerView mRecyclerView;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "WorkoutPlansActivity";
     public static List<WorkoutPlans> workoutPlansList;
     public static String planName;
-    public static String routineName; // chack in EditCustomPlanActivity
+    public static String routineName; // check in EditCustomPlanActivity
     private WorkoutPlanAdapter workoutAdapter;
 
 
@@ -56,7 +56,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
 
 
     private void setupSwipeMenu() {
-        new RecyclerViewSwipeHelper(this, view, this);
+        new RecyclerViewSwipeHelper(this, mRecyclerView, this);
     }
 
 
@@ -97,7 +97,6 @@ public class WorkoutPlansActivity extends AppCompatActivity
                 getBaseContext(),
                 0,
                 0,
-
                 R.drawable.ic_delete,
                 R.dimen.ic_delete_size,
                 R.color.colorAccent,
@@ -105,7 +104,7 @@ public class WorkoutPlansActivity extends AppCompatActivity
                     @Override
                     public void onClick(int pos) {
                         deleteItem(pos);
-                        deleteFromFirebase(pos);
+                        deleteFromFb(pos);
                     }
                 }
         ));
@@ -134,13 +133,13 @@ public class WorkoutPlansActivity extends AppCompatActivity
     private void deleteItem(final int position) {
         workoutAdapter = new WorkoutPlanAdapter(this, workoutPlansList);
         workoutPlansList.remove(position);
-        view.removeViewAt(position);
+        mRecyclerView.removeViewAt(position);
         workoutAdapter.notifyItemRemoved(position);
         workoutAdapter.notifyItemRangeChanged(position, workoutPlansList.size());
     }
 
 
-    private void deleteFromFirebase(final int position) {
+    private void deleteFromFb(final int position) {
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).
                 document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
@@ -239,14 +238,16 @@ public class WorkoutPlansActivity extends AppCompatActivity
     private void initRecyclerView() {
         // RecyclerView view;
 
-        view = findViewById(R.id.rv_workout_plans);
+        mRecyclerView = findViewById(R.id.rv_workout_plans);
 
-        Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + view);
+        Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + mRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        view.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(layoutManager);
 
         workoutAdapter = new WorkoutPlanAdapter(this, workoutPlansList);
-        view.setAdapter(workoutAdapter);
+        mRecyclerView.setAdapter(workoutAdapter);
     }
+
+
 }

@@ -1,19 +1,25 @@
 package fitness.albert.com.pumpit.workout;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,6 +35,7 @@ import java.util.List;
 import fitness.albert.com.pumpit.Adapter.TrainingAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.SwipeHelper;
 import fitness.albert.com.pumpit.Model.TrackerExercise;
 import fitness.albert.com.pumpit.Model.Training;
 import fitness.albert.com.pumpit.Model.Workout;
@@ -44,8 +51,10 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private TextView emptyWorkout;
     private ProgressDialog progressdialog;
     private ImageView btnStartWorkout;
-    private List<TrackerExercise> trackerExerciseList;
-    public static List<Training> trainingList;
+    private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
+    public static List<Training> trainingList = new ArrayList<>();
+    private TrainingAdapter trainingAdapter;
+    private AlertDialog dialog;
 
 
     @Override
@@ -54,11 +63,12 @@ public class StartWorkoutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start_workout);
 
         init();
-
         getDayWorkout();
-
         setBtnStartWorkout();
+
+        swipe();
     }
+
 
     @SuppressLint("SetTextI18n")
     private void init() {
@@ -93,8 +103,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private void getDayWorkout() {
         final List<WorkoutPlans> workoutPlansList = new ArrayList<>();
         final List<Workout> workoutList = new ArrayList<>();
-        trainingList = new ArrayList<>();
-        trackerExerciseList = new ArrayList<>();
 
         final String[] day = new String[1];
         final String[] part1 = new String[1];
@@ -102,6 +110,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
         progressdialog = new ProgressDialog(this);
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
+
 
         //get workout id
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
@@ -114,125 +123,231 @@ public class StartWorkoutActivity extends AppCompatActivity {
                                 WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
                                 workoutPlansList.add(workoutPlans);
 
-
                                 SavePref savePref = new SavePref();
                                 savePref.createSharedPreferencesFiles(StartWorkoutActivity.this, "exercise");
                                 String routineName = savePref.getString("default_plan", "");
 
-                                Log.d(TAG, routineName);
-                                Log.d(TAG, workoutPlansList.get(i).getRoutineName());
+                                Log.d(TAG, "routineName: " + routineName + workoutPlansList.get(i).getRoutineName());
 
                                 if (routineName.equals(workoutPlansList.get(i).getRoutineName())) {
                                     workoutNameId = task.getResult().getDocuments().get(i).getId();
                                 }
                             }
 
-                            Log.d(TAG, "Successfully get workout Name Id: " + workoutNameId);
+                            if (workoutNameId == null) {
+                                startActivity(new Intent(StartWorkoutActivity.this, ChangePlanActivity.class));
+                                finish();
+                            } else {
+                                Log.d(TAG, "Successfully get workout name id: " + workoutNameId);
 
 
+                                db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                                        .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId)
+                                        .collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                            //todo if the user logout.. its not working
-                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-                                    .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId)
-                                    .collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful() && task.getResult() != null) {
+                                            for (int i = 0; i < task.getResult().size(); i++) {
 
-                                    if (task.isSuccessful() && task.getResult() != null) {
-                                        for (int i = 0; i < task.getResult().size(); i++) {
+                                                Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
+                                                workoutList.add(workout);
 
-                                            Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
-                                            workoutList.add(workout);
+                                                String splitWorkoutDayName = workoutList.get(i).getWorkoutDay();
+                                                String[] parts = splitWorkoutDayName.split(" ");
+                                                part1[0] = parts[0];
 
-                                            String splitWorkoutDayName = workoutList.get(i).getWorkoutDay();
-                                            String[] parts = splitWorkoutDayName.split(" ");
-                                            part1[0] = parts[0];
+                                                Date d = new Date();
 
-                                            Date d = new Date();
+                                                if (part1[0].equals("Day")) {
+                                                    day[0] = getDayOfTheWeekBeWorkout(d.getDay());
 
-                                            if (part1[0].equals("Day")) {
-                                                day[0] = getDayOfTheWeekBeWorkout(d.getDay());
+                                                } else {
+                                                    day[0] = getDayOfTheWeek();
+                                                }
 
-                                            } else {
-                                                day[0] = getDayOfTheWeek();
-                                            }
+                                                if (workoutList.get(i).getWorkoutDay().equals(day[0])) {
 
-                                            if (workoutList.get(i).getWorkoutDay().equals(day[0])) {
+                                                    String workoutId = task.getResult().getDocuments().get(i).getId();
 
-                                                String workoutId = task.getResult().getDocuments().get(i).getId();
+                                                    Log.d(TAG, "Successfully get workout ID: " + workoutId);
 
-                                                Log.d(TAG, "Successfully get workout ID: " + workoutId);
+                                                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
+                                                            .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
+                                                            .document(workoutId).collection(Workout.EXERCISE_NAME).get()
+                                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                    if (task.isSuccessful() && task.getResult() != null) {
 
-                                                db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
-                                                        .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
-                                                        .document(workoutId).collection(Workout.EXERCISE_NAME).get()
-                                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                if (task.isSuccessful() && task.getResult() != null) {
+                                                                        for (int i = 0; i < task.getResult().size(); i++) {
 
-                                                                    for (int i = 0; i < task.getResult().size(); i++) {
+                                                                            Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
+                                                                            TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
+                                                                            trackerExerciseList.add(trackerExercise);
+                                                                            trainingList.add(training);
 
-                                                                        Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
-                                                                        TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
-                                                                        trackerExerciseList.add(trackerExercise);
-                                                                        trainingList.add(training);
-
-                                                                        initRecyclerView(trainingList, trackerExerciseList);
+                                                                            initRecyclerView();
+                                                                        }
 
                                                                         Log.d(TAG, "Exercise Size: " + trainingList.size());
+                                                                        btnStartWorkout.setVisibility(View.VISIBLE);
+                                                                        emptyWorkout.setVisibility(View.INVISIBLE);
+                                                                    } else {
+                                                                        emptyWorkout.setVisibility(View.VISIBLE);
+                                                                        btnStartWorkout.setVisibility(View.INVISIBLE);
                                                                     }
-                                                                }
-                                                                //if have exercise today
-                                                                if (!trainingList.isEmpty()) {
-                                                                    btnStartWorkout.setVisibility(View.VISIBLE);
-                                                                    emptyWorkout.setVisibility(View.INVISIBLE);
-                                                                } else {
-                                                                    emptyWorkout.setVisibility(View.VISIBLE);
-                                                                    btnStartWorkout.setVisibility(View.INVISIBLE);
-                                                                }
+//                                                                    //if have exercise today
+//                                                                    if (!trainingList.isEmpty()) {
+//                                                                        btnStartWorkout.setVisibility(View.VISIBLE);
+//                                                                        emptyWorkout.setVisibility(View.INVISIBLE);
+//                                                                    } else {
+//                                                                        emptyWorkout.setVisibility(View.VISIBLE);
+//                                                                        btnStartWorkout.setVisibility(View.INVISIBLE);
+//                                                                    }
 
-                                                                Log.d(TAG, "successfully get Workout");
-
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull Exception e) {
-                                                                Log.d(TAG, "Failure: " + e);
-                                                            }
-                                                        });
+                                                                    Log.d(TAG, "Successfully get workout");
+                                                                }
+                                                            })
+                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    Log.d(TAG, "Failure get workout: " + e);
+                                                                }
+                                                            });
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "Failure" + e);
-                                }
-                            });
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d(TAG, "Failure" + e);
+                                    }
+                                });
+                            }
                         } else {
                             Log.d(TAG, "ERROR to received Id");
                         }
-
                         progressdialog.hide();
                     }
                 });
     }
 
 
-    private void initRecyclerView(List<Training> trainingList, List<TrackerExercise> trackerList) {
+    private void swipe() {
+        new SwipeHelper(this, mRecyclerView) {
+            @Override
+            public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "Delete",
+                        0,
+                        Color.parseColor("#d50000"),
+                        new SwipeHelper.UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+                                deleteItem(pos);
 
-        TrainingAdapter trainingAdapter;
+                            }
+                        }
+                ));
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "Edit",
+                        0,
+                        Color.parseColor("#4caf50"),
+                        new SwipeHelper.UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+                                addLayoutRepsAndSets(pos);
+                                editItem(pos);
+                            }
+                        }
+                ));
+            }
+        };
+    }
+
+    // TODO: 2019-05-10 check if exercise have on fb befor add
+
+    private void deleteItem(final int position) {
+        trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
+        trainingList.remove(position);
+        mRecyclerView.removeViewAt(position);
+        trainingAdapter.notifyItemRemoved(position);
+        trainingAdapter.notifyItemRangeChanged(position, trainingList.size());
+    }
+
+    private void editItem(int position) {
+
+
+    }
+
+
+    private void addLayoutRepsAndSets(int position) {
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.layout_recive_reps_and_sets, null);
+
+        ImageView btnDoneSetsReps = dialogView.findViewById(R.id.btn_done_edit_sets_reps);
+        ImageView btnCancel = dialogView.findViewById(R.id.iv_cancel_weight_reps);
+
+        for (int i = 0; i < trainingList.get(position).getSizeOfRept(); i++) {
+            addWeightandSetIntoLayout(dialogView, position, i);
+        }
+
+        btnDoneSetsReps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSetsAndRepsIntoFb();
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialogBuilder.setView(dialogView);
+        dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
+    private void addWeightandSetIntoLayout(View view, int position, int i) {
+        //add layout into layout_recive_reps_and_sets
+        LayoutInflater inf = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        @SuppressLint("InflateParams") final View rowView = inf.inflate(R.layout.layout_weight_and_reps, null);
+        final LinearLayout linearLayout = view.findViewById(R.id.linear_set_reps);
+        linearLayout.addView(rowView);
+
+        EditText etWeight = view.findViewById(R.id.et_weight);
+        EditText etReps = view.findViewById(R.id.et_reps);
+        etWeight.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getWeight()));
+        etReps.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getRepNumber()));
+
+    }
+
+    private void getSetsAndRepsFromFb() {
+        db.collection(WorkoutPlans.WORKOUT_PLANS).
+                document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                .document("").collection(Workout.WORKOUT_DAY_NAME).document("").collection(Workout.EXERCISE_NAME).document();
+
+
+    }
+
+    private void setSetsAndRepsIntoFb() {
+
+    }
+
+
+    private void initRecyclerView() {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        trainingAdapter = new TrainingAdapter(this, trainingList, trackerList);
+        trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
         mRecyclerView.setAdapter(trainingAdapter);
 
-        Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);
+        Log.d(TAG, "initRecyclerView: init recyclerView " + mRecyclerView);
     }
 
 
@@ -249,7 +364,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
                 return "Wednesday";
             case 4:
                 return "Thursday";
-
             case 5:
                 return "Friday";
             case 6:
@@ -283,7 +397,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(StartWorkoutActivity.this, WorkoutStartActivity.class));
-
             }
         });
     }

@@ -3,6 +3,7 @@ package fitness.albert.com.pumpit.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,18 +32,17 @@ import java.util.Objects;
 import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.SwipeHelper;
 import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.CustomPlanActivity;
 import fitness.albert.com.pumpit.workout.EditCustomPlanActivity;
-import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PlanFragment extends Fragment
-        implements RecyclerViewSwipeHelper.RecyclerViewSwipeHelperDelegate{
+public class PlanFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -62,11 +62,14 @@ public class PlanFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_plan, container, false);
+        View view = inflater.inflate(R.layout.fragment_plan, container, false);
         mRecyclerView = view.findViewById(R.id.fr_rv_workout_plans);
         setHasOptionsMenu(true);
         getPlanFormFb();
         initRecyclerView();
+
+        swipe();
+
         return view;
     }
 
@@ -76,20 +79,11 @@ public class PlanFragment extends Fragment
     }
 
 
-
-    //    private void setupSwipeMenu() {
-//        new RecyclerViewSwipeHelper(getActivity(), mRecyclerView, delegate);
-//    }
-
-
-
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main_add, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
-
 
 
     @Override
@@ -102,57 +96,44 @@ public class PlanFragment extends Fragment
     }
 
 
-    @Override
-    public boolean showButton(int rowPosition, int buttonIndex) {
-        return true;
+
+    private void swipe() {
+        new SwipeHelper(getContext(), mRecyclerView) {
+            @Override
+            public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "Delete",
+                        0,
+                        // R.color.colorAccent,
+                        Color.parseColor("#d50000"),
+                        new SwipeHelper.UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+                                deleteItem(pos);
+                                deleteFromFb(pos);
+                            }
+                        }
+                ));
+
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "Edit",
+                        0,
+                        //R.color.md_green_500,
+                        Color.parseColor("#4caf50"),
+                        new SwipeHelper.UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+                                routineName = workoutPlansList.get(pos).getRoutineName();
+                                Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlansList.get(pos).getRoutineName());
+
+                                Intent i = new Intent(Objects.requireNonNull(getActivity()).getBaseContext(), EditCustomPlanActivity.class);
+                                startActivity(i);
+                            }
+                        }
+                ));
+            }
+        };
     }
-
-    @Override
-    public int buttonWidth() {
-        return 0;
-    }
-
-    @Override
-    public void setupSwipeButtons(RecyclerView.ViewHolder viewHolder,
-                                  List<RecyclerViewSwipeHelper.SwipeButton> swipeButtons) {
-        //swipe delete
-        swipeButtons.add(new RecyclerViewSwipeHelper.SwipeButton(
-                Objects.requireNonNull(getActivity()).getBaseContext(),
-                0,
-                0,
-
-                R.drawable.ic_delete,
-                R.dimen.ic_delete_size,
-                R.color.colorAccent,
-                new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
-                    @Override
-                    public void onClick(int pos) {
-                        deleteItem(pos);
-                        deleteFromFb(pos);
-                    }
-                }
-        ));
-        //swipe edit
-        swipeButtons.add(new RecyclerViewSwipeHelper.SwipeButton(
-                getActivity().getBaseContext(),
-                0,
-                0,
-                R.drawable.ic_edit_action,
-                R.dimen.ic_delete_size,
-                R.color.md_green_500,
-                new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
-                    @Override
-                    public void onClick(int pos) {
-                        routineName = workoutPlansList.get(pos).getRoutineName();
-                        Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlansList.get(pos).getRoutineName());
-
-                        Intent i = new Intent(Objects.requireNonNull(getActivity()).getBaseContext(), EditCustomPlanActivity.class);
-                        startActivity(i);
-                    }
-                }
-        ));
-    }
-
 
     private void deleteItem(final int position) {
         workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
@@ -180,8 +161,8 @@ public class PlanFragment extends Fragment
                                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if(task.isSuccessful() && task.getResult() != null) {
-                                                for(int i=0; i<task.getResult().size();i++) {
+                                            if (task.isSuccessful() && task.getResult() != null) {
+                                                for (int i = 0; i < task.getResult().size(); i++) {
                                                     String workoutDayId = task.getResult().getDocuments().get(i).getId();
 
                                                     db.collection(WorkoutPlans.WORKOUT_PLANS).
@@ -239,7 +220,7 @@ public class PlanFragment extends Fragment
                                 initRecyclerView();
                             }
 
-                            if(workoutPlansList.size() == 1) {
+                            if (workoutPlansList.size() == 1) {
                                 SavePref savePref = new SavePref();
                                 savePref.createSharedPreferencesFiles(getActivity(), "exercise");
                                 savePref.saveData("default_plan", workoutPlansList.get(0).getRoutineName());
@@ -258,21 +239,6 @@ public class PlanFragment extends Fragment
                 });
     }
 
-
-
-//    private void initRecyclerView() {
-//        mLayoutManager = new LinearLayoutManager(this.getActivity());
-//        Log.d("debugMode", "The application stopped after this");
-//        mRecyclerView.setLayoutManager(mLayoutManager);
-//
-//        workoutAdapter = new WorkoutPlanAdapter(getActivity(),workoutPlansList);
-//        mRecyclerView.setAdapter(workoutAdapter);
-//
-//    }
-
-
-
-
     private void initRecyclerView() {
         // RecyclerView view;
 
@@ -283,9 +249,4 @@ public class PlanFragment extends Fragment
         workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
         mRecyclerView.setAdapter(workoutAdapter);
     }
-
-
-
-
-
 }

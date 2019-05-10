@@ -10,8 +10,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -36,7 +34,6 @@ import fitness.albert.com.pumpit.R;
 
 public class TrainingActivity extends AppCompatActivity {
 
-    private ImageView btnAddExercise;
     private RecyclerView rvTraining;
     private TrainingAdapter trainingAdapter;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -51,13 +48,10 @@ public class TrainingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_training);
 
         init();
-        onClick();
-
-        getTrainingFromFb();
 
         countExercise();
 
-        // itemTouchHelper();
+         itemTouchHelper();
     }
 
     private void init() {
@@ -65,22 +59,18 @@ public class TrainingActivity extends AppCompatActivity {
         trainingList = new ArrayList<>();
 
         rvTraining = findViewById(R.id.rv_training);
-        btnAddExercise = findViewById(R.id.btn_add_exercise);
-    }
-
-    private void onClick() {
-        btnAddExercise.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(TrainingActivity.this, AddExerciseActivity.class));
-                finish();
-            }
-        });
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        getTrainingFromFb();
+    }
+
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_edit, menu);
+        getMenuInflater().inflate(R.menu.menu_custom_add_exercise, menu);
         // MenuItem menuItem = menu.findItem(R.id.menu_edit_training);
         return true;
     }
@@ -90,10 +80,12 @@ public class TrainingActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.menu_edit_training) {
-            itemTouchHelper();
+        if (id == R.id.menu_custom_add_exercise) {
+            startActivity(new Intent(TrainingActivity.this, AddExerciseActivity.class));
+            finish();
+//            startActivity(new Intent(this, CustomAddExerciseActivity.class));
+//            finish();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -135,7 +127,6 @@ public class TrainingActivity extends AppCompatActivity {
                                             Log.d(TAG, "get failed with ", e);
                                         }
                                     });
-
                         }
 
                     }
@@ -209,6 +200,7 @@ public class TrainingActivity extends AppCompatActivity {
                                             int exerciseTime = 33;
 
                                             Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
+                                            assert training != null;
                                             countRestAfterExercise += training.getRestAfterExercise();
                                             countRestBetweenSet += training.getRestBetweenSet();
                                             sizeOfRept += training.getSizeOfRept();
@@ -218,9 +210,6 @@ public class TrainingActivity extends AppCompatActivity {
                                             Log.d(TAG, "totalTimeTraining: " + totalTimeTraining + " countRestAfterExercise: "
                                                     + countRestAfterExercise + " countRestBetweenSet " + countRestBetweenSet + " sizeOfRept: " + sizeOfRept);
                                         }
-
-
-
                                         DocumentReference documentReference = db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                                                 .collection(Workout.WORKOUT_NAME).document(getPlanId)
                                                 .collection(Workout.WORKOUT_DAY_NAME).document(id);

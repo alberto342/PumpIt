@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -63,17 +62,13 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         holder.tvExerciseName.setText(workoutList.get(position).getWorkoutDayName());
         holder.tvExerciseCount.setText(String.valueOf(workoutList.get(position).getNumOfExercise()));
         holder.tvExerciseTime.setText(String.format(Locale.getDefault(), "%d min(s)", min));
-      //  holder.tvExerciseTime.setText(String.valueOf(workoutList.get(position).getLengthTraining()));
-        holder.layout.setOnClickListener(new View.OnClickListener() {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 pos = position;
-
                 workoutDayName = workoutList.get(position).getWorkoutDayName();
-
                 mContext.startActivity(new Intent(mContext, TrainingActivity.class));
-
                 Log.d(TAG, "Workout day name: " + workoutDayName);
             }
         });
@@ -88,7 +83,6 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView tvExerciseCount, tvExerciseName, tvDay, tvDate, tvExerciseTime;
-        private LinearLayout layout;
 
         public ViewHolder(View rowView) {
             super(rowView);
@@ -99,7 +93,6 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             this.tvExerciseName = rowView.findViewById(R.id.tv_exercise_name_work);
             this.tvDay = rowView.findViewById(R.id.tv_day);
             this.tvExerciseTime = rowView.findViewById(R.id.tv_time_workout);
-            this.layout = rowView.findViewById(R.id.ll_wokout_selected);
         }
 
         @Override

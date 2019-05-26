@@ -101,8 +101,6 @@ public class TrackerExerciseFragment extends Fragment {
         saveTracker = view.findViewById(R.id.btn_save_tracker);
         setsRest = view.findViewById(R.id.et_rest_between_sets);
         exerciseRest = view.findViewById(R.id.et_sec_rest_after_exercise);
-
-
     }
 
 
@@ -165,7 +163,6 @@ public class TrackerExerciseFragment extends Fragment {
         trackerList.add(newTex2);
     }
 
-
     //save all date into firebase
     private void saveClick() {
         saveTracker.setOnClickListener(new View.OnClickListener() {
@@ -212,10 +209,9 @@ public class TrackerExerciseFragment extends Fragment {
             trackerExerciseList.add(new TrackerExercise(repNumberList.get(i).getRepNumber(), weightList.get(i).getWeight()));
         }
 
-
-
-        final Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2, Integer.valueOf(setsRest.getText().toString()), Integer.valueOf(exerciseRest.getText().toString()), ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
-
+        final Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2,
+                Integer.valueOf(setsRest.getText().toString()), Integer.valueOf(exerciseRest.getText().toString()),
+                ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
                 .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

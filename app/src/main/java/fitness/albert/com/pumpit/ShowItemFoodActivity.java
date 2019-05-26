@@ -427,22 +427,22 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     public String getMeal() {
         SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-        boolean breakfast = pref.getBoolean("DINNER", false);
-        boolean dinner = pref.getBoolean("BREAKFAST", false);
-        boolean lunch = pref.getBoolean("LUNCH", false);
-        boolean snack = pref.getBoolean("SNACK", false);
+        boolean breakfast = pref.getBoolean("dinner", false);
+        boolean dinner = pref.getBoolean("breakfast", false);
+        boolean lunch = pref.getBoolean("lunch", false);
+        boolean snack = pref.getBoolean("snack", false);
 
         if (breakfast) {
-            return "DINNER";
+            return "dinner";
         }
         if (dinner) {
-            return "BREAKFAST";
+            return "breakfast";
         }
         if (lunch) {
-            return "LUNCH";
+            return "lunch";
         }
         if (snack) {
-            return "SNACK";
+            return "snack";
         } else {
             return null;
         }
@@ -468,6 +468,5 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     public void onBackPressed() {
         super.onBackPressed();
         savePref.removeAll(this, "passMeal");
-        finish();
     }
 }

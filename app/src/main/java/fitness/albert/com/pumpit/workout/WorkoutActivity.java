@@ -388,7 +388,9 @@ public class WorkoutActivity extends AppCompatActivity
                                             for (int i = 0; i < trainingList.size(); i++) {
                                                 db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                                                         .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME)
-                                                        .document(id).collection(Workout.EXERCISE_NAME).document(trainingList.get(i).getExerciseName()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        .document(id).collection(Workout.EXERCISE_NAME)
+                                                        .document(trainingList.get(i).getExerciseName())
+                                                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
                                                         Log.d(TAG, "Exercise successfully deleted!");

@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:text="Today you need to rest \nNo exercises\n If you what you can add exercise \nOR \nChange plan"
+        android:text="Today you need to rest \nNo exercises"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="@dimen/common_font_16"

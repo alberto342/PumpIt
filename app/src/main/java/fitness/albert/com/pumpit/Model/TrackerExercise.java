@@ -9,19 +9,18 @@ public class TrackerExercise {
     }
 
 
+    public TrackerExercise(int repNumber, float weight) {
+        this.repsNumber = repNumber;
+        this.weight = weight;
+    }
+
+
     public TrackerExercise(float weight) {
         this.weight = weight;
     }
 
     public TrackerExercise(int repNumber) {
         this.repsNumber = repNumber;
-    }
-
-
-
-    public TrackerExercise(int repNumber, float weight) {
-        this.repsNumber = repNumber;
-        this.weight = weight;
     }
 
 

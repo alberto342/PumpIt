@@ -370,10 +370,4 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         return df.format(c);
     }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
 }

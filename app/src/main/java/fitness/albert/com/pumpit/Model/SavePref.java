@@ -14,7 +14,7 @@ public class SavePref {
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor editor;
 
-    private Context context;
+ // private Context context;
 
 //
 //    public SavePref(Context context, String fileName) {
@@ -25,7 +25,7 @@ public class SavePref {
 
 
     public void createSharedPreferencesFiles(Context context, String fileName) {
-       this.context = context;
+       // this.context = context;
         this.sharedPref = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 

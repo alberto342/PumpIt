@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -77,7 +78,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
         btnSaveAllFood.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               saveAll();
+                saveAll();
             }
         });
     }
@@ -92,7 +93,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
         final String search = edQuery.getText().toString().trim();
 
         if (search.length() == 0 || search.isEmpty() || search.equals("")) {
-            Toast.makeText(this,"Please Enter food name",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please Enter food name", Toast.LENGTH_SHORT).show();
         } else {
             foodRequest = new FoodRequest(search);
         }
@@ -100,15 +101,15 @@ public class SearchFoodsActivity extends AppCompatActivity {
         Call<FoodListResponse> call = api.foodList(Global.x_app_id, Global.x_app_key, foodRequest);
 
         call.enqueue(new Callback<FoodListResponse>() {
+            @SuppressLint("ShowToast")
             @Override
-            public void onResponse(Call<FoodListResponse> call, Response<FoodListResponse> response) {
+            public void onResponse(@NonNull Call<FoodListResponse> call, @NonNull Response<FoodListResponse> response) {
                 progressdialog.hide();
                 if (response.body() != null) {
                     if (response.body().getFoods().size() > 0) {
                         tvEmpty.setVisibility(View.GONE);
 
-
-                        if(response.body().getFoods().size() > 1) {
+                        if (response.body().getFoods().size() > 1) {
                             btnSaveAllFood.setVisibility(View.VISIBLE);
                         } else {
                             btnSaveAllFood.setVisibility(View.INVISIBLE);
@@ -125,7 +126,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<FoodListResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<FoodListResponse> call, @NonNull Throwable t) {
                 progressdialog.hide();
                 t.printStackTrace();
             }
@@ -133,13 +134,8 @@ public class SearchFoodsActivity extends AppCompatActivity {
     }
 
 
-
-
-
     private void saveAll() {
-
-        for(int i =0 ; i< mListItem.size(); i++) {
-
+        for (int i = 0; i < mListItem.size(); i++) {
             try {
                 arrayListIntoClass();
                 db.collection(Foods.NUTRITION)
@@ -172,41 +168,36 @@ public class SearchFoodsActivity extends AppCompatActivity {
 
         SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-        boolean breakfast = pref.getBoolean("DINNER", false);
-        boolean dinner = pref.getBoolean("BREAKFAST",false);
-        boolean lunch = pref.getBoolean("LUNCH",false);
-        boolean snack = pref.getBoolean("SNACK",false);
+        boolean breakfast = pref.getBoolean("dinner", false);
+        boolean dinner = pref.getBoolean("breakfast", false);
+        boolean lunch = pref.getBoolean("lunch", false);
+        boolean snack = pref.getBoolean("Snack", false);
 
         if (breakfast) {
-            return "BREAKFAST";
+            return "breakfast";
         }
         if (dinner) {
-            return "DINNER";
+            return "dinner";
         }
         if (lunch) {
-            return "LUNCH";
+            return "lunch";
         }
         if (snack) {
-            return "SNACK";
+            return "Snack";
         } else {
             return null;
         }
     }
 
     private void arrayListIntoClass() {
-
-        for(int i = 0 ; i<mListItem.size(); i++) {
+        for (int i = 0; i < mListItem.size(); i++) {
             foods.setFood_name(mListItem.get(i).getFood_name());
             foods.setImgUrl(mListItem.get(i).getImgUrl());
         }
     }
-
-
-
-
-
-    public int getListSize() {
-       return mListItem.size();
-    }
+//
+//    public int getListSize() {
+//       return mListItem.size();
+//    }
 
 }

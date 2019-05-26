@@ -25,12 +25,9 @@ public class FindWorkoutActivity extends AppCompatActivity {
     }
 
     private void init() {
-
         TabLayout tabs = findViewById(R.id.tablayout_workout);
         ViewPager viewPager = findViewById(R.id.vp_plans);
-
         setupViewPager(viewPager);
-
         tabs.setupWithViewPager(viewPager);
     }
 

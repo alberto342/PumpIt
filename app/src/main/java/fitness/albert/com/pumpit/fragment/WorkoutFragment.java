@@ -33,14 +33,12 @@ import fitness.albert.com.pumpit.workout.WorkoutPlansActivity;
 
 public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
-
     private boolean exerciseExist;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView exerciseName, level, workoutComplete, emptyExercise, seeWorkout;
     private ImageView btnAdd, findWorkout, btnStartWorkout;
 
     public WorkoutFragment() {
-        // Required empty public constructor
     }
 
 
@@ -67,6 +65,12 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
+     //   loadExerciseFromFb();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         loadExerciseFromFb();
     }
 
@@ -147,7 +151,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
         if (exerciseExist) {
             SavePref savePref = new SavePref();
-            savePref.createSharedPreferencesFiles(getContext(), SavePref.EXERCISE);
+            savePref.createSharedPreferencesFiles(getActivity(), SavePref.EXERCISE);
 
             seeWorkout.setVisibility(TextView.VISIBLE);
             emptyExercise.setVisibility(TextView.INVISIBLE);
@@ -163,9 +167,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                 exerciseName.setText(routineName);
                 exerciseName.setTextColor(Color.WHITE);
             }
-
             savePref.saveData("defaultExercise", true);
-
         } else {
             btnAdd.setVisibility(View.VISIBLE);
             emptyExercise.setVisibility(TextView.VISIBLE);

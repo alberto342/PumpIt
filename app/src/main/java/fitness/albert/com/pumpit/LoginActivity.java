@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LoginActivity extends AppCompatActivity  { //implements GoogleApiClient.OnConnectionFailedListener
+public class LoginActivity extends AppCompatActivity { //implements GoogleApiClient.OnConnectionFailedListener
 
     private EditText inputEmail, inputPassword;
     private ProgressBar progressBar;
@@ -38,7 +39,6 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
     public static final int SIGN_IN_CODE = 777;
     private List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.GoogleBuilder().build());
-
 
 
     @Override
@@ -181,7 +181,7 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
     private void resetPassword() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.activity_reset_password, null);
+        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.activity_reset_password, null);
 
 
         dialogBuilder.setView(dialogView);
@@ -233,6 +233,7 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
 
     private void checkIfEmailVerified() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        assert user != null;
         if (user.isEmailVerified()) {
             finish();
             Toast.makeText(LoginActivity.this, "Successfully logged in", Toast.LENGTH_SHORT).show();

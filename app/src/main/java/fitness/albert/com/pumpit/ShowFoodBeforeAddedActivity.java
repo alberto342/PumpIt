@@ -2,7 +2,6 @@ package fitness.albert.com.pumpit;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,19 +21,17 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
@@ -285,10 +282,8 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             newQuantity = 1;
             quantityViewCustom.setQuantity(newQuantity);
         }
-
         getFoodInfo();
         calculateOnSpinnerChange();
-
     }
 
 
@@ -1120,8 +1115,8 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             }
 
             //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
-            db.collection(Foods.NUTRITION).document(getEmailRegister())
-                    .collection(getMeal()).document(getTodayDate())
+            db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                    .collection(getMeal()).document(UserRegister.getTodayData())
                     .collection(Foods.FRUIT).add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @SuppressLint("LongLogTag")
@@ -1130,7 +1125,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                             FoodListAdapter.measure.clear();
                             finish();
-
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -1149,27 +1143,26 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
         SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-        boolean breakfast = pref.getBoolean("DINNER", false);
-        boolean dinner = pref.getBoolean("BREAKFAST", false);
-        boolean lunch = pref.getBoolean("LUNCH", false);
-        boolean snack = pref.getBoolean("SNACK", false);
+        boolean breakfast = pref.getBoolean("dinner", false);
+        boolean dinner = pref.getBoolean("breakfast", false);
+        boolean lunch = pref.getBoolean("lunch", false);
+        boolean snack = pref.getBoolean("snack", false);
 
         if (breakfast) {
-            return "DINNER";
+            return "dinner";
         }
         if (dinner) {
-            return "BREAKFAST";
+            return "breakfast";
         }
         if (lunch) {
-            return "LUNCH";
+            return "lunch";
         }
         if (snack) {
-            return "SNACK";
+            return "snack";
         } else {
             return null;
         }
     }
-
 
     private void onAddButtonClick() {
         btnSaveFood.setOnClickListener(new View.OnClickListener() {
@@ -1180,33 +1173,31 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                 //save activity to sharedPreferences
                 SavePref savePref = new SavePref();
                 savePref.createSharedPreferencesFiles(ShowFoodBeforeAddedActivity.this, "activity");
-                savePref.saveData("FROM_ACTIVITY", "ShowFoodBeforeAddedActivity");
-                startActivity(new Intent(ShowFoodBeforeAddedActivity.this, FragmentNavigationActivity.class));
+                savePref.saveData("fromActivity", "ShowFoodBeforeAddedActivity");
+                //startActivity(new Intent(ShowFoodBeforeAddedActivity.this, FragmentNavigationActivity.class));
                 finish();
             }
         });
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         FoodListAdapter.measure.clear();
-        //finish();
     }
 
-    public String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
-        }
-        return email;
-    }
+//    public String getEmailRegister() {
+//        String email = null;
+//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+//        if (mAuth.getCurrentUser() != null) {
+//            email = mAuth.getCurrentUser().getEmail();
+//        }
+//        return email;
+//    }
 
-    public String getTodayDate() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
-        return df.format(c);
-    }
+//    public String getTodayDate() {
+//        Date c = Calendar.getInstance().getTime();
+//        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+//        return df.format(c);
+//    }
 }

@@ -18,14 +18,10 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,8 +30,10 @@ import fitness.albert.com.pumpit.Adapter.DinnerListAdapter;
 import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
 import fitness.albert.com.pumpit.Adapter.LunchListAdapter;
 import fitness.albert.com.pumpit.Adapter.SnacksListAdapter;
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.SwipeToDeleteCallback;
+import fitness.albert.com.pumpit.Model.UserRegister;
 
 public class ShowAllNutritionActivity extends AppCompatActivity {
 
@@ -92,8 +90,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         progressdialog.show();
 
         //get NUTRITION from firestone
-        db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
+        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                .collection(keyValue).document(UserRegister.getTodayData())
                 .collection(Foods.FRUIT).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
@@ -144,8 +142,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
 
     private void deleteFromFirebase(final String keyValue, final String foodName, final int qty) {
-        db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
+        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                .collection(keyValue).document(UserRegister.getTodayData())
                 .collection(Foods.FRUIT).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
@@ -163,8 +161,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                     String id = task.getResult().getDocuments().get(i).getId();
 
                                     //delete from firebase
-                                    db.collection(Foods.NUTRITION).document(getEmailRegister())
-                                            .collection(keyValue).document(getTodayDate())
+                                    db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                                            .collection(keyValue).document(UserRegister.getTodayData())
                                             .collection(Foods.FRUIT).document(id).delete();
 
                                     Log.d(TAG, "DocumentSnapshot " + task.getResult().getDocuments().get(i).getId()   + " successfully deleted!");
@@ -271,24 +269,19 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     }
 
 
-    public String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
-        }
-        return email;
-    }
+//    public String getEmailRegister() {
+//        String email = null;
+//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+//        if (mAuth.getCurrentUser() != null) {
+//            email = mAuth.getCurrentUser().getEmail();
+//        }
+//        return email;
+//    }
+//
+//    public String getTodayDate() {
+//        Date c = Calendar.getInstance().getTime();
+//        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+//        return df.format(c);
+//    }
 
-    public String getTodayDate() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
-        return df.format(c);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
 }

@@ -219,13 +219,11 @@ public class PlanFragment extends Fragment {
 
                                 initRecyclerView();
                             }
-
                             if (workoutPlansList.size() == 1) {
                                 SavePref savePref = new SavePref();
                                 savePref.createSharedPreferencesFiles(getActivity(), "exercise");
                                 savePref.saveData("default_plan", workoutPlansList.get(0).getRoutineName());
                             }
-
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
@@ -241,7 +239,6 @@ public class PlanFragment extends Fragment {
 
     private void initRecyclerView() {
         // RecyclerView view;
-
         Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + mRecyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,6 +26,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
@@ -38,8 +40,13 @@ import fitness.albert.com.pumpit.ShowAllNutritionActivity;
 
 public class NutritionFragment extends Fragment {
 
-    private ImageView btnAddBreakfast, btnAddLunch, btnAddSnacks, btnAddDinner;
-    private TextView tvGoal, tvFood, tvExersice, tvRemaining, tvFat, tvProtien, tvCarbs, tvDetails;
+    private TextView tvGoal;
+    private TextView tvFood;
+    private TextView tvExersice;
+    private TextView tvRemaining;
+    private TextView tvFat;
+    private TextView tvProtien;
+    private TextView tvCarbs;
     private List<Foods> foodList = new ArrayList<>();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private SavePref savePref = new SavePref();
@@ -47,6 +54,8 @@ public class NutritionFragment extends Fragment {
     private float kcal, fat, protein, carbs;
     private final String TAG = "NutritionFragment";
     private boolean isOnNutrition;
+    private FragmentActivity myContext;
+
 
 
     public NutritionFragment() {
@@ -59,12 +68,10 @@ public class NutritionFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_nutrition, container, false);
-
-        return view;
+        return inflater.inflate(R.layout.fragment_nutrition, container, false);
     }
 
     @Override
@@ -73,34 +80,22 @@ public class NutritionFragment extends Fragment {
 
         init(view);
 
+        mealFromFs();
+
         getUserDataAndSetGoal();
 
         emailIsOnNutrition();
-
-        if(isOnNutrition) {
-            ProgressDialog progressdialog = new ProgressDialog(getActivity());
-            progressdialog.setMessage("Please Wait....");
-            progressdialog.show();
-
-            getMealFromFs(Foods.BREAKFAST);
-            getMealFromFs(Foods.SNACK);
-            getMealFromFs(Foods.LUNCH);
-            getMealFromFs(Foods.DINNER);
-            progressdialog.hide();
-        }
-
-
     }
+
 
 
     private void init(View view) {
         //add food btn
-        btnAddBreakfast = view.findViewById(R.id.btn_add_breakfast);
-        btnAddDinner = view.findViewById(R.id.btn_add_dinner);
-        btnAddLunch = view.findViewById(R.id.btn_add_lunch);
-        btnAddSnacks = view.findViewById(R.id.btn_add_snacks);
-        tvDetails = view.findViewById(R.id.tv_details);
-
+        ImageView btnAddBreakfast = view.findViewById(R.id.btn_add_breakfast);
+        ImageView btnAddDinner = view.findViewById(R.id.btn_add_dinner);
+        ImageView btnAddLunch = view.findViewById(R.id.btn_add_lunch);
+        ImageView btnAddSnacks = view.findViewById(R.id.btn_add_snacks);
+        TextView tvDetails = view.findViewById(R.id.tv_details);
 
         tvGoal = view.findViewById(R.id.tv_goal);
         tvExersice = view.findViewById(R.id.tv_exercise);
@@ -112,16 +107,30 @@ public class NutritionFragment extends Fragment {
         tvCarbs = view.findViewById(R.id.tv_carbs);
         tvProtien = view.findViewById(R.id.tv_protein);
 
-
         //disable RecyclerView scrolling
-//        rvListFood.setNestedScrollingEnabled(false);
-
-
+        //rvListFood.setNestedScrollingEnabled(false);
         btnAddBreakfast.setOnClickListener(onClickListener);
         btnAddSnacks.setOnClickListener(onClickListener);
         btnAddLunch.setOnClickListener(onClickListener);
         btnAddDinner.setOnClickListener(onClickListener);
         tvDetails.setOnClickListener(onClickListener);
+    }
+
+
+
+
+    private void mealFromFs() {
+     //   if (isOnNutrition) {
+            ProgressDialog progressdialog = new ProgressDialog(getActivity());
+            progressdialog.setMessage("Please Wait....");
+            progressdialog.show();
+
+            getMealFromFs(Foods.BREAKFAST);
+            getMealFromFs(Foods.SNACK);
+            getMealFromFs(Foods.LUNCH);
+            getMealFromFs(Foods.DINNER);
+            progressdialog.hide();
+     //   }
     }
 
 
@@ -156,46 +165,44 @@ public class NutritionFragment extends Fragment {
 
     //The first time the email not exist, only after add food is exists
     private void emailIsOnNutrition() {
-       DocumentReference docRef =  db.collection(Foods.NUTRITION).document(getEmailRegister());
-       docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-           @Override
-           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-               if(task.isSuccessful()) {
-                   DocumentSnapshot document = task.getResult();
-                   if ((document.exists())) {
-                       Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                       isOnNutrition = true;
-                   } else {
-                       Log.d(TAG, "No such document");
-                       isOnNutrition = false;
-                   }
-               } else {
-                   Log.d(TAG, "get failed with ", task.getException());
-               }
-           }
-       });
-
-
-
+        DocumentReference docRef = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    assert document != null;
+                    if ((document.exists())) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        isOnNutrition = true;
+                    } else {
+                        Log.d(TAG, "No such document");
+                        isOnNutrition = false;
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
     private void saveMealToSP(boolean dinner, boolean breakfast, boolean lunch, boolean snack) {
-        savePref.saveData("DINNER", dinner);
-        savePref.saveData("BREAKFAST", breakfast);
-        savePref.saveData("LUNCH", lunch);
-        savePref.saveData("SNACK", snack);
+        savePref.saveData("dinner", dinner);
+        savePref.saveData("breakfast", breakfast);
+        savePref.saveData("lunch", lunch);
+        savePref.saveData("Snack", snack);
 
         startActivity(new Intent(getActivity(), SearchFoodsActivity.class));
-        getActivity().getFragmentManager().popBackStack();
+        Objects.requireNonNull(getActivity()).getFragmentManager().popBackStack();
     }
 
 
     private void getMealFromFs(String keyValue) {
-
         //get NUTRITION from firestone
+
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(FireBaseInit.fireBaseInit.getTodayDate())
-                .collection("FRUIT").get()
+                .collection(keyValue).document(UserRegister.getTodayData())
+                .collection(Foods.FRUIT).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -205,24 +212,23 @@ public class NutritionFragment extends Fragment {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);
 
-
                                 Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
 
-                                //set NUTRITION to float
+                                //Set NUTRITION to float
                                 kcal += foodList.get(i).getNf_calories();
                                 carbs += foodList.get(i).getNf_total_carbohydrate();
                                 fat += foodList.get(i).getNf_total_fat();
                                 protein += foodList.get(i).getNf_protein();
 
+                                Log.d(TAG, "Kcal: " + kcal);
+
+                                tvFood.setText(String.format(Locale.getDefault(), "%.2f", kcal));
+                                tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of 334g", carbs));
+                                tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of 25g", protein));
+                                tvFat.setText(String.format(Locale.getDefault(), "%.2fg of 67g", fat));
+                                //Need to be calculation
+                                tvRemaining.setText(String.format(Locale.getDefault(), "%.2f", kcal));
                             }
-
-                            tvFood.setText(String.format("%.2f", kcal));
-                            tvCarbs.setText(String.format("%.2fg of 334g", carbs));
-                            tvProtien.setText(String.format("%.2fg of 25g", protein));
-                            tvFat.setText(String.format("%.2fg of 67g", fat));
-                            float remaining = kcal;
-                            tvRemaining.setText(String.format("%.2f", remaining));
-
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
                         }
@@ -234,7 +240,6 @@ public class NutritionFragment extends Fragment {
                         e.printStackTrace();
                     }
                 });
-
     }
 
 
@@ -243,14 +248,13 @@ public class NutritionFragment extends Fragment {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        db.collection(UserRegister.fireBaseUsers).document(getEmailRegister()).get()
+        db.collection(UserRegister.fireBaseUsers).document(FireBaseInit.getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         user = documentSnapshot.toObject(UserRegister.class);
 
-
-
+                        assert user != null;
                         tvGoal.setText(String.valueOf(user.thermicEffect(user.getActivityLevel())));
 
                         progressdialog.hide();
@@ -265,26 +269,5 @@ public class NutritionFragment extends Fragment {
     }
 
 
-    public String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
-        }
-        return email;
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
 }
 

@@ -3,6 +3,7 @@ package fitness.albert.com.pumpit.Adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,14 +39,15 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mListItem = mListItem;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(mContext).inflate(R.layout.item_food, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         bindViews((ViewHolder) holder, position);
     }
 
@@ -71,8 +73,7 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         holder.tvCalories.setText(mContext.getString(R.string.calories) + ": " + mListItem.get(position).getNf_calories());
         holder.tvServingQuantity.setText(mContext.getString(R.string.serving_qty) + ": " + mListItem.get(position).getServing_qty());
         holder.tvServingUnit.setText(mContext.getString(R.string.serving_unit) + ": " + mListItem.get(position).getServing_unit());
-        holder.llSelectedItem.setOnClickListener(new View.OnClickListener() {
-
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
@@ -81,6 +82,13 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 ((Activity) mContext).finish();
             }
         });
+//        holder.llSelectedItem.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
     }
 
 
@@ -143,7 +151,7 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         //remove existed
         if(!mListItem.get(position).getAlt_measures().isEmpty()) {
-            if(String.valueOf(mListItem.get(position).getServing_weight_grams()) != mListItem.get(position).getAlt_measures().get(position).getServing_weight()) {
+            if(!String.valueOf(mListItem.get(position).getServing_weight_grams()).equals(mListItem.get(position).getAlt_measures().get(position).getServing_weight())) {
                 String itemOne = measure.get(0);
                 measure.remove(0);
                 measure.add(itemOne);

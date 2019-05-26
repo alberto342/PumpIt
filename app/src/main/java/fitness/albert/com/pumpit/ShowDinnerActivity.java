@@ -21,16 +21,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +35,7 @@ import java.util.Map;
 import fitness.albert.com.pumpit.Adapter.DinnerListAdapter;
 import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
@@ -129,7 +126,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         progressdialog.show();
 
         db.collection(Foods.NUTRITION)
-                .document(getEmailRegister()).collection(Foods.DINNER)
+                .document(FireBaseInit.getEmailRegister()).collection(Foods.DINNER)
                 .document(user.getTodayData()).collection(Foods.FRUIT)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -290,8 +287,8 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
+        DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                .collection(keyValue).document(UserRegister.getTodayData())
                 .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());
@@ -328,8 +325,8 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
+        DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                .collection(keyValue).document(UserRegister.getTodayData())
                 .collection(Foods.FRUIT).document(DinnerListAdapter.fireId);
 
         doc.update("serving_unit", spinnerSelectedItem);
@@ -359,24 +356,18 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
     }
 
 
-    public String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
-        }
-        return email;
-    }
-
-    public String getTodayDate() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-        return df.format(c);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
+//    public String getEmailRegister() {
+//        String email = null;
+//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+//        if (mAuth.getCurrentUser() != null) {
+//            email = mAuth.getCurrentUser().getEmail();
+//        }
+//        return email;
+//    }
+//
+//    public String getTodayDate() {
+//        Date c = Calendar.getInstance().getTime();
+//        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+//        return df.format(c);
+//    }
 }

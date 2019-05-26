@@ -53,7 +53,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     private EditText weight, reps;
     private View rowView;
     private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
-    private TrackerExercise trackerExercise = new TrackerExercise();
+
 
 
     @Override
@@ -85,7 +85,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         exercisesLeft = findViewById(R.id.tv_exercise_left);
 
         // onAddField(container);
-
         assert StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName() != null;
         exerciseName.setText(StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName());
 
@@ -412,12 +411,11 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
             @SuppressLint({"SetTextI18n", "DefaultLocale"})
             public void onTick(long millisUntilFinished) {
 
-                timerUp.setText("" + String.format("%d:%d",
+                timerUp.setText("" + String.format("%d :%d",
                         TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished),
                         TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) -
                                 TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
             }
-
             @SuppressLint("SetTextI18n")
             public void onFinish() {
                 timerUp.setText("");
@@ -428,13 +426,33 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
     private void setExerciseIntoFb() {
 
-        if (weight.getText().toString().isEmpty() || weight.getText() == null && reps.getText().toString().isEmpty() || reps.getText() == null) {
+        if (weight.getText().toString().isEmpty() || weight.getText() == null || reps.getText().toString().isEmpty() || reps.getText() == null) {
             countAddSets--;
         }
+
 
         for (int i = 0; i < trackerExerciseList.size(); i++) {
             Log.d(TAG, "exercise recording: " + trackerExerciseList.get(i).getWeight());
         }
+
+        Log.d(TAG, "countExercisesLeft: " + countExercisesLeft);
+
+        boolean isBlow = countExercisesLeft < StartWorkoutActivity.trainingList.size();
+
+        boolean isIn = true;
+        while (isIn) {
+            Log.d(TAG, "isBlow: " + isBlow);
+            if (!isBlow) {
+                countExercisesLeft--;
+                isBlow =  countExercisesLeft < StartWorkoutActivity.trainingList.size();
+                Log.d(TAG, "countExercisesLeft: " + countExercisesLeft + " blow " + StartWorkoutActivity.trainingList.size());
+            } else {
+                isIn = false;
+            }
+        }
+        Log.d(TAG, "countExercise: " + countExercisesLeft);
+
+
         FinishTraining finishTraining = new FinishTraining(exerciseName.getText().toString(),
                 trackerExerciseList, 0,
                 StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestBetweenSet(),
@@ -455,6 +473,33 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 Log.w(TAG, "Error writing document", e);
             }
         });
+
+
+
+
+
+//            if (countExercisesLeft < StartWorkoutActivity.trainingList.size()) {
+//                FinishTraining finishTraining = new FinishTraining(exerciseName.getText().toString(),
+//                        trackerExerciseList, 0,
+//                        StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestBetweenSet(),
+//                        StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise(),
+//                        StartWorkoutActivity.trainingList.get(countExercisesLeft).getImgName(),
+//                        UserRegister.getTodayData(), StartWorkoutActivity.trainingList.get(countExercisesLeft).isFavorite(),
+//                        mChronometer.getText().toString(), 0, "", "", "", 0f, 0);
+//
+//                db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
+//                        .collection(UserRegister.getTodayData()).add(finishTraining).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                    @Override
+//                    public void onSuccess(DocumentReference documentReference) {
+//                        Log.d(TAG, "Document successfully written!");
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.w(TAG, "Error writing document", e);
+//                    }
+//                });
+//            }
     }
 
 
@@ -477,7 +522,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         //save into fb
         setExerciseIntoFb();
 
-        if (countExercisesLeft == StartWorkoutActivity.trainingList.size()) {
+        if (countExercisesLeft == StartWorkoutActivity.trainingList.size() || countExercisesLeft == 0) {
             onClick(stopWorkout);
             if (countDownTimer != null) {
                 countDownTimer.cancel();
@@ -501,7 +546,9 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
             }
             container.removeAllViews();
             //set timer
-            countDownTimer(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getRestAfterExercise() * 1000);
+            Log.d(TAG, "countExercisesLeft:" + countExercisesLeft);
+            countDownTimer(StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise() * 1000);
+          //  countDownTimer(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getRestAfterExercise() * 1000);
 
             //count for exercise left
             countExercisesLeft++;
@@ -516,17 +563,21 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
     private boolean setWeightAndReptIntoList() {
 
+        TrackerExercise trackerExercise = new TrackerExercise();
+
+
+
         boolean weightIsText = weight.getText() == null || weight.getText().toString().isEmpty();
 
         boolean repsIsText = reps.getText() == null || reps.getText().toString().isEmpty();
 
         if (weight.getText() == null || weight.getText().toString().isEmpty() && weight.getHint() == null) {
-            weight.setError("please enter weight");
+            weight.setError("Please enter weight");
             return false;
         }
 
         if (reps.getText() == null || reps.getText().toString().isEmpty() && reps.getHint() == null) {
-            reps.setError("please enter reps");
+            reps.setError("Please enter reps");
             return false;
         }
 
@@ -545,7 +596,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         }
 
         trackerExerciseList.add(trackerExercise);
-
 
         for (int i = 0; i < trackerExerciseList.size(); i++) {
             Log.d(TAG, "trackerExerciseList: " + trackerExerciseList.get(i).getWeight());
@@ -574,12 +624,26 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         }
-
         countAddSets++;
         btnRemoveSte.setVisibility(View.VISIBLE);
         btnAddNewSet.setVisibility(View.INVISIBLE);
 
-        Log.d(TAG, "countAddSets: " + countAddSets);
+//        final boolean toExit = false;
+//        final Thread t = new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//
+//                Log.d(TAG, "countAddSets: " + countAddSets);
+//
+//                try {
+//                    Thread.sleep(500);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+
 
         ivIsFinish.setOnClickListener(new View.OnClickListener() {
             @Override

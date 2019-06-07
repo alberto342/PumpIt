@@ -15,9 +15,6 @@ import fitness.albert.com.pumpit.R;
 
 public class LogTabActivity extends AppCompatActivity {
 
-    TabLayout tabs;
-    ViewPager viewPager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,8 +24,8 @@ public class LogTabActivity extends AppCompatActivity {
     }
 
     private void init() {
-        tabs = findViewById(R.id.tablayout_logs);
-        viewPager = findViewById(R.id.vp_logs);
+        TabLayout tabs = findViewById(R.id.tablayout_logs);
+        ViewPager viewPager = findViewById(R.id.vp_logs);
 
         setupViewPager(viewPager);
         tabs.setupWithViewPager(viewPager);
@@ -49,9 +46,7 @@ public class LogTabActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
+    
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPagerAdapter.addFragment(new LogNutritionFragment(), "Nutrition Log");

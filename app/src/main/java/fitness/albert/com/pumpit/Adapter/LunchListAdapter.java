@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.R;
@@ -95,10 +96,22 @@ public class LunchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
                 //refresh page
                 mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
-                ((ShowAllNutritionActivity) mContext).finish();
 
-                //Get Food id
-                getFoodId(position);
+                String cotxt = mContext.toString();
+                String[] parts = cotxt.split("@");
+                String part1 = parts[0];
+
+                Log.d(TAG, "part: " + part1);
+
+                if(!part1.equals("fitness.albert.com.pumpit.fragment.logsFragment.LogTabActivity")) {
+                    ((ShowAllNutritionActivity) mContext).finish();
+
+                    //Get Food id
+                    getFoodId(position);
+                }
+
+
+
 
                 Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
@@ -118,13 +131,13 @@ public class LunchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private void getFoodId(final int position) {
         db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(Foods.LUNCH).document(getTodayDate())
-                .collection(Foods.FRUIT).get()
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            fireId = task.getResult().getDocuments().get(position).getId();
+                            fireId = Objects.requireNonNull(task.getResult()).getDocuments().get(position).getId();
 
                             Log.d(TAG, "Documents: " + task.getResult().getDocuments());
 

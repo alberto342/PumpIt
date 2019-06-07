@@ -44,7 +44,7 @@ public class FragmentNavigationActivity extends AppCompatActivity {
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
-        //get current user
+
         getCurrentUser();
 
         nutritionFragment = new NutritionFragment();
@@ -82,9 +82,7 @@ public class FragmentNavigationActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.navigation_nutrition:
                         toolbar.setTitle("Nutrition");
-
                         nutritionFragment = new NutritionFragment();
-
                         transaction.replace(R.id.frame_container, nutritionFragment).commit();
                         return true;
 

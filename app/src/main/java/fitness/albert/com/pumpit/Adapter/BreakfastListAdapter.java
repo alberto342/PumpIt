@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.R;
@@ -53,6 +54,7 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
 
+    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(mContext).inflate(R.layout.item_food_nutrition, parent, false);
@@ -94,7 +96,7 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 //refresh page
                 mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
-                ((ShowAllNutritionActivity) mContext).finish();
+               ((ShowAllNutritionActivity) mContext).finish();
 
                 //Get Food id
                 getFoodId(position);
@@ -106,8 +108,7 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 qty = foodsList.get(position).getServing_qty();
                 unit = foodsList.get(position).getServing_unit();
 
-                Intent intent = new Intent(mContext, ShowBreakfastActivity.class);
-                mContext.startActivity(intent);
+                mContext.startActivity(new Intent(mContext, ShowBreakfastActivity.class));
                 foodsList.clear();
                 ((Activity) mContext).finish();
             }
@@ -118,13 +119,13 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
     private void getFoodId(final int position) {
         db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(Foods.BREAKFAST).document(getTodayDate())
-                .collection(Foods.FRUIT).get()
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            fireId = task.getResult().getDocuments().get(position).getId();
+                            fireId = Objects.requireNonNull(task.getResult()).getDocuments().get(position).getId();
 
 
                             Log.d(TAG, "Documents: " + task.getResult().getDocuments());

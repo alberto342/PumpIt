@@ -54,6 +54,7 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
 
+    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(mContext).inflate(R.layout.item_food_nutrition, parent, false);
@@ -118,7 +119,7 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void getFoodId(final int position) {
         db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(Foods.DINNER).document(getTodayDate())
-                .collection(Foods.FRUIT).get()
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override

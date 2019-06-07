@@ -92,7 +92,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         //get NUTRITION from firestone
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(UserRegister.getTodayData())
-                .collection(Foods.FRUIT).get()
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override
@@ -144,7 +144,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     private void deleteFromFirebase(final String keyValue, final String foodName, final int qty) {
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(UserRegister.getTodayData())
-                .collection(Foods.FRUIT).get()
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override
@@ -163,7 +163,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                     //delete from firebase
                                     db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                                             .collection(keyValue).document(UserRegister.getTodayData())
-                                            .collection(Foods.FRUIT).document(id).delete();
+                                            .collection(Foods.All_NUTRITION).document(id).delete();
 
                                     Log.d(TAG, "DocumentSnapshot " + task.getResult().getDocuments().get(i).getId()   + " successfully deleted!");
                                     return;

@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -69,13 +68,13 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         holder.tvSetAndRep.setText(String.format(Locale.US, "%d SET(s)", set));
         holder.tvRestTime.setText(String.format(Locale.US, "Rest: %ds", trainingList.get(position).getRestBetweenSet()));
 
-        holder.layout.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 posit = position;
-
             }
         });
+
     }
 
 
@@ -88,7 +87,6 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         private ImageView ivTraining;
         private TextView trainingName, tvSetAndRep, tvRestTime;
-        private LinearLayout layout;
 
         public ViewHolder(View rowView) {
             super(rowView);
@@ -98,7 +96,6 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.trainingName = rowView.findViewById(R.id.tv_training_name);
             this.tvSetAndRep = rowView.findViewById(R.id.tv_set_and_rep);
             this.tvRestTime = rowView.findViewById(R.id.tv_rest_time);
-            this.layout = rowView.findViewById(R.id.item_training_selected);
         }
 
         @Override

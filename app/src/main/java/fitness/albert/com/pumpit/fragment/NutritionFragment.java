@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -53,9 +54,10 @@ public class NutritionFragment extends Fragment {
     UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs;
     private final String TAG = "NutritionFragment";
+    private int calculationGoal;
     private boolean isOnNutrition;
     private FragmentActivity myContext;
-
+    private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
 
 
     public NutritionFragment() {
@@ -88,7 +90,6 @@ public class NutritionFragment extends Fragment {
     }
 
 
-
     private void init(View view) {
         //add food btn
         ImageView btnAddBreakfast = view.findViewById(R.id.btn_add_breakfast);
@@ -107,6 +108,10 @@ public class NutritionFragment extends Fragment {
         tvCarbs = view.findViewById(R.id.tv_carbs);
         tvProtien = view.findViewById(R.id.tv_protein);
 
+        progressCarbs = view.findViewById(R.id.pb_carbs);
+        progressProtien = view.findViewById(R.id.pb_protein);
+        progressFat = view.findViewById(R.id.pb_fat);
+
         //disable RecyclerView scrolling
         //rvListFood.setNestedScrollingEnabled(false);
         btnAddBreakfast.setOnClickListener(onClickListener);
@@ -117,20 +122,18 @@ public class NutritionFragment extends Fragment {
     }
 
 
-
-
     private void mealFromFs() {
-     //   if (isOnNutrition) {
-            ProgressDialog progressdialog = new ProgressDialog(getActivity());
-            progressdialog.setMessage("Please Wait....");
-            progressdialog.show();
+        //   if (isOnNutrition) {
+        ProgressDialog progressdialog = new ProgressDialog(getActivity());
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
 
-            getMealFromFs(Foods.BREAKFAST);
-            getMealFromFs(Foods.SNACK);
-            getMealFromFs(Foods.LUNCH);
-            getMealFromFs(Foods.DINNER);
-            progressdialog.hide();
-     //   }
+        getMealFromFs(Foods.BREAKFAST);
+        getMealFromFs(Foods.SNACK);
+        getMealFromFs(Foods.LUNCH);
+        getMealFromFs(Foods.DINNER);
+        progressdialog.hide();
+        //   }
     }
 
 
@@ -202,7 +205,7 @@ public class NutritionFragment extends Fragment {
 
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(UserRegister.getTodayData())
-                .collection(Foods.FRUIT).get()
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -222,12 +225,16 @@ public class NutritionFragment extends Fragment {
 
                                 Log.d(TAG, "Kcal: " + kcal);
 
-                                tvFood.setText(String.format(Locale.getDefault(), "%.2f", kcal));
-                                tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of 334g", carbs));
-                                tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of 25g", protein));
-                                tvFat.setText(String.format(Locale.getDefault(), "%.2fg of 67g", fat));
+                                tvFood.setText(String.format(Locale.getDefault(), "%.0f", kcal));
+                                tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
+                                tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
+                                tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
                                 //Need to be calculation
-                                tvRemaining.setText(String.format(Locale.getDefault(), "%.2f", kcal));
+                                tvRemaining.setText(String.format(Locale.getDefault(), "%.0f", kcal));
+
+                                updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                                updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                                updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
                             }
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
@@ -255,7 +262,17 @@ public class NutritionFragment extends Fragment {
                         user = documentSnapshot.toObject(UserRegister.class);
 
                         assert user != null;
-                        tvGoal.setText(String.valueOf(user.thermicEffect(user.getActivityLevel())));
+
+                        calculationGoal = user.thermicEffect(user.getActivityLevel());
+
+                        tvGoal.setText(String.valueOf(calculationGoal));
+                        tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
+                        tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
+                        tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
+
+                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
 
                         progressdialog.hide();
                     }
@@ -268,6 +285,18 @@ public class NutritionFragment extends Fragment {
                 });
     }
 
+    private void updateProgressColor(RoundCornerProgressBar roundCornerProgressBar, float nutrition, int calculationGoal) {
 
+        float fractionToPercent = nutrition / calculationGoal * 100;
+        roundCornerProgressBar.setProgress(fractionToPercent);
+        float progress = roundCornerProgressBar.getProgress();
+        if (progress <= 50) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.yellow_dolly));
+        } else if (progress > 75 && progress <= 100) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_green_600));
+        } else if (progress > 100) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_red_500));
+        }
+    }
 }
 

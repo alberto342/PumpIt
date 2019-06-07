@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/logs_relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.logsFragment.LogFragment">
@@ -13,49 +14,53 @@
         android:layout_height="wrap_content"
         android:background="@color/background"
         android:dateTextAppearance="@style/CalenderViewDateCustomText"
+        android:maxDate="01/01/2021"
+        android:minDate="01/01/2016"
         android:theme="@style/CalenderViewCustom"
-        android:weekDayTextAppearance="@style/CalenderViewWeekCustomText"></CalendarView>
+        android:weekDayTextAppearance="@style/CalenderViewWeekCustomText">
+
+    </CalendarView>
 
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tablayout_logs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="320dp"
-        android:touchscreenBlocksFocus="false"
-        android:transitionGroup="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:tabBackground="@color/background"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/myBlue"
-        app:tabIndicatorGravity="bottom"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/myBlue"
-        app:tabTextColor="@color/white"
-        app:tabUnboundedRipple="false">
+    <!--<android.support.design.widget.TabLayout-->
+    <!--android:id="@+id/tablayout_logs"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/calendarView"-->
+    <!--android:touchscreenBlocksFocus="false"-->
+    <!--android:transitionGroup="false"-->
+    <!--app:tabBackground="@color/background"-->
+    <!--app:tabGravity="fill"-->
+    <!--app:tabIndicatorColor="@color/myBlue"-->
+    <!--app:tabIndicatorGravity="bottom"-->
+    <!--app:tabMode="fixed"-->
+    <!--app:tabSelectedTextColor="@color/myBlue"-->
+    <!--app:tabTextColor="@color/white"-->
+    <!--app:tabUnboundedRipple="false">-->
 
-        <android.support.design.widget.TabItem
-            android:id="@+id/tab_nutrition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nutrition" />
+    <!--<android.support.design.widget.TabItem-->
+    <!--android:id="@+id/tab_nutrition"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Nutrition" />-->
 
-        <android.support.design.widget.TabItem
-            android:id="@+id/tab_workout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Workout" />
-    </android.support.design.widget.TabLayout>
+    <!--<android.support.design.widget.TabItem-->
+    <!--android:id="@+id/tab_workout"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Workout" />-->
+    <!--</android.support.design.widget.TabLayout>-->
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/vp_logs"
-        android:layout_width="match_parent"
-        android:layout_height="320dp"
-        android:layout_gravity="bottom"
-        android:layout_marginTop="8dp"
-        android:overScrollMode="always"
-        android:touchscreenBlocksFocus="false" />
+    <!--<android.support.v4.view.ViewPager-->
+    <!--android:id="@+id/vp_logs"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/tablayout_logs"-->
+    <!--android:layout_alignParentStart="true"-->
+    <!--android:layout_alignParentEnd="true"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:overScrollMode="always"-->
+    <!--android:touchscreenBlocksFocus="false" />-->
 
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

@@ -127,7 +127,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
 
         db.collection(Foods.NUTRITION)
                 .document(FireBaseInit.getEmailRegister()).collection(Foods.DINNER)
-                .document(user.getTodayData()).collection(Foods.FRUIT)
+                .document(user.getTodayData()).collection(Foods.All_NUTRITION)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -289,7 +289,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
 
         DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(UserRegister.getTodayData())
-                .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
+                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());
         doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
@@ -327,7 +327,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
 
         DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(UserRegister.getTodayData())
-                .collection(Foods.FRUIT).document(DinnerListAdapter.fireId);
+                .collection(Foods.All_NUTRITION).document(DinnerListAdapter.fireId);
 
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());

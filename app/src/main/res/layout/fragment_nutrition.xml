@@ -5,6 +5,7 @@
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="15dp"
     android:background="@color/background"
     android:orientation="vertical"
     tools:context=".fragment.NutritionFragment">
@@ -168,10 +169,53 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:foregroundGravity="center"
+        android:orientation="horizontal">
+
+        <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+            android:id="@+id/pb_carbs"
+            android:layout_width="100dp"
+            android:layout_height="15dp"
+            android:layout_marginEnd="20dp"
+            app:rcBackgroundColor="@color/colorDarkBlue"
+            app:rcBackgroundPadding="0dp"
+            app:rcMax="100"
+            app:rcProgress="0.0"
+            app:rcRadius="15dp"
+            app:rcReverse="false" />
+
+        <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+            android:id="@+id/pb_protein"
+            android:layout_width="100dp"
+            android:layout_height="15dp"
+            android:layout_marginEnd="20dp"
+            app:rcBackgroundColor="@color/colorDarkBlue"
+            app:rcBackgroundPadding="0dp"
+            app:rcMax="100"
+            app:rcProgress="0.0"
+            app:rcRadius="15dp"
+            app:rcReverse="false" />
+
+        <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+            android:id="@+id/pb_fat"
+            android:layout_width="100dp"
+            android:layout_height="15dp"
+            app:rcBackgroundColor="@color/colorDarkBlue"
+            app:rcBackgroundPadding="0dp"
+            app:rcMax="100"
+            app:rcProgress="0.0"
+            app:rcRadius="15dp"
+            app:rcReverse="false" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <TextView
@@ -180,7 +224,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingStart="25dp"
-            android:text="0g of 334g"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -188,7 +231,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="0g of 122g"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -196,7 +238,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="0g of 67g"
             android:textColor="@android:color/white" />
     </LinearLayout>
 

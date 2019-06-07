@@ -8,9 +8,9 @@ public class Foods {
     public static final String DINNER = "dinner";
     public static final String BREAKFAST = "breakfast";
     public static final String LUNCH = "lunch";
-    public static final String SNACK = "Snack";
+    public static final String SNACK = "snack";
     public static final String NUTRITION = "nutrition";
-    public static final String FRUIT = "fruit";
+    public static final String All_NUTRITION = "all_nutrition";
 
     public Foods() {
     }
@@ -1038,5 +1038,10 @@ public class Foods {
     public String toString() {
         return "ClassPojo [serving_unit = " + serving_unit + ", nf_total_carbohydrate = " + nf_total_carbohydrate + ", nf_sodium = " + nf_sodium + ", lng = " + lng + ", nf_p = " + nf_p + ", alt_measures = " + alt_measures + ", nf_sugars = " + nf_sugars + ", nf_calories = " + nf_calories + ", brand_name = " + brand_name + ", lat = " + lat + ", metadata = " + metadata + ", tags = " + tags + ", sub_recipe = " + sub_recipe + ", ndb_no = " + ndb_no + ", food_name = " + food_name + ", meal_type = " + meal_type + ", nf_saturated_fat = " + nf_saturated_fat + ", nf_protein = " + nf_protein + ", nf_total_fat = " + nf_total_fat + ", consumed_at = " + consumed_at + ", nf_dietary_fiber = " + nf_dietary_fiber + ", nf_cholesterol = " + nf_cholesterol + ", photo = " + photo + ", upc = " + upc + ", nf_potassium = " + nf_potassium + ", nix_brand_name = " + nix_brand_name + ", full_nutrients = " + full_nutrients + ", nix_item_id = " + nix_item_id + ", source = " + source + ", nix_item_name = " + nix_item_name + ", serving_weight_grams = " + serving_weight_grams + ", nix_brand_id = " + nix_brand_id + ", serving_qty = " + serving_qty + "]";
     }
+
+
+
+
+
 
 }

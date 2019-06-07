@@ -74,8 +74,8 @@ dependencies {
     //Img loader from uri/url
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-    //Material DateTime Picker
-    //implementation 'com.wdullaer:materialdatetimepicker:4.1.0'
+    //ProgressView
+    implementation 'com.akexorcist:RoundCornerProgressBar:2.0.3'
 
 
     testImplementation 'junit:junit:4.12'

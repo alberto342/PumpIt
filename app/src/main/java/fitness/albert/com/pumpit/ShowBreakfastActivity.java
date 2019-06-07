@@ -131,7 +131,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
         db.collection(Foods.NUTRITION)
                 .document(getEmailRegister()).collection(Foods.BREAKFAST)
-                .document(UserRegister.getTodayData()).collection(Foods.FRUIT)
+                .document(UserRegister.getTodayData()).collection(Foods.All_NUTRITION)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -289,7 +289,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
         DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
+                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());
         doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
@@ -327,7 +327,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
         DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.FRUIT).document(BreakfastListAdapter.fireId);
+                .collection(Foods.All_NUTRITION).document(BreakfastListAdapter.fireId);
 
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());

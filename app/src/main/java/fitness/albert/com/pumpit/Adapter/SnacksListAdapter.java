@@ -117,7 +117,7 @@ public class SnacksListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void getFoodId(final int position) {
         db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(Foods.SNACK).document(getTodayDate())
-                .collection(Foods.FRUIT).get()
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override

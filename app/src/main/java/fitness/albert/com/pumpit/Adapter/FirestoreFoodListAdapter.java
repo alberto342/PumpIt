@@ -119,7 +119,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
     private void getFoodId(final int position) {
         db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(Foods.BREAKFAST).document(getTodayDate())
-                .collection(Foods.FRUIT).get()
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override

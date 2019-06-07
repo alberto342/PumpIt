@@ -128,7 +128,7 @@ public class ShowSnackActivity extends AppCompatActivity implements QuantityView
 
         db.collection(Foods.NUTRITION)
                 .document(getEmailRegister()).collection(Foods.SNACK)
-                .document(user.getTodayData()).collection(Foods.FRUIT)
+                .document(user.getTodayData()).collection(Foods.All_NUTRITION)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -286,7 +286,7 @@ public class ShowSnackActivity extends AppCompatActivity implements QuantityView
 
         DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
+                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());
         doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
@@ -324,7 +324,7 @@ public class ShowSnackActivity extends AppCompatActivity implements QuantityView
 
         DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.FRUIT).document(SnacksListAdapter.fireId);
+                .collection(Foods.All_NUTRITION).document(SnacksListAdapter.fireId);
 
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());

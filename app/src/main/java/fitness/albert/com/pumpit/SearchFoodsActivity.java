@@ -140,7 +140,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
                 arrayListIntoClass();
                 db.collection(Foods.NUTRITION)
                         .document(FireBaseInit.getEmailRegister()).collection(Foods.BREAKFAST)
-                        .document(UserRegister.getTodayData()).collection(Foods.FRUIT).add(mListItem.get(i))
+                        .document(UserRegister.getTodayData()).collection(Foods.All_NUTRITION).add(mListItem.get(i))
 
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override

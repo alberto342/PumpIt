@@ -102,7 +102,6 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), CustomPlanActivity.class));
                 break;
             case R.id.btn_find_workout:
-
                 startActivity(new Intent(getActivity(), FindWorkoutActivity.class));
 //
 //                Fragment fragment = new FindWorkoutFragment();

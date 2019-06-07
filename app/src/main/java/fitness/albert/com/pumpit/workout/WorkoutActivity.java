@@ -65,13 +65,12 @@ public class WorkoutActivity extends AppCompatActivity
         setContentView(R.layout.activity_workout);
 
         init();
-
         getPlanFormFb();
-
         initRecyclerView();
-
         setupSwipeMenu();
     }
+
+
 
     private void init() {
         workoutList = new ArrayList<>();

@@ -1117,7 +1117,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
             db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                     .collection(getMeal()).document(UserRegister.getTodayData())
-                    .collection(Foods.FRUIT).add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
+                    .collection(Foods.All_NUTRITION).add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @SuppressLint("LongLogTag")
                         @Override

@@ -143,7 +143,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
 //        db.collection(Foods.NUTRITION)
 //                .document(getEmailRegister()).collection(Foods.BREAKFAST)
-//                .document(user.getTodayData()).collection(Foods.FRUIT).document(id)
+//                .document(user.getTodayData()).collection(Foods.All_NUTRITION).document(id)
 //                .get()
 //                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 //                    @Override
@@ -199,7 +199,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
         db.collection(Foods.NUTRITION)
                 .document(getEmailRegister()).collection(Foods.BREAKFAST)
-                .document(user.getTodayData()).collection(Foods.FRUIT)
+                .document(user.getTodayData()).collection(Foods.All_NUTRITION)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -357,7 +357,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
         DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
+                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());
         doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
@@ -395,7 +395,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
         DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
                 .collection(keyValue).document(getTodayDate())
-                .collection(Foods.FRUIT).document(FirestoreFoodListAdapter.fireId);
+                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
 
         doc.update("serving_unit", spinnerSelectedItem);
         doc.update("serving_qty", quantityViewCustom.getQuantity());

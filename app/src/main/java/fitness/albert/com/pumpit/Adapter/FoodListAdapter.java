@@ -30,7 +30,6 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public static ArrayList<Foods> mListItem;
     public static int mItemPosition;
     private ClickListener clickListener;
-    private final String TAG = "FoodListAdapter";
     public static List<String> measure = new ArrayList<>();
     public static Map<String, Float> measureMap = new HashMap<>();
 
@@ -130,6 +129,7 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private void getNutrition(final int position) {
 
+        String TAG = "FoodListAdapter";
         Log.d(TAG, "onClick: clicked on: " + mListItem.get(position));
 
         mItemPosition = position;

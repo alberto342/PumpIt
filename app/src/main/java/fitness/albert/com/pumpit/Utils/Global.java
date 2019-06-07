@@ -27,6 +27,7 @@ public class Global {
     public static final String x_app_key ="153a6d177ad9532a8c610eb59f6455a3";
 
 
+
     public static boolean isNetworkAvailable(Context mContext) {
         ConnectivityManager cm = (ConnectivityManager) mContext
                 .getSystemService(Context.CONNECTIVITY_SERVICE);

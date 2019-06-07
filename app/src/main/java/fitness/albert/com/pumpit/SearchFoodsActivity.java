@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -46,9 +47,10 @@ public class SearchFoodsActivity extends AppCompatActivity {
     FoodListAdapter foodListAdapter;
 
     RestApi api;
-    private ArrayList<Foods> mListItem = new ArrayList<>();
+    public static ArrayList<Foods> mListItem = new ArrayList<>();
+    private Foods foods = new Foods();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String TAG;
+    private String TAG = "SearchFoodsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +80,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                saveAll();
-
             }
         });
     }
@@ -107,7 +108,14 @@ public class SearchFoodsActivity extends AppCompatActivity {
                 if (response.body() != null) {
                     if (response.body().getFoods().size() > 0) {
                         tvEmpty.setVisibility(View.GONE);
-                        visibleButton();
+
+
+                        if(response.body().getFoods().size() > 1) {
+                            btnSaveAllFood.setVisibility(View.VISIBLE);
+                        } else {
+                            btnSaveAllFood.setVisibility(View.INVISIBLE);
+                        }
+
                         mListItem = response.body().getFoods();
                         foodListAdapter = new FoodListAdapter(SearchFoodsActivity.this, mListItem);
                         rvList.setAdapter(foodListAdapter);
@@ -126,68 +134,89 @@ public class SearchFoodsActivity extends AppCompatActivity {
         });
     }
 
-    public void visibleButton() {
-        final String search = edQuery.getText().toString().trim();
-        if (getListSize() >= 1 || search.contains(" ")) {
-            btnSaveAllFood.setVisibility(View.VISIBLE);
-        }
-    }
+
 
 
 
     private void saveAll() {
-        try {
-            db.collection("nutrition").document(getMeal()).collection(getTodayDate()).add(mListItem)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            Log.d(TAG, "DocumentSnapshot added with ID: ");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error adding document", e);
-                        }
-                    });
 
-            Log.d(TAG, "Food data save successfully");
-        } catch (Exception e) {
-            e.printStackTrace();
+        for(int i =0 ; i< mListItem.size(); i++) {
+
+            try {
+                arrayListIntoClass();
+                db.collection(Foods.NUTRITION)
+                        .document(getEmailRegister()).collection(Foods.BREAKFAST)
+                        .document(getTodayDate()).collection(Foods.FRUIT).add(mListItem.get(i))
+
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error adding document", e);
+                            }
+                        });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        Toast.makeText(SearchFoodsActivity.this, "Save successfully", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
 
     //get Meal from SharedPreferences file
     private String getMeal() {
 
-        SharedPreferences pref = getSharedPreferences(Foods.SharedPreferencesFile, Context.MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-        boolean breakfast = pref.getBoolean("dinner", false);
-        boolean dinner = pref.getBoolean("breakfast",false);
-        boolean lunch = pref.getBoolean("lunch",false);
-        boolean snack = pref.getBoolean("snack",false);
+        boolean breakfast = pref.getBoolean("DINNER", false);
+        boolean dinner = pref.getBoolean("BREAKFAST",false);
+        boolean lunch = pref.getBoolean("LUNCH",false);
+        boolean snack = pref.getBoolean("SNACK",false);
 
         if (breakfast) {
-            return "breakfast";
+            return "BREAKFAST";
         }
         if (dinner) {
-            return "dinner";
+            return "DINNER";
         }
         if (lunch) {
-            return "lunch";
+            return "LUNCH";
         }
         if (snack) {
-            return "snack";
+            return "SNACK";
         } else {
             return null;
         }
     }
 
+    private void arrayListIntoClass() {
+
+        for(int i = 0 ; i<mListItem.size(); i++) {
+            foods.setFood_name(mListItem.get(i).getFood_name());
+            foods.setImgUrl(mListItem.get(i).getImgUrl());
+        }
+    }
+
+
     private String getTodayDate() {
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         return df.format(c);
+    }
+
+    public String getEmailRegister() {
+        String email = null;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+            email = mAuth.getCurrentUser().getEmail();
+        }
+        return email;
     }
 
 

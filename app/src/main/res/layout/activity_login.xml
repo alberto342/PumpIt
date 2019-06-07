@@ -90,6 +90,8 @@
         app:layout_constraintTop_toTopOf="@+id/guideline40"
         app:srcCompat="@mipmap/password" />
 
+
+
     <ImageView
         android:id="@+id/login_btn"
         android:layout_width="wrap_content"
@@ -99,6 +101,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline41"
         app:srcCompat="@mipmap/btn_login" />
+
+    <ProgressBar
+        android:id="@+id/progress_login"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/btn_done_confirm_email"
+        android:layout_alignTop="@+id/btn_done_confirm_email"
+        android:layout_alignEnd="@+id/btn_done_confirm_email"
+        android:layout_alignBottom="@+id/btn_done_confirm_email"
+        android:indeterminateTint="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/login_btn"
+        app:layout_constraintEnd_toStartOf="@+id/guideline45"
+        app:layout_constraintStart_toStartOf="@+id/guideline44"
+        app:layout_constraintTop_toTopOf="@+id/login_btn" />
 
     <ImageView
         android:id="@+id/btn_forgetten_password"
@@ -176,19 +194,6 @@
         app:layout_constraintStart_toStartOf="@+id/guideline44"
         app:layout_constraintTop_toBottomOf="@+id/imageView29" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/imageView33"
-        app:layout_constraintEnd_toStartOf="@+id/guideline45"
-        app:layout_constraintStart_toStartOf="@+id/guideline44"
-        app:layout_constraintTop_toTopOf="@+id/guideline46" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline46"

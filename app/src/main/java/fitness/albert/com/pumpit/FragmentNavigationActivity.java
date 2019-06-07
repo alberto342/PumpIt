@@ -114,6 +114,9 @@ public class FragmentNavigationActivity extends AppCompatActivity {
     }
 
 
+
+
+
     @Override
     public void onStart() {
         super.onStart();

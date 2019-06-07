@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.Model;
 
 public class Photo {
+
     private String highres;
 
     private String thumb;

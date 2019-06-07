@@ -118,10 +118,10 @@ public class HeightActivity extends AppCompatActivity {
         SPSaveTheCounter = getSharedPreferences("userInfo",MODE_NO_LOCALIZED_COLLATORS);
     }
 
-    private void sharedPreferencesSaveData(String key, float floatObj) {
+    private void sharedPreferencesSaveData(String key, int intObj) {
         editor = SPSaveTheCounter.edit();
         try {
-            editor.putFloat(key, floatObj);
+            editor.putInt(key, intObj);
         } catch (Exception e) {
             e.printStackTrace();
         }

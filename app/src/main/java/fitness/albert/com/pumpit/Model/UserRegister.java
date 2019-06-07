@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -14,8 +15,7 @@ public class UserRegister {
     public static final String NAME_KEY = "name";
     public static final String EMAIL_KEY ="email";
     public static final String SharedPreferencesFile = "userInfo";
-    private String TAG;
-
+    public static final String fireBaseUsers = "users";
 
     private String imagesRefPath;  //profile img url
     private String fullName;
@@ -34,10 +34,8 @@ public class UserRegister {
 
     private String bodyFat;
     private String fatTarget;
-
-
-
-    final Map<String, Object> dataToSave = new HashMap<>();
+    private String activityLevel;
+    private final Map<String, Object> dataToSave = new HashMap<>();
 
 
     public enum TrainingType {
@@ -204,6 +202,14 @@ public class UserRegister {
         this.imagesRefPath = imagesRefPath;
     }
 
+    public String getActivityLevel() {
+        return activityLevel;
+    }
+
+    public void setActivityLevel(String activityLevel) {
+        this.activityLevel = activityLevel;
+    }
+
     public Map<String, Object> getDataToSave() {
         return dataToSave;
     }
@@ -223,13 +229,13 @@ public class UserRegister {
 
 
     public float customFloatNum(int num1, int num2) {
-        float floatNum = Float.parseFloat(num1 + "." + num2);
-        return floatNum;
+        return Float.parseFloat(num1 + "." + num2);
+       // return floatNum;
     }
 
 
-    public int calculatorBMR() {
 
+    public int calculatorBMR() {
         return (int) (isMale() ?  (66 + (this.weight) * 13.8 + (this.height) * 5 - (this.age) * 6.8)
                 :  (655 + (this.weight) * 9.6 + (this.height) * 1.8 - (this.age) * 4.7));
     }
@@ -250,9 +256,9 @@ public class UserRegister {
         return (int) (calculatorBEE().get(valueKey) * 1.1);
     }
 
-    public String getTodayData() {
+    public static String getTodayData() {
         Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
         return df.format(c);
     }
 

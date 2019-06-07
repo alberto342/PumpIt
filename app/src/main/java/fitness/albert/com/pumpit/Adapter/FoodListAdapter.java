@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,9 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.R;
@@ -21,11 +25,13 @@ import fitness.albert.com.pumpit.ShowFoodBeforeAddedActivity;
 
 public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    Context mContext;
+    private Context mContext;
     public static ArrayList<Foods> mListItem;
+    public static int mItemPosition;
     private ClickListener clickListener;
-    private String TAG;
-
+    private final String TAG = "FoodListAdapter";
+    public static List<String> measure = new ArrayList<>();
+    public static Map<String, Float> measureMap = new HashMap<>();
 
     public FoodListAdapter(Context ctx, ArrayList<Foods> mListItem) {
         this.mContext = ctx;
@@ -44,7 +50,6 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
 
-
     public void setClickListener(ClickListener clickListener) {
         this.clickListener = clickListener;
 
@@ -52,7 +57,6 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public interface ClickListener {
         void itemClicked(View view, int position);
-
     }
 
     private void bindViews(final ViewHolder holder, final int position) {
@@ -68,16 +72,16 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         holder.tvServingQuantity.setText(mContext.getString(R.string.serving_qty) + ": " + mListItem.get(position).getServing_qty());
         holder.tvServingUnit.setText(mContext.getString(R.string.serving_unit) + ": " + mListItem.get(position).getServing_unit());
         holder.llSelectedItem.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
-                Intent intent = new Intent(context, ShowFoodBeforeAddedActivity.class);
-                putExtra(intent, position);
-                context.startActivity(intent);
+                getNutrition(position);
+                context.startActivity(new Intent(context, ShowFoodBeforeAddedActivity.class));
+                ((Activity) mContext).finish();
             }
         });
     }
-
 
 
     @Override
@@ -116,28 +120,46 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
 
-
-    private void putExtra (Intent intent, final int position) {
+    private void getNutrition(final int position) {
 
         Log.d(TAG, "onClick: clicked on: " + mListItem.get(position));
-        intent.putExtra("food_name", mListItem.get(position).getFood_name());
-        intent.putExtra("nf_calories", mListItem.get(position).getNf_calories());
-        intent.putExtra("serving_qty", mListItem.get(position).getServing_qty());
-        intent.putExtra("serving_unit", mListItem.get(position).getServing_unit());
-        intent.putExtra("nf_total_fat", mListItem.get(position).getNf_total_fat());
-        intent.putExtra("serving_weight_grams", mListItem.get(position).getServing_weight_grams());
-        intent.putExtra("nf_cholesterol", mListItem.get(position).getNf_cholesterol());
-        intent.putExtra("nf_saturated_fat", mListItem.get(position).getNf_saturated_fat());
-        intent.putExtra("nf_sodium", mListItem.get(position).getNf_sodium());
-        intent.putExtra("nf_total_carbohydrate", mListItem.get(position).getNf_total_carbohydrate());
-        intent.putExtra("nf_dietary_fiber", mListItem.get(position).getNf_dietary_fiber());
-        intent.putExtra("nf_sugars", mListItem.get(position).getNf_sugars());
-        intent.putExtra("nf_protein", mListItem.get(position).getNf_protein());
-        intent.putExtra("nf_potassium", mListItem.get(position).getNf_potassium());
-        intent.putExtra("nf_p", mListItem.get(position).getNf_p());
-        intent.putExtra("thumb", mListItem.get(position).getPhoto().getThumb());
-        intent.putExtra("photoHighres", mListItem.get(position).getPhoto().getHighres());
-        mContext.startActivity(intent);
+
+        mItemPosition = position;
+
+        if (mListItem.get(position).getAlt_measures().size() == 0) {
+            try {
+                mListItem.get(position).getAlt_measures().get(0).setServing_weight("1");
+                mListItem.get(position).getAlt_measures().get(0).setMeasure("package");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        for (int i = 0; i < mListItem.get(position).getAlt_measures().size(); i++) {
+            measure.add(String.valueOf(mListItem.get(position).getAlt_measures().get(i).getMeasure()));
+        }
+
+
+        //remove existed
+        if(!mListItem.get(position).getAlt_measures().isEmpty()) {
+            if(String.valueOf(mListItem.get(position).getServing_weight_grams()) != mListItem.get(position).getAlt_measures().get(position).getServing_weight()) {
+                String itemOne = measure.get(0);
+                measure.remove(0);
+                measure.add(itemOne);
+            }
+        }
+
+
+        for (int i = 1; i < measure.size(); i++) {
+            if (measure.get(0).equals(measure.get(i))) {
+                measure.remove(i);
+            }
+        }
+
+        for (int i = 0; i < mListItem.get(position).getAlt_measures().size(); i++) {
+            measureMap.put(mListItem.get(position).getAlt_measures().get(i).getMeasure(), Float.valueOf(mListItem.get(position).getAlt_measures().get(i).getServing_weight()));
+        }
     }
 
     @Override
@@ -145,4 +167,6 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         //Auto-generated method stub
         return position;
     }
+
+
 }

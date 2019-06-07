@@ -19,6 +19,9 @@ import fitness.albert.com.pumpit.R;
  */
 public class FindWorkoutFragment extends Fragment {
 
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
+
 
     public FindWorkoutFragment() {
         // Required empty public constructor
@@ -26,7 +29,7 @@ public class FindWorkoutFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_find_workout, container, false);
@@ -35,14 +38,17 @@ public class FindWorkoutFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ViewPager viewPager = view.findViewById(R.id.viewPager);
-        TabLayout tabLayout = view.findViewById(R.id.tablayout);
 
+        viewPager = view.findViewById(R.id.view_pager);
+        tabLayout = view.findViewById(R.id.tablayout);
         tabLayout.setupWithViewPager(viewPager);
 
         ViewPageAdapter adapter = new ViewPageAdapter(getChildFragmentManager());
         adapter.addFrag(new PlanFragment());
         adapter.addFrag(new FeaturedFragment());
         viewPager.setAdapter(adapter);
+
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
     }
 }

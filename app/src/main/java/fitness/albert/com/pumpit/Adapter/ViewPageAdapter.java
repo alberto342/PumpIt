@@ -26,12 +26,14 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
     }
 
     public void addFrag(Fragment fragment) {
+
+
         mFragmentList.add(fragment);
         mFragmentTitleList.add("");
     }
 
-    public void addFrag(Fragment fragment, String title) {
-        mFragmentList.add(fragment);
-        mFragmentTitleList.add(title);
-    }
+//    public void addFrag(Fragment fragment, String title) {
+//        mFragmentList.add(fragment);
+//        mFragmentTitleList.add(title);
+//    }
 }

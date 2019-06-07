@@ -12,7 +12,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ShowAllNutritionActivity"></activity>
+        <activity android:name=".workout.ExerciseLogsActivity"></activity>
+        <activity android:name=".workout.TrainingActivity" />
+        <activity android:name=".workout.WorkoutActivity" />
+        <activity android:name=".workout.WorkoutPlansActivity" />
+        <activity android:name=".workout.CustomPlanActivity" />
+        <activity android:name=".workout.ShowExerciseResult" />
+        <activity android:name=".workout.ExerciseDetailActivity" />
+        <activity android:name=".ShowSnackActivity" />
+        <activity android:name=".ShowLunchActivity" />
+        <activity android:name=".ShowDinnerActivity" />
+        <activity android:name=".ShowBreakfastActivity" />
+        <activity android:name=".ShowAllNutritionActivity" />
         <activity android:name=".ShowItemFoodActivity" />
         <activity
             android:name=".WelcomeActivities.WelcomeActivity"
@@ -58,7 +69,7 @@
             android:name=".Register.EmailRegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AddExerciseActivity"
+            android:name=".workout.AddExerciseActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SearchFoodsActivity"

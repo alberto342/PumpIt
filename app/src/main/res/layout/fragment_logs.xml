@@ -8,18 +8,16 @@
     tools:context=".fragment.logsFragment.LogFragment">
 
 
-    <CalendarView
-        android:id="@+id/calendarView"
+    <fitness.albert.com.pumpit.helper.CalenderEvent
+        android:id="@+id/calender_event"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/background"
-        android:dateTextAppearance="@style/CalenderViewDateCustomText"
-        android:maxDate="01/01/2021"
-        android:minDate="01/01/2016"
-        android:theme="@style/CalenderViewCustom"
-        android:weekDayTextAppearance="@style/CalenderViewWeekCustomText">
-
-    </CalendarView>
+        android:layout_height="match_parent"
+        app:calender_background="@color/background"
+        app:current_month_day_color="@color/white"
+        app:month_color="@color/white"
+        app:next_icon="@mipmap/next"
+        app:previous_icon="@mipmap/previous_icon_2"
+        app:week_name_color="@color/white" />
 
 
     <!--<android.support.design.widget.TabLayout-->

@@ -56,8 +56,15 @@ dependencies {
     //firebase
     implementation 'com.google.firebase:firebase-core:16.0.9'
     implementation 'com.google.firebase:firebase-auth:17.0.0'
-    implementation 'com.google.firebase:firebase-firestore:19.0.0'
+    implementation 'com.google.firebase:firebase-firestore:19.0.2'
     implementation 'com.google.firebase:firebase-storage:17.0.0'
+    implementation 'com.google.firebase:firebase-database:17.0.0'
+
+    //Firebase-UI Library
+    implementation 'com.firebaseui:firebase-ui-firestore:5.0.0'
+
+    //Firebase Pagination Library
+    implementation 'com.shreyaspatil:FirebaseRecyclerPagination:1.0.1'
 
     // Google Sign In SDK (only required for Google Sign In)
     implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
@@ -77,6 +84,8 @@ dependencies {
     //ProgressView
     implementation 'com.akexorcist:RoundCornerProgressBar:2.0.3'
 
+    //Material Searchview
+    implementation 'com.github.mancj:MaterialSearchBar:0.8.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

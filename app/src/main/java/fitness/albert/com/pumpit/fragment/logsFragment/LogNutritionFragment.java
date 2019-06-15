@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.fragment.logsFragment;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,11 +16,14 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import fitness.albert.com.pumpit.Adapter.BreakfastListAdapter;
 import fitness.albert.com.pumpit.Adapter.DinnerListAdapter;
@@ -27,6 +31,8 @@ import fitness.albert.com.pumpit.Adapter.LunchListAdapter;
 import fitness.albert.com.pumpit.Adapter.SnacksListAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
+import fitness.albert.com.pumpit.Model.SwipeHelper;
+import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
 /**
@@ -41,13 +47,11 @@ public class LogNutritionFragment extends Fragment {
     private ArrayList<Foods> lunchList = new ArrayList<>();
     private ArrayList<Foods> dinnerList = new ArrayList<>();
     private ArrayList<Foods> snacksList = new ArrayList<>();
-    private TextView tvBreakfast, tvLunch, tvDinner,tvSnacks;
-
+    private TextView tvBreakfast, tvLunch, tvDinner, tvSnacks;
 
     public LogNutritionFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -74,15 +78,20 @@ public class LogNutritionFragment extends Fragment {
         rvDinner.setNestedScrollingEnabled(false);
         rvSnacks.setNestedScrollingEnabled(false);
 
+        getNutritionFromFb(LogFragment.date, Foods.BREAKFAST);
+        getNutritionFromFb(LogFragment.date, Foods.LUNCH);
+        getNutritionFromFb(LogFragment.date, Foods.DINNER);
+        getNutritionFromFb(LogFragment.date, Foods.SNACK);
+
+        swipe(rvBreakfast);
+        swipe(rvDinner);
+        swipe(rvLunch);
+        swipe(rvSnacks);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        getNutritionFromFb(LogFragment.date, Foods.BREAKFAST);
-        getNutritionFromFb(LogFragment.date, Foods.LUNCH);
-        getNutritionFromFb(LogFragment.date, Foods.DINNER);
-        getNutritionFromFb(LogFragment.date, Foods.SNACK);
     }
 
 
@@ -97,47 +106,46 @@ public class LogNutritionFragment extends Fragment {
                         switch (nutritionType) {
                             case "breakfast":
                                 breakfastList.add(foods);
-                                if (!breakfastList.isEmpty()) {
-                                  rvBreakfast.setVisibility(View.VISIBLE);
-                                  tvBreakfast.setVisibility(View.VISIBLE);
-                                    initBreakfastRecyclerView();
-                                } else {
-                                    rvBreakfast.setVisibility(View.GONE);
-                                    tvBreakfast.setVisibility(View.GONE);
-                                }
+                                initBreakfastRecyclerView();
+//                                if (!breakfastList.isEmpty()) {
+//                                  rvBreakfast.setVisibility(View.VISIBLE);
+//                                  tvBreakfast.setVisibility(View.VISIBLE);
+//
+//                                } else {
+//                                    rvBreakfast.setVisibility(View.GONE);
+//                                    tvBreakfast.setVisibility(View.GONE);
+//                                }
                                 break;
                             case "lunch":
                                 lunchList.add(foods);
-                                if (!lunchList.isEmpty()) {
-                                    rvLunch.setVisibility(View.VISIBLE);
-                                    initLunchRecyclerView();
-                                } else {
-                                    rvLunch.setVisibility(View.GONE);
-                                    tvLunch.setVisibility(View.GONE);
-                                }
+                                initLunchRecyclerView();
+//                                if (!lunchList.isEmpty()) {
+//                                    rvLunch.setVisibility(View.VISIBLE);
+//                                } else {
+//                                    rvLunch.setVisibility(View.GONE);
+//                                    tvLunch.setVisibility(View.GONE);
+//                                }
                                 break;
                             case "dinner":
                                 dinnerList.add(foods);
-                                if (!dinnerList.isEmpty()) {
-                                    rvDinner.setVisibility(View.VISIBLE);
-                                    initLunchRecyclerView();
-                                } else {
-                                    rvDinner.setVisibility(View.GONE);
-                                    tvDinner.setVisibility(View.GONE);
-                                }
                                 initDinnerRecyclerView();
+//                                if (!dinnerList.isEmpty()) {
+//                                    rvDinner.setVisibility(View.VISIBLE);
+//                                } else {
+//                                    rvDinner.setVisibility(View.GONE);
+//                                    tvDinner.setVisibility(View.GONE);
+//                                }
                                 break;
                             case "Snack":
                                 snacksList.add(foods);
-                                if (!snacksList.isEmpty()) {
-                                   rvSnacks.setVisibility(View.VISIBLE);
-                                   tvSnacks.setVisibility(View.VISIBLE);
-                                    initLunchRecyclerView();
-                                } else {
-                                    rvSnacks.setVisibility(View.GONE);
-                                    tvSnacks.setVisibility(View.GONE);
-                                }
                                 initSnacksRecyclerView();
+//                                if (!snacksList.isEmpty()) {
+//                                   rvSnacks.setVisibility(View.VISIBLE);
+//                                   tvSnacks.setVisibility(View.VISIBLE);
+//                                } else {
+//                                    rvSnacks.setVisibility(View.GONE);
+//                                    tvSnacks.setVisibility(View.GONE);
+//                                }
                         }
                     }
                 }
@@ -186,5 +194,73 @@ public class LogNutritionFragment extends Fragment {
         rvSnacks.setLayoutManager(layoutManager);
         snacksListAdapter = new SnacksListAdapter(getActivity(), snacksList);
         rvSnacks.setAdapter(snacksListAdapter);
+    }
+
+
+    private void swipe(RecyclerView recyclerView) {
+        new SwipeHelper(getContext(), recyclerView) {
+            @Override
+            public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "Delete",
+                        0,
+
+                        Color.parseColor("#d50000"),
+                        new SwipeHelper.UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+                                //    deleteItem(pos);
+                                //  deleteFromFb(pos);
+                                delNutrition(Foods.BREAKFAST, breakfastList, pos);
+
+                            }
+                        }
+                ));
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "Edit",
+                        0,
+                        Color.parseColor("#4caf50"),
+                        new SwipeHelper.UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+
+                            }
+                        }
+                ));
+            }
+        };
+    }
+
+    private void delNutrition(final String nutrition, ArrayList<Foods> foodsArrayList, int pos) {
+        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                .collection(nutrition).document(UserRegister.getTodayData()).collection(Foods.All_NUTRITION)
+                .whereEqualTo("food_name", foodsArrayList.get(pos).getFood_name())
+                .whereEqualTo("serving_qty", foodsArrayList.get(pos).getServing_qty()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()) {
+                            for(int i = 0; i< Objects.requireNonNull(task.getResult()).size(); i++) {
+                                String docId = task.getResult().getDocuments().get(i).getId();
+                                Log.d(TAG, "id: " + docId);
+                                db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                                        .collection(nutrition).document(UserRegister.getTodayData())
+                                        .collection(Foods.All_NUTRITION).document(docId)
+                                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.i(TAG, "Success delete doc");
+                                    }
+                                });
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.i(TAG, "failed " + e.getMessage());
+                    }
+                });
     }
 }

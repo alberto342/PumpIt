@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import java.util.Locale;
 import fitness.albert.com.pumpit.Model.FinishTraining;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.helper.BitmapFromAssent;
+import fitness.albert.com.pumpit.workout.ShowLogExercise;
 
 public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -67,7 +69,7 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mContext.startActivity(new Intent(mContext, ShowLogExercise.class));
             }
         });
 

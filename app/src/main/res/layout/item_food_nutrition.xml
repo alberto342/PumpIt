@@ -6,92 +6,61 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginBottom="5dp"
-        app:cardBackgroundColor="@color/white"
-        app:cardUseCompatPadding="true">
+        app:cardBackgroundColor="@color/white">
 
         <LinearLayout
-            android:id="@+id/item_food_selected"
+            android:id="@+id/layout_3"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/iv_food_img"
-                android:layout_width="@dimen/common_78"
-                android:layout_height="@dimen/common_78"
-                android:layout_gravity="center"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_marginRight="@dimen/common_8"
-                android:contentDescription="@null"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@mipmap/ic_launcher_round" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
 
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tv_food_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:hint="@string/food_name"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tv_food_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Food name"
-                        android:letterSpacing="0.1"
-                        android:padding="@dimen/common_4"
-                        android:textColor="@color/background"
-                        android:textSize="14sp"
-                        android:textStyle="normal" />
+                <TextView
+                    android:id="@+id/tv_calories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/calories"
+                    android:textSize="14sp" />
 
-                    <TextView
-                        android:id="@+id/tv_calories"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Calories"
-                        android:letterSpacing="0.1"
-                        android:paddingStart="@dimen/common_4"
-                        android:paddingLeft="@dimen/common_4"
-                        android:textColor="@color/background"
-                        android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/tv_protin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Protine" />
 
-                    <TextView
-                        android:id="@+id/tv_protin"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Protein"
-                        android:letterSpacing="0.1"
-                        android:paddingStart="@dimen/common_4"
-                        android:paddingLeft="@dimen/common_4"
-                        android:textColor="@color/background"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/tv_service_quantity"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Qty"
-                        android:letterSpacing="0.1"
-                        android:paddingStart="@dimen/common_4"
-                        android:paddingLeft="@dimen/common_4"
-                        android:textColor="@color/background"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_service_quantity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/serving_qty" />
 
             </LinearLayout>
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
+
 
 </LinearLayout>

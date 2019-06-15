@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,7 +40,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
     private final String TAG = "FirestoreFoodListAdapter";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     //Firebase item id
-    public static String fireId;
+    //public static String fireId;
     public static String foodName;
     public static int qty;
     public static String unit;
@@ -88,12 +87,9 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
         holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNf_protein()));
         holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServing_qty());
 
-
-        holder.itemFoodSelected.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("LongLogTag")
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 //refresh page
                 mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
                 ((ShowAllNutritionActivity) mContext).finish();
@@ -125,8 +121,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
-                            fireId = task.getResult().getDocuments().get(position).getId();
-
+                          //  fireId = task.getResult().getDocuments().get(position).getId();
 
                             //getDocuments splite for get NUTRITION
                             String getDocuments = String.valueOf(task.getResult().getDocuments());
@@ -139,7 +134,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
 //                            savePref.createSharedPreferencesFiles(mContext, "fire_id");
 //                            savePref.saveData("foodId", task.getResult().getDocuments().get(position).getId());
 
-                            Log.d(TAG, "FireId: " + fireId);
+                          //  Log.d(TAG, "FireId: " + fireId);
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
                         }
@@ -200,7 +195,6 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
         private TextView tvCalories;
         private TextView tvProtein;
         private TextView tvServiceQty;
-        private LinearLayout itemFoodSelected;
 
 
         public ViewHolder(View rowView) {
@@ -212,7 +206,6 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
             tvCalories = rowView.findViewById(R.id.tv_calories);
             tvProtein = rowView.findViewById(R.id.tv_protin);
             tvServiceQty = rowView.findViewById(R.id.tv_service_quantity);
-            itemFoodSelected = rowView.findViewById(R.id.item_food_selected);
         }
 
         @Override

@@ -56,16 +56,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_all_nutrition);
 
         init();
-
-        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast);
-        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch);
-        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner);
-        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks);
-
-        enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.BREAKFAST);
-        enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
-        enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.LUNCH);
-        enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.SNACK);
     }
 
     private void init() {
@@ -78,10 +68,22 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         tvTotalLunch = findViewById(R.id.tv_total_lunch);
         tvTotalDinner = findViewById(R.id.tv_total_dinner);
         tvTotalSnacks = findViewById(R.id.tv_total_snacks);
-
         constraintLayout = findViewById(R.id.coordinator_layout);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast);
+        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch);
+        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner);
+        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks);
+
+        enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.BREAKFAST);
+        enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
+        enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.LUNCH);
+        enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.SNACK);
+    }
 
     private void getMealFromFs(final String keyValue, final RecyclerView recyclerView, final List<Foods> foodList, final TextView totalMeal) {
 
@@ -100,7 +102,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                         //hide ProgressDialog
                         progressdialog.hide();
 
-                        if(task.isSuccessful() && task.getResult() != null) {
+                        if (task.isSuccessful() && task.getResult() != null) {
 
                             nutritionName = keyValue;
 
@@ -108,10 +110,9 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);
 
-                                initRecyclerView(recyclerView, foodList,keyValue);
+                                initRecyclerView(recyclerView, foodList, keyValue);
                                 //Disable RecyclerView scrolling
                                 recyclerView.setNestedScrollingEnabled(false);
-
 
                                 Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
 
@@ -121,8 +122,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                 fat += foodList.get(i).getNf_total_fat();
                                 protein += foodList.get(i).getNf_protein();
                             }
-
-                            totalMeal.setText(String.format(Locale.US,"Total: %.2f" + " Kcal.  " + "%.2f" + " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ", kcal, carbs, protein, fat));
+                            totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" + " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ", kcal, carbs, protein, fat));
 
                             kcal = carbs = fat = protein = 0;
 
@@ -140,7 +140,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     }
 
 
-
     private void deleteFromFirebase(final String keyValue, final String foodName, final int qty) {
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(UserRegister.getTodayData())
@@ -150,13 +149,13 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                        if(task.isSuccessful() && task.getResult() != null) {
+                        if (task.isSuccessful() && task.getResult() != null) {
 
                             for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
 
                                 assert foods != null;
-                                if(foodName.equals(foods.getFood_name()) && qty == foods.getServing_qty()) {
+                                if (foodName.equals(foods.getFood_name()) && qty == foods.getServing_qty()) {
 
                                     String id = task.getResult().getDocuments().get(i).getId();
 
@@ -165,7 +164,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                             .collection(keyValue).document(UserRegister.getTodayData())
                                             .collection(Foods.All_NUTRITION).document(id).delete();
 
-                                    Log.d(TAG, "DocumentSnapshot " + task.getResult().getDocuments().get(i).getId()   + " successfully deleted!");
+                                    Log.d(TAG, "DocumentSnapshot " + task.getResult().getDocuments().get(i).getId() + " successfully deleted!");
                                     return;
                                 }
                             }
@@ -183,37 +182,36 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     }
 
 
-
-        @SuppressLint("LongLogTag")
+    @SuppressLint("LongLogTag")
     private void initRecyclerView(RecyclerView recyclerView, List<Foods> foodList, String nutrition) {
 
-            BreakfastListAdapter breakfastAdapter;
-            LunchListAdapter lunchAdapter;
-            DinnerListAdapter dinnerAdapter;
-            SnacksListAdapter snacksAdapter;
+        BreakfastListAdapter breakfastAdapter;
+        LunchListAdapter lunchAdapter;
+        DinnerListAdapter dinnerAdapter;
+        SnacksListAdapter snacksAdapter;
 
         Log.d(TAG, "initRecyclerView: init food recyclerView" + recyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
-            switch (nutrition) {
-                case Foods.BREAKFAST:
-                    breakfastAdapter = new BreakfastListAdapter(this, foodList);
-                    recyclerView.setAdapter(breakfastAdapter);
-                    break;
-                case Foods.LUNCH:
-                    lunchAdapter = new LunchListAdapter(this, foodList);
-                    recyclerView.setAdapter(lunchAdapter);
-                    break;
-                case Foods.DINNER:
-                    dinnerAdapter = new DinnerListAdapter(this, foodList);
-                    recyclerView.setAdapter(dinnerAdapter);
-                    break;
-                case Foods.SNACK:
-                    snacksAdapter = new SnacksListAdapter(this, foodList);
-                    recyclerView.setAdapter(snacksAdapter);
-            }
+        switch (nutrition) {
+            case Foods.BREAKFAST:
+                breakfastAdapter = new BreakfastListAdapter(this, foodList);
+                recyclerView.setAdapter(breakfastAdapter);
+                break;
+            case Foods.LUNCH:
+                lunchAdapter = new LunchListAdapter(this, foodList);
+                recyclerView.setAdapter(lunchAdapter);
+                break;
+            case Foods.DINNER:
+                dinnerAdapter = new DinnerListAdapter(this, foodList);
+                recyclerView.setAdapter(dinnerAdapter);
+                break;
+            case Foods.SNACK:
+                snacksAdapter = new SnacksListAdapter(this, foodList);
+                recyclerView.setAdapter(snacksAdapter);
+        }
     }
 
     // Swipe to delete item
@@ -227,13 +225,12 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                 final int position = viewHolder.getAdapterPosition();
                 final Foods item = mAdapter.getData().get(position);
 
-               deleteFromFirebase(keyValue, item.getFood_name(), item.getServing_qty());
+                deleteFromFirebase(keyValue, item.getFood_name(), item.getServing_qty());
 
                 foodList.remove(position);
                 recyclerView.removeViewAt(position);
                 mAdapter.notifyItemRemoved(position);
                 mAdapter.notifyItemRangeChanged(position, foodList.size());
-
 
                 final Snackbar snackbar = Snackbar
                         .make(constraintLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
@@ -248,16 +245,9 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                 snackbar.show();
             }
         };
-
         ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
         itemTouchhelper.attachToRecyclerView(recyclerView);
-
     }
-
-
-
-
-
 
     //Without this method Data will be double
     public void onPause() {
@@ -267,21 +257,4 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         this.foodListLunch.clear();
         this.foodListSnacks.clear();
     }
-
-
-//    public String getEmailRegister() {
-//        String email = null;
-//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-//        if (mAuth.getCurrentUser() != null) {
-//            email = mAuth.getCurrentUser().getEmail();
-//        }
-//        return email;
-//    }
-//
-//    public String getTodayDate() {
-//        Date c = Calendar.getInstance().getTime();
-//        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
-//        return df.format(c);
-//    }
-
 }

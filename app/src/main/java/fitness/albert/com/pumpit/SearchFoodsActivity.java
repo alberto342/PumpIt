@@ -2,8 +2,6 @@ package fitness.albert.com.pumpit;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,8 +17,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.Api.RestApi;
@@ -37,43 +36,37 @@ import retrofit2.Response;
 
 public class SearchFoodsActivity extends AppCompatActivity {
 
-    EditText edQuery;
+    private String TAG = "SearchFoodsActivity";
+    public static ArrayList<Foods> mListItem = new ArrayList<>();
+    FoodListAdapter foodListAdapter;
     RecyclerView rvList;
-    Button btnSearch;
     Button btnSaveAllFood;
     TextView tvEmpty;
-
-    FoodListAdapter foodListAdapter;
-
     RestApi api;
-    public static ArrayList<Foods> mListItem = new ArrayList<>();
     private Foods foods = new Foods();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String TAG = "SearchFoodsActivity";
+    private MaterialSearchBar searchBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_foods);
+
+        Objects.requireNonNull(getSupportActionBar()).hide();
+
         api = Global.initRetrofit();
         findViews();
     }
 
     private void findViews() {
         tvEmpty = findViewById(R.id.tvEmpty);
-        edQuery = findViewById(R.id.edQuery);
         rvList = findViewById(R.id.rvList);
-        btnSearch = findViewById(R.id.btnSearch);
         btnSaveAllFood = findViewById(R.id.btn_save_all_food);
-
+        searchBar = findViewById(R.id.food_search_bar);
         rvList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getFoodList();
-            }
-        });
+        searchBarClicked();
 
         btnSaveAllFood.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,20 +77,44 @@ public class SearchFoodsActivity extends AppCompatActivity {
     }
 
 
+    private void searchBarClicked() {
+        searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
+            @Override
+            public void onSearchStateChanged(boolean enabled) {
+
+            }
+            @Override
+            public void onSearchConfirmed(CharSequence text) {
+                getFoodList();
+            }
+            @Override
+            public void onButtonClicked(int buttonCode) {
+                switch (buttonCode){
+                    case MaterialSearchBar.BUTTON_NAVIGATION:
+                        break;
+                    case MaterialSearchBar.BUTTON_SPEECH:
+                        //  openVoiceRecognizer();
+                        break;
+                    case MaterialSearchBar.BUTTON_BACK:
+                        searchBar.disableSearch();
+                }
+            }
+        });
+    }
+
     private void getFoodList() {
         final ProgressDialog progressdialog = new ProgressDialog(this);
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
         FoodRequest foodRequest = null;
-        final String search = edQuery.getText().toString().trim();
+         final String search = searchBar.getText();
 
-        if (search.length() == 0 || search.isEmpty() || search.equals("")) {
+        if (search.length() == 0) {
             Toast.makeText(this, "Please Enter food name", Toast.LENGTH_SHORT).show();
         } else {
             foodRequest = new FoodRequest(search);
         }
-
         Call<FoodListResponse> call = api.foodList(Global.x_app_id, Global.x_app_key, foodRequest);
 
         call.enqueue(new Callback<FoodListResponse>() {
@@ -114,7 +131,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
                         } else {
                             btnSaveAllFood.setVisibility(View.INVISIBLE);
                         }
-
                         mListItem = response.body().getFoods();
                         foodListAdapter = new FoodListAdapter(SearchFoodsActivity.this, mListItem);
                         rvList.setAdapter(foodListAdapter);
@@ -124,7 +140,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
                     }
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<FoodListResponse> call, @NonNull Throwable t) {
                 progressdialog.hide();
@@ -133,7 +148,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
         });
     }
 
-
     private void saveAll() {
         for (int i = 0; i < mListItem.size(); i++) {
             try {
@@ -141,7 +155,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
                 db.collection(Foods.NUTRITION)
                         .document(FireBaseInit.getEmailRegister()).collection(Foods.BREAKFAST)
                         .document(UserRegister.getTodayData()).collection(Foods.All_NUTRITION).add(mListItem.get(i))
-
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
@@ -164,30 +177,30 @@ public class SearchFoodsActivity extends AppCompatActivity {
 
 
     //get Meal from SharedPreferences file
-    private String getMeal() {
-
-        SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
-
-        boolean breakfast = pref.getBoolean("dinner", false);
-        boolean dinner = pref.getBoolean("breakfast", false);
-        boolean lunch = pref.getBoolean("lunch", false);
-        boolean snack = pref.getBoolean("Snack", false);
-
-        if (breakfast) {
-            return "breakfast";
-        }
-        if (dinner) {
-            return "dinner";
-        }
-        if (lunch) {
-            return "lunch";
-        }
-        if (snack) {
-            return "Snack";
-        } else {
-            return null;
-        }
-    }
+//    private String getMeal() {
+//
+//        SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+//
+//        boolean breakfast = pref.getBoolean("dinner", false);
+//        boolean dinner = pref.getBoolean("breakfast", false);
+//        boolean lunch = pref.getBoolean("lunch", false);
+//        boolean snack = pref.getBoolean("Snack", false);
+//
+//        if (breakfast) {
+//            return "breakfast";
+//        }
+//        if (dinner) {
+//            return "dinner";
+//        }
+//        if (lunch) {
+//            return "lunch";
+//        }
+//        if (snack) {
+//            return "Snack";
+//        } else {
+//            return null;
+//        }
+//    }
 
     private void arrayListIntoClass() {
         for (int i = 0; i < mListItem.size(); i++) {
@@ -199,5 +212,8 @@ public class SearchFoodsActivity extends AppCompatActivity {
 //    public int getListSize() {
 //       return mListItem.size();
 //    }
+
+
+
 
 }

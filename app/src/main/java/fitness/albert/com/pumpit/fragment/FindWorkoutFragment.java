@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.fragment;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,12 +21,14 @@ import fitness.albert.com.pumpit.R;
 
 
 public class FindWorkoutFragment extends Fragment {
-    
+
+
     public FindWorkoutFragment() {
         // Required empty public constructor
     }
 
 
+    @SuppressLint("NewApi")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

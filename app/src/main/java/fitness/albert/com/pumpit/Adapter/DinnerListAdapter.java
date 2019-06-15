@@ -2,7 +2,6 @@ package fitness.albert.com.pumpit.Adapter;
 
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -12,40 +11,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.ShowAllNutritionActivity;
-import fitness.albert.com.pumpit.ShowDinnerActivity;
 
 public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    private Context mContext;
-    private static List<Foods> foodsList;
     private final String TAG = "DinnerListAdapter";
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    //Firebase item id
-    public static String fireId;
+    private Context mContext;
+    private List<Foods> foodsList;
     public static String foodName;
-    public static int qty;
-    public static String unit;
-    public static String nutrition;
+
 
 
     public DinnerListAdapter(Context mContext, List<Foods> foodsList) {
@@ -72,9 +55,8 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
 
-    @SuppressLint({"LongLogTag"})
+    @SuppressLint({"LongLogTag", "SetTextI18n"})
     private void bindViews(final ViewHolder holder, final int position) {
-
 
         Picasso.get()
                 .load(foodsList.get(position).getPhoto().getThumb())
@@ -82,65 +64,51 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
-
         holder.tvFoodName.setText(foodsList.get(position).getFood_name());
         holder.tvCalories.setText(String.format(Locale.getDefault(),"%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNf_calories(), foodsList.get(position).getNf_total_carbohydrate()));
         holder.tvProtein.setText(String.format(Locale.getDefault(),"%.0f Protein",foodsList.get(position).getNf_protein()));
         holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServing_qty());
 
-
-        holder.itemFoodSelected.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("LongLogTag")
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //refresh page
-                mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
-                ((ShowAllNutritionActivity) mContext).finish();
-
-                //Get Food id
-                getFoodId(position);
-
                 Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
-                foodName = holder.tvFoodName.getText().toString();
-                qty = foodsList.get(position).getServing_qty();
-                unit = foodsList.get(position).getServing_unit();
+                foodName = foodsList.get(position).getFood_name();
 
-                Intent intent = new Intent(mContext, ShowDinnerActivity.class);
-                mContext.startActivity(intent);
-                foodsList.clear();
-                ((Activity)mContext).finish();
+                String cotxt = mContext.toString();
+                String[] parts = cotxt.split("@");
+                String part1 = parts[0];
+
+                //refresh page
+                if (!part1.equals("fitness.albert.com.pumpit.fragment.logsFragment.LogTabActivity")) {
+                    mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
+                    ((ShowAllNutritionActivity) mContext).finish();
+                }
+
+                Intent i = new Intent(mContext, DinnerListAdapter.class);
+                i.putExtra("foodPhoto", foodsList.get(position).getPhoto().getHighres());
+                i.putExtra("kcal", foodsList.get(position).getNf_calories());
+                i.putExtra("fat", foodsList.get(position).getNf_total_fat());
+                i.putExtra("protein", foodsList.get(position).getNf_protein());
+                i.putExtra("carbohydrate", foodsList.get(position).getNf_total_carbohydrate());
+                i.putExtra("servingWeightGrams", foodsList.get(position).getServing_weight_grams());
+                i.putExtra("qty", foodsList.get(position).getServing_qty());
+                i.putExtra("servingUnit", foodsList.get(position).getServing_unit());
+                i.putExtra("altMeasuresSize", foodsList.get(position).getAlt_measures().size());
+
+
+                for (int r = 0; r < foodsList.get(position).getAlt_measures().size(); r++) {
+                    i.putExtra("measure" + r, foodsList.get(position).getAlt_measures().get(r).getMeasure());
+                    i.putExtra("measureServingWeight" + r, foodsList.get(position).getAlt_measures().get(r).getServing_weight());
+                }
+                mContext.startActivity(i);
             }
         });
     }
 
-    //Get firebase food item id
-    private void getFoodId(final int position) {
-        db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(Foods.DINNER).document(getTodayDate())
-                .collection(Foods.All_NUTRITION).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("LongLogTag")
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
 
-                            fireId = task.getResult().getDocuments().get(position).getId();
-
-                            Log.d(TAG, "Documents: " + task.getResult().getDocuments() +"\nFireID: " + fireId);
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-    }
 
 
     @Override
@@ -148,40 +116,24 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return foodsList.size();
     }
 
-
-    public void removeItem(int position) {
-        foodsList.remove(position);
-        notifyItemRemoved(position);
-    }
-
-
-    public void restoreItem(Foods item, int position) {
-        foodsList.add(position, item);
-        notifyItemInserted(position);
-    }
+//
+//    public void removeItem(int position) {
+//        foodsList.remove(position);
+//        notifyItemRemoved(position);
+//    }
+//
+//
+//    public void restoreItem(Foods item, int position) {
+//        foodsList.add(position, item);
+//        notifyItemInserted(position);
+//    }
 
 
     public List<Foods> getData() {
         return foodsList;
     }
 
-    public String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
-        }
-        return email;
-    }
 
-
-
-
-    public String getTodayDate() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-        return df.format(c);
-    }
 
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -191,7 +143,6 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private TextView tvCalories;
         private TextView tvProtein;
         private TextView tvServiceQty;
-        private LinearLayout itemFoodSelected;
 
 
         public ViewHolder(View rowView) {
@@ -203,7 +154,6 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             tvCalories = rowView.findViewById(R.id.tv_calories);
             tvProtein = rowView.findViewById(R.id.tv_protin);
             tvServiceQty = rowView.findViewById(R.id.tv_service_quantity);
-            itemFoodSelected = rowView.findViewById(R.id.item_food_selected);
         }
 
         @Override

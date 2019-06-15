@@ -22,10 +22,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
@@ -279,7 +277,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
         float altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams * quantityViewCustom.getQuantity();
 
 
-        updateNutrition(Foods.BREAKFAST, altMeasures);
+        //updateNutrition(Foods.BREAKFAST, altMeasures);
     }
 
     @Override
@@ -336,7 +334,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                     testOnce = true;
 
                     quantityViewCustom.setQuantity(1);
-                    updateNutrition(Foods.BREAKFAST, altMeasures);
+                   // updateNutrition(Foods.BREAKFAST, altMeasures);
                 }
             }
 
@@ -350,78 +348,78 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     }
 
 
-    private void spinnerIsGram(final String keyValue) {
-        progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
-                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
-        doc.update("serving_unit", spinnerSelectedItem);
-        doc.update("serving_qty", quantityViewCustom.getQuantity());
-        doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
-        doc.update("nf_total_fat", fat + quantityViewCustom.getQuantity());
-        doc.update("nf_protein", protein + quantityViewCustom.getQuantity());
-        doc.update("nf_total_carbohydrate", carbs + quantityViewCustom.getQuantity());
-        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
-
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        progressdialog.hide();
-                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
-                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal + quantityViewCustom.getQuantity()));
-                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat + quantityViewCustom.getQuantity()));
-                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein + quantityViewCustom.getQuantity()));
-                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs + quantityViewCustom.getQuantity()));
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error updating document", e);
-            }
-        });
-    }
+//    private void spinnerIsGram(final String keyValue) {
+//        progressdialog = new ProgressDialog(this);
+//        progressdialog.setMessage("Please Wait....");
+//        progressdialog.show();
+//
+//        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
+//                .collection(keyValue).document(getTodayDate())
+//                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
+//        doc.update("serving_unit", spinnerSelectedItem);
+//        doc.update("serving_qty", quantityViewCustom.getQuantity());
+//        doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
+//        doc.update("nf_total_fat", fat + quantityViewCustom.getQuantity());
+//        doc.update("nf_protein", protein + quantityViewCustom.getQuantity());
+//        doc.update("nf_total_carbohydrate", carbs + quantityViewCustom.getQuantity());
+//        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
+//
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        progressdialog.hide();
+//                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
+//                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal + quantityViewCustom.getQuantity()));
+//                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat + quantityViewCustom.getQuantity()));
+//                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein + quantityViewCustom.getQuantity()));
+//                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs + quantityViewCustom.getQuantity()));
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.w(TAG, "Error updating document", e);
+//            }
+//        });
+//    }
 
     // TODO: 20/03/2019 check if its grams and change the info
 
     //Update if spinner
-    private void updateNutrition(final String keyValue, final float altMeasures) {
-
-        progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
-                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
-
-        doc.update("serving_unit", spinnerSelectedItem);
-        doc.update("serving_qty", quantityViewCustom.getQuantity());
-        doc.update("nf_calories", kcal * altMeasures);
-        doc.update("nf_total_fat", fat * altMeasures);
-        doc.update("nf_protein", protein * altMeasures);
-        doc.update("nf_total_carbohydrate", carbs * altMeasures);
-        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
-
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        progressdialog.hide();
-                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
-                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal * altMeasures));
-                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat * altMeasures));
-                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein * altMeasures));
-                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs * altMeasures));
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error updating document", e);
-            }
-        });
-    }
+//    private void updateNutrition(final String keyValue, final float altMeasures) {
+//
+//        progressdialog = new ProgressDialog(this);
+//        progressdialog.setMessage("Please Wait....");
+//        progressdialog.show();
+//
+//        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
+//                .collection(keyValue).document(getTodayDate())
+//                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
+//
+//        doc.update("serving_unit", spinnerSelectedItem);
+//        doc.update("serving_qty", quantityViewCustom.getQuantity());
+//        doc.update("nf_calories", kcal * altMeasures);
+//        doc.update("nf_total_fat", fat * altMeasures);
+//        doc.update("nf_protein", protein * altMeasures);
+//        doc.update("nf_total_carbohydrate", carbs * altMeasures);
+//        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
+//
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        progressdialog.hide();
+//                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
+//                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal * altMeasures));
+//                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat * altMeasures));
+//                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein * altMeasures));
+//                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs * altMeasures));
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.w(TAG, "Error updating document", e);
+//            }
+//        });
+//    }
 
 
     public String getMeal() {

@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +24,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
@@ -31,9 +33,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import fitness.albert.com.pumpit.Adapter.DinnerListAdapter;
-import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
@@ -48,24 +50,23 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
     private QuantityView quantityViewCustom;
     private TextView tvEnergy, tvCarbs, tvProtein, tvFat;
     private ImageView foodItem;
-    private UserRegister user = new UserRegister();
-    private List<Foods> foodList = new ArrayList<>();
     private List<String> spinnerList = new ArrayList<>();
     private Map<String, Float> allServingWeight = new HashMap<>();
     private List<Float> servingWeightList = new ArrayList<>();
     private float kcal, fat, protein, carbs, servingWeightGrams;
-    private String qty;
+    private int qty;
     private boolean testOnce = false;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ProgressDialog progressdialog;
     private boolean isGrams = true;
+    private String docId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_dinner);
         init();
-        getDataFromFirbase();
+        getData();
     }
 
     private void init() {
@@ -120,84 +121,57 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
     }
 
 
-    private void getDataFromFirbase() {
-        progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
+    private void getData() {
+        Intent iin = getIntent();
+        Bundle bundle = iin.getExtras();
 
-        db.collection(Foods.NUTRITION)
-                .document(FireBaseInit.getEmailRegister()).collection(Foods.DINNER)
-                .document(user.getTodayData()).collection(Foods.All_NUTRITION)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        progressdialog.hide();
-                        if (task.isSuccessful()) {
-                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
-                                Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-                                foodList.add(foods);
+        if (bundle != null) {
 
-                                Log.d(TAG, "getQTTY:" + foodList.get(i).getServing_qty());
+            Picasso.get()
+                    .load(bundle.getString("foodPhoto"))
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .into(foodItem);
 
-                                if (DinnerListAdapter.foodName.equals(foodList.get(i).getFood_name()) && DinnerListAdapter.qty == foodList.get(i).getServing_qty() && DinnerListAdapter.unit.equals(foodList.get(i).getServing_unit())) {
-                                    Picasso.get()
-                                            .load(foodList.get(i).getPhoto().getHighres())
-                                            .placeholder(R.mipmap.ic_launcher)
-                                            .error(R.mipmap.ic_launcher)
-                                            .into(foodItem);
+            kcal = bundle.getFloat("kcal");
+            fat = bundle.getFloat("fat");
+            protein = bundle.getFloat("protein");
+            carbs = bundle.getFloat("carbohydrate");
+            servingWeightGrams = bundle.getFloat("servingWeightGrams");
+            qty = bundle.getInt("qty");
 
-                                    //Save to float
-                                    kcal = foodList.get(i).getNf_calories();
-                                    fat = foodList.get(i).getNf_total_fat();
-                                    protein = foodList.get(i).getNf_protein();
-                                    carbs = foodList.get(i).getNf_total_carbohydrate();
-                                    servingWeightGrams = foodList.get(i).getServing_weight_grams();
-                                    qty = String.valueOf(foodList.get(i).getServing_qty());
+            quantityViewCustom.setQuantity(qty);
 
+            String servingUnit = bundle.getString("servingUnit");
 
+            //Get Serving Unit
+            if (servingUnit == null) {
+                spinnerList.add("Packet");
+            } else {
+                spinnerList.add(servingUnit);
+            }
 
-                                    quantityViewCustom.setQuantity(Integer.parseInt(qty));
+            //add value into list
+            for (int r = 0; r < bundle.getInt("altMeasuresSize"); r++) {
+                spinnerList.add(bundle.getString("measure" + r));
+                servingWeightList.add(Float.valueOf(Objects.requireNonNull(bundle.getString("measureServingWeight" + r))));
 
-                                    //Get Serving Unit
-                                    if (foodList.get(i).getServing_unit() == null) {
-                                        spinnerList.add("Packet");
-                                    } else {
-                                        spinnerList.add(foodList.get(i).getServing_unit());
-                                    }
+                //add spinner to the map
+                if (servingWeightList.isEmpty()) {
+                    allServingWeight.put("package", servingWeightGrams);
+                } else {
+                    allServingWeight.put(Objects.requireNonNull(bundle.getString("measure" + r)),
+                            Float.valueOf(Objects.requireNonNull(bundle.getString("measureServingWeight" + r))));
+                }
+            }
+        }
+        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal));
+        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat));
+        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein));
+        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs));
+        quantityViewCustom.setQuantity(qty);
 
-                                    //add value into list
-                                    for (int r = 0; r < foodList.get(i).getAlt_measures().size(); r++) {
-                                        spinnerList.add(foodList.get(i).getAlt_measures().get(r).getMeasure()); // Measure name
-                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAlt_measures().get(r).getServing_weight())); // Measure value
-
-
-                                        //add spinner to the map
-                                        if (servingWeightList.isEmpty()) {
-                                            allServingWeight.put("package", servingWeightGrams);
-                                        } else {
-                                            allServingWeight.put(foodList.get(i).getAlt_measures().get(r).getMeasure(), Float.valueOf(foodList.get(i).getAlt_measures().get(r).getServing_weight()));
-                                        }
-                                    }
-                                }
-                            }
-                            tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal));
-                            tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat));
-                            tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein));
-                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs));
-                            quantityViewCustom.setQuantity(Integer.parseInt(qty));
-
-                            addItemsOnSpinner();
-                        }
-                    }
-                })
-
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+        addItemsOnSpinner();
     }
 
 
@@ -210,8 +184,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
 
         float altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams * quantityViewCustom.getQuantity();
 
-
-        updateNutrition(Foods.BREAKFAST, altMeasures);
+        updateNutrition(altMeasures);
     }
 
     @Override
@@ -268,7 +241,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
                     testOnce = true;
 
                     quantityViewCustom.setQuantity(1);
-                    updateNutrition(Foods.BREAKFAST, altMeasures);
+                    updateNutrition(altMeasures);
                 }
             }
 
@@ -282,92 +255,98 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
     }
 
 
-    private void spinnerIsGram(final String keyValue) {
-        progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(UserRegister.getTodayData())
-                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
-        doc.update("serving_unit", spinnerSelectedItem);
-        doc.update("serving_qty", quantityViewCustom.getQuantity());
-        doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
-        doc.update("nf_total_fat", fat + quantityViewCustom.getQuantity());
-        doc.update("nf_protein", protein + quantityViewCustom.getQuantity());
-        doc.update("nf_total_carbohydrate", carbs + quantityViewCustom.getQuantity());
-        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
-
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        progressdialog.hide();
-                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
-                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal + quantityViewCustom.getQuantity()));
-                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat + quantityViewCustom.getQuantity()));
-                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein + quantityViewCustom.getQuantity()));
-                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs + quantityViewCustom.getQuantity()));
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error updating document", e);
-            }
-        });
-    }
+//    private void spinnerIsGram(final String keyValue) {
+//        progressdialog = new ProgressDialog(this);
+//        progressdialog.setMessage("Please Wait....");
+//        progressdialog.show();
+//
+//        DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+//                .collection(keyValue).document(UserRegister.getTodayData())
+//                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
+//        doc.update("serving_unit", spinnerSelectedItem);
+//        doc.update("serving_qty", quantityViewCustom.getQuantity());
+//        doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
+//        doc.update("nf_total_fat", fat + quantityViewCustom.getQuantity());
+//        doc.update("nf_protein", protein + quantityViewCustom.getQuantity());
+//        doc.update("nf_total_carbohydrate", carbs + quantityViewCustom.getQuantity());
+//        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
+//
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        progressdialog.hide();
+//                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
+//                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal + quantityViewCustom.getQuantity()));
+//                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat + quantityViewCustom.getQuantity()));
+//                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein + quantityViewCustom.getQuantity()));
+//                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs + quantityViewCustom.getQuantity()));
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.w(TAG, "Error updating document", e);
+//            }
+//        });
+//    }
 
     // TODO: 20/03/2019 check if its grams and change the info
 
     //Update if spinner
-    private void updateNutrition(final String keyValue, final float altMeasures) {
+    private void updateNutrition(final float altMeasures) {
 
         progressdialog = new ProgressDialog(this);
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(UserRegister.getTodayData())
-                .collection(Foods.All_NUTRITION).document(DinnerListAdapter.fireId);
-
-        doc.update("serving_unit", spinnerSelectedItem);
-        doc.update("serving_qty", quantityViewCustom.getQuantity());
-        doc.update("nf_calories", kcal * altMeasures);
-        doc.update("nf_total_fat", fat * altMeasures);
-        doc.update("nf_protein", protein * altMeasures);
-        doc.update("nf_total_carbohydrate", carbs * altMeasures);
-        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
-
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                .collection(Foods.DINNER).document(UserRegister.getTodayData())
+                .collection(Foods.All_NUTRITION)
+                .whereEqualTo("food_name", DinnerListAdapter.foodName)
+                .whereEqualTo("serving_unit", spinnerSelectedItem)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        progressdialog.hide();
-                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
-                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal * altMeasures));
-                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat * altMeasures));
-                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein * altMeasures));
-                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs * altMeasures));
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, "document.getId " + document.getId() + " => " + document.getData());
+                                docId = document.getId();
+                            }
+
+                            DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                                    .collection(Foods.DINNER).document(UserRegister.getTodayData())
+                                    .collection(Foods.All_NUTRITION).document(docId);
+
+                            doc.update("serving_unit", spinnerSelectedItem);
+                            doc.update("serving_qty", quantityViewCustom.getQuantity());
+                            doc.update("nf_calories", kcal * altMeasures);
+                            doc.update("nf_total_fat", fat * altMeasures);
+                            doc.update("nf_protein", protein * altMeasures);
+                            doc.update("nf_total_carbohydrate", carbs * altMeasures);
+                            doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
+
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            progressdialog.hide();
+                                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                            tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal * altMeasures));
+                                            tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat * altMeasures));
+                                            tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein * altMeasures));
+                                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs * altMeasures));
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error updating document", e);
+                                        }
+                                    });
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error updating document", e);
-            }
-        });
+                });
     }
 
-
-//    public String getEmailRegister() {
-//        String email = null;
-//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-//        if (mAuth.getCurrentUser() != null) {
-//            email = mAuth.getCurrentUser().getEmail();
-//        }
-//        return email;
-//    }
-//
-//    public String getTodayDate() {
-//        Date c = Calendar.getInstance().getTime();
-//        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-//        return df.format(c);
-//    }
 }

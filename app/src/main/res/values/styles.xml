@@ -45,7 +45,7 @@
     </style>
 
 
-    <!--ToolBarStyle-->
+    <!--ToolBar Style-->
 
     <style name="ToolBarStyle" parent="ToolBarStyle.Base" />
 
@@ -69,7 +69,8 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!--End ToolBarStyle-->
+    <!--End ToolBar Style-->
+
 
 
 </resources>

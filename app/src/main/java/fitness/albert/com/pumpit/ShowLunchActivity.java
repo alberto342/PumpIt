@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,24 +22,22 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
-import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.Adapter.LunchListAdapter;
+import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.SavePref;
 import fitness.albert.com.pumpit.Model.UserRegister;
@@ -46,31 +45,30 @@ import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowLunchActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
+    private final String TAG = "ShowLunchActivity";
     private Spinner spinnerServingUnit;
     private String spinnerSelectedItem;
     private QuantityView quantityViewCustom;
     private TextView tvEnergy, tvCarbs, tvProtein, tvFat;
     private ImageView foodItem;
-    private UserRegister user = new UserRegister();
-    private List<Foods> foodList = new ArrayList<>();
     private List<String> spinnerList = new ArrayList<>();
     private Map<String, Float> allServingWeight = new HashMap<>();
     private List<Float> servingWeightList = new ArrayList<>();
     private float kcal, fat, protein, carbs, servingWeightGrams;
-    private String qty;
+    private int qty;
     private boolean testOnce = false;
     private SavePref savePref = new SavePref();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final String TAG = "ShowLunchActivity";
     private ProgressDialog progressdialog;
     private boolean isGrams = true;
+    private String docId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_lunch);
         init();
-        getDataFromFirbase();
+        getData();
     }
 
     private void init() {
@@ -92,6 +90,7 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
         mToolbar = getSupportActionBar();
         String foodName = LunchListAdapter.foodName;
         String foodNameCapitalizeFirstLetter = foodName.substring(0, 1).toUpperCase() + foodName.substring(1);
+        assert mToolbar != null;
         mToolbar.setTitle(foodNameCapitalizeFirstLetter);
 
         // Create a TextView programmatically.
@@ -123,95 +122,71 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
         mToolbar.setCustomView(tv);
     }
 
+    private void getData() {
+        Intent iin = getIntent();
+        Bundle bundle = iin.getExtras();
 
-    private void getDataFromFirbase() {
-        progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
+        if (bundle != null) {
 
-        db.collection(Foods.NUTRITION)
-                .document(getEmailRegister()).collection(Foods.LUNCH)
-                .document(user.getTodayData()).collection(Foods.All_NUTRITION)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        progressdialog.hide();
-                        if (task.isSuccessful()) {
-                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
-                                Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-                                foodList.add(foods);
+            Picasso.get()
+                    .load(bundle.getString("foodPhoto"))
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .into(foodItem);
 
-                                if (LunchListAdapter.foodName.equals(foodList.get(i).getFood_name()) && LunchListAdapter.qty == foodList.get(i).getServing_qty() && LunchListAdapter.unit.equals(foodList.get(i).getServing_unit())) {
-                                    Picasso.get()
-                                            .load(foodList.get(i).getPhoto().getHighres())
-                                            .placeholder(R.mipmap.ic_launcher)
-                                            .error(R.mipmap.ic_launcher)
-                                            .into(foodItem);
+            kcal = bundle.getFloat("kcal");
+            fat = bundle.getFloat("fat");
+            protein = bundle.getFloat("protein");
+            carbs = bundle.getFloat("carbohydrate");
+            servingWeightGrams = bundle.getFloat("servingWeightGrams");
+            qty = bundle.getInt("qty");
 
-                                    //Save to float
-                                    kcal = foodList.get(i).getNf_calories();
-                                    fat = foodList.get(i).getNf_total_fat();
-                                    protein = foodList.get(i).getNf_protein();
-                                    carbs = foodList.get(i).getNf_total_carbohydrate();
-                                    servingWeightGrams = foodList.get(i).getServing_weight_grams();
-                                    qty = String.valueOf(foodList.get(i).getServing_qty());
+            quantityViewCustom.setQuantity(qty);
 
-                                    quantityViewCustom.setQuantity(Integer.parseInt(qty));
+            String servingUnit = bundle.getString("servingUnit");
 
-                                    //Get Serving Unit
-                                    if (foodList.get(i).getServing_unit() == null) {
-                                        spinnerList.add("Packet");
-                                    } else {
-                                        spinnerList.add(foodList.get(i).getServing_unit());
-                                    }
+            //Get Serving Unit
+            if (servingUnit == null) {
+                spinnerList.add("Packet");
+            } else {
+                spinnerList.add(servingUnit);
+            }
 
-                                    //add value into list
-                                    for (int r = 0; r < foodList.get(i).getAlt_measures().size(); r++) {
-                                        spinnerList.add(foodList.get(i).getAlt_measures().get(r).getMeasure()); // Measure name
-                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAlt_measures().get(r).getServing_weight())); // Measure value
+            //add value into list
+            for (int r = 0; r < bundle.getInt("altMeasuresSize"); r++) {
+                spinnerList.add(bundle.getString("measure" + r));
+                servingWeightList.add(Float.valueOf(Objects.requireNonNull(bundle.getString("measureServingWeight" + r))));
 
+                //add spinner to the map
+                if (servingWeightList.isEmpty()) {
+                    allServingWeight.put("package", servingWeightGrams);
+                } else {
+                    allServingWeight.put(Objects.requireNonNull(bundle.getString("measure" + r)),
+                            Float.valueOf(Objects.requireNonNull(bundle.getString("measureServingWeight" + r))));
+                }
+            }
+        }
+        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal));
+        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat));
+        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein));
+        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs));
+        quantityViewCustom.setQuantity(qty);
 
-                                        //add spinner to the map
-                                        if (servingWeightList.isEmpty()) {
-                                            allServingWeight.put("package", servingWeightGrams);
-                                        } else {
-                                            allServingWeight.put(foodList.get(i).getAlt_measures().get(r).getMeasure(), Float.valueOf(foodList.get(i).getAlt_measures().get(r).getServing_weight()));
-                                        }
-                                    }
-                                }
-                            }
-                            tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal));
-                            tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat));
-                            tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein));
-                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs));
-                            quantityViewCustom.setQuantity(Integer.parseInt(qty));
-
-                            addItemsOnSpinner();
-                        }
-                    }
-                })
-
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+        addItemsOnSpinner();
     }
 
 
     //Calculation the quantity + -
+    @Override
     public void onQuantityChanged(int oldQuantity, int newQuantity, boolean programmatically) {
         if (newQuantity == 0) {
             newQuantity = 1;
             quantityViewCustom.setQuantity(newQuantity);
         }
-
         float altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams * quantityViewCustom.getQuantity();
 
 
-        updateNutrition(Foods.BREAKFAST, altMeasures);
+        updateNutrition(altMeasures);
     }
 
     @Override
@@ -224,10 +199,8 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
         return super.onOptionsItemSelected(item);
     }
 
-
     //Spinner Unit list
     public void addItemsOnSpinner() {
-
         //Remove existing
         if (spinnerList.get(0) != null) {
             for (int i = 1; i < spinnerList.size(); i++) {
@@ -236,7 +209,6 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
                 }
             }
         }
-
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, spinnerList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -245,7 +217,6 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
         onItemSelectedListener();
     }
 
-
     //Wen user change the spinner selection
     private void onItemSelectedListener() {
         spinnerServingUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -253,22 +224,20 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 spinnerSelectedItem = String.valueOf(spinnerServingUnit.getItemAtPosition(position));
-                Log.d(TAG, "Spinner Item Position: " + spinnerServingUnit.getItemAtPosition(position));
+                Log.d(TAG, "Spinner Item Position: " + spinnerSelectedItem);
 
                 if (allServingWeight.get(spinnerSelectedItem) == null) {
                     FoodListAdapter.measureMap.put(spinnerSelectedItem, servingWeightGrams);
                     allServingWeight.put(spinnerSelectedItem, servingWeightGrams);
                 }
-
                 float altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams * quantityViewCustom.getQuantity();
-
 
                 //Check if the position is change
                 if (position > 0 || testOnce) {
                     testOnce = true;
 
                     quantityViewCustom.setQuantity(1);
-                    updateNutrition(Foods.BREAKFAST, altMeasures);
+                    updateNutrition(altMeasures);
                 }
             }
 
@@ -282,94 +251,100 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
     }
 
 
-    private void spinnerIsGram(final String keyValue) {
-        progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
-                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
-        doc.update("serving_unit", spinnerSelectedItem);
-        doc.update("serving_qty", quantityViewCustom.getQuantity());
-        doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
-        doc.update("nf_total_fat", fat + quantityViewCustom.getQuantity());
-        doc.update("nf_protein", protein + quantityViewCustom.getQuantity());
-        doc.update("nf_total_carbohydrate", carbs + quantityViewCustom.getQuantity());
-        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
-
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        progressdialog.hide();
-                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
-                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal + quantityViewCustom.getQuantity()));
-                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat + quantityViewCustom.getQuantity()));
-                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein + quantityViewCustom.getQuantity()));
-                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs + quantityViewCustom.getQuantity()));
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error updating document", e);
-            }
-        });
-    }
+//    private void spinnerIsGram(final String keyValue) {
+//        progressdialog = new ProgressDialog(this);
+//        progressdialog.setMessage("Please Wait....");
+//        progressdialog.show();
+//
+//        DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+//                .collection(keyValue).document(UserRegister.getTodayData())
+//                .collection(Foods.All_NUTRITION).document(FirestoreFoodListAdapter.fireId);
+//        doc.update("serving_unit", spinnerSelectedItem);
+//        doc.update("serving_qty", quantityViewCustom.getQuantity());
+//        doc.update("nf_calories", kcal + quantityViewCustom.getQuantity());
+//        doc.update("nf_total_fat", fat + quantityViewCustom.getQuantity());
+//        doc.update("nf_protein", protein + quantityViewCustom.getQuantity());
+//        doc.update("nf_total_carbohydrate", carbs + quantityViewCustom.getQuantity());
+//        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
+//
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        progressdialog.hide();
+//                        Log.d(TAG,  " DocumentSnapshot successfully updated!");
+//                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal + quantityViewCustom.getQuantity()));
+//                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat + quantityViewCustom.getQuantity()));
+//                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein + quantityViewCustom.getQuantity()));
+//                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs + quantityViewCustom.getQuantity()));
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.w(TAG, "Error updating document", e);
+//            }
+//        });
+//    }
 
     // TODO: 20/03/2019 check if its grams and change the info
 
     //Update if spinner
-    private void updateNutrition(final String keyValue, final float altMeasures) {
+    private void updateNutrition(final float altMeasures) {
 
         progressdialog = new ProgressDialog(this);
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        DocumentReference doc = db.collection(Foods.NUTRITION).document(getEmailRegister())
-                .collection(keyValue).document(getTodayDate())
-                .collection(Foods.All_NUTRITION).document(LunchListAdapter.fireId);
-
-        doc.update("serving_unit", spinnerSelectedItem);
-        doc.update("serving_qty", quantityViewCustom.getQuantity());
-        doc.update("nf_calories", kcal * altMeasures);
-        doc.update("nf_total_fat", fat * altMeasures);
-        doc.update("nf_protein", protein * altMeasures);
-        doc.update("nf_total_carbohydrate", carbs * altMeasures);
-        doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
-
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                .collection(Foods.LUNCH).document(UserRegister.getTodayData())
+                .collection(Foods.All_NUTRITION)
+                .whereEqualTo("food_name", LunchListAdapter.foodName)
+                .whereEqualTo("serving_unit", spinnerSelectedItem)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        progressdialog.hide();
-                        Log.d(TAG, FirestoreFoodListAdapter.fireId + " DocumentSnapshot successfully updated!");
-                        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal * altMeasures));
-                        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat * altMeasures));
-                        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein * altMeasures));
-                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs * altMeasures));
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, "document.getId " + document.getId() + " => " + document.getData());
+                                docId = document.getId();
+                            }
+
+                            DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                                    .collection(Foods.LUNCH).document(UserRegister.getTodayData())
+                                    .collection(Foods.All_NUTRITION).document(docId);
+
+                            doc.update("serving_unit", spinnerSelectedItem);
+                            doc.update("serving_qty", quantityViewCustom.getQuantity());
+                            doc.update("nf_calories", kcal * altMeasures);
+                            doc.update("nf_total_fat", fat * altMeasures);
+                            doc.update("nf_protein", protein * altMeasures);
+                            doc.update("nf_total_carbohydrate", carbs * altMeasures);
+                            doc.update("serving_weight_grams", allServingWeight.get(spinnerSelectedItem))
+
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            progressdialog.hide();
+                                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                            tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal * altMeasures));
+                                            tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat * altMeasures));
+                                            tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein * altMeasures));
+                                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs * altMeasures));
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error updating document", e);
+                                        }
+                                    });
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error updating document", e);
-            }
-        });
+                });
     }
 
-
-    public String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
-        }
-        return email;
-    }
-
-    public String getTodayDate() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-        return df.format(c);
-    }
 
     @Override
     public void onBackPressed() {

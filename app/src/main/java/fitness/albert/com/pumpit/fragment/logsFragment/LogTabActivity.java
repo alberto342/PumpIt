@@ -84,4 +84,7 @@ public class LogTabActivity extends AppCompatActivity {
             fragmentTitles.add(name);
         }
     }
+
+
+
 }

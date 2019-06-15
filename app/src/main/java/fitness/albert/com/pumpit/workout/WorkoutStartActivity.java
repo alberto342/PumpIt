@@ -37,8 +37,6 @@ import fitness.albert.com.pumpit.R;
 
 public class WorkoutStartActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //android dynamically
-
     private final String TAG = "WorkoutStartActivity";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView exerciseName, timerUp, btnAddNewSet, btnRemoveSte, exercisesLeft, countReps;
@@ -88,7 +86,22 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         assert StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName() != null;
         exerciseName.setText(StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName());
 
-        //exercise img
+
+        exerciseImg();
+
+        //exercise left
+        exercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
+
+        timeRest.setOnClickListener(this);
+        editStartWorkout.setOnClickListener(this);
+        playWorkout.setOnClickListener(this);
+        stopWorkout.setOnClickListener(this);
+        nextExercise.setOnClickListener(this);
+        btnAddNewSet.setOnClickListener(this);
+        btnRemoveSte.setOnClickListener(this);
+    }
+
+    private void exerciseImg() {
         try {
             String imgFile = "file:///android_asset/images/" + StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getImgName();
 
@@ -102,16 +115,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //exercise left
-        exercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
-
-        timeRest.setOnClickListener(this);
-        editStartWorkout.setOnClickListener(this);
-        playWorkout.setOnClickListener(this);
-        stopWorkout.setOnClickListener(this);
-        nextExercise.setOnClickListener(this);
-        btnAddNewSet.setOnClickListener(this);
-        btnRemoveSte.setOnClickListener(this);
     }
 
     private void initRestTimerLayout(View dialogView) {
@@ -459,7 +462,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise(),
                 StartWorkoutActivity.trainingList.get(countExercisesLeft).getImgName(),
                 UserRegister.getTodayData(), StartWorkoutActivity.trainingList.get(countExercisesLeft).isFavorite(),
-                mChronometer.getText().toString(), 0, "", "", "", 0f, 0);
+                mChronometer.getText().toString(), false, "", "", "", 0f, 0);
 
         db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
                 .collection(UserRegister.getTodayData()).add(finishTraining).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

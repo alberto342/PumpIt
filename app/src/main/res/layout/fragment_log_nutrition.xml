@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
             <TextView
                 android:id="@+id/tv_log_breakfast"
                 android:layout_width="match_parent"
@@ -34,9 +35,17 @@
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:id="@+id/textView76"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:text="  Total: " />
+
+            <TextView
                 android:id="@+id/tv_log_lunch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:background="@color/colorPrimary"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
@@ -51,11 +60,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <TextView
+                android:id="@+id/textView74"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
 
             <TextView
                 android:id="@+id/tv_log_dinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:background="@color/colorPrimary"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
@@ -72,9 +88,16 @@
 
 
             <TextView
+                android:id="@+id/textView75"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
+            <TextView
                 android:id="@+id/tv_log_snacks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:background="@color/colorPrimary"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
@@ -88,6 +111,12 @@
                 android:id="@+id/rv_log_snacks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textView77"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
         </LinearLayout>
 
     </ScrollView>

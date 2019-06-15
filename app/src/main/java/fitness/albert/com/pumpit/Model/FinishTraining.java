@@ -8,7 +8,7 @@ public class FinishTraining extends Training{
     public static final String TRAINING_NAME = "trainingName";
 
     private String chrTotalTraining;
-    private int exerciseComplete;
+    private Boolean exerciseComplete;
     private String chrWasted;
     private String chrActual;
     private String chrRestTime;
@@ -18,7 +18,7 @@ public class FinishTraining extends Training{
     public FinishTraining() {
     }
 
-    public FinishTraining(String chrTotalTraining, int exerciseComplete, String chrWasted, String chrActual, String chrRestTime, float totalWeight, int newRecord) {
+    public FinishTraining(String chrTotalTraining, Boolean exerciseComplete, String chrWasted, String chrActual, String chrRestTime, float totalWeight, int newRecord) {
         this.chrTotalTraining = chrTotalTraining;
         this.exerciseComplete = exerciseComplete;
         this.chrWasted = chrWasted;
@@ -28,7 +28,7 @@ public class FinishTraining extends Training{
         this.newRecord = newRecord;
     }
 
-    public FinishTraining(String exerciseName, List<TrackerExercise> trackerExercises, int sizeOfRept, int restBetweenSet, int restAfterExercise, String imgName, String date, boolean isFavorite, String chrTotalTraining, int exerciseComplete, String chrWasted, String chrActual, String chrRestTime, float totalWeight, int newRecord) {
+    public FinishTraining(String exerciseName, List<TrackerExercise> trackerExercises, int sizeOfRept, int restBetweenSet, int restAfterExercise, String imgName, String date, boolean isFavorite, String chrTotalTraining, Boolean exerciseComplete, String chrWasted, String chrActual, String chrRestTime, float totalWeight, int newRecord) {
         super(exerciseName, trackerExercises, sizeOfRept, restBetweenSet, restAfterExercise, imgName, date, isFavorite);
         this.chrTotalTraining = chrTotalTraining;
         this.exerciseComplete = exerciseComplete;
@@ -55,11 +55,11 @@ public class FinishTraining extends Training{
         this.chrTotalTraining = chrTotalTraining;
     }
 
-    public int getExerciseComplete() {
+    public Boolean getExerciseComplete() {
         return exerciseComplete;
     }
 
-    public void setExerciseComplete(int exerciseComplete) {
+    public void setExerciseComplete(Boolean exerciseComplete) {
         this.exerciseComplete = exerciseComplete;
     }
 

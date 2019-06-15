@@ -4,10 +4,12 @@ package fitness.albert.com.pumpit.fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,14 +54,20 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setToolBar();
         init(view);
-
         seeWorkout.setOnClickListener(this);
         findWorkout.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
         btnStartWorkout.setOnClickListener(this);
-
         loadExerciseFromFb();
+    }
+
+    private void setToolBar() {
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        assert activity != null;
+        assert activity.getSupportActionBar() != null;
+        activity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorDarkBlue)));
     }
 
     @Override

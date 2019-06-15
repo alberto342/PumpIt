@@ -236,6 +236,25 @@
     <string name="city">City</string>
     <string name="my_goals">My Goals</string>
     <string name="title_activity_log_tab">LogTabActivity</string>
+    <!--<string name="sun">sun</string>-->
+    <!--<string name="mon">mon</string>-->
+    <!--<string name="tue">tue</string>-->
+    <!--<string name="wed">wed</string>-->
+    <!--<string name="thu">thu</string>-->
+    <!--<string name="fri">fri</string>-->
+    <!--<string name="set">set</string>-->
+
+
+
+    <!-- calender -->
+        <string name="sun">S</string>
+        <string name="mon">M</string>
+        <string name="tue">T</string>
+        <string name="wed">W</string>
+        <string name="thu">T</string>
+        <string name="fri">F</string>
+        <string name="sat">S</string>
+
 
 
 </resources>

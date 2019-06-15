@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".fragment.logsFragment.LogTabActivity"></activity>
+        <activity android:name=".workout.ShowLogExercise"></activity>
+        <activity android:name=".fragment.logsFragment.LogTabActivity" />
         <activity android:name=".workout.CustomAddExerciseActivity" />
         <activity android:name=".workout.ChangePlanActivity" />
         <activity android:name=".workout.WorkoutStartActivity" />
@@ -91,6 +92,8 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+
     </application>
 
 </manifest>

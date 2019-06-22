@@ -7,10 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import fitness.albert.com.pumpit.Adapter.TrainingAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.SwipeHelper;
 import fitness.albert.com.pumpit.Model.TrackerExercise;
 import fitness.albert.com.pumpit.Model.Training;
@@ -57,7 +57,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
     public static List<Training> trainingList = new ArrayList<>();
     private TrainingAdapter trainingAdapter;
     private AlertDialog dialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,9 +123,9 @@ public class StartWorkoutActivity extends AppCompatActivity {
                                 WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
                                 workoutPlansList.add(workoutPlans);
 
-                                SavePref savePref = new SavePref();
-                                savePref.createSharedPreferencesFiles(StartWorkoutActivity.this, "exercise");
-                                String routineName = savePref.getString("default_plan", "");
+                                PrefsUtils prefsUtils = new PrefsUtils();
+                                prefsUtils.createSharedPreferencesFiles(StartWorkoutActivity.this, "exercise");
+                                String routineName = prefsUtils.getString("default_plan", "");
 
                                 Log.d(TAG, "routineName: " + routineName + workoutPlansList.get(i).getRoutineName());
 

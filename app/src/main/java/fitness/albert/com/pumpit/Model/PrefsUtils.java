@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class SavePref {
+public class PrefsUtils {
 
     public static final String DEFAULT_PLAN = "default_plan";
     public static final String EXERCISE = "exercise";
@@ -17,7 +17,7 @@ public class SavePref {
  // private Context context;
 
 //
-//    public SavePref(Context context, String fileName) {
+//    public PrefsUtils(Context context, String fileName) {
 //        this.context = context;
 //        this.sharedPref = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
 //    }

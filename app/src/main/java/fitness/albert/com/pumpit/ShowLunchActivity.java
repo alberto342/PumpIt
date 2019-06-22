@@ -4,9 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -39,7 +39,7 @@ import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.Adapter.LunchListAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
 
@@ -57,7 +57,7 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
     private float kcal, fat, protein, carbs, servingWeightGrams;
     private int qty;
     private boolean testOnce = false;
-    private SavePref savePref = new SavePref();
+    private PrefsUtils prefsUtils = new PrefsUtils();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ProgressDialog progressdialog;
     private boolean isGrams = true;
@@ -349,7 +349,7 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        savePref.removeAll(this, "passMeal");
+        prefsUtils.removeAll(this, "passMeal");
         finish();
     }
 }

@@ -3,8 +3,8 @@ package fitness.albert.com.pumpit.Adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.StartWorkoutActivity;
@@ -63,9 +63,9 @@ public class ChangePlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             public void onClick(View v) {
                 holder.btnSelectedPlan.setImageResource(R.mipmap.ic_ok_selected);
 
-                SavePref savePref = new SavePref();
-                savePref.createSharedPreferencesFiles(mContext, "exercise");
-                savePref.saveData("default_plan", workoutPlansList.get(position).getRoutineName());
+                PrefsUtils prefsUtils = new PrefsUtils();
+                prefsUtils.createSharedPreferencesFiles(mContext, "exercise");
+                prefsUtils.saveData("default_plan", workoutPlansList.get(position).getRoutineName());
                 Log.d(TAG, "default program active");
                 mContext.startActivity(new Intent(mContext, StartWorkoutActivity.class));
                 ((Activity) mContext).finish();

@@ -4,17 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.fragment.NutritionFragment;
 import fitness.albert.com.pumpit.fragment.PlanFragment;
 import fitness.albert.com.pumpit.fragment.WorkoutFragment;
@@ -109,7 +109,6 @@ public class FragmentNavigationActivity extends AppCompatActivity {
                 return true;
             }
         });
-
     }
 
 
@@ -122,8 +121,8 @@ public class FragmentNavigationActivity extends AppCompatActivity {
         //check if activity come from ShowFoodBeforeAddedActivity
         assert prevActivity != null;
         if (prevActivity.equals("ShowFoodBeforeAddedActivity")) {
-            SavePref savePref = new SavePref();
-            savePref.removeAll(this, "activity");
+            PrefsUtils prefsUtils = new PrefsUtils();
+            prefsUtils.removeAll(this, "activity");
             getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, nutritionFragment).commit();
         }
         auth.addAuthStateListener(authListener);

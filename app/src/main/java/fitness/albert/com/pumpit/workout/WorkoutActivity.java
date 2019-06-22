@@ -5,10 +5,10 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,7 +35,7 @@ import java.util.List;
 import fitness.albert.com.pumpit.Adapter.WorkoutAdapter;
 import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.Training;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.Model.Workout;
@@ -57,7 +57,7 @@ public class WorkoutActivity extends AppCompatActivity
     private RecyclerView view;
     private WorkoutAdapter workoutAdapter;
     public static String workoutId;
-    private SavePref savePref = new SavePref();
+    private PrefsUtils prefsUtils = new PrefsUtils();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,10 +110,10 @@ public class WorkoutActivity extends AppCompatActivity
 
     private void isActivatedPlan() {
 
-        savePref.createSharedPreferencesFiles(this, SavePref.EXERCISE);
-        boolean defaultExercise = savePref.getBoolean(SavePref.DEFAULT_EXERCISE, false);
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.EXERCISE);
+        boolean defaultExercise = prefsUtils.getBoolean(PrefsUtils.DEFAULT_EXERCISE, false);
 
-        String routineName = savePref.getString(SavePref.DEFAULT_PLAN, "");
+        String routineName = prefsUtils.getString(PrefsUtils.DEFAULT_PLAN, "");
 
         if (defaultExercise && tvNameOfPlan.getText().toString().equals(routineName)) {
             tvChangePlan.setVisibility(View.VISIBLE);
@@ -213,9 +213,9 @@ public class WorkoutActivity extends AppCompatActivity
 
 
     private String getWorkPlanId() {
-        SavePref savePref = new SavePref();
-        savePref.createSharedPreferencesFiles(this, SavePref.EXERCISE);
-        return savePref.getString(SavePref.PLAN_NAME, "null");
+        PrefsUtils prefsUtils = new PrefsUtils();
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.EXERCISE);
+        return prefsUtils.getString(PrefsUtils.PLAN_NAME, "null");
     }
 
 
@@ -461,9 +461,9 @@ public class WorkoutActivity extends AppCompatActivity
     }
 
     private void changeDefault() {
-        savePref.createSharedPreferencesFiles(this, "exercise");
-        savePref.removeSingle(this,"exercise","default_plan");
-        savePref.saveData("default_plan", tvNameOfPlan.getText().toString());
+        prefsUtils.createSharedPreferencesFiles(this, "exercise");
+        prefsUtils.removeSingle(this,"exercise","default_plan");
+        prefsUtils.saveData("default_plan", tvNameOfPlan.getText().toString());
 
     }
 

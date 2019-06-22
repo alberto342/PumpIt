@@ -4,13 +4,14 @@ package fitness.albert.com.pumpit.fragment.logsFragment;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,6 +30,7 @@ import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.DayContainerModel;
 import fitness.albert.com.pumpit.Model.Event;
+import fitness.albert.com.pumpit.Model.FinishTraining;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.UserRegister;
@@ -66,6 +68,12 @@ public class LogFragment extends Fragment {
         initCalendar(view);
 
         calenderOnClick();
+
+        Calendar cal = Calendar.getInstance();
+        int month = cal.get(Calendar.MONTH);
+        int year = cal.get(Calendar.YEAR);
+
+        getMonthData(month, year);
     }
 
 
@@ -86,7 +94,6 @@ public class LogFragment extends Fragment {
 
                 if (dayContainerModel.getDay() < 10) {
                     date = "0" + dayContainerModel.getDay() + "-" + monthFromNum + "-" + dayContainerModel.getYear();
-
                 } else {
                     date = dayContainerModel.getDay() + "-" + monthFromNum + "-" + dayContainerModel.getYear();
                 }
@@ -94,35 +101,40 @@ public class LogFragment extends Fragment {
                 Objects.requireNonNull(getActivity()).startActivity(new Intent(getActivity(), LogTabActivity.class));
             }
         });
-
         calenderEvent.setOnMonthChangedListener(new OnMonthChangedListener() {
             @Override
             public void onMonthChanged(CalenderEvent calenderEvent, int numMonth, String month, int year) {
-
-                String date, dateNum;
-
-                int maxDay = maxDayInMonth(numMonth, year);
-
-                String monthFromNum = monthAdded(numMonth);
-
-                for (int i = 0; i <= maxDay; i++) {
-
-                    if (i < 10) {
-                        date = "0" + i + "-" + monthFromNum + "-" + year;
-                        dateNum = "0" + i + "-" + monthFromNum + "-" + year;
-                    } else {
-                        date = i + "-" + monthFromNum + "-" + year;
-                        dateNum = i + "-" + monthFromNum + "-" + year;
-                    }
-
-
-                    getNutritionFromFb(date, dateNum, Foods.BREAKFAST);
-                    getNutritionFromFb(date, dateNum, Foods.LUNCH);
-                    getNutritionFromFb(date, dateNum, Foods.DINNER);
-                    getNutritionFromFb(date, dateNum, Foods.SNACK);
-                }
+                getMonthData(numMonth, year);
             }
         });
+    }
+
+    private void getMonthData(int numMonth, int year) {
+        String date, digitMonth;
+        int maxDay = maxDayInMonth(numMonth, year);
+        String monthFromNum = monthAdded(numMonth);
+        try {
+            for (int i = 0; i <= maxDay; i++) {
+
+                int newMonth = numMonth + 1;
+
+                if (i < 10) {
+                    date = "0" + i + "-" + monthFromNum + "-" + year;
+                    digitMonth = "0" + i + "-" + newMonth + "-" + year;
+                } else {
+                    date = i + "-" + monthFromNum + "-" + year;
+                    digitMonth = i + "-" + newMonth + "-" + year;
+                }
+                getNutritionFromFb(date, digitMonth, Foods.BREAKFAST);
+                getNutritionFromFb(date, digitMonth, Foods.LUNCH);
+                getNutritionFromFb(date, digitMonth, Foods.DINNER);
+                getNutritionFromFb(date, digitMonth, Foods.SNACK);
+
+                getFitnessLogFromFb(date, digitMonth);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private int maxDayInMonth(int month, int year) {
@@ -132,38 +144,81 @@ public class LogFragment extends Fragment {
         return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 
-    private void getNutritionFromFb(final String date, final String dateNum, final String nutritionType) {
-        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(nutritionType)
-                .document(date).collection(Foods.All_NUTRITION).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+    private void getNutritionFromFb(final String date, final String digitMonth, final String nutritionType) {
 
-                        if (task.isSuccessful() && Objects.requireNonNull(task.getResult()).getDocuments().size() > 0) {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(nutritionType)
+                        .document(date).collection(Foods.All_NUTRITION).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful() && Objects.requireNonNull(task.getResult()).getDocuments().size() > 0) {
 
-                            Log.d(TAG, "have nutrition in this data: " + date);
+                                    Log.d(TAG, "have nutrition in this data: " + date);
 
-                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
 
-                            try {
-                                Date mDate = sdf.parse(dateNum);
-                                long timeInMilliseconds = mDate.getTime();
+                                    try {
+                                        Date mDate = sdf.parse(digitMonth);
+                                        long timeInMilliseconds = mDate.getTime();
 
-                                calenderEvent.addEvent(new Event(timeInMilliseconds, "Nutrition", Color.GREEN));
+                                        calenderEvent.addEvent(new Event(timeInMilliseconds, "\uD83C\uDF4F", Color.GREEN));
+                                        Log.d(TAG, "Success added date " + digitMonth);
 
-
-                            } catch (ParseException e) {
-                                Log.i(TAG, "error: " + e);
+                                    } catch (ParseException e) {
+                                        Log.i(TAG, "error: " + e);
+                                    }
+                                }
                             }
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.i(TAG, "Filed receive data " + e);
-                    }
-                });
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.i(TAG, "Filed receive data " + e);
+                            }
+                        });
+            }
+        });
+        thread.start();
+    }
+
+    private void getFitnessLogFromFb(final String date, final String digitMonth) {
+
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
+                        .collection(date).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful() && Objects.requireNonNull(task.getResult()).getDocuments().size() > 0) {
+                                    Log.d(TAG, "have fitness in this data: " + date);
+
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+
+                                    try {
+                                        Date mDate = sdf.parse(digitMonth);
+                                        long timeInMilliseconds = mDate.getTime();
+
+                                        calenderEvent.addEvent(new Event(timeInMilliseconds, "\uD83D\uDCAA", Color.GREEN));
+                                        Log.d(TAG, "Success added date " + digitMonth);
+
+                                    } catch (ParseException e) {
+                                        Log.i(TAG, "error: " + e);
+                                    }
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.i(TAG, "Filed receive data " + e);
+                            }
+                        });
+            }
+        });
+        thread.start();
     }
 
     private String monthAdded(int month) {
@@ -180,7 +235,6 @@ public class LogFragment extends Fragment {
         monthName.add("Oct");
         monthName.add("Nov");
         monthName.add("Dec");
-
         return monthName.get(month);
     }
 }

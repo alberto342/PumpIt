@@ -21,25 +21,31 @@
         style="@style/MaterialSearchBarLight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         app:mt_maxSuggestionsCount="10"
         app:mt_placeholder="Search..."
         app:mt_speechMode="true" />
+
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:background="@color/dark_blue"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:text="@string/no_data_found"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
-
-
-        <TextView
-            android:id="@+id/tvEmpty"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="@string/no_data_found"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:visibility="visible" />
 
         <Button
             android:id="@+id/btn_save_all_food"
@@ -52,12 +58,13 @@
             android:textColor="@color/white"
             android:visibility="invisible" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/background"
             android:padding="@dimen/common_8"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     </RelativeLayout>
+
 </LinearLayout>

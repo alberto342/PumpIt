@@ -5,9 +5,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +31,7 @@ import java.util.Objects;
 import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.Adapter.WorkoutAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.TrackerExercise;
 import fitness.albert.com.pumpit.Model.Training;
 import fitness.albert.com.pumpit.Model.UserRegister;
@@ -176,10 +176,10 @@ public class TrackerExerciseFragment extends Fragment {
 
     private void saveTrackerIntoFb() {
 
-        final SavePref savePref = new SavePref();
+        final PrefsUtils prefsUtils = new PrefsUtils();
 
-        savePref.createSharedPreferencesFiles(getActivity(), "exercise");
-        final String getPlanId = savePref.getString("planName", "");
+        prefsUtils.createSharedPreferencesFiles(getActivity(), "exercise");
+        final String getPlanId = prefsUtils.getString("planName", "");
 
 //        String rest = setsRest.getText().toString();
 //        String[] parts = rest.split(" ");
@@ -257,7 +257,7 @@ public class TrackerExerciseFragment extends Fragment {
 //
 //                startActivity(new Intent(getActivity(), TrainingActivity.class));
 //                Objects.requireNonNull(getActivity()).finish();
-//                //savePref.removeSingle(getActivity(), "exercise", "planName");
+//                //prefsUtils.removeSingle(getActivity(), "exercise", "planName");
 //            }
 //        })
 //                .addOnFailureListener(new OnFailureListener() {

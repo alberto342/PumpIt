@@ -3,15 +3,17 @@ package fitness.albert.com.pumpit.fragment.logsFragment;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -48,6 +50,9 @@ public class LogNutritionFragment extends Fragment {
     private ArrayList<Foods> dinnerList = new ArrayList<>();
     private ArrayList<Foods> snacksList = new ArrayList<>();
     private TextView tvBreakfast, tvLunch, tvDinner, tvSnacks;
+    private LinearLayout llBreakfast, llLunch, llDinner, llSnacks;
+    private ProgressBar progressBar;
+
 
     public LogNutritionFragment() {
         // Required empty public constructor
@@ -73,6 +78,13 @@ public class LogNutritionFragment extends Fragment {
         tvDinner = view.findViewById(R.id.tv_log_dinner);
         tvSnacks = view.findViewById(R.id.tv_log_snacks);
 
+        llBreakfast = view.findViewById(R.id.breakfast_container);
+        llDinner = view.findViewById(R.id.dinner_container);
+        llLunch = view.findViewById(R.id.lunch_container);
+        llSnacks = view.findViewById(R.id.snacks_container);
+
+        progressBar = view.findViewById(R.id.pb_log_nutrition);
+
         rvBreakfast.setNestedScrollingEnabled(false);
         rvLunch.setNestedScrollingEnabled(false);
         rvDinner.setNestedScrollingEnabled(false);
@@ -95,58 +107,24 @@ public class LogNutritionFragment extends Fragment {
     }
 
 
-    private void getNutritionFromFb(String date, final String nutritionType) {
+    private void getNutritionFromFb(final String date, final String nutritionType) {
+
+        progressBar.setVisibility(View.VISIBLE);
+
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(nutritionType)
                 .document(date).collection(Foods.All_NUTRITION).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                progressBar.setVisibility(View.GONE);
+
+                if(task.getResult().isEmpty()) {
+                    Foods foods = null;
+                    getNutrition(nutritionType, false, foods);
+                }
                 if (task.isSuccessful() && task.getResult() != null) {
                     for (int i = 0; i < task.getResult().size(); i++) {
                         Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-                        switch (nutritionType) {
-                            case "breakfast":
-                                breakfastList.add(foods);
-                                initBreakfastRecyclerView();
-//                                if (!breakfastList.isEmpty()) {
-//                                  rvBreakfast.setVisibility(View.VISIBLE);
-//                                  tvBreakfast.setVisibility(View.VISIBLE);
-//
-//                                } else {
-//                                    rvBreakfast.setVisibility(View.GONE);
-//                                    tvBreakfast.setVisibility(View.GONE);
-//                                }
-                                break;
-                            case "lunch":
-                                lunchList.add(foods);
-                                initLunchRecyclerView();
-//                                if (!lunchList.isEmpty()) {
-//                                    rvLunch.setVisibility(View.VISIBLE);
-//                                } else {
-//                                    rvLunch.setVisibility(View.GONE);
-//                                    tvLunch.setVisibility(View.GONE);
-//                                }
-                                break;
-                            case "dinner":
-                                dinnerList.add(foods);
-                                initDinnerRecyclerView();
-//                                if (!dinnerList.isEmpty()) {
-//                                    rvDinner.setVisibility(View.VISIBLE);
-//                                } else {
-//                                    rvDinner.setVisibility(View.GONE);
-//                                    tvDinner.setVisibility(View.GONE);
-//                                }
-                                break;
-                            case "Snack":
-                                snacksList.add(foods);
-                                initSnacksRecyclerView();
-//                                if (!snacksList.isEmpty()) {
-//                                   rvSnacks.setVisibility(View.VISIBLE);
-//                                   tvSnacks.setVisibility(View.VISIBLE);
-//                                } else {
-//                                    rvSnacks.setVisibility(View.GONE);
-//                                    tvSnacks.setVisibility(View.GONE);
-//                                }
-                        }
+                        getNutrition(nutritionType, true, foods);
                     }
                 }
                 Log.d(TAG, "Successfully receive data from fb");
@@ -157,6 +135,47 @@ public class LogNutritionFragment extends Fragment {
                 Log.i(TAG, "Filed receive data " + e);
             }
         });
+    }
+
+
+    private void getNutrition(String nutritionType, boolean isOnFb, Foods foods) {
+        switch (nutritionType) {
+            case Foods.BREAKFAST:
+                if (isOnFb) {
+                    breakfastList.add(foods);
+                    initBreakfastRecyclerView();
+                    llBreakfast.setVisibility(View.VISIBLE);
+                } else {
+                    llBreakfast.setVisibility(View.GONE);
+                }
+                break;
+            case Foods.LUNCH:
+                if (isOnFb) {
+                    lunchList.add(foods);
+                    initLunchRecyclerView();
+                    llLunch.setVisibility(View.VISIBLE);
+                } else {
+                    llLunch.setVisibility(View.GONE);
+                }
+                break;
+            case Foods.DINNER:
+                if (isOnFb) {
+                    dinnerList.add(foods);
+                    initDinnerRecyclerView();
+                    llDinner.setVisibility(View.VISIBLE);
+                } else {
+                    llDinner.setVisibility(View.GONE);
+                }
+                break;
+            case Foods.SNACK:
+                if (isOnFb) {
+                    snacksList.add(foods);
+                    initSnacksRecyclerView();
+                    llSnacks.setVisibility(View.VISIBLE);
+                } else {
+                    llSnacks.setVisibility(View.GONE);
+                }
+        }
     }
 
     private void initBreakfastRecyclerView() {
@@ -239,8 +258,8 @@ public class LogNutritionFragment extends Fragment {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()) {
-                            for(int i = 0; i< Objects.requireNonNull(task.getResult()).size(); i++) {
+                        if (task.isSuccessful()) {
+                            for (int i = 0; i < Objects.requireNonNull(task.getResult()).size(); i++) {
                                 String docId = task.getResult().getDocuments().get(i).getId();
                                 Log.d(TAG, "id: " + docId);
                                 db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())

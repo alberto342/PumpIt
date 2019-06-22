@@ -3,8 +3,8 @@ package fitness.albert.com.pumpit.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,7 +58,6 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
     @SuppressLint({"LongLogTag", "SetTextI18n"})
     private void bindViews(final ViewHolder holder, final int position) {
 
-
         Picasso.get()
                 .load(foodsList.get(position).getPhoto().getThumb())
                 .placeholder(R.mipmap.ic_launcher)
@@ -89,7 +88,6 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                     ((ShowAllNutritionActivity) mContext).finish();
                 }
 
-
                 Intent i = new Intent(mContext, ShowBreakfastActivity.class);
                 i.putExtra("foodPhoto", foodsList.get(position).getPhoto().getHighres());
                 i.putExtra("kcal", foodsList.get(position).getNf_calories());
@@ -100,7 +98,6 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 i.putExtra("qty", foodsList.get(position).getServing_qty());
                 i.putExtra("servingUnit", foodsList.get(position).getServing_unit());
                 i.putExtra("altMeasuresSize", foodsList.get(position).getAlt_measures().size());
-
 
                 for (int r = 0; r < foodsList.get(position).getAlt_measures().size(); r++) {
                     i.putExtra("measure" + r, foodsList.get(position).getAlt_measures().get(r).getMeasure());

@@ -245,16 +245,14 @@
     <!--<string name="set">set</string>-->
 
 
-
     <!-- calender -->
-        <string name="sun">S</string>
-        <string name="mon">M</string>
-        <string name="tue">T</string>
-        <string name="wed">W</string>
-        <string name="thu">T</string>
-        <string name="fri">F</string>
-        <string name="sat">S</string>
-
+    <string name="sun">S</string>
+    <string name="mon">M</string>
+    <string name="tue">T</string>
+    <string name="wed">W</string>
+    <string name="thu">T</string>
+    <string name="fri">F</string>
+    <string name="sat">S</string>
 
 
 </resources>

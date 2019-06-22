@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit.Api;
 
+import fitness.albert.com.pumpit.Model.CommonListResponse;
 import fitness.albert.com.pumpit.Model.FoodListResponse;
 import fitness.albert.com.pumpit.RetroRequest.FoodRequest;
 import fitness.albert.com.pumpit.Utils.Global;
@@ -12,6 +13,9 @@ public interface RestApi {
 
     @POST(Global.NUTRIENTS)
     Call<FoodListResponse> foodList(@Header("x-app-id") String x_app_id, @Header("x-app-key") String x_app_key, @Body FoodRequest foodRequest);
+
+    @POST(Global.INSTANT)
+    Call<CommonListResponse> foodListInstant(@Header("x-app-id") String x_app_id, @Header("x-app-key") String x_app_key, @Body FoodRequest foodRequest);
 
 
 }

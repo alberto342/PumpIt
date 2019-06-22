@@ -2,11 +2,11 @@ package fitness.albert.com.pumpit.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +25,7 @@ import java.util.List;
 import fitness.albert.com.pumpit.Adapter.TrainingAdapter;
 import fitness.albert.com.pumpit.Adapter.WorkoutAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.TrackerExercise;
 import fitness.albert.com.pumpit.Model.Training;
 import fitness.albert.com.pumpit.Model.Workout;
@@ -134,10 +134,10 @@ public class TrainingActivity extends AppCompatActivity {
 
 
     private void countExercise() {
-        final SavePref savePref = new SavePref();
+        final PrefsUtils prefsUtils = new PrefsUtils();
 
-        savePref.createSharedPreferencesFiles(this, "exercise");
-        final String getPlanId = savePref.getString("planName", "");
+        prefsUtils.createSharedPreferencesFiles(this, "exercise");
+        final String getPlanId = prefsUtils.getString("planName", "");
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                 .collection(Workout.WORKOUT_NAME).document(getPlanId)

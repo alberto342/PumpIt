@@ -2,8 +2,8 @@ package fitness.albert.com.pumpit.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
@@ -126,11 +126,11 @@ public class CustomPlanActivity extends AppCompatActivity {
         routineName = etRoutineName.getText().toString();
 
         //check if have default exercise
-        SavePref savePref = new SavePref();
-        savePref.createSharedPreferencesFiles(this, "exercise");
+        PrefsUtils prefsUtils = new PrefsUtils();
+        prefsUtils.createSharedPreferencesFiles(this, "exercise");
 
-//        if(savePref.getBoolean("defaultExercise", false)) {
-//            savePref.saveData("defRoutineName",routineName);
+//        if(prefsUtils.getBoolean("defaultExercise", false)) {
+//            prefsUtils.saveData("defRoutineName",routineName);
 //        }
 
 

@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 
-import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.Model.UserRegister;
+import fitness.albert.com.pumpit.R;
 
 public class WeightActivity extends AppCompatActivity {
 

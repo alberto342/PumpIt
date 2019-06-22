@@ -4,10 +4,10 @@ package fitness.albert.com.pumpit.fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +32,7 @@ import java.util.Objects;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.SearchFoodsActivity;
@@ -50,7 +50,7 @@ public class NutritionFragment extends Fragment {
     private TextView tvCarbs;
     private List<Foods> foodList = new ArrayList<>();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private SavePref savePref = new SavePref();
+    private PrefsUtils prefsUtils = new PrefsUtils();
     UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs;
     private final String TAG = "NutritionFragment";
@@ -73,7 +73,7 @@ public class NutritionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nutrition, container, false);
+        return inflater.inflate(R.layout.fragment_nutrition2, container, false);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class NutritionFragment extends Fragment {
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            savePref.createSharedPreferencesFiles(getActivity(), Foods.SHARED_PREFERENCES_FILE);
+            prefsUtils.createSharedPreferencesFiles(getActivity(), Foods.SHARED_PREFERENCES_FILE);
 
             switch (v.getId()) {
                 case R.id.btn_add_dinner:
@@ -190,10 +190,10 @@ public class NutritionFragment extends Fragment {
     }
 
     private void saveMealToSP(boolean dinner, boolean breakfast, boolean lunch, boolean snack) {
-        savePref.saveData("dinner", dinner);
-        savePref.saveData("breakfast", breakfast);
-        savePref.saveData("lunch", lunch);
-        savePref.saveData("Snack", snack);
+        prefsUtils.saveData("dinner", dinner);
+        prefsUtils.saveData("breakfast", breakfast);
+        prefsUtils.saveData("lunch", lunch);
+        prefsUtils.saveData("Snack", snack);
 
         startActivity(new Intent(getActivity(), SearchFoodsActivity.class));
         Objects.requireNonNull(getActivity()).getFragmentManager().popBackStack();

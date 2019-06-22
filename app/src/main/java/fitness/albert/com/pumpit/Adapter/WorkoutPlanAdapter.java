@@ -2,8 +2,8 @@ package fitness.albert.com.pumpit.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +22,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.WorkoutActivity;
@@ -127,9 +127,9 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                             Log.d(TAG, "Documents: " + task.getResult().getDocuments() +
                                     "\nFireId: " + task.getResult().getDocuments().get(position).getId());
 
-                            SavePref savePref = new SavePref();
-                            savePref.createSharedPreferencesFiles(mContext, "exercise");
-                            savePref.saveData("planName", task.getResult().getDocuments().get(position).getId());
+                            PrefsUtils prefsUtils = new PrefsUtils();
+                            prefsUtils.createSharedPreferencesFiles(mContext, "exercise");
+                            prefsUtils.saveData("planName", task.getResult().getDocuments().get(position).getId());
                         }
                     }
                 })

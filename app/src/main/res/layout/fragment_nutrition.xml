@@ -10,6 +10,7 @@
     android:orientation="vertical"
     tools:context=".fragment.NutritionFragment">
 
+
     <ImageView
         android:id="@+id/imageView21"
         android:layout_width="match_parent"
@@ -31,6 +32,7 @@
             android:layout_marginStart="15dp"
             android:layout_weight="1"
             android:paddingStart="25dp"
+            android:textAlignment="center"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -49,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="0"
+            android:textAlignment="center"
             android:textColor="@android:color/holo_red_dark" />
 
         <TextView
@@ -62,10 +65,11 @@
 
         <TextView
             android:id="@+id/tv_exercise"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="45dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="0"
+            android:textAlignment="center"
             android:textColor="@color/yellow_dolly" />
 
         <TextView
@@ -81,9 +85,9 @@
             android:id="@+id/tv_remaining"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
             android:layout_marginEnd="25dp"
             android:layout_weight="1"
+            android:textAlignment="center"
             android:textColor="@color/md_green_600" />
 
     </LinearLayout>
@@ -109,6 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Food"
+            android:textAlignment="center"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -117,6 +122,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Exercise"
+            android:textAlignment="center"
             android:textColor="@android:color/white" />
 
         <TextView
@@ -125,6 +131,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Remaining"
+            android:textAlignment="center"
             android:textColor="@android:color/white" />
     </LinearLayout>
 

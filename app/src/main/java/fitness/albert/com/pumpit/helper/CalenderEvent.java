@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -17,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.graphics.drawable.DrawableCompat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -105,7 +106,6 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
     public CalenderEvent(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-
         initAttrs(attrs);
 
         initView(context);
@@ -138,7 +138,6 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
         eventsTextViewList = new TextView[6 * 7];
         daysContainer = new LinearLayout[6 * 7];
 
-
         weeks[0] = weekOneLayout;
         weeks[1] = weekTwoLayout;
         weeks[2] = weekThreeLayout;
@@ -153,7 +152,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
 
         Log.d(TAG, "Today, " + mToday);
 
-        initDaysInCalender(getdaysLayoutParams(), mContext, metrics);
+        initDaysInCalender(getDaysLayoutParams(), mContext, metrics);
 
         initCalender(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH));
 
@@ -336,6 +335,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
                 eventsTextViewList[index].setText(event.getEventText());
                 eventsTextViewList[index].setVisibility(VISIBLE);
                 eventsTextViewList[index].setTextColor(event.getEventColor());
+                //eventsTextViewList[index].setTextSize(18);
             } else {
                 eventsTextViewList[index].setVisibility(INVISIBLE);
             }
@@ -561,7 +561,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
         }
     }
 
-    private LayoutParams getdaysLayoutParams() {
+    private LayoutParams getDaysLayoutParams() {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
@@ -595,7 +595,6 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
         }
         return null;
     }
-
 
 
     public void addEvent(Event event) {
@@ -633,8 +632,6 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
     public void initCalderItemClickCallback(CalenderDayClickListener listener) {
         this.mCalenderDayClickListener = listener;
     }
-
-
 
     protected void dispatchOnMonthChanged(final int numMonth, final String month, final int year) {
         if (monthListener != null) {

@@ -3,8 +3,8 @@ package fitness.albert.com.pumpit.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +69,20 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mContext.startActivity(new Intent(mContext, ShowLogExercise.class));
+
+
+                Intent i = new Intent(mContext, ShowLogExercise.class);
+                i.putExtra("exerciseName", finishTrainingList.get(position).getExerciseName());
+                i.putExtra("trackerExercisesSize", finishTrainingList.get(position).getTrackerExercises().size());
+
+                for(int p=0; p<finishTrainingList.get(position).getTrackerExercises().size(); p++) {
+                    int repNumber =  finishTrainingList.get(position).getTrackerExercises().get(p).getRepNumber();
+                    float weight = finishTrainingList.get(position).getTrackerExercises().get(p).getWeight();
+
+                    i.putExtra("repNumber" + p, repNumber);
+                    i.putExtra("weight" + p, weight);
+                }
+                mContext.startActivity(i);
             }
         });
 

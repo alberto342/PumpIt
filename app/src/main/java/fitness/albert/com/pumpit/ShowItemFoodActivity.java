@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -40,7 +40,7 @@ import java.util.Map;
 import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
 
@@ -59,7 +59,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     private float kcal, fat, protein, carbs, servingWeightGrams;
     private String qty;
     private boolean testOnce = false;
-    private SavePref savePref = new SavePref();
+    private PrefsUtils prefsUtils = new PrefsUtils();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "ShowItemFoodActivity";
     private ProgressDialog progressdialog;
@@ -465,6 +465,6 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        savePref.removeAll(this, "passMeal");
+        prefsUtils.removeAll(this, "passMeal");
     }
 }

@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -130,7 +130,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
 
                             Log.d(TAG, "Nutrition: " + nutrition);
                             Log.d(TAG, "Documents: " + task.getResult().getDocuments());
-//                            SavePref savePref = new SavePref();
+//                            PrefsUtils savePref = new PrefsUtils();
 //                            savePref.createSharedPreferencesFiles(mContext, "fire_id");
 //                            savePref.saveData("foodId", task.getResult().getDocuments().get(position).getId());
 

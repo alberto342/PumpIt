@@ -4,10 +4,10 @@ package fitness.albert.com.pumpit.workout;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +30,7 @@ import java.util.Objects;
 
 import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.Workout;
 import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
@@ -235,9 +235,9 @@ public class MyPlansFragment extends Fragment
                             }
 
                             if(workoutPlansList.size() == 1) {
-                                SavePref savePref = new SavePref();
-                                savePref.createSharedPreferencesFiles(getActivity(), "exercise");
-                                savePref.saveData("default_plan", workoutPlansList.get(0).getRoutineName());
+                                PrefsUtils prefsUtils = new PrefsUtils();
+                                prefsUtils.createSharedPreferencesFiles(getActivity(), "exercise");
+                                prefsUtils.saveData("default_plan", workoutPlansList.get(0).getRoutineName());
                             }
 
                             if(workoutPlansList.size() == 0 ) {

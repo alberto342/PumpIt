@@ -6,8 +6,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -376,7 +376,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
             mChronometer.setBase(SystemClock.elapsedRealtime() - timeWhenStopped);
             mChronometer.start();
         }
-
         //pause
         if (view == R.id.iv_stop_workout && !isStop) {
 
@@ -646,8 +645,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 //                }
 //            }
 //        });
-
-
         ivIsFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

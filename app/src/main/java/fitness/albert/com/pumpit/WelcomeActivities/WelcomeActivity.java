@@ -3,7 +3,7 @@ package fitness.albert.com.pumpit.WelcomeActivities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.Model.Exercise;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.R;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -23,7 +23,7 @@ import io.realm.RealmResults;
 public class WelcomeActivity extends AppCompatActivity {
 
     private Realm realm;
-    private SavePref savePref = new SavePref();
+    private PrefsUtils prefsUtils = new PrefsUtils();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +39,9 @@ public class WelcomeActivity extends AppCompatActivity {
         RealmConfiguration config = new RealmConfiguration.Builder().name("gym.realm").deleteRealmIfMigrationNeeded().build();
         Realm.setDefaultConfiguration(config);
 
-        savePref.createSharedPreferencesFiles(this, "realmExisting");
+        prefsUtils.createSharedPreferencesFiles(this, "realmExisting");
 
-        boolean getPref = savePref.getBoolean("realm", false);
+        boolean getPref = prefsUtils.getBoolean("realm", false);
 
         if (!getPref) {
             readTxtFile();
@@ -86,7 +86,7 @@ public class WelcomeActivity extends AppCompatActivity {
             Log.d(TAG, "Data save successfully into: " + realm.getPath() + " size: " + result.size());
             //Check If Realm have save successfully all data
             realmExisting = true;
-            savePref.saveData("realm", realmExisting);
+            prefsUtils.saveData("realm", realmExisting);
             startActivity(new Intent(this, GoalActivity.class));
         } catch (Exception e) {
             e.printStackTrace();

@@ -3,11 +3,11 @@ package fitness.albert.com.pumpit.fragment.logsFragment;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +39,6 @@ public class LogWorkoutFragment extends Fragment {
     private RecyclerView rvWorkout;
 
     public LogWorkoutFragment() {
-        // Required empty public constructor
     }
 
 
@@ -64,9 +63,7 @@ public class LogWorkoutFragment extends Fragment {
     }
 
 
-
     private void getWorkoutFromFb(String date) {
-
         db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
                 .collection(date).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

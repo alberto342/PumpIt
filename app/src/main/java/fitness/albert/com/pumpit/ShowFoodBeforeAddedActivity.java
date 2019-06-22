@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -30,7 +30,7 @@ import java.util.Locale;
 import fitness.albert.com.pumpit.Adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
 
@@ -1171,9 +1171,9 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                 saveDataToFirestore();
 
                 //save activity to sharedPreferences
-                SavePref savePref = new SavePref();
-                savePref.createSharedPreferencesFiles(ShowFoodBeforeAddedActivity.this, "activity");
-                savePref.saveData("fromActivity", "ShowFoodBeforeAddedActivity");
+                PrefsUtils prefsUtils = new PrefsUtils();
+                prefsUtils.createSharedPreferencesFiles(ShowFoodBeforeAddedActivity.this, "activity");
+                prefsUtils.saveData("fromActivity", "ShowFoodBeforeAddedActivity");
                 //startActivity(new Intent(ShowFoodBeforeAddedActivity.this, FragmentNavigationActivity.class));
                 finish();
             }

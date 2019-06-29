@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".fragment.logsFragment.LogFragment">
 
-
     <fitness.albert.com.pumpit.helper.CalenderEvent
         android:id="@+id/calender_event"
         android:layout_width="match_parent"
@@ -18,8 +17,5 @@
         app:next_icon="@mipmap/next"
         app:previous_icon="@mipmap/previous_icon_2"
         app:week_name_color="@color/white" />
-
-
-
 
 </RelativeLayout>

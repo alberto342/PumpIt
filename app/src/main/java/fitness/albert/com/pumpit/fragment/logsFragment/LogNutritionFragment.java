@@ -1,13 +1,9 @@
 package fitness.albert.com.pumpit.fragment.logsFragment;
 
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +11,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -181,6 +183,7 @@ public class LogNutritionFragment extends Fragment {
     private void initBreakfastRecyclerView() {
         BreakfastListAdapter breakfastListAdapter;
         Log.d(TAG, "initRecyclerView: init LogNutrition recyclerView" + breakfastList);
+        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvBreakfast.setLayoutManager(layoutManager);
         breakfastListAdapter = new BreakfastListAdapter(getActivity(), breakfastList);
@@ -190,6 +193,7 @@ public class LogNutritionFragment extends Fragment {
     private void initLunchRecyclerView() {
         LunchListAdapter lunchListAdapter;
         Log.d(TAG, "initRecyclerView: init LogNutrition recyclerView" + rvLunch);
+        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvLunch.setLayoutManager(layoutManager);
         lunchListAdapter = new LunchListAdapter(getActivity(), lunchList);
@@ -200,6 +204,7 @@ public class LogNutritionFragment extends Fragment {
     private void initDinnerRecyclerView() {
         DinnerListAdapter dinnerListAdapter;
         Log.d(TAG, "initRecyclerView: init LogNutrition recyclerView" + dinnerList);
+        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvDinner.setLayoutManager(layoutManager);
         dinnerListAdapter = new DinnerListAdapter(getActivity(), dinnerList);
@@ -209,6 +214,7 @@ public class LogNutritionFragment extends Fragment {
     private void initSnacksRecyclerView() {
         SnacksListAdapter snacksListAdapter;
         Log.d(TAG, "initRecyclerView: init LogNutrition recyclerView" + snacksList);
+        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvSnacks.setLayoutManager(layoutManager);
         snacksListAdapter = new SnacksListAdapter(getActivity(), snacksList);

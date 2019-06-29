@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,17 +16,23 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import fitness.albert.com.pumpit.Adapter.BreakfastListAdapter;
 import fitness.albert.com.pumpit.Adapter.DinnerListAdapter;
 import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
@@ -38,6 +45,7 @@ import fitness.albert.com.pumpit.Model.UserRegister;
 
 public class ShowAllNutritionActivity extends AppCompatActivity {
 
+    private final String TAG = "ShowAllNutritionActivity";
     private RecyclerView rvListBreakfast, rvListLunch, rvListDinner, rvListSnacks;
     private List<Foods> foodListBreakfast = new ArrayList<>();
     private List<Foods> foodListLunch = new ArrayList<>();
@@ -47,9 +55,13 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     private float kcal, fat, protein, carbs;
     private FirestoreFoodListAdapter mAdapter;
     private ConstraintLayout constraintLayout;
-    private final String TAG = "ShowAllNutritionActivity";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private LinearLayout breakfastContainer, lunchContainer, dinnerContainer, snacksContainer;
     public static String nutritionName;
+    private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
+    private UserRegister user = new UserRegister();
+    private TextView tvCarbs, tvProtien, tvFat;
+    private int calculationGoal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +69,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_all_nutrition);
 
         init();
+        datePicker();
+        getUserDataAndSetGoal();
     }
 
     private void init() {
@@ -70,15 +84,86 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         tvTotalDinner = findViewById(R.id.tv_total_dinner);
         tvTotalSnacks = findViewById(R.id.tv_total_snacks);
         constraintLayout = findViewById(R.id.coordinator_layout);
+
+        tvCarbs = findViewById(R.id.tv_carbs_all_nutrition);
+        tvProtien = findViewById(R.id.tv_protein_all_nutrition);
+        tvFat = findViewById(R.id.tv_fat_all_nutrition);
+
+        progressCarbs = findViewById(R.id.pb_carbs);
+        progressProtien = findViewById(R.id.pb_protein);
+        progressFat = findViewById(R.id.pb_fat);
+
+
+        breakfastContainer = findViewById(R.id.breakfast_container);
+        lunchContainer = findViewById(R.id.lunch_container);
+        dinnerContainer = findViewById(R.id.dinner_container);
+        snacksContainer = findViewById(R.id.snacks_container);
+    }
+
+
+    private void datePicker() {
+        /* starts before 1 month from now */
+        Calendar startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -1);
+
+        /* ends after 1 month from now */
+        Calendar endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 1);
+
+        HorizontalCalendar calendarView = new HorizontalCalendar.Builder(this, R.id.calendar_view_custom)
+                .range(startDate, endDate)
+                .datesNumberOnScreen(7)
+                .build();
+
+        calendarView.setCalendarListener(new HorizontalCalendarListener() {
+            @SuppressLint("LongLogTag")
+            @Override
+            public void onDateSelected(Calendar date, int position) {
+
+                restData();
+
+                ProgressDialog progressdialog = new ProgressDialog(ShowAllNutritionActivity.this);
+                progressdialog.setMessage("Please Wait....");
+                progressdialog.show();
+
+                String newDate;
+                int day = date.get(Calendar.DAY_OF_MONTH);
+                int year = date.get(Calendar.YEAR);
+
+                if (day < 10) {
+                    newDate = "0" + day + "-" + monthAdded(date.get(Calendar.MONDAY)) + "-" + year;
+                } else {
+                    newDate = day + "-" + monthAdded(date.get(Calendar.MONDAY)) + "-" + year;
+                }
+                Log.d(TAG, "Date Selected: " + newDate);
+
+
+                getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast, newDate);
+                getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch, newDate);
+                getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner, newDate);
+                getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks, newDate);
+
+                progressdialog.hide();
+            }
+        });
+    }
+
+    private void restData() {
+        kcal = fat = protein = carbs = 0;
+        progressCarbs.setProgress(0);
+        progressFat.setProgress(0);
+        progressProtien.setProgress(0);
+        getUserDataAndSetGoal();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast);
-        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch);
-        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner);
-        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks);
+        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast, UserRegister.getTodayData());
+        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch, UserRegister.getTodayData());
+        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner, UserRegister.getTodayData());
+        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks, UserRegister.getTodayData());
 
         enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.BREAKFAST);
         enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
@@ -86,7 +171,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.SNACK);
     }
 
-    private void getMealFromFs(final String keyValue, final RecyclerView recyclerView, final List<Foods> foodList, final TextView totalMeal) {
+    private void getMealFromFs(final String keyValue, final RecyclerView recyclerView,
+                               final List<Foods> foodList, final TextView totalMeal, String date) {
 
         final ProgressDialog progressdialog = new ProgressDialog(this);
         progressdialog.setMessage("Please Wait....");
@@ -94,12 +180,13 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
         //get NUTRITION from firestone
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(UserRegister.getTodayData())
+                .collection(keyValue).document(date)
                 .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
                         //hide ProgressDialog
                         progressdialog.hide();
 
@@ -110,6 +197,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                             for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);
+
+                                visibleNutrition(keyValue);
 
                                 initRecyclerView(recyclerView, foodList, keyValue);
                                 //Disable RecyclerView scrolling
@@ -127,6 +216,10 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
                             kcal = carbs = fat = protein = 0;
 
+                            updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                            updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                            updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
+
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
                         }
@@ -138,6 +231,23 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 });
+    }
+
+
+    private void visibleNutrition(String nutritionType) {
+        switch (nutritionType) {
+            case Foods.BREAKFAST:
+                breakfastContainer.setVisibility(View.VISIBLE);
+                break;
+            case Foods.LUNCH:
+                lunchContainer.setVisibility(View.VISIBLE);
+                break;
+            case Foods.DINNER:
+                dinnerContainer.setVisibility(View.VISIBLE);
+                break;
+            case Foods.SNACK:
+                snacksContainer.setVisibility(View.VISIBLE);
+        }
     }
 
 
@@ -192,6 +302,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
         Log.d(TAG, "initRecyclerView: init food recyclerView" + recyclerView);
 
+        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
@@ -247,6 +358,71 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         };
         ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
         itemTouchhelper.attachToRecyclerView(recyclerView);
+    }
+
+
+    private void getUserDataAndSetGoal() {
+        final ProgressDialog progressdialog = new ProgressDialog(this);
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
+
+        db.collection(UserRegister.fireBaseUsers).document(FireBaseInit.getEmailRegister()).get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        user = documentSnapshot.toObject(UserRegister.class);
+
+                        assert user != null;
+                        calculationGoal = user.thermicEffect(user.getActivityLevel());
+
+                        tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
+                        tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
+                        tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
+
+                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
+
+                        progressdialog.hide();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    private void updateProgressColor(RoundCornerProgressBar roundCornerProgressBar, float nutrition, int calculationGoal) {
+
+        float fractionToPercent = nutrition / calculationGoal * 100;
+        roundCornerProgressBar.setProgress(fractionToPercent);
+        float progress = roundCornerProgressBar.getProgress();
+        if (progress <= 50) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.yellow_dolly));
+        } else if (progress > 75 && progress <= 100) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_green_600));
+        } else if (progress > 100) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_red_500));
+        }
+    }
+
+    private String monthAdded(int month) {
+        List<String> monthName = new ArrayList<>();
+        monthName.add("Jan");
+        monthName.add("Feb");
+        monthName.add("Mar");
+        monthName.add("Apr");
+        monthName.add("May");
+        monthName.add("Jun");
+        monthName.add("Jul");
+        monthName.add("Aug");
+        monthName.add("Sep");
+        monthName.add("Oct");
+        monthName.add("Nov");
+        monthName.add("Dec");
+        return monthName.get(month);
     }
 
     //Without this method Data will be double

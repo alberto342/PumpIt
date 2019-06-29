@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -15,9 +12,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,6 +41,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     //Todo check if spinner is empty
 
     private QuantityView quantityViewCustom;
+    private ProgressBar progressBar;
     private Spinner spinnerServingUnit;
     private String spinnerSelectedItem;
     private TextView tvEnergy, tvCrabs, tvProtein, tvFat, tvServingWeightGrams, tvCholesterol,
@@ -95,6 +98,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         tvProtein = findViewById(R.id.tv_protein);
         tvFat = findViewById(R.id.tv_fat);
         btnSaveFood = findViewById(R.id.btn_save_food);
+        progressBar= findViewById(R.id.pb_show_food);
 
 
         //scroll
@@ -229,7 +233,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         tvWater = findViewById(R.id.tv_water);
         tvZinc = findViewById(R.id.tv_zinc);
 
-
         quantityViewCustom = findViewById(R.id.quantityView_custom);
         quantityViewCustom.setOnQuantityChangeListener(this);
     }
@@ -348,6 +351,13 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             tvCrabs.setText(String.format(Locale.getDefault(), "%.2f g", crabs * calAltMeasures));
             tvProtein.setText(String.format(Locale.getDefault(), "%.2f g", protein * calAltMeasures));
             tvFat.setText(String.format(Locale.getDefault(), "%.2f g", fat * calAltMeasures));
+
+
+            // TODO: 2019-06-29 calculation for grams
+            if(spinnerSelectedItem.equals("g")) {
+                int newKcal = Integer.parseInt(tvEnergy.getText().toString());
+                tvEnergy.setText(newKcal + quantityViewCustom.getQuantity());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -356,7 +366,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
     private float getServingWeightGrams() {
         float servingWeight = 1;
-        if(!FoodListAdapter.mListItem.isEmpty()) {
+        if (!FoodListAdapter.mListItem.isEmpty()) {
             for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
                 servingWeight = FoodListAdapter.mListItem.get(i).getServing_weight_grams();
             }
@@ -367,6 +377,8 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
     //get food info from searchFood
     private void getFoodInfo() {
+
+        progressBar.setVisibility(View.INVISIBLE);
 
         int quantity = quantityViewCustom.getQuantity();
 
@@ -1072,6 +1084,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         float kcal = 1, crabs = 1, protein = 1, fat = 1, cholesterol = 1, dietaryFiber = 1,
                 nfp = 1, potassium = 1, saturatedFat = 1, sodium = 1, sugars = 1;
 
+
         for (int i = 0; i < FoodListAdapter.mListItem.size(); i++) {
             kcal = FoodListAdapter.mListItem.get(i).getNf_calories();
             crabs = FoodListAdapter.mListItem.get(i).getNf_total_carbohydrate();
@@ -1185,19 +1198,4 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         super.onBackPressed();
         FoodListAdapter.measure.clear();
     }
-
-//    public String getEmailRegister() {
-//        String email = null;
-//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-//        if (mAuth.getCurrentUser() != null) {
-//            email = mAuth.getCurrentUser().getEmail();
-//        }
-//        return email;
-//    }
-
-//    public String getTodayDate() {
-//        Date c = Calendar.getInstance().getTime();
-//        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
-//        return df.format(c);
-//    }
 }

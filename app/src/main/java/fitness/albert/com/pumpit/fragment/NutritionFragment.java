@@ -3,17 +3,20 @@ package fitness.albert.com.pumpit.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,10 +29,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.Model.PrefsUtils;
@@ -41,23 +47,17 @@ import fitness.albert.com.pumpit.ShowAllNutritionActivity;
 
 public class NutritionFragment extends Fragment {
 
-    private TextView tvGoal;
-    private TextView tvFood;
-    private TextView tvExersice;
-    private TextView tvRemaining;
-    private TextView tvFat;
-    private TextView tvProtien;
-    private TextView tvCarbs;
+    private final String TAG = "NutritionFragment";
+    private TextView tvGoal, tvFood, tvExersice, tvRemaining, tvFat, tvProtien, tvCarbs;
     private List<Foods> foodList = new ArrayList<>();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private PrefsUtils prefsUtils = new PrefsUtils();
-    UserRegister user = new UserRegister();
+    private UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs;
-    private final String TAG = "NutritionFragment";
     private int calculationGoal;
-    private boolean isOnNutrition;
     private FragmentActivity myContext;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
+   // final Calendar myCalendar = Calendar.getInstance();
 
 
     public NutritionFragment() {
@@ -73,20 +73,28 @@ public class NutritionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nutrition2, container, false);
+        return inflater.inflate(R.layout.fragment_nutrition, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         init(view);
-
         mealFromFs();
-
         getUserDataAndSetGoal();
-
         emailIsOnNutrition();
+        datePicker(view);
+    }
+
+    private void setToolBar() {
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        assert activity != null;
+        assert activity.getSupportActionBar() != null;
+        activity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorDarkBlue)));
+        activity.getSupportActionBar().setTitle(UserRegister.getTodayData());
+        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
 
@@ -98,16 +106,14 @@ public class NutritionFragment extends Fragment {
         ImageView btnAddSnacks = view.findViewById(R.id.btn_add_snacks);
         TextView tvDetails = view.findViewById(R.id.tv_details);
 
+
         tvGoal = view.findViewById(R.id.tv_goal);
         tvExersice = view.findViewById(R.id.tv_exercise);
-
         tvFood = view.findViewById(R.id.tv_food);
         tvRemaining = view.findViewById(R.id.tv_remaining);
-
         tvFat = view.findViewById(R.id.tv_fat);
         tvCarbs = view.findViewById(R.id.tv_carbs);
         tvProtien = view.findViewById(R.id.tv_protein);
-
         progressCarbs = view.findViewById(R.id.pb_carbs);
         progressProtien = view.findViewById(R.id.pb_protein);
         progressFat = view.findViewById(R.id.pb_fat);
@@ -121,6 +127,37 @@ public class NutritionFragment extends Fragment {
         tvDetails.setOnClickListener(onClickListener);
     }
 
+//    private void datePickerDialog() {
+//
+//        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+//
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int monthOfYear,
+//                                  int dayOfMonth) {
+//                myCalendar.set(Calendar.YEAR, year);
+//                myCalendar.set(Calendar.MONTH, monthOfYear);
+//                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+//                updateLabel();
+//            }
+//
+//        };
+//        toolbarTxt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new DatePickerDialog(getActivity(), date, myCalendar
+//                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+//                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+//            }
+//        });
+//    }
+//
+//    private void updateLabel() {
+//        String myFormat = "MM/dd/yy"; //In which you need put here
+//        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+//
+//        toolbarTxt.setText(sdf.format(myCalendar.getTime()));
+//    }
+
 
     private void mealFromFs() {
         //   if (isOnNutrition) {
@@ -128,12 +165,69 @@ public class NutritionFragment extends Fragment {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        getMealFromFs(Foods.BREAKFAST);
-        getMealFromFs(Foods.SNACK);
-        getMealFromFs(Foods.LUNCH);
-        getMealFromFs(Foods.DINNER);
+        getMealFromFs(Foods.BREAKFAST, UserRegister.getTodayData());
+        getMealFromFs(Foods.SNACK, UserRegister.getTodayData());
+        getMealFromFs(Foods.LUNCH, UserRegister.getTodayData());
+        getMealFromFs(Foods.DINNER, UserRegister.getTodayData());
         progressdialog.hide();
         //   }
+    }
+
+    private void datePicker(View view) {
+        /* starts before 1 month from now */
+        Calendar startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -1);
+
+        /* ends after 1 month from now */
+        Calendar endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 1);
+
+        HorizontalCalendar calendarView = new HorizontalCalendar.Builder(view, R.id.calendar_view_custom)
+                .range(startDate, endDate)
+                .datesNumberOnScreen(7)
+                .build();
+
+        calendarView.setCalendarListener(new HorizontalCalendarListener() {
+            @Override
+            public void onDateSelected(Calendar date, int position) {
+
+                ProgressDialog progressdialog = new ProgressDialog(getActivity());
+                progressdialog.setMessage("Please Wait....");
+                progressdialog.show();
+
+                restData();
+
+                String newDate;
+                int day = date.get(Calendar.DAY_OF_MONTH);
+                int year = date.get(Calendar.YEAR);
+
+                if (day < 10) {
+                    newDate = "0" + day + "-" + monthAdded(date.get(Calendar.MONDAY)) + "-" + year;
+                } else {
+                    newDate = day + "-" + monthAdded(date.get(Calendar.MONDAY)) + "-" + year;
+                }
+                Log.d(TAG, "Date Selected: " + newDate);
+
+                getMealFromFs(Foods.BREAKFAST, newDate);
+                getMealFromFs(Foods.SNACK, newDate);
+                getMealFromFs(Foods.LUNCH, newDate);
+                getMealFromFs(Foods.DINNER, newDate);
+                progressdialog.hide();
+            }
+        });
+    }
+
+    private void restData() {
+        kcal = fat = protein = carbs = 0;
+        tvFood.setText("0");
+        tvRemaining.setText("0");
+        tvCarbs.setText("0");
+        tvProtien.setText("0");
+        tvFat.setText("0");
+        getUserDataAndSetGoal();
+        //  progressCarbs.setProgress(0);
+        //progressFat.setProgress(0);
+        //progressProtien.setProgress(0);
     }
 
 
@@ -144,24 +238,20 @@ public class NutritionFragment extends Fragment {
             prefsUtils.createSharedPreferencesFiles(getActivity(), Foods.SHARED_PREFERENCES_FILE);
 
             switch (v.getId()) {
-                case R.id.btn_add_dinner:
-                    saveMealToSP(true, false, false, false);
-                    break;
-
-                case R.id.btn_add_breakfast:
-                    saveMealToSP(false, true, false, false);
-                    break;
-
-                case R.id.btn_add_lunch:
-                    saveMealToSP(false, false, true, false);
-                    break;
-
-                case R.id.btn_add_snacks:
-                    saveMealToSP(false, false, false, true);
-                    break;
                 case R.id.tv_details:
                     startActivity(new Intent(getActivity(), ShowAllNutritionActivity.class));
                     break;
+                case R.id.btn_add_dinner:
+                    saveMealToSP(true, false, false, false);
+                    break;
+                case R.id.btn_add_breakfast:
+                    saveMealToSP(false, true, false, false);
+                    break;
+                case R.id.btn_add_lunch:
+                    saveMealToSP(false, false, true, false);
+                    break;
+                case R.id.btn_add_snacks:
+                    saveMealToSP(false, false, false, true);
             }
         }
     };
@@ -177,10 +267,10 @@ public class NutritionFragment extends Fragment {
                     assert document != null;
                     if ((document.exists())) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        isOnNutrition = true;
+                        //   isOnNutrition = true;
                     } else {
                         Log.d(TAG, "No such document");
-                        isOnNutrition = false;
+                        // isOnNutrition = false;
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
@@ -200,11 +290,11 @@ public class NutritionFragment extends Fragment {
     }
 
 
-    private void getMealFromFs(String keyValue) {
+    private void getMealFromFs(String keyValue, String date) {
         //get NUTRITION from firestone
 
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(UserRegister.getTodayData())
+                .collection(keyValue).document(date)
                 .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -262,7 +352,6 @@ public class NutritionFragment extends Fragment {
                         user = documentSnapshot.toObject(UserRegister.class);
 
                         assert user != null;
-
                         calculationGoal = user.thermicEffect(user.getActivityLevel());
 
                         tvGoal.setText(String.valueOf(calculationGoal));
@@ -297,6 +386,23 @@ public class NutritionFragment extends Fragment {
         } else if (progress > 100) {
             roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_red_500));
         }
+    }
+
+    private String monthAdded(int month) {
+        List<String> monthName = new ArrayList<>();
+        monthName.add("Jan");
+        monthName.add("Feb");
+        monthName.add("Mar");
+        monthName.add("Apr");
+        monthName.add("May");
+        monthName.add("Jun");
+        monthName.add("Jul");
+        monthName.add("Aug");
+        monthName.add("Sep");
+        monthName.add("Oct");
+        monthName.add("Nov");
+        monthName.add("Dec");
+        return monthName.get(month);
     }
 }
 

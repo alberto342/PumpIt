@@ -3,12 +3,8 @@ package fitness.albert.com.pumpit.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,24 +12,33 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
-import fitness.albert.com.pumpit.Adapter.FirestoreFoodListAdapter;
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import fitness.albert.com.pumpit.Model.FireBaseInit;
 import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.SavePref;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.SearchFoodsActivity;
@@ -42,22 +47,17 @@ import fitness.albert.com.pumpit.ShowAllNutritionActivity;
 
 public class NutritionFragment extends Fragment {
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ImageView btnAddBreakfast, btnAddLunch, btnAddSnacks, btnAddDinner;
-    private TextView tvGoal, tvFood, tvExersice, tvRemaining, tvFat, tvProtien, tvCarbs, tvDetails;
+    private final String TAG = "NutritionFragment";
+    private TextView tvGoal, tvFood, tvExersice, tvRemaining, tvFat, tvProtien, tvCarbs;
     private List<Foods> foodList = new ArrayList<>();
-//    private RecyclerView rvListFood;
-    private SavePref savePref = new SavePref();
-    UserRegister user = new UserRegister();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private PrefsUtils prefsUtils = new PrefsUtils();
+    private UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs;
-    private String TAG;
-    private FirestoreFoodListAdapter mAdapter = new FirestoreFoodListAdapter(getActivity(), foodList);
-    CoordinatorLayout coordinatorLayout;
-
-
-
-    //Todo finish the selected on food
-
+    private int calculationGoal;
+    private FragmentActivity myContext;
+    private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
+   // final Calendar myCalendar = Calendar.getInstance();
 
 
     public NutritionFragment() {
@@ -70,60 +70,56 @@ public class NutritionFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_nutrition, container, false);
-
-        return view;
+        return inflater.inflate(R.layout.fragment_nutrition, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         init(view);
+        mealFromFs();
+        getUserDataAndSetGoal();
+        emailIsOnNutrition();
+        datePicker(view);
+    }
 
-//        getMealFromFs("breakfast");
-
-//        getUserDataAndSetGoal();
-
-//        enableSwipeToDeleteAndUndo();
-
+    private void setToolBar() {
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        assert activity != null;
+        assert activity.getSupportActionBar() != null;
+        activity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorDarkBlue)));
+        activity.getSupportActionBar().setTitle(UserRegister.getTodayData());
+        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
 
     private void init(View view) {
         //add food btn
-        btnAddBreakfast = view.findViewById(R.id.btn_add_breakfast);
-        btnAddDinner = view.findViewById(R.id.btn_add_dinner);
-        btnAddLunch = view.findViewById(R.id.btn_add_lunch);
-        btnAddSnacks = view.findViewById(R.id.btn_add_snacks);
-        tvDetails = view.findViewById(R.id.tv_details);
-
-        //RecyclerView
-//        rvListFood = view.findViewById(R.id.rv_list_food);
-
-        //coordinatorLayout
-//        coordinatorLayout = view.findViewById(R.id.coordinatorLayout);
-
+        ImageView btnAddBreakfast = view.findViewById(R.id.btn_add_breakfast);
+        ImageView btnAddDinner = view.findViewById(R.id.btn_add_dinner);
+        ImageView btnAddLunch = view.findViewById(R.id.btn_add_lunch);
+        ImageView btnAddSnacks = view.findViewById(R.id.btn_add_snacks);
+        TextView tvDetails = view.findViewById(R.id.tv_details);
 
 
         tvGoal = view.findViewById(R.id.tv_goal);
         tvExersice = view.findViewById(R.id.tv_exercise);
-
         tvFood = view.findViewById(R.id.tv_food);
         tvRemaining = view.findViewById(R.id.tv_remaining);
-
         tvFat = view.findViewById(R.id.tv_fat);
         tvCarbs = view.findViewById(R.id.tv_carbs);
         tvProtien = view.findViewById(R.id.tv_protein);
-
+        progressCarbs = view.findViewById(R.id.pb_carbs);
+        progressProtien = view.findViewById(R.id.pb_protein);
+        progressFat = view.findViewById(R.id.pb_fat);
 
         //disable RecyclerView scrolling
-//        rvListFood.setNestedScrollingEnabled(false);
-
-
+        //rvListFood.setNestedScrollingEnabled(false);
         btnAddBreakfast.setOnClickListener(onClickListener);
         btnAddSnacks.setOnClickListener(onClickListener);
         btnAddLunch.setOnClickListener(onClickListener);
@@ -131,88 +127,207 @@ public class NutritionFragment extends Fragment {
         tvDetails.setOnClickListener(onClickListener);
     }
 
+//    private void datePickerDialog() {
+//
+//        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+//
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int monthOfYear,
+//                                  int dayOfMonth) {
+//                myCalendar.set(Calendar.YEAR, year);
+//                myCalendar.set(Calendar.MONTH, monthOfYear);
+//                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+//                updateLabel();
+//            }
+//
+//        };
+//        toolbarTxt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new DatePickerDialog(getActivity(), date, myCalendar
+//                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+//                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+//            }
+//        });
+//    }
+//
+//    private void updateLabel() {
+//        String myFormat = "MM/dd/yy"; //In which you need put here
+//        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+//
+//        toolbarTxt.setText(sdf.format(myCalendar.getTime()));
+//    }
+
+
+    private void mealFromFs() {
+        //   if (isOnNutrition) {
+        ProgressDialog progressdialog = new ProgressDialog(getActivity());
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
+
+        getMealFromFs(Foods.BREAKFAST, UserRegister.getTodayData());
+        getMealFromFs(Foods.SNACK, UserRegister.getTodayData());
+        getMealFromFs(Foods.LUNCH, UserRegister.getTodayData());
+        getMealFromFs(Foods.DINNER, UserRegister.getTodayData());
+        progressdialog.hide();
+        //   }
+    }
+
+    private void datePicker(View view) {
+        /* starts before 1 month from now */
+        Calendar startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -1);
+
+        /* ends after 1 month from now */
+        Calendar endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 1);
+
+        HorizontalCalendar calendarView = new HorizontalCalendar.Builder(view, R.id.calendar_view_custom)
+                .range(startDate, endDate)
+                .datesNumberOnScreen(7)
+                .build();
+
+        calendarView.setCalendarListener(new HorizontalCalendarListener() {
+            @Override
+            public void onDateSelected(Calendar date, int position) {
+
+                ProgressDialog progressdialog = new ProgressDialog(getActivity());
+                progressdialog.setMessage("Please Wait....");
+                progressdialog.show();
+
+                restData();
+
+                String newDate;
+                int day = date.get(Calendar.DAY_OF_MONTH);
+                int year = date.get(Calendar.YEAR);
+
+                if (day < 10) {
+                    newDate = "0" + day + "-" + monthAdded(date.get(Calendar.MONDAY)) + "-" + year;
+                } else {
+                    newDate = day + "-" + monthAdded(date.get(Calendar.MONDAY)) + "-" + year;
+                }
+                Log.d(TAG, "Date Selected: " + newDate);
+
+                getMealFromFs(Foods.BREAKFAST, newDate);
+                getMealFromFs(Foods.SNACK, newDate);
+                getMealFromFs(Foods.LUNCH, newDate);
+                getMealFromFs(Foods.DINNER, newDate);
+                progressdialog.hide();
+            }
+        });
+    }
+
+    private void restData() {
+        kcal = fat = protein = carbs = 0;
+        tvFood.setText("0");
+        tvRemaining.setText("0");
+        tvCarbs.setText("0");
+        tvProtien.setText("0");
+        tvFat.setText("0");
+        getUserDataAndSetGoal();
+        //  progressCarbs.setProgress(0);
+        //progressFat.setProgress(0);
+        //progressProtien.setProgress(0);
+    }
 
 
     //Check meal selected
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            savePref.createSharedPreferencesFiles(getActivity(), Foods.SharedPreferencesFile);
+            prefsUtils.createSharedPreferencesFiles(getActivity(), Foods.SHARED_PREFERENCES_FILE);
+
             switch (v.getId()) {
-                case R.id.btn_add_dinner:
-                    saveMealToSP(true, false, false, false);
-                    break;
-
-                case R.id.btn_add_breakfast:
-                    saveMealToSP(false,true,false,false);
-                    break;
-
-                case R.id.btn_add_lunch:
-                    saveMealToSP(false,false,true,false);
-                    break;
-
-                case R.id.btn_add_snacks:
-                    saveMealToSP(false,false,false,true);
-                    break;
                 case R.id.tv_details:
                     startActivity(new Intent(getActivity(), ShowAllNutritionActivity.class));
                     break;
+                case R.id.btn_add_dinner:
+                    saveMealToSP(true, false, false, false);
+                    break;
+                case R.id.btn_add_breakfast:
+                    saveMealToSP(false, true, false, false);
+                    break;
+                case R.id.btn_add_lunch:
+                    saveMealToSP(false, false, true, false);
+                    break;
+                case R.id.btn_add_snacks:
+                    saveMealToSP(false, false, false, true);
             }
         }
     };
 
-    private void saveMealToSP(boolean dinner, boolean breakfast, boolean lunch, boolean snack) {
-        savePref.saveData("dinner", dinner);
-        savePref.saveData("breakfast", breakfast);
-        savePref.saveData("lunch", lunch);
-        savePref.saveData("snack", snack);
+    //The first time the email not exist, only after add food is exists
+    private void emailIsOnNutrition() {
+        DocumentReference docRef = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    assert document != null;
+                    if ((document.exists())) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        //   isOnNutrition = true;
+                    } else {
+                        Log.d(TAG, "No such document");
+                        // isOnNutrition = false;
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
 
-        startActivity( new Intent(getActivity(), SearchFoodsActivity.class));
-        getActivity().getFragmentManager().popBackStack();
+    private void saveMealToSP(boolean dinner, boolean breakfast, boolean lunch, boolean snack) {
+        prefsUtils.saveData("dinner", dinner);
+        prefsUtils.saveData("breakfast", breakfast);
+        prefsUtils.saveData("lunch", lunch);
+        prefsUtils.saveData("Snack", snack);
+
+        startActivity(new Intent(getActivity(), SearchFoodsActivity.class));
+        Objects.requireNonNull(getActivity()).getFragmentManager().popBackStack();
     }
 
 
-    private void getMealFromFs(String keyValue) {
+    private void getMealFromFs(String keyValue, String date) {
+        //get NUTRITION from firestone
 
-        final ProgressDialog progressdialog = new ProgressDialog(getActivity());
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        //get nutrition from firestone
-        FireBaseInit.getInstance(getActivity()).db.collection("nutrition").document(FireBaseInit.fireBaseInit.getEmailRegister()).collection(keyValue).document(getTodayDate()).collection("fruit").get()
+        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+                .collection(keyValue).document(date)
+                .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        //hide ProgressDialog
-                        progressdialog.hide();
 
-                        if(task.isSuccessful()) {
-
+                        if (task.isSuccessful() && task.getResult() != null) {
                             for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);
 
-                                initRecyclerView();
-
                                 Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
 
-                                //set nutrition to float
-                                kcal += foodList.get(i).getNf_calories();
-                                carbs += foodList.get(i).getNf_total_carbohydrate();
-                                fat += foodList.get(i).getNf_total_fat();
-                                protein += foodList.get(i).getNf_protein();
+                                //Set NUTRITION to float
+                                kcal += foodList.get(i).getNfCalories();
+                                carbs += foodList.get(i).getNfTotalCarbohydrate();
+                                fat += foodList.get(i).getNfTotalFat();
+                                protein += foodList.get(i).getNfProtein();
+
+                                Log.d(TAG, "Kcal: " + kcal);
+
+                                tvFood.setText(String.format(Locale.getDefault(), "%.0f", kcal));
+                                tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
+                                tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
+                                tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
+                                //Need to be calculation
+                                tvRemaining.setText(String.format(Locale.getDefault(), "%.0f", kcal));
+
+                                updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                                updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                                updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
                             }
-
-                            tvFood.setText(String.format("%.2f", kcal));
-                            tvCarbs.setText(String.format("%.2fg of 334g", carbs));
-                            tvProtien.setText(String.format("%.2fg of 25g", protein));
-                            tvFat.setText(String.format("%.2fg of 67g", fat));
-                            float remaining = kcal + 0;
-                            tvRemaining.setText(String.format("%.2f", remaining));
-
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
-
                         }
                     }
                 })
@@ -226,13 +341,29 @@ public class NutritionFragment extends Fragment {
 
 
     private void getUserDataAndSetGoal() {
-        db.collection("users").document(FireBaseInit.fireBaseInit.getEmailRegister()).get()
+        final ProgressDialog progressdialog = new ProgressDialog(getActivity());
+        progressdialog.setMessage("Please Wait....");
+        progressdialog.show();
+
+        db.collection(UserRegister.fireBaseUsers).document(FireBaseInit.getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         user = documentSnapshot.toObject(UserRegister.class);
 
-                        tvGoal.setText(String.valueOf(user.calculatorBMR()));
+                        assert user != null;
+                        calculationGoal = user.thermicEffect(user.getActivityLevel());
+
+                        tvGoal.setText(String.valueOf(calculationGoal));
+                        tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
+                        tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
+                        tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
+
+                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
+
+                        progressdialog.hide();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -243,82 +374,35 @@ public class NutritionFragment extends Fragment {
                 });
     }
 
+    private void updateProgressColor(RoundCornerProgressBar roundCornerProgressBar, float nutrition, int calculationGoal) {
 
-
-
-    private void initRecyclerView(){
-        Log.d(TAG, "initRecyclerView: init food recyclerView");
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-
-//        rvListFood.setLayoutManager(layoutManager);
-        mAdapter = new FirestoreFoodListAdapter(getActivity(), foodList);
-//        rvListFood.setAdapter(mAdapter);
+        float fractionToPercent = nutrition / calculationGoal * 100;
+        roundCornerProgressBar.setProgress(fractionToPercent);
+        float progress = roundCornerProgressBar.getProgress();
+        if (progress <= 50) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.yellow_dolly));
+        } else if (progress > 75 && progress <= 100) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_green_600));
+        } else if (progress > 100) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_red_500));
+        }
     }
 
-    private String getTodayDate() {
-        Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-        return df.format(c);
+    private String monthAdded(int month) {
+        List<String> monthName = new ArrayList<>();
+        monthName.add("Jan");
+        monthName.add("Feb");
+        monthName.add("Mar");
+        monthName.add("Apr");
+        monthName.add("May");
+        monthName.add("Jun");
+        monthName.add("Jul");
+        monthName.add("Aug");
+        monthName.add("Sep");
+        monthName.add("Oct");
+        monthName.add("Nov");
+        monthName.add("Dec");
+        return monthName.get(month);
     }
-
-
-    private int getListSize() {
-        return foodList.size();
-    }
-
-
-
-
-    // Swipe to delete item
-//    private void enableSwipeToDeleteAndUndo() {
-//        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(getActivity()) {
-//            @Override
-//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-//
-//                final int position = viewHolder.getAdapterPosition();
-//                final Foods item = mAdapter.getData().get(position);
-//
-//                mAdapter.removeItem(position);
-//
-//                Snackbar snackbar = Snackbar
-//                        .make(coordinatorLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
-//                snackbar.setAction("UNDO", new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//
-//                            mAdapter.restoreItem(item, position);
-////                            rvListFood.scrollToPosition(position);
-////                    }
-////                });
-//                snackbar.setActionTextColor(Color.YELLOW);
-//                snackbar.show();
-//            }
-//        };
-//
-//
-////        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
-////        itemTouchhelper.attachToRecyclerView(rvListFood);
-//    }
-
-
-
-
-    //Todo Delete data from firestore chack if user not click on UNDO
-    private void deleteFromFs() {
-
-    }
-
-    private int dpToPxl(int paddingDp) {
-        float density = getActivity().getResources().getDisplayMetrics().density;
-        return (int)(paddingDp * density);
-    }
-
-
-    //Without this method Data will be double
-//    public void onPause() {
-//        super.onPause();
-//        this.foodList.clear();
-//    }
 }
 

@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,53 +8,59 @@
     android:orientation="vertical"
     tools:context=".SearchFoodsActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
 
-        <EditText
-            android:id="@+id/edQuery"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/common_8"
-            android:layout_weight="1"
-            android:autofillHints="@string/Search"
-            android:drawableStart="@mipmap/ic_search_black_18dp"
-            android:drawableLeft="@mipmap/ic_search_black_18dp"
-            android:drawablePadding="@dimen/common_16"
-            android:hint="@string/Search"
-            android:inputType="text"
-            android:textColor="@color/white" />
+            android:background="@color/colorDarkBlue"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
-        <Button
-            android:id="@+id/btnSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/go" />
 
-    </LinearLayout>
+            <com.mancj.materialsearchbar.MaterialSearchBar
+                android:id="@+id/food_search_bar"
+                style="@style/MaterialSearchBarLight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                app:mt_maxSuggestionsCount="10"
+                app:mt_menuIconDrawable="@mipmap/ic_search_black_18dp"
+                app:mt_placeholder="Search..."
+                app:mt_speechMode="true" />
+        </LinearLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+
+
+
+
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:background="@color/dark_blue"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:text="@string/no_data_found"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
-
-        <TextView
-            android:id="@+id/tvEmpty"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="@dimen/common_8"
-            android:layout_marginLeft="@dimen/common_8"
-            android:layout_marginTop="@dimen/common_8"
-            android:layout_marginEnd="296dp"
-            android:layout_marginRight="@dimen/common_8"
-            android:layout_marginBottom="@dimen/common_8"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/no_data_found"
-            android:visibility="gone" />
-
 
         <Button
             android:id="@+id/btn_save_all_food"
@@ -69,12 +73,13 @@
             android:textColor="@color/white"
             android:visibility="invisible" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/background"
             android:padding="@dimen/common_8"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     </RelativeLayout>
+
 </LinearLayout>

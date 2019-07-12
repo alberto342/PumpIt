@@ -1,10 +1,11 @@
 package fitness.albert.com.pumpit;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LoginActivity extends AppCompatActivity  { //implements GoogleApiClient.OnConnectionFailedListener
+public class LoginActivity extends AppCompatActivity { //implements GoogleApiClient.OnConnectionFailedListener
 
     private EditText inputEmail, inputPassword;
     private ProgressBar progressBar;
@@ -38,7 +39,6 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
     public static final int SIGN_IN_CODE = 777;
     private List<AuthUI.IdpConfig> providers = Arrays.asList(
             new AuthUI.IdpConfig.GoogleBuilder().build());
-
 
 
     @Override
@@ -64,10 +64,9 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
         btnForgetPassword = findViewById(R.id.btn_forgetten_password);
         btnGoogleSign = findViewById(R.id.btn_google);
 
-        progressBar = findViewById(R.id.progressBar);
+        progressBar = findViewById(R.id.progress_login);
 
         btnLogin.setImageResource(R.mipmap.btn_login_active);
-
     }
 
     private void setOnClickListener() {
@@ -118,6 +117,10 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
 
 
     private void loginOnClick() {
+        btnLogin.setImageResource(R.mipmap.emty_login_btn);
+        progressBar.setVisibility(View.VISIBLE);
+
+
         final String email = inputEmail.getText().toString();
         final String password = inputPassword.getText().toString();
 
@@ -132,7 +135,7 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
                             // If sign in fails, display a message to the user. If sign in succeeds
                             // the auth state listener will be notified and logic to handle the
                             // signed in user can be handled in the listener.
-                            progressBar.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.INVISIBLE);
                             if (!task.isSuccessful() && isEmailValid(email)) {
                                 errorMessage(inputEmail, "Email not exists" + task.getException());
                                 if (password.length() < 6) {
@@ -160,6 +163,9 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
 
     public void errorMessage(EditText text, String message) {
         String strUserName = text.getText().toString();
+
+        btnLogin.setImageResource(R.mipmap.btn_login);
+
         if (TextUtils.isEmpty(strUserName)) {
             text.setError(message);
         }
@@ -175,7 +181,7 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
     private void resetPassword() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.activity_reset_password, null);
+        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.activity_reset_password, null);
 
 
         dialogBuilder.setView(dialogView);
@@ -184,7 +190,7 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
         final Button btnReset = dialogView.findViewById(R.id.btn_reset_password);
         final Button btnBack = dialogView.findViewById(R.id.btn_back);
 
-        final ProgressBar progressBar1 = dialogView.findViewById(R.id.progressBar);
+        final ProgressBar progressBar1 = dialogView.findViewById(R.id.progress_login);
         //dialogBuilder.setTitle("Send Photos");
         final AlertDialog dialog = dialogBuilder.create();
         btnReset.setOnClickListener(new View.OnClickListener() {
@@ -227,12 +233,22 @@ public class LoginActivity extends AppCompatActivity  { //implements GoogleApiCl
 
     private void checkIfEmailVerified() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        assert user != null;
         if (user.isEmailVerified()) {
             finish();
             Toast.makeText(LoginActivity.this, "Successfully logged in", Toast.LENGTH_SHORT).show();
         } else {
             errorMessage(inputEmail, "Please Verify Your Email Address");
+            sleepTimer();
             FirebaseAuth.getInstance().signOut();
+        }
+    }
+
+    public void sleepTimer() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

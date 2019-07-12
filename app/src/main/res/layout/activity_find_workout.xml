@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical"
+    tools:context=".workout.FindWorkoutActivity">
+
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tablayout_workout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:touchscreenBlocksFocus="false"
+        android:transitionGroup="false"
+        app:tabBackground="@color/background"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/myBlue"
+        app:tabIndicatorGravity="bottom"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/myBlue"
+        app:tabTextColor="@color/white"
+        app:tabUnboundedRipple="false">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab_my_plans"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Plans" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab_featured"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Featured" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/vp_plans"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="always"
+        android:touchscreenBlocksFocus="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+</LinearLayout>

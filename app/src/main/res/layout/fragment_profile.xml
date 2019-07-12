@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".fragment.profile.ProfileFragment">
+
 
     <TextView
         android:id="@+id/txt_bmi"
@@ -17,7 +18,7 @@
         app:layout_constraintStart_toStartOf="@+id/guideline62"
         app:layout_constraintTop_toBottomOf="@+id/txt_name" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline50"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,14 +36,14 @@
         app:layout_constraintStart_toEndOf="@+id/guideline62"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline53"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.65" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline62"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -71,14 +72,14 @@
         app:layout_constraintStart_toStartOf="@+id/guideline63"
         app:layout_constraintTop_toTopOf="@+id/guideline50" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline63"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.05" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline64"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -103,7 +104,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="Goal:"
+        android:text="@string/goal"
         android:textColor="@color/white"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline64"
@@ -111,14 +112,14 @@
         app:layout_constraintStart_toStartOf="@+id/guideline53"
         app:layout_constraintTop_toTopOf="@+id/guideline50" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline67"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.60" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline69"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -136,18 +137,91 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline62"
         app:layout_constraintStart_toStartOf="@+id/guideline63" />
 
-    <ImageView
-        android:id="@+id/stettings"
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="8dp"
-        android:src="@mipmap/settings"
-        app:layout_constraintBottom_toTopOf="@+id/guideline61"
-        app:layout_constraintEnd_toStartOf="@+id/guideline78"
-        app:layout_constraintStart_toStartOf="@+id/guideline63"
-        app:layout_constraintTop_toTopOf="@+id/guideline67" />
+        android:layout_height="195dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline67">
 
-    <android.support.constraint.Guideline
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/btn_account_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/account" />
+
+            <ImageView
+                android:id="@+id/btn_profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/profile_settings" />
+
+            <ImageView
+                android:id="@+id/btn_my_goals"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/my_goals" />
+
+            <ImageView
+                android:id="@+id/btn_diary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/diary" />
+
+            <ImageView
+                android:id="@+id/btn_water_tracker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/water_tracker" />
+
+            <ImageView
+                android:id="@+id/btn_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/notification_settings" />
+
+            <ImageView
+                android:id="@+id/btn_units"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/units" />
+
+            <ImageView
+                android:id="@+id/btn_data_export"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/data_export" />
+
+            <ImageView
+                android:id="@+id/btn_help"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/help_faq" />
+
+            <ImageView
+                android:id="@+id/btn_about"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/about" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline76"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -158,7 +232,7 @@
         android:id="@+id/textView24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="DETAILS"
+        android:text="@string/details"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textStyle="bold"
@@ -172,7 +246,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Protein"
+        android:text="@string/protein"
         android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/guideline53"
         app:layout_constraintStart_toStartOf="@+id/guideline62"
@@ -194,7 +268,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Carb"
+        android:text="@string/carb"
         android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/guideline62"
         app:layout_constraintStart_toStartOf="@+id/guideline63"
@@ -216,7 +290,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Fat"
+        android:text="@string/fat"
         android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/guideline78"
         app:layout_constraintStart_toStartOf="@+id/guideline53"
@@ -233,41 +307,28 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline53"
         app:layout_constraintStart_toStartOf="@+id/guideline62" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline77"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.48" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline78"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.95" />
 
-    <ImageView
-        android:id="@+id/btn_account_setting"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline61"
-        app:layout_constraintEnd_toStartOf="@+id/guideline78"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline63"
-        app:layout_constraintTop_toTopOf="@+id/guideline65"
-        tools:src="@tools:sample/avatars" />
-
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline61"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.88" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline65"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -284,4 +345,4 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline78"
         app:layout_constraintStart_toStartOf="@+id/guideline62" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

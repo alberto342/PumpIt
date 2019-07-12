@@ -1,21 +1,24 @@
 package fitness.albert.com.pumpit.Model;
 
-public class Metadata {
-    private String is_raw_food;
+import com.google.gson.annotations.SerializedName;
 
-    public String getIs_raw_food ()
+public class Metadata {
+    @SerializedName("is_raw_food")
+    private String isRawFood;
+
+    public String getIsRawFood()
     {
-        return is_raw_food;
+        return isRawFood;
     }
 
-    public void setIs_raw_food (String is_raw_food)
+    public void setIsRawFood(String isRawFood)
     {
-        this.is_raw_food = is_raw_food;
+        this.isRawFood = isRawFood;
     }
 
     @Override
     public String toString()
     {
-        return "ClassPojo [is_raw_food = "+is_raw_food+"]";
+        return "ClassPojo [isRawFood = "+ isRawFood +"]";
     }
 }

@@ -1,15 +1,19 @@
 package fitness.albert.com.pumpit.Model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Tags {
     private String measure;
 
-    private String food_group;
+    @SerializedName("food_group")
+    private int foodGroup;
 
     private String item;
 
     private String quantity;
 
-    private String tag_id;
+    @SerializedName("tag_id")
+    private String tagId;
 
     public String getMeasure ()
     {
@@ -21,14 +25,14 @@ public class Tags {
         this.measure = measure;
     }
 
-    public String getFood_group ()
+    public int getFoodGroup()
     {
-        return food_group;
+        return foodGroup;
     }
 
-    public void setFood_group (String food_group)
+    public void setFoodGroup(int foodGroup)
     {
-        this.food_group = food_group;
+        this.foodGroup = foodGroup;
     }
 
     public String getItem ()
@@ -51,18 +55,43 @@ public class Tags {
         this.quantity = quantity;
     }
 
-    public String getTag_id ()
+    public String getTagId()
     {
-        return tag_id;
+        return tagId;
     }
 
-    public void setTag_id (String tag_id)
+    public void setTagId(String tagId)
     {
-        this.tag_id = tag_id;
+        this.tagId = tagId;
     }
+
 
     @Override
     public String toString() {
-        return "ClassPojo [measure = "+measure+", food_group = "+food_group+", item = "+item+", quantity = "+quantity+", tag_id = "+tag_id+"]";
+        return "ClassPojo [measure = "+measure+", foodGroup = "+ foodGroup +", item = "+item+", quantity = "+quantity+", tagId = "+ tagId +"]";
+    }
+
+    public static String foodGroup(int id) {
+        switch (id) {
+            case 1:
+                return "Dairy";
+            case 2:
+                return "Protein";
+            case 3:
+                return "Fruit";
+            case 4:
+                return "Vegetable";
+            case 5:
+                return "Grain";
+            case 6:
+                return "Fat";
+            case 7:
+                return "Legume";
+            case 8:
+                return "Combination (multiple food groups)";
+            case 9:
+                return "Not applicable";
+        }
+        return "Combination (multiple food groups)";
     }
 }

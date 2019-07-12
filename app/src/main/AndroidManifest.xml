@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="fitness.albert.com.pumpit">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -11,8 +14,29 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".ShowAllNutritionActivity"></activity>
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".workout.FinisherWorkoutActivity"></activity>
+        <activity android:name=".workout.ShowLogExercise" />
+        <activity android:name=".fragment.logsFragment.LogTabActivity" />
+        <activity android:name=".workout.CustomAddExerciseActivity" />
+        <activity android:name=".workout.ChangePlanActivity" />
+        <activity android:name=".workout.WorkoutStartActivity" />
+        <activity android:name=".workout.StartWorkoutActivity" />
+        <activity android:name=".workout.FindWorkoutActivity" />
+        <activity android:name=".workout.EditCustomPlanActivity" />
+        <activity android:name=".workout.ExerciseLogsActivity" />
+        <activity android:name=".workout.TrainingActivity" />
+        <activity android:name=".workout.WorkoutActivity" />
+        <activity android:name=".workout.WorkoutPlansActivity" />
+        <activity android:name=".workout.CustomPlanActivity" />
+        <activity android:name=".workout.ShowExerciseResult" />
+        <activity android:name=".workout.ExerciseDetailActivity" />
+        <activity android:name=".ShowSnackActivity" />
+        <activity android:name=".ShowLunchActivity" />
+        <activity android:name=".ShowDinnerActivity" />
+        <activity android:name=".ShowBreakfastActivity" />
+        <activity android:name=".ShowAllNutritionActivity" />
         <activity android:name=".ShowItemFoodActivity" />
         <activity
             android:name=".WelcomeActivities.WelcomeActivity"
@@ -58,14 +82,19 @@
             android:name=".Register.EmailRegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AddExerciseActivity"
+            android:name=".workout.AddExerciseActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SearchFoodsActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ShowFoodBeforeAddedActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

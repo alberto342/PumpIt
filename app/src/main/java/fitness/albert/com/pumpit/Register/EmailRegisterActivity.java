@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +12,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,6 +27,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import fitness.albert.com.pumpit.LoginActivity;
 import fitness.albert.com.pumpit.Model.UserRegister;
@@ -33,7 +36,7 @@ import fitness.albert.com.pumpit.R;
 
 public class EmailRegisterActivity extends AppCompatActivity {
 
-    public static String TAG;
+    public static String TAG = "EmailRegisterActivity";
     private EditText inputEmail, inputName, inputPassword, inputPasswordConfirm;
     private ImageView btnSignUp;
     private ProgressBar progressBar;
@@ -145,6 +148,13 @@ public class EmailRegisterActivity extends AppCompatActivity {
                     return;
                 }
 
+                if(!isEmailValid(inputEmail.getText().toString())) {
+                    errorMessage(inputEmail, "Please enter a valid email address");
+                    return;
+                }
+
+
+
                 //Save data to maps
                 final Map<String, Object> saveData = new IdentityHashMap<>();
                 saveData.put("firstName", userRegister.getFirstName());
@@ -156,6 +166,7 @@ public class EmailRegisterActivity extends AppCompatActivity {
                 saveData.put("bodyFat", userRegister.getCurrentBodyFat());
                 saveData.put("fatTarget", userRegister.getTargetBodyFat());
                 saveData.put("programSelect", userRegister.getMyProgram());
+                saveData.put("activityLevel", "setOfTheDay");
 
                 
                 progressBar.setVisibility(View.VISIBLE);
@@ -184,7 +195,6 @@ public class EmailRegisterActivity extends AppCompatActivity {
                                                         Log.w(TAG, "Error adding document", e);
                                                     }
                                                 });
-
                                         clearSharedPreferencesDataֿ();
 
                                         Toast.makeText(EmailRegisterActivity.this, "Registration Succeeded, Please Verify Your Email Address", Toast.LENGTH_SHORT).show();
@@ -253,5 +263,12 @@ public class EmailRegisterActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    public static boolean isEmailValid(String email) {
+        String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
+        Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }

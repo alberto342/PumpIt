@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".ShowItemFoodActivity">
+
 
     <ImageView
         android:id="@+id/iv_food_item"
@@ -17,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline79"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -116,7 +117,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline83"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline81"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -137,56 +138,45 @@
         app:qv_removeButtonBackground="@drawable/remove_selector"
         app:qv_removeButtonTextColor="@color/md_white_1000" />
 
-    <ImageView
-        android:id="@+id/imageView36"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline82"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/spinner_serving"
-        app:layout_constraintTop_toTopOf="@+id/guideline81"
-        app:srcCompat="@mipmap/serving_size" />
-
 
     <Spinner
         android:id="@+id/spinner_serving"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="25dp"
+
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="25dp"
-        android:entries="@color/white"
+        android:layout_marginBottom="5dp"
+        android:background="@color/white"
         android:minWidth="@dimen/browser_actions_context_menu_min_padding"
-        android:popupBackground="@color/background"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView36"
+        app:layout_constraintBottom_toTopOf="@+id/guideline82"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/quantity_view"
-        app:layout_constraintTop_toTopOf="@+id/imageView36" />
+        app:layout_constraintTop_toTopOf="@+id/guideline81" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline82"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.37" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline83"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.25" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline84"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.50" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline85"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -218,7 +208,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline82" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline80"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -403,4 +393,4 @@
         </LinearLayout>
     </ScrollView>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

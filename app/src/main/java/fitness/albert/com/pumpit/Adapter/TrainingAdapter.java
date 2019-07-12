@@ -2,13 +2,15 @@ package fitness.albert.com.pumpit.Adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
@@ -53,7 +55,7 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private void bindViews(final ViewHolder holder, final int position) {
 
-        String TAG = "TrainingAdapter";
+        final String TAG = "TrainingAdapter";
 
         Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, trainingList.get(position).getImgName());
 
@@ -72,9 +74,9 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             @Override
             public void onClick(View v) {
                 posit = position;
+                Log.d(TAG, "onClick: " + trainingList.get(position).getExerciseName());
             }
         });
-
     }
 
 

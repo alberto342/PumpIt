@@ -4,14 +4,15 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -82,10 +83,10 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                 .into(holder.ivImage);
 
 
-        holder.tvFoodName.setText(foodsList.get(position).getFood_name());
-        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNf_calories(), foodsList.get(position).getNf_total_carbohydrate()));
-        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNf_protein()));
-        holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServing_qty());
+        holder.tvFoodName.setText(foodsList.get(position).getFoodName());
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNfCalories(), foodsList.get(position).getNfTotalCarbohydrate()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNfProtein()));
+        holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServingQty());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,8 +101,8 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
                 Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
                 foodName = holder.tvFoodName.getText().toString();
-                qty = foodsList.get(position).getServing_qty();
-                unit = foodsList.get(position).getServing_unit();
+                qty = foodsList.get(position).getServingQty();
+                unit = foodsList.get(position).getServingUnit();
 
                 Intent intent = new Intent(mContext, ShowItemFoodActivity.class);
                 mContext.startActivity(intent);

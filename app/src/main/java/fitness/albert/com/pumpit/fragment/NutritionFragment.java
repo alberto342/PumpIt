@@ -308,10 +308,10 @@ public class NutritionFragment extends Fragment {
                                 Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
 
                                 //Set NUTRITION to float
-                                kcal += foodList.get(i).getNf_calories();
-                                carbs += foodList.get(i).getNf_total_carbohydrate();
-                                fat += foodList.get(i).getNf_total_fat();
-                                protein += foodList.get(i).getNf_protein();
+                                kcal += foodList.get(i).getNfCalories();
+                                carbs += foodList.get(i).getNfTotalCarbohydrate();
+                                fat += foodList.get(i).getNfTotalFat();
+                                protein += foodList.get(i).getNfProtein();
 
                                 Log.d(TAG, "Kcal: " + kcal);
 

@@ -2,6 +2,8 @@ package fitness.albert.com.pumpit.Model;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class Foods {
@@ -18,20 +20,22 @@ public class Foods {
     }
 
 
-    private String serving_unit;
+    @SerializedName("serving_unit")
+    private String servingUnit;
 
-    private float nf_total_carbohydrate;
+    @SerializedName("nf_total_carbohydrate")
+    private float nfTotalCarbohydrate;
 
-    private float nf_sodium;
+    @SerializedName("nf_sodium")
+    private float nfSodium;
 
     private String lng;
 
-    private float nf_p;
+    @SerializedName("nf_p")
+    private float nfP;
 
-    private List<Alt_measures> alt_measures;
-
-//    private Alt_measures[] alt_measures;
-
+    @SerializedName("alt_measures")
+    private List<AltMeasures> altMeasures;
 
     String calcium;
     String carbohydrate;
@@ -161,11 +165,14 @@ public class Foods {
     String zinc;
 
 
-    private float nf_sugars;
+    @SerializedName("nf_sugars")
+    private float nfSugars;
 
-    private float nf_calories;
+    @SerializedName("nf_calories")
+    private float nfCalories;
 
-    private String brand_name;
+    @SerializedName("brand_name")
+    private String brandName;
 
     private String lat;
 
@@ -173,78 +180,92 @@ public class Foods {
 
     private Tags tags;
 
-    private String sub_recipe;
+    @SerializedName("sub_recipe")
+    private String subRecipe;
 
-    private String ndb_no;
+    @SerializedName("ndb_no")
+    private String ndbNo;
 
-    private String food_name;
+    @SerializedName("food_name")
+    private String foodName;
 
-    private String meal_type;
+    @SerializedName("meal_type")
+    private String mealType;
 
-    private float nf_saturated_fat;
+    @SerializedName("nf_saturated_fat")
+    private float nfSaturatedFat;
 
-    private float nf_protein;
+    @SerializedName("nf_protein")
+    private float nfProtein;
 
-    private float nf_total_fat;
+    @SerializedName("nf_total_fat")
+    private float nfTotalFat;
 
-    private String consumed_at;
+    @SerializedName("consumed_at")
+    private String consumedAt;
 
-    private float nf_dietary_fiber;
+    @SerializedName("nf_dietary_fiber")
+    private float nfDietaryFiber;
 
-    private float nf_cholesterol;
+    @SerializedName("nf_cholesterol")
+    private float nfCholesterol;
 
     private Photo photo;
 
     private String upc;
 
-    private float nf_potassium;
+    @SerializedName("nf_potassium")
+    private float nfPotassium;
 
-    private String nix_brand_name;
+    @SerializedName("nix_brand_name")
+    private String nixBrandName;
 
+    @SerializedName("full_nutrients")
+    private List<FullNutrients> fullNutrients;
 
-//    private Full_nutrients[] full_nutrients;
-
-    private List<Full_nutrients> full_nutrients;
-
-
-    private String nix_item_id;
+    @SerializedName("nix_item_id")
+    private String nixItemId;
 
     private String source;
 
-    private String nix_item_name;
+    @SerializedName("nix_item_name")
+    private String nixItemName;
 
-    private float serving_weight_grams;
+    @SerializedName("serving_weight_grams")
+    private float servingWeightGrams;
 
-    private String nix_brand_id;
+    @SerializedName("nix_brand_id")
+    private String nixBrandId;
 
-    private int serving_qty;
+    @SerializedName("serving_qty")
+    private int servingQty;
 
     private String imgUrl;
 
     private String thumb;
 
-    public String getServing_unit() {
-        return serving_unit;
+    public String getServingUnit() {
+        return servingUnit;
     }
 
-    public void setServing_unit(String serving_unit) {
-        this.serving_unit = serving_unit;
+    public void setServingUnit(String servingUnit) {
+        this.servingUnit = servingUnit;
     }
 
-    public float getNf_total_carbohydrate() {
-        return nf_total_carbohydrate;
+    public float getNfTotalCarbohydrate() {
+        return nfTotalCarbohydrate;
     }
 
-    public void setNf_total_carbohydrate(float nf_total_carbohydrate) {
-        this.nf_total_carbohydrate = nf_total_carbohydrate;
+    public void setNfTotalCarbohydrate(float nfTotalCarbohydrate) {
+        this.nfTotalCarbohydrate = nfTotalCarbohydrate;
     }
 
-    public float getNf_sodium() {
-        return nf_sodium;
+    public float getNfSodium() {
+        return nfSodium;
     }
 
-    public void setNf_sodium(float nf_sodium) {
-        this.nf_sodium = nf_sodium;
+    public void setNfSodium(float nfSodium) {
+        this.nfSodium = nfSodium;
     }
 
     public String getLng() {
@@ -255,48 +276,48 @@ public class Foods {
         this.lng = lng;
     }
 
-    public float getNf_p() {
-        return nf_p;
+    public float getNfP() {
+        return nfP;
     }
 
-    public void setNf_p(float nf_p) {
-        this.nf_p = nf_p;
+    public void setNfP(float nfP) {
+        this.nfP = nfP;
     }
 
-    public List<Alt_measures> getAlt_measures() {
-        return alt_measures;
+    public List<AltMeasures> getAltMeasures() {
+        return altMeasures;
     }
 
-//    public Alt_measures[] getAlt_measures() {
-//        return alt_measures;
+//    public AltMeasures[] getAltMeasures() {
+//        return AltMeasures;
 //    }
 //
-//    public void setAlt_measures(Alt_measures[] alt_measures) {
-//        this.alt_measures = alt_measures;
+//    public void setAltMeasures(AltMeasures[] AltMeasures) {
+//        this.AltMeasures = AltMeasures;
 //    }
 
-    public float getNf_sugars() {
-        return nf_sugars;
+    public float getNfSugars() {
+        return nfSugars;
     }
 
-    public void setNf_sugars(float nf_sugars) {
-        this.nf_sugars = nf_sugars;
+    public void setNfSugars(float nfSugars) {
+        this.nfSugars = nfSugars;
     }
 
-    public float getNf_calories() {
-        return nf_calories;
+    public float getNfCalories() {
+        return nfCalories;
     }
 
-    public void setNf_calories(float nf_calories) {
-        this.nf_calories = nf_calories;
+    public void setNfCalories(float nfCalories) {
+        this.nfCalories = nfCalories;
     }
 
-    public String getBrand_name() {
-        return brand_name;
+    public String getBrandName() {
+        return brandName;
     }
 
-    public void setBrand_name(String brand_name) {
-        this.brand_name = brand_name;
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
 
     public String getLat() {
@@ -324,84 +345,84 @@ public class Foods {
         this.tags = tags;
     }
 
-    public String getSub_recipe() {
-        return sub_recipe;
+    public String getSubRecipe() {
+        return subRecipe;
     }
 
-    public void setSub_recipe(String sub_recipe) {
-        this.sub_recipe = sub_recipe;
+    public void setSubRecipe(String subRecipe) {
+        this.subRecipe = subRecipe;
     }
 
-    public String getNdb_no() {
-        return ndb_no;
+    public String getNdbNo() {
+        return ndbNo;
     }
 
-    public void setNdb_no(String ndb_no) {
-        this.ndb_no = ndb_no;
+    public void setNdbNo(String ndbNo) {
+        this.ndbNo = ndbNo;
     }
 
-    public String getFood_name() {
-        return food_name;
+    public String getFoodName() {
+        return foodName;
     }
 
-    public void setFood_name(String food_name) {
-        this.food_name = food_name;
+    public void setFoodName(String foodName) {
+        this.foodName = foodName;
     }
 
-    public String getMeal_type() {
-        return meal_type;
+    public String getMealType() {
+        return mealType;
     }
 
-    public void setMeal_type(String meal_type) {
-        this.meal_type = meal_type;
+    public void setMealType(String mealType) {
+        this.mealType = mealType;
     }
 
-    public float getNf_saturated_fat() {
-        return nf_saturated_fat;
+    public float getNfSaturatedFat() {
+        return nfSaturatedFat;
     }
 
-    public void setNf_saturated_fat(float nf_saturated_fat) {
-        this.nf_saturated_fat = nf_saturated_fat;
+    public void setNfSaturatedFat(float nfSaturatedFat) {
+        this.nfSaturatedFat = nfSaturatedFat;
     }
 
-    public float getNf_protein() {
-        return nf_protein;
+    public float getNfProtein() {
+        return nfProtein;
     }
 
-    public void setNf_protein(float nf_protein) {
-        this.nf_protein = nf_protein;
+    public void setNfProtein(float nfProtein) {
+        this.nfProtein = nfProtein;
     }
 
-    public float getNf_total_fat() {
-        return nf_total_fat;
+    public float getNfTotalFat() {
+        return nfTotalFat;
     }
 
-    public void setNf_total_fat(float nf_total_fat) {
-        this.nf_total_fat = nf_total_fat;
+    public void setNfTotalFat(float nfTotalFat) {
+        this.nfTotalFat = nfTotalFat;
     }
 
-    public String getConsumed_at() {
-        return consumed_at;
+    public String getConsumedAt() {
+        return consumedAt;
     }
 
-    public void setConsumed_at(String consumed_at) {
-        this.consumed_at = consumed_at;
+    public void setConsumedAt(String consumedAt) {
+        this.consumedAt = consumedAt;
     }
 
-    public float getNf_dietary_fiber() {
-        return nf_dietary_fiber;
+    public float getNfDietaryFiber() {
+        return nfDietaryFiber;
     }
 
-    public void setNf_dietary_fiber(float nf_dietary_fiber) {
-        this.nf_dietary_fiber = nf_dietary_fiber;
+    public void setNfDietaryFiber(float nfDietaryFiber) {
+        this.nfDietaryFiber = nfDietaryFiber;
     }
 
-    public float getNf_cholesterol() {
-        return nf_cholesterol;
+    public float getNfCholesterol() {
+        return nfCholesterol;
     }
 
-    public void setNf_cholesterol(float nf_cholesterol) {
-        this.nf_cholesterol = nf_cholesterol;
+    public void setNfCholesterol(float nfCholesterol) {
+        this.nfCholesterol = nfCholesterol;
     }
 
     public Photo getPhoto() {
@@ -420,40 +441,40 @@ public class Foods {
         this.upc = upc;
     }
 
-    public float getNf_potassium() {
-        return nf_potassium;
+    public float getNfPotassium() {
+        return nfPotassium;
     }
 
-    public void setNf_potassium(float nf_potassium) {
-        this.nf_potassium = nf_potassium;
+    public void setNfPotassium(float nfPotassium) {
+        this.nfPotassium = nfPotassium;
     }
 
-    public String getNix_brand_name() {
-        return nix_brand_name;
+    public String getNixBrandName() {
+        return nixBrandName;
     }
 
-    public void setNix_brand_name(String nix_brand_name) {
-        this.nix_brand_name = nix_brand_name;
+    public void setNixBrandName(String nixBrandName) {
+        this.nixBrandName = nixBrandName;
     }
 
-    public List<Full_nutrients> getFull_nutrients() {
-        return full_nutrients;
+    public List<FullNutrients> getFullNutrients() {
+        return fullNutrients;
     }
 
-    //    public Full_nutrients[] getFull_nutrients() {
-//        return full_nutrients;
+    //    public FullNutrients[] getFullNutrients() {
+//        return FullNutrients;
 //    }
 //
-//    public void setFull_nutrients(Full_nutrients[] full_nutrients) {
-//        this.full_nutrients = full_nutrients;
+//    public void setFullNutrients(FullNutrients[] FullNutrients) {
+//        this.FullNutrients = FullNutrients;
 //    }
 
-    public String getNix_item_id() {
-        return nix_item_id;
+    public String getNixItemId() {
+        return nixItemId;
     }
 
-    public void setNix_item_id(String nix_item_id) {
-        this.nix_item_id = nix_item_id;
+    public void setNixItemId(String nixItemId) {
+        this.nixItemId = nixItemId;
     }
 
     public String getSource() {
@@ -464,44 +485,44 @@ public class Foods {
         this.source = source;
     }
 
-    public String getNix_item_name() {
-        return nix_item_name;
+    public String getNixItemName() {
+        return nixItemName;
     }
 
-    public void setNix_item_name(String nix_item_name) {
-        this.nix_item_name = nix_item_name;
+    public void setNixItemName(String nixItemName) {
+        this.nixItemName = nixItemName;
     }
 
-    public float getServing_weight_grams() {
-        return serving_weight_grams;
+    public float getServingWeightGrams() {
+        return servingWeightGrams;
     }
 
-    public void setServing_weight_grams(float serving_weight_grams) {
-        this.serving_weight_grams = serving_weight_grams;
+    public void setServingWeightGrams(float servingWeightGrams) {
+        this.servingWeightGrams = servingWeightGrams;
     }
 
-    public String getNix_brand_id() {
-        return nix_brand_id;
+    public String getNixBrandId() {
+        return nixBrandId;
     }
 
-    public void setNix_brand_id(String nix_brand_id) {
-        this.nix_brand_id = nix_brand_id;
+    public void setNixBrandId(String nixBrandId) {
+        this.nixBrandId = nixBrandId;
     }
 
-    public int getServing_qty() {
-        return serving_qty;
+    public int getServingQty() {
+        return servingQty;
     }
 
-    public void setServing_qty(int serving_qty) {
-        this.serving_qty = serving_qty;
+    public void setServingQty(int servingQty) {
+        this.servingQty = servingQty;
     }
 
-    //    public String getServing_qty() {
-//        return serving_qty;
+    //    public String getServingQty() {
+//        return servingQty;
 //    }
 //
-//    public void setServing_qty(String serving_qty) {
-//        this.serving_qty = serving_qty;
+//    public void setServingQty(String servingQty) {
+//        this.servingQty = servingQty;
 //    }
 
     public String getImgUrl() {
@@ -521,8 +542,8 @@ public class Foods {
     }
 
 
-    public void setAlt_measures(List<Alt_measures> alt_measures) {
-        this.alt_measures = alt_measures;
+    public void setAltMeasures(List<AltMeasures> altMeasures) {
+        this.altMeasures = altMeasures;
     }
 
     public void setCalcium(String calcium) {
@@ -1029,14 +1050,14 @@ public class Foods {
         this.zinc = zinc;
     }
 
-    public void setFull_nutrients(List<Full_nutrients> full_nutrients) {
-        this.full_nutrients = full_nutrients;
+    public void setFullNutrients(List<FullNutrients> fullNutrients) {
+        this.fullNutrients = fullNutrients;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return "ClassPojo [serving_unit = " + serving_unit + ", nf_total_carbohydrate = " + nf_total_carbohydrate + ", nf_sodium = " + nf_sodium + ", lng = " + lng + ", nf_p = " + nf_p + ", alt_measures = " + alt_measures + ", nf_sugars = " + nf_sugars + ", nf_calories = " + nf_calories + ", brand_name = " + brand_name + ", lat = " + lat + ", metadata = " + metadata + ", tags = " + tags + ", sub_recipe = " + sub_recipe + ", ndb_no = " + ndb_no + ", food_name = " + food_name + ", meal_type = " + meal_type + ", nf_saturated_fat = " + nf_saturated_fat + ", nf_protein = " + nf_protein + ", nf_total_fat = " + nf_total_fat + ", consumed_at = " + consumed_at + ", nf_dietary_fiber = " + nf_dietary_fiber + ", nf_cholesterol = " + nf_cholesterol + ", photo = " + photo + ", upc = " + upc + ", nf_potassium = " + nf_potassium + ", nix_brand_name = " + nix_brand_name + ", full_nutrients = " + full_nutrients + ", nix_item_id = " + nix_item_id + ", source = " + source + ", nix_item_name = " + nix_item_name + ", serving_weight_grams = " + serving_weight_grams + ", nix_brand_id = " + nix_brand_id + ", serving_qty = " + serving_qty + "]";
+        return "ClassPojo [servingUnit = " + servingUnit + ", nfTotalCarbohydrate = " + nfTotalCarbohydrate + ", nfSodium = " + nfSodium + ", lng = " + lng + ", nfP = " + nfP + ", AltMeasures = " + altMeasures + ", nfSugars = " + nfSugars + ", nfCalories = " + nfCalories + ", brandName = " + brandName + ", lat = " + lat + ", metadata = " + metadata + ", tags = " + tags + ", subRecipe = " + subRecipe + ", ndbNo = " + ndbNo + ", foodName = " + foodName + ", mealType = " + mealType + ", nfSaturatedFat = " + nfSaturatedFat + ", nfProtein = " + nfProtein + ", nfTotalFat = " + nfTotalFat + ", consumedAt = " + consumedAt + ", nfDietaryFiber = " + nfDietaryFiber + ", nfCholesterol = " + nfCholesterol + ", photo = " + photo + ", upc = " + upc + ", nfPotassium = " + nfPotassium + ", nixBrandName = " + nixBrandName + ", FullNutrients = " + fullNutrients + ", nixItemId = " + nixItemId + ", source = " + source + ", nixItemName = " + nixItemName + ", servingWeightGrams = " + servingWeightGrams + ", nixBrandId = " + nixBrandId + ", servingQty = " + servingQty + "]";
     }
 
 

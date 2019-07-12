@@ -1,6 +1,6 @@
 package fitness.albert.com.pumpit.Model;
 
-public class Alt_measures {
+public class AltMeasures {
     private String measure;
 
     private String serving_weight;

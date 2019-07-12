@@ -1,15 +1,19 @@
 package fitness.albert.com.pumpit.Model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Tags {
     private String measure;
 
-    private int food_group;
+    @SerializedName("food_group")
+    private int foodGroup;
 
     private String item;
 
     private String quantity;
 
-    private String tag_id;
+    @SerializedName("tag_id")
+    private String tagId;
 
     public String getMeasure ()
     {
@@ -21,14 +25,14 @@ public class Tags {
         this.measure = measure;
     }
 
-    public int getFood_group ()
+    public int getFoodGroup()
     {
-        return food_group;
+        return foodGroup;
     }
 
-    public void setFood_group (int food_group)
+    public void setFoodGroup(int foodGroup)
     {
-        this.food_group = food_group;
+        this.foodGroup = foodGroup;
     }
 
     public String getItem ()
@@ -51,20 +55,20 @@ public class Tags {
         this.quantity = quantity;
     }
 
-    public String getTag_id ()
+    public String getTagId()
     {
-        return tag_id;
+        return tagId;
     }
 
-    public void setTag_id (String tag_id)
+    public void setTagId(String tagId)
     {
-        this.tag_id = tag_id;
+        this.tagId = tagId;
     }
 
 
     @Override
     public String toString() {
-        return "ClassPojo [measure = "+measure+", food_group = "+food_group+", item = "+item+", quantity = "+quantity+", tag_id = "+tag_id+"]";
+        return "ClassPojo [measure = "+measure+", foodGroup = "+ foodGroup +", item = "+item+", quantity = "+quantity+", tagId = "+ tagId +"]";
     }
 
     public static String foodGroup(int id) {
@@ -84,11 +88,10 @@ public class Tags {
             case 7:
                 return "Legume";
             case 8:
-                return "Combination (multiple food groups, not discernable)";
-
+                return "Combination (multiple food groups)";
             case 9:
                 return "Not applicable";
         }
-        return null;
+        return "Combination (multiple food groups)";
     }
 }

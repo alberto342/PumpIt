@@ -67,10 +67,10 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
-        holder.tvFoodName.setText(mListItem.get(position).getFood_name());
-        holder.tvCalories.setText(mContext.getString(R.string.calories) + ": " + mListItem.get(position).getNf_calories());
-        holder.tvServingQuantity.setText(mContext.getString(R.string.serving_qty) + ": " + mListItem.get(position).getServing_qty());
-        holder.tvServingUnit.setText(mContext.getString(R.string.serving_unit) + ": " + mListItem.get(position).getServing_unit());
+        holder.tvFoodName.setText(mListItem.get(position).getFoodName());
+        holder.tvCalories.setText(mContext.getString(R.string.calories) + ": " + mListItem.get(position).getNfCalories());
+        holder.tvServingQuantity.setText(mContext.getString(R.string.servingQty) + ": " + mListItem.get(position).getServingQty());
+        holder.tvServingUnit.setText(mContext.getString(R.string.servingUnit) + ": " + mListItem.get(position).getServingUnit());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,23 +124,23 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         mItemPosition = position;
 
-        if (mListItem.get(position).getAlt_measures().size() == 0) {
+        if (mListItem.get(position).getAltMeasures().size() == 0) {
             try {
-                mListItem.get(position).getAlt_measures().get(0).setServing_weight("1");
-                mListItem.get(position).getAlt_measures().get(0).setMeasure("package");
+                mListItem.get(position).getAltMeasures().get(0).setServing_weight("1");
+                mListItem.get(position).getAltMeasures().get(0).setMeasure("package");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        for (int i = 0; i < mListItem.get(position).getAlt_measures().size(); i++) {
-            measure.add(String.valueOf(mListItem.get(position).getAlt_measures().get(i).getMeasure()));
+        for (int i = 0; i < mListItem.get(position).getAltMeasures().size(); i++) {
+            measure.add(String.valueOf(mListItem.get(position).getAltMeasures().get(i).getMeasure()));
         }
 
 
         //remove existed
-        if(!mListItem.get(position).getAlt_measures().isEmpty()) {
-            if(!String.valueOf(mListItem.get(position).getServing_weight_grams()).equals(mListItem.get(position).getAlt_measures().get(position).getServing_weight())) {
+        if(!mListItem.get(position).getAltMeasures().isEmpty()) {
+            if(!String.valueOf(mListItem.get(position).getServingWeightGrams()).equals(mListItem.get(position).getAltMeasures().get(position).getServing_weight())) {
                 String itemOne = measure.get(0);
                 measure.remove(0);
                 measure.add(itemOne);
@@ -154,8 +154,8 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         }
 
-        for (int i = 0; i < mListItem.get(position).getAlt_measures().size(); i++) {
-            measureMap.put(mListItem.get(position).getAlt_measures().get(i).getMeasure(), Float.valueOf(mListItem.get(position).getAlt_measures().get(i).getServing_weight()));
+        for (int i = 0; i < mListItem.get(position).getAltMeasures().size(); i++) {
+            measureMap.put(mListItem.get(position).getAltMeasures().get(i).getMeasure(), Float.valueOf(mListItem.get(position).getAltMeasures().get(i).getServing_weight()));
         }
     }
 

@@ -34,7 +34,7 @@
                     android:id="@+id/tv_food_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/food_name"
+                    android:hint="@string/foodName"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -55,7 +55,7 @@
                     android:id="@+id/tv_service_quantity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/serving_qty" />
+                    android:hint="@string/servingQty" />
 
             </LinearLayout>
 

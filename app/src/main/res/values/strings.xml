@@ -9,7 +9,7 @@
 
     <string name="Search">Search...</string>
 
-    <string name="food_name">Food name</string>
+    <string name="foodName">Food name</string>
 
     <string name="general_fitness">General Fitness</string>
     <string name="bulking">Bulking</string>
@@ -144,8 +144,8 @@
     <!--<String name="zinc">Zinc, Zn</String>-->
 
 
-    <string name="serving_qty">Serving Quantity</string>
-    <string name="serving_unit">Unit</string>
+    <string name="servingQty">Serving Quantity</string>
+    <string name="servingUnit">Unit</string>
     <string name="go">Go</string>
     <string name="no_data_found">No data found!</string>
 

@@ -3,14 +3,15 @@ package fitness.albert.com.pumpit.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
@@ -21,6 +22,7 @@ import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.ShowAllNutritionActivity;
 import fitness.albert.com.pumpit.ShowBreakfastActivity;
+import fitness.albert.com.pumpit.fragment.logsFragment.LogTabActivity;
 
 public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -64,12 +66,10 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
-        holder.tvFoodName.setText(foodsList.get(position).getFood_name());
-        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNf_calories(), foodsList.get(position).getNf_total_carbohydrate()));
-        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNf_protein()));
-        holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServing_qty());
-
-
+        holder.tvFoodName.setText(foodsList.get(position).getFoodName());
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNfCalories(), foodsList.get(position).getNfTotalCarbohydrate()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNfProtein()));
+        holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServingQty());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,41 +78,50 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 foodName = holder.tvFoodName.getText().toString();
 
-                String cotxt = mContext.toString();
-                String[] parts = cotxt.split("@");
-                String part1 = parts[0];
+                //String cotxt = mContext.toString();
+               // String[] parts = cotxt.split("@");
+               // String part1 = parts[0];
 
                 //refresh page
-                if (!part1.equals("fitness.albert.com.pumpit.fragment.logsFragment.LogTabActivity")) {
+
+                if(mContext instanceof LogTabActivity) {
                     mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
                     ((ShowAllNutritionActivity) mContext).finish();
                 }
 
+//                if (!part1.equals("fitness.albert.com.pumpit.fragment.logsFragment.LogTabActivity")) {
+//                    mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
+//                    ((ShowAllNutritionActivity) mContext).finish();
+//                }
+
                 Intent i = new Intent(mContext, ShowBreakfastActivity.class);
                 i.putExtra("foodPhoto", foodsList.get(position).getPhoto().getHighres());
-                i.putExtra("kcal", foodsList.get(position).getNf_calories());
-                i.putExtra("fat", foodsList.get(position).getNf_total_fat());
-                i.putExtra("protein", foodsList.get(position).getNf_protein());
-                i.putExtra("carbohydrate", foodsList.get(position).getNf_total_carbohydrate());
-                i.putExtra("servingWeightGrams", foodsList.get(position).getServing_weight_grams());
-                i.putExtra("qty", foodsList.get(position).getServing_qty());
-                i.putExtra("servingUnit", foodsList.get(position).getServing_unit());
-                i.putExtra("altMeasuresSize", foodsList.get(position).getAlt_measures().size());
+                i.putExtra("kcal", foodsList.get(position).getNfCalories());
+                i.putExtra("fat", foodsList.get(position).getNfTotalFat());
+                i.putExtra("protein", foodsList.get(position).getNfProtein());
+                i.putExtra("carbohydrate", foodsList.get(position).getNfTotalCarbohydrate());
+                i.putExtra("servingWeightGrams", foodsList.get(position).getServingWeightGrams());
+                i.putExtra("qty", foodsList.get(position).getServingQty());
+                i.putExtra("servingUnit", foodsList.get(position).getServingUnit());
+                i.putExtra("altMeasuresSize", foodsList.get(position).getAltMeasures().size());
+                i.putExtra("fullNutrientsSize", foodsList.get(position).getFullNutrients().size());
 
-                for (int r = 0; r < foodsList.get(position).getAlt_measures().size(); r++) {
-                    i.putExtra("measure" + r, foodsList.get(position).getAlt_measures().get(r).getMeasure());
-                    i.putExtra("measureServingWeight" + r, foodsList.get(position).getAlt_measures().get(r).getServing_weight());
+                for (int r = 0; r < foodsList.get(position).getAltMeasures().size(); r++) {
+                    i.putExtra("measure" + r, foodsList.get(position).getAltMeasures().get(r).getMeasure());
+                    i.putExtra("measureServingWeight" + r, foodsList.get(position).getAltMeasures().get(r).getServing_weight());
+                }
+
+                for(int r=0; r< foodsList.get(position).getFullNutrients().size(); r++) {
+                    i.putExtra("AttrId" + r, foodsList.get(position).getFullNutrients().get(r).getAttrId());
+                    i.putExtra("values" + r,foodsList.get(position).getFullNutrients().get(r).getValue());
                 }
                 mContext.startActivity(i);
 
-
-               // mContext.startActivity(new Intent(mContext, ShowBreakfastActivity.class));
+//                mContext.startActivity(new Intent(mContext, ShowBreakfastActivity.class));
 //                foodsList.clear();
 //                ((Activity) mContext).finish();
             }
         });
-
-
     }
 
 
@@ -140,6 +149,7 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
 
+
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView ivImage;
@@ -151,7 +161,6 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
         public ViewHolder(View rowView) {
             super(rowView);
             rowView.setOnClickListener(this);
-
             ivImage = rowView.findViewById(R.id.iv_food_img);
             tvFoodName = rowView.findViewById(R.id.tv_food_name);
             tvCalories = rowView.findViewById(R.id.tv_calories);

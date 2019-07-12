@@ -1,12 +1,15 @@
 package fitness.albert.com.pumpit.Model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Photo {
 
     private String highres;
 
     private String thumb;
 
-    private String is_user_uploaded;
+    @SerializedName("is_user_uploaded")
+    private String isUserUploaded;
 
     public String getHighres ()
     {
@@ -28,17 +31,17 @@ public class Photo {
         this.thumb = thumb;
     }
 
-    public String getIs_user_uploaded ()
+    public String getIsUserUploaded()
     {
-        return is_user_uploaded;
+        return isUserUploaded;
     }
 
-    public void setIs_user_uploaded (String is_user_uploaded) {
-        this.is_user_uploaded = is_user_uploaded;
+    public void setIsUserUploaded(String isUserUploaded) {
+        this.isUserUploaded = isUserUploaded;
     }
 
     @Override
     public String toString() {
-        return "ClassPojo [highres = "+highres+", thumb = "+thumb+", is_user_uploaded = "+is_user_uploaded+"]";
+        return "ClassPojo [highres = "+highres+", thumb = "+thumb+", isUserUploaded = "+ isUserUploaded +"]";
     }
 }

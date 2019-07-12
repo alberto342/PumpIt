@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,22 +8,39 @@
     android:orientation="vertical"
     tools:context=".SearchFoodsActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5sp"
-        android:orientation="horizontal" />
+        android:fitsSystemWindows="true">
 
-    <com.mancj.materialsearchbar.MaterialSearchBar
-        android:id="@+id/food_search_bar"
-        style="@style/MaterialSearchBarLight"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        app:mt_maxSuggestionsCount="10"
-        app:mt_placeholder="Search..."
-        app:mt_speechMode="true" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorDarkBlue"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+
+            <com.mancj.materialsearchbar.MaterialSearchBar
+                android:id="@+id/food_search_bar"
+                style="@style/MaterialSearchBarLight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                app:mt_maxSuggestionsCount="10"
+                app:mt_menuIconDrawable="@mipmap/ic_search_black_18dp"
+                app:mt_placeholder="Search..."
+                app:mt_speechMode="true" />
+        </LinearLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+
+
+
 
     <TextView
         android:id="@+id/tvEmpty"

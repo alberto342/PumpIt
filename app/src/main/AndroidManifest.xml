@@ -89,7 +89,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ShowFoodBeforeAddedActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="preloaded_fonts"

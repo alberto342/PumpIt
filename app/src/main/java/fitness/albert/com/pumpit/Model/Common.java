@@ -1,18 +1,23 @@
 package fitness.albert.com.pumpit.Model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Common {
 
-    private String food_name;
+    @SerializedName("food_name")
+    private String foodName;
     private String image;
-    private int tag_id;
-    private String tag_name;
+    @SerializedName("tag_id")
+    private int tagId;
+    @SerializedName("tag_name")
+    private String tagName;
 
-    public String getFood_name() {
-        return food_name;
+    public String getFoodName() {
+        return foodName;
     }
 
-    public void setFood_name(String food_name) {
-        this.food_name = food_name;
+    public void setFoodName(String foodName) {
+        this.foodName = foodName;
     }
 
     public String getImage() {
@@ -23,19 +28,19 @@ public class Common {
         this.image = image;
     }
 
-    public int getTag_id() {
-        return tag_id;
+    public int getTagId() {
+        return tagId;
     }
 
-    public void setTag_id(int tag_id) {
-        this.tag_id = tag_id;
+    public void setTagId(int tagId) {
+        this.tagId = tagId;
     }
 
-    public String getTag_name() {
-        return tag_name;
+    public String getTagName() {
+        return tagName;
     }
 
-    public void setTag_name(String tag_name) {
-        this.tag_name = tag_name;
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
     }
 }

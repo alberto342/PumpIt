@@ -259,8 +259,8 @@ public class LogNutritionFragment extends Fragment {
     private void delNutrition(final String nutrition, ArrayList<Foods> foodsArrayList, int pos) {
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(nutrition).document(UserRegister.getTodayData()).collection(Foods.All_NUTRITION)
-                .whereEqualTo("food_name", foodsArrayList.get(pos).getFood_name())
-                .whereEqualTo("serving_qty", foodsArrayList.get(pos).getServing_qty()).get()
+                .whereEqualTo("food_name", foodsArrayList.get(pos).getFoodName())
+                .whereEqualTo("serving_qty", foodsArrayList.get(pos).getServingQty()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {

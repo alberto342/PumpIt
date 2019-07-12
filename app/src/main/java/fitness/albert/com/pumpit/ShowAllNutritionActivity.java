@@ -78,22 +78,17 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         rvListLunch = findViewById(R.id.rv_lunch);
         rvListDinner = findViewById(R.id.rv_dinner);
         rvListSnacks = findViewById(R.id.rv_snacks);
-
         tvTotalBreakfast = findViewById(R.id.tv_total_breakfast);
         tvTotalLunch = findViewById(R.id.tv_total_lunch);
         tvTotalDinner = findViewById(R.id.tv_total_dinner);
         tvTotalSnacks = findViewById(R.id.tv_total_snacks);
         constraintLayout = findViewById(R.id.coordinator_layout);
-
         tvCarbs = findViewById(R.id.tv_carbs_all_nutrition);
         tvProtien = findViewById(R.id.tv_protein_all_nutrition);
         tvFat = findViewById(R.id.tv_fat_all_nutrition);
-
         progressCarbs = findViewById(R.id.pb_carbs);
         progressProtien = findViewById(R.id.pb_protein);
         progressFat = findViewById(R.id.pb_fat);
-
-
         breakfastContainer = findViewById(R.id.breakfast_container);
         lunchContainer = findViewById(R.id.lunch_container);
         dinnerContainer = findViewById(R.id.dinner_container);
@@ -169,6 +164,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
         enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.LUNCH);
         enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.SNACK);
+
     }
 
     private void getMealFromFs(final String keyValue, final RecyclerView recyclerView,
@@ -207,10 +203,10 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                 Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
 
                                 //set NUTRITION to float
-                                kcal += foodList.get(i).getNf_calories();
-                                carbs += foodList.get(i).getNf_total_carbohydrate();
-                                fat += foodList.get(i).getNf_total_fat();
-                                protein += foodList.get(i).getNf_protein();
+                                kcal += foodList.get(i).getNfCalories();
+                                carbs += foodList.get(i).getNfTotalCarbohydrate();
+                                fat += foodList.get(i).getNfTotalFat();
+                                protein += foodList.get(i).getNfProtein();
                             }
                             totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" + " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ", kcal, carbs, protein, fat));
 
@@ -266,7 +262,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
 
                                 assert foods != null;
-                                if (foodName.equals(foods.getFood_name()) && qty == foods.getServing_qty()) {
+                                if (foodName.equals(foods.getFoodName()) && qty == foods.getServingQty()) {
 
                                     String id = task.getResult().getDocuments().get(i).getId();
 
@@ -295,10 +291,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
     @SuppressLint("LongLogTag")
     private void initRecyclerView(RecyclerView recyclerView, List<Foods> foodList, String nutrition) {
-        BreakfastListAdapter breakfastAdapter;
-        LunchListAdapter lunchAdapter;
-        DinnerListAdapter dinnerAdapter;
-        SnacksListAdapter snacksAdapter;
 
         Log.d(TAG, "initRecyclerView: init food recyclerView" + recyclerView);
 
@@ -308,19 +300,19 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
         switch (nutrition) {
             case Foods.BREAKFAST:
-                breakfastAdapter = new BreakfastListAdapter(this, foodList);
+                BreakfastListAdapter breakfastAdapter = new BreakfastListAdapter(this, foodList);
                 recyclerView.setAdapter(breakfastAdapter);
                 break;
             case Foods.LUNCH:
-                lunchAdapter = new LunchListAdapter(this, foodList);
+                LunchListAdapter lunchAdapter = new LunchListAdapter(this, foodList);
                 recyclerView.setAdapter(lunchAdapter);
                 break;
             case Foods.DINNER:
-                dinnerAdapter = new DinnerListAdapter(this, foodList);
+                DinnerListAdapter dinnerAdapter = new DinnerListAdapter(this, foodList);
                 recyclerView.setAdapter(dinnerAdapter);
                 break;
             case Foods.SNACK:
-                snacksAdapter = new SnacksListAdapter(this, foodList);
+                SnacksListAdapter snacksAdapter = new SnacksListAdapter(this, foodList);
                 recyclerView.setAdapter(snacksAdapter);
         }
     }
@@ -336,7 +328,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                 final int position = viewHolder.getAdapterPosition();
                 final Foods item = mAdapter.getData().get(position);
 
-                deleteFromFirebase(keyValue, item.getFood_name(), item.getServing_qty());
+                deleteFromFirebase(keyValue, item.getFoodName(), item.getServingQty());
 
                 foodList.remove(position);
                 recyclerView.removeViewAt(position);
@@ -433,4 +425,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         this.foodListLunch.clear();
         this.foodListSnacks.clear();
     }
+
+
 }

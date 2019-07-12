@@ -62,10 +62,10 @@ public class LunchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
-        holder.tvFoodName.setText(foodsList.get(position).getFood_name());
-        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNf_calories(), foodsList.get(position).getNf_total_carbohydrate()));
-        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNf_protein()));
-        holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServing_qty());
+        holder.tvFoodName.setText(foodsList.get(position).getFoodName());
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNfCalories(), foodsList.get(position).getNfTotalCarbohydrate()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNfProtein()));
+        holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServingQty());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +73,7 @@ public class LunchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
                 Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
-                foodName = foodsList.get(position).getFood_name();
+                foodName = foodsList.get(position).getFoodName();
 
                 String cotxt = mContext.toString();
                 String[] parts = cotxt.split("@");
@@ -88,19 +88,19 @@ public class LunchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
                 Intent i = new Intent(mContext, ShowLunchActivity.class);
                 i.putExtra("foodPhoto", foodsList.get(position).getPhoto().getHighres());
-                i.putExtra("kcal", foodsList.get(position).getNf_calories());
-                i.putExtra("fat", foodsList.get(position).getNf_total_fat());
-                i.putExtra("protein", foodsList.get(position).getNf_protein());
-                i.putExtra("carbohydrate", foodsList.get(position).getNf_total_carbohydrate());
-                i.putExtra("servingWeightGrams", foodsList.get(position).getServing_weight_grams());
-                i.putExtra("qty", foodsList.get(position).getServing_qty());
-                i.putExtra("servingUnit", foodsList.get(position).getServing_unit());
-                i.putExtra("altMeasuresSize", foodsList.get(position).getAlt_measures().size());
+                i.putExtra("kcal", foodsList.get(position).getNfCalories());
+                i.putExtra("fat", foodsList.get(position).getNfTotalFat());
+                i.putExtra("protein", foodsList.get(position).getNfProtein());
+                i.putExtra("carbohydrate", foodsList.get(position).getNfTotalCarbohydrate());
+                i.putExtra("servingWeightGrams", foodsList.get(position).getServingWeightGrams());
+                i.putExtra("qty", foodsList.get(position).getServingQty());
+                i.putExtra("servingUnit", foodsList.get(position).getServingUnit());
+                i.putExtra("altMeasuresSize", foodsList.get(position).getAltMeasures().size());
 
 
-                for (int r = 0; r < foodsList.get(position).getAlt_measures().size(); r++) {
-                    i.putExtra("measure" + r, foodsList.get(position).getAlt_measures().get(r).getMeasure());
-                    i.putExtra("measureServingWeight" + r, foodsList.get(position).getAlt_measures().get(r).getServing_weight());
+                for (int r = 0; r < foodsList.get(position).getAltMeasures().size(); r++) {
+                    i.putExtra("measure" + r, foodsList.get(position).getAltMeasures().get(r).getMeasure());
+                    i.putExtra("measureServingWeight" + r, foodsList.get(position).getAltMeasures().get(r).getServing_weight());
                 }
                 mContext.startActivity(i);
 

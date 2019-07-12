@@ -1,15 +1,17 @@
 package fitness.albert.com.pumpit.workout;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -57,7 +59,6 @@ public class TrainingActivity extends AppCompatActivity {
     private void init() {
         trackerExerciseList = new ArrayList<>();
         trainingList = new ArrayList<>();
-
         rvTraining = findViewById(R.id.rv_training);
     }
 
@@ -202,6 +203,7 @@ public class TrainingActivity extends AppCompatActivity {
 
     public void initRecyclerView(List<Training> trainingList, List<TrackerExercise> trackerList) {
 
+        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvTraining.setLayoutManager(layoutManager);
 

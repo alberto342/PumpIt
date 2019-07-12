@@ -6,17 +6,20 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -59,17 +62,20 @@ public class SearchFoodsActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private MaterialSearchBar searchBar;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_foods);
+
         //checkPermission();
         Objects.requireNonNull(getSupportActionBar()).hide();
         api = Global.initRetrofit();
         findViews();
     }
 
+
+
+    @SuppressLint("WrongConstant")
     private void findViews() {
         tvEmpty = findViewById(R.id.tvEmpty);
         rvList = findViewById(R.id.rvList);
@@ -88,8 +94,16 @@ public class SearchFoodsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main_add, menu);
+        return true;
+    }
+
 
     private void searchBarClicked() {
+
         searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
             @Override
             public void onSearchStateChanged(boolean enabled) {
@@ -201,7 +215,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<CommonListResponse> call, @NonNull Response<CommonListResponse> response) {
                 if (response.body() != null) {
                     commonArrayList = response.body().getFoods();
-                    Log.d(TAG, "LOLO:" +  commonArrayList.get(0).getFood_name());
+                    Log.d(TAG, "LOLO:" + commonArrayList.get(0).getFoodName());
 
                     commonListAdapter = new CommonListAdapter(SearchFoodsActivity.this, commonArrayList);
                     rvList.setAdapter(commonListAdapter);
@@ -304,7 +318,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
 
     private void arrayListIntoClass() {
         for (int i = 0; i < mListItem.size(); i++) {
-            foods.setFood_name(mListItem.get(i).getFood_name());
+            foods.setFoodName(mListItem.get(i).getFoodName());
             foods.setImgUrl(mListItem.get(i).getImgUrl());
         }
     }

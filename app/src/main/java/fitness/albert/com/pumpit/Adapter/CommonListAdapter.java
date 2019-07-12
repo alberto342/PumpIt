@@ -2,14 +2,15 @@ package fitness.albert.com.pumpit.Adapter;
 
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -56,7 +57,7 @@ public class CommonListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void bindViews(final ViewHolder holder, final int position) {
 
 
-        Log.d("TEst", "hle: " + mListItem.get(position).getFood_name());
+        Log.d("TEst", "hle: " + mListItem.get(position).getFoodName());
 
 //
 //        Picasso.get()
@@ -74,9 +75,9 @@ public class CommonListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 //                .into(holder.ivImage);
 
 
-        holder.tvFoodName.setText(mListItem.get(position).getFood_name());
-       // holder.tvServingQuantity.setText(mContext.getString(R.string.serving_qty) + " :- " + mListItem.get(position).getServing_qty());
-        //holder.tvServingUnit.setText(mContext.getString(R.string.serving_unit) + " :- " + mListItem.get(position).getServing_unit());
+        holder.tvFoodName.setText(mListItem.get(position).getFoodName());
+       // holder.tvServingQuantity.setText(mContext.getString(R.string.serving_qty) + " :- " + mListItem.get(position).getServingQty());
+        //holder.tvServingUnit.setText(mContext.getString(R.string.serving_unit) + " :- " + mListItem.get(position).getServingUnit());
     }
 
     @Override

@@ -46,7 +46,6 @@
 
 
     <!--ToolBar Style-->
-
     <style name="ToolBarStyle" parent="ToolBarStyle.Base" />
 
     <style name="ToolBarStyle.Base" parent="">
@@ -71,6 +70,14 @@
 
     <!--End ToolBar Style-->
 
+
+    <!-- Not ActionBar application theme. -->
+    <style name="AppThemeNotActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
 
 </resources>

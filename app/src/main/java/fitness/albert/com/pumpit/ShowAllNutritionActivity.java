@@ -71,6 +71,16 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         init();
         datePicker();
         getUserDataAndSetGoal();
+
+        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast, UserRegister.getTodayData());
+        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch, UserRegister.getTodayData());
+        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner, UserRegister.getTodayData());
+        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks, UserRegister.getTodayData());
+
+        enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.BREAKFAST);
+        enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
+        enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.LUNCH);
+        enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.SNACK);
     }
 
     private void init() {
@@ -155,16 +165,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast, UserRegister.getTodayData());
-        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch, UserRegister.getTodayData());
-        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner, UserRegister.getTodayData());
-        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks, UserRegister.getTodayData());
-
-        enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.BREAKFAST);
-        enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
-        enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.LUNCH);
-        enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.SNACK);
-
     }
 
     private void getMealFromFs(final String keyValue, final RecyclerView recyclerView,
@@ -290,7 +290,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
 
     @SuppressLint("LongLogTag")
-    private void initRecyclerView(RecyclerView recyclerView, List<Foods> foodList, String nutrition) {
+    private void initRecyclerView(RecyclerView recyclerView, final List<Foods> foodList, String nutrition) {
 
         Log.d(TAG, "initRecyclerView: init food recyclerView" + recyclerView);
 
@@ -300,7 +300,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
         switch (nutrition) {
             case Foods.BREAKFAST:
-                BreakfastListAdapter breakfastAdapter = new BreakfastListAdapter(this, foodList);
+                final BreakfastListAdapter breakfastAdapter = new BreakfastListAdapter(this, foodList);
                 recyclerView.setAdapter(breakfastAdapter);
                 break;
             case Foods.LUNCH:

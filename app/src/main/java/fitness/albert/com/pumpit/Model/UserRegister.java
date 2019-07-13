@@ -66,6 +66,8 @@ public class UserRegister {
 
 
 
+
+
     public int getMeter() {
         return meter;
     }

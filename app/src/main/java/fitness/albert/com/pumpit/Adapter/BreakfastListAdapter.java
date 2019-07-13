@@ -22,7 +22,6 @@ import fitness.albert.com.pumpit.Model.Foods;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.ShowAllNutritionActivity;
 import fitness.albert.com.pumpit.ShowBreakfastActivity;
-import fitness.albert.com.pumpit.fragment.logsFragment.LogTabActivity;
 
 public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -78,21 +77,14 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 foodName = holder.tvFoodName.getText().toString();
 
-                //String cotxt = mContext.toString();
-               // String[] parts = cotxt.split("@");
-               // String part1 = parts[0];
+                String cotxt = mContext.toString();
+                String[] parts = cotxt.split("@");
+                String part1 = parts[0];
 
-                //refresh page
-
-                if(mContext instanceof LogTabActivity) {
+                if (!part1.equals("fitness.albert.com.pumpit.fragment.logsFragment.LogTabActivity")) {
                     mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
                     ((ShowAllNutritionActivity) mContext).finish();
                 }
-
-//                if (!part1.equals("fitness.albert.com.pumpit.fragment.logsFragment.LogTabActivity")) {
-//                    mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
-//                    ((ShowAllNutritionActivity) mContext).finish();
-//                }
 
                 Intent i = new Intent(mContext, ShowBreakfastActivity.class);
                 i.putExtra("foodPhoto", foodsList.get(position).getPhoto().getHighres());
@@ -116,6 +108,9 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                     i.putExtra("values" + r,foodsList.get(position).getFullNutrients().get(r).getValue());
                 }
                 mContext.startActivity(i);
+
+
+             //   ((Activity) mContext).recreate();
 
 //                mContext.startActivity(new Intent(mContext, ShowBreakfastActivity.class));
 //                foodsList.clear();

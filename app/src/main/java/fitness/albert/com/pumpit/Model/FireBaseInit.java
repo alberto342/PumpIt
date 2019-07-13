@@ -20,22 +20,17 @@ import java.util.List;
 public class FireBaseInit {
     public static FireBaseInit fireBaseInit = null;
     public FirebaseUser user;
-
     public List<AuthUI.IdpConfig> providers = Collections.singletonList(
-
             new AuthUI.IdpConfig.GoogleBuilder().build());
-
     public FirebaseStorage storage;
-
     public StorageReference storageRef;
-
     public DocumentReference docRef;
-
     public FirebaseFirestore db;
     private Context context;
+    public PrefsUtils prefsUtils = new PrefsUtils();
 
 
-    private FireBaseInit(Context context){
+    public FireBaseInit(Context context){
         this.context=context;
 
         defineTheFireBaseDataBase();
@@ -53,12 +48,18 @@ public class FireBaseInit {
     }
 
     public static String getEmailRegister() {
+
         String email = null;
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
             email = mAuth.getCurrentUser().getEmail();
         }
         return email;
+    }
+
+    public void setIntoPrefs() {
+        prefsUtils.createSharedPreferencesFiles(context, "user");
+        prefsUtils.saveData("userEmail", getEmailRegister());
     }
 
     // rest the firebase settings

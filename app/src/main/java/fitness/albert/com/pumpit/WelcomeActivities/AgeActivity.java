@@ -1,29 +1,26 @@
 package fitness.albert.com.pumpit.WelcomeActivities;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.DatePicker;
 import android.widget.ImageView;
-import android.widget.NumberPicker;
+import android.widget.TextView;
 
-import java.lang.reflect.Field;
+import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Calendar;
+
+import fitness.albert.com.pumpit.Model.PrefsUtils;
+import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
-public class AgeActivity extends AppCompatActivity {
+public class AgeActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
-    private NumberPicker np;
     private ImageView next;
-
-    private SharedPreferences SPSaveTheCounter;
-    private SharedPreferences.Editor editor;
+    private TextView mDisplayDate;
 
 
     @Override
@@ -32,67 +29,23 @@ public class AgeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_age);
 
         getSupportActionBar().hide();
-
         init();
-
-        createSharedPreferencesFiles();
-
-        //Gets whether the selector wheel wraps when reaching the min/max value.
-        np.setWrapSelectorWheel(true);
-
-        //Set a value change listener for NumPicker
-        np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal){
-                //Display the newly selected number from picker
-                sharedPreferencesSaveData("age", newVal);
-
-            }
-        });
-
         btnNextPressed();
     }
 
     private void init() {
-        np = findViewById(R.id.np);
         next = findViewById(R.id.next_preesed);
+        mDisplayDate = findViewById(R.id.tv_my_age);
 
-        setNumberPickerTextColor(np, Color.WHITE);
-
-        //Populate NumPicker values from minimum and maximum value range
-        //Set the minimum value of NumPicker
-        np.setMinValue(14);
-        //Specify the maximum value/number of NumPicker
-        np.setMaxValue(75);
+        ImageView btnSelectedAge = findViewById(R.id.btn_set_date);
+        btnSelectedAge.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog();
+            }
+        });
     }
 
-    @SuppressLint("LongLogTag")
-    public static void setNumberPickerTextColor(NumberPicker numberPicker, int color) {
-
-        try{
-            Field selectorWheelPaintField = numberPicker.getClass()
-                    .getDeclaredField("mSelectorWheelPaint");
-            selectorWheelPaintField.setAccessible(true);
-            ((Paint)selectorWheelPaintField.get(numberPicker)).setColor(color);
-        }
-        catch(NoSuchFieldException e){
-            Log.w("setNumberPickerTextColor", e);
-        }
-        catch(IllegalAccessException e){
-            Log.w("setNumberPickerTextColor", e);
-        }
-        catch(IllegalArgumentException e){
-            Log.w("setNumberPickerTextColor", e);
-        }
-
-        final int count = numberPicker.getChildCount();
-        for(int i = 0; i < count; i++){
-            View child = numberPicker.getChildAt(i);
-            if(child instanceof EditText)
-                ((EditText)child).setTextColor(color);
-        }
-        numberPicker.invalidate();
-    }
 
     private void btnNextPressed() {
         next.setOnClickListener(new View.OnClickListener() {
@@ -103,18 +56,43 @@ public class AgeActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("WrongConstant")
-    private void createSharedPreferencesFiles() {
-        SPSaveTheCounter = getSharedPreferences("userInfo",MODE_NO_LOCALIZED_COLLATORS);
+
+    public void showDatePickerDialog() {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                android.R.style.Theme_DeviceDefault_Light_Dialog,
+                this,
+                Calendar.getInstance().get(Calendar.YEAR),
+                Calendar.getInstance().get(Calendar.MONTH),
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.show();
     }
 
-    private void sharedPreferencesSaveData(String key, int intObj) {
-        editor = SPSaveTheCounter.edit();
-        try {
-            editor.putInt(key, intObj);
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        String date = month+1 + "/" + dayOfMonth + "/" + year;
+        PrefsUtils prefsUtils = new PrefsUtils();
+        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
+        prefsUtils.saveData("dateOfBirth", date);
+        mDisplayDate.setText(getAge(year, month, dayOfMonth));
+
+        if(!date.isEmpty()) {
+            next.setVisibility(View.VISIBLE);
         }
-        editor.apply();
+    }
+
+    private String getAge(int year, int month, int day) {
+        Calendar dob = Calendar.getInstance();
+        Calendar today = Calendar.getInstance();
+        dob.set(year, month, day);
+
+        int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
+
+        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+        @SuppressLint("UseValueOf")
+        Integer ageInt = new Integer(age);
+        return ageInt.toString();
     }
 }

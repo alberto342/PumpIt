@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fitness.albert.com.pumpit.LoginActivity;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
@@ -42,12 +43,9 @@ public class EmailRegisterActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private int height;
-    private String programSelect;
-    private int age;
+    private int height, age;
+    private String programSelect, bodyFat, fatTarget;;
     private Float weight;
-    private String bodyFat;
-    private String fatTarget;
     private Boolean isMale;
 
     @Override
@@ -101,7 +99,6 @@ public class EmailRegisterActivity extends AppCompatActivity {
     }
 
 
-
     private void signup() {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,11 +145,10 @@ public class EmailRegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                if(!isEmailValid(inputEmail.getText().toString())) {
+                if (!isEmailValid(inputEmail.getText().toString())) {
                     errorMessage(inputEmail, "Please enter a valid email address");
                     return;
                 }
-
 
 
                 //Save data to maps
@@ -168,7 +164,7 @@ public class EmailRegisterActivity extends AppCompatActivity {
                 saveData.put("programSelect", userRegister.getMyProgram());
                 saveData.put("activityLevel", "setOfTheDay");
 
-                
+
                 progressBar.setVisibility(View.VISIBLE);
                 //create user
                 try {
@@ -183,19 +179,23 @@ public class EmailRegisterActivity extends AppCompatActivity {
                                                 Toast.LENGTH_SHORT).show();
                                     } else {
                                         //save data to firebase
-                                        db.collection("users").document(userRegister.getEmail()).set(saveData).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Log.d(TAG, "DocumentSnapshot added with ID: ");
-                                            }
-                                        })
+                                        db.collection("users").document(userRegister.getEmail()).set(saveData)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "DocumentSnapshot added with ID: ");
+                                                        PrefsUtils prefsUtils = new PrefsUtils();
+                                                        prefsUtils.createSharedPreferencesFiles(EmailRegisterActivity.this, UserRegister.SharedPreferencesFile);
+                                                        prefsUtils.saveData("email", userRegister.getEmail());
+                                                    }
+                                                })
                                                 .addOnFailureListener(new OnFailureListener() {
                                                     @Override
                                                     public void onFailure(@NonNull Exception e) {
                                                         Log.w(TAG, "Error adding document", e);
                                                     }
                                                 });
-                                        clearSharedPreferencesDataֿ();
+                                        //clearSharedPreferencesDataֿ();
 
                                         Toast.makeText(EmailRegisterActivity.this, "Registration Succeeded, Please Verify Your Email Address", Toast.LENGTH_SHORT).show();
                                         sendVerificationEmail();
@@ -207,7 +207,6 @@ public class EmailRegisterActivity extends AppCompatActivity {
                                             finish();
                                         } else {
                                             errorMessage(inputPasswordConfirm, "Those password didn't match. Try again");
-                                            return;
                                         }
                                     }
                                 }
@@ -218,7 +217,6 @@ public class EmailRegisterActivity extends AppCompatActivity {
             }
         });
     }
-
 
 
     private void loadPreferences() {
@@ -232,11 +230,6 @@ public class EmailRegisterActivity extends AppCompatActivity {
         this.fatTarget = pref.getString("fatTarget", null);
     }
 
-    private void clearSharedPreferencesDataֿ() {
-        SharedPreferences settings = EmailRegisterActivity.this
-                .getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        settings.edit().clear().commit();
-    }
 
     private void sendVerificationEmail() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

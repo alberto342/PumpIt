@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/private/var/folders/0g/2t5cpp5x0tz4f7d7gnv56w2m0000gn/T/AppTranslocation/2036041A-1139-4197-8CBE-A83C76ED8A57/d/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_search_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/private/var/folders/0g/2t5cpp5x0tz4f7d7gnv56w2m0000gn/T/AppTranslocation/A665DAEC-E90E-485C-9E11-A4034E5C333C/d/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_settings_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -55,7 +55,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_search_white" />
+                                      <entry key="outputName" value="ic_setting_white" />
                                       <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ffffff" />
                                     </map>

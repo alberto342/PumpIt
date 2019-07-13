@@ -2,11 +2,9 @@ package fitness.albert.com.pumpit.WelcomeActivities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -14,22 +12,19 @@ import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.lang.reflect.Field;
 
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
 public class WeightActivity extends AppCompatActivity {
 
-    private SharedPreferences SPSaveTheCounter;
-    private SharedPreferences.Editor editor;
-
+   PrefsUtils prefsUtils = new PrefsUtils();
     private NumberPicker pKg, pGram;
     private ImageView next;
-    private int color = Color.WHITE;
-    private TextView textPoint;
-    private int saveKg;
-    private int saveGram;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +32,9 @@ public class WeightActivity extends AppCompatActivity {
         setContentView(R.layout.activity_weight);
 
         getSupportActionBar().hide();
-
         init();
-
-        createSharedPreferencesFiles();
-
+        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
         valueChangedListener();
-
         btnNextPressed();
     }
 
@@ -55,7 +46,7 @@ public class WeightActivity extends AppCompatActivity {
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 //Display the newly selected number from picker
 
-                saveKg = newVal;
+               // saveKg = newVal;
             }
         });
 
@@ -63,7 +54,7 @@ public class WeightActivity extends AppCompatActivity {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 //Display the newly selected number from picker
-                saveGram = newVal;
+                //saveGram = newVal;
             }
         });
         UserRegister user = new UserRegister();
@@ -71,13 +62,14 @@ public class WeightActivity extends AppCompatActivity {
     }
 
     private void init() {
-        textPoint = findViewById(R.id.text_point);
+        TextView textPoint = findViewById(R.id.text_point);
         textPoint.setText(".");
 
         pKg = findViewById(R.id.p_kg);
         pGram = findViewById(R.id.p_gram);
         next = findViewById(R.id.next_btn);
 
+        int color = Color.WHITE;
         setNumberPickerTextColor(pKg, color);
         setNumberPickerTextColor(pGram, color);
 
@@ -120,26 +112,11 @@ public class WeightActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 UserRegister user = new UserRegister();
-                sharedPreferencesSaveData("weight", user.customFloatNum(pKg.getValue(), pGram.getValue()));
+                prefsUtils.saveData("weight",user.customFloatNum(pKg.getValue(),pGram.getValue()));
                 startActivity(new Intent(WeightActivity.this, BodyFatActivity.class));
             }
         });
     }
 
 
-
-    @SuppressLint("WrongConstant")
-    private void createSharedPreferencesFiles() {
-        SPSaveTheCounter = getSharedPreferences("userInfo",MODE_NO_LOCALIZED_COLLATORS);
-    }
-
-    private void sharedPreferencesSaveData(String key, float floatObj) {
-        editor = SPSaveTheCounter.edit();
-        try {
-            editor.putFloat(key, floatObj);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        editor.apply();
-    }
 }

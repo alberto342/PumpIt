@@ -16,7 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".workout.FinisherWorkoutActivity"></activity>
+        <activity
+            android:name=".fragment.profile.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
+        <activity android:name=".workout.FinisherWorkoutActivity" />
         <activity android:name=".workout.ShowLogExercise" />
         <activity android:name=".fragment.logsFragment.LogTabActivity" />
         <activity android:name=".workout.CustomAddExerciseActivity" />

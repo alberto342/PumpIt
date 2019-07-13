@@ -1,6 +1,5 @@
 package fitness.albert.com.pumpit.Adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -77,7 +76,6 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 Context context = v.getContext();
                 getNutrition(position);
                 context.startActivity(new Intent(context, ShowFoodBeforeAddedActivity.class));
-                ((Activity) mContext).finish();
             }
         });
     }
@@ -95,7 +93,6 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         private TextView tvCalories;
         private TextView tvServingQuantity;
         private TextView tvServingUnit;
-
 
         public ViewHolder(View rowView) {
             super(rowView);

@@ -3,9 +3,6 @@ package fitness.albert.com.pumpit.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +11,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 
 import java.util.List;
 
+import fitness.albert.com.pumpit.Model.PrefsUtils;
+import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.WelcomeActivities.BodyFatActivity;
 import fitness.albert.com.pumpit.WelcomeActivities.FatTargetActivity;
@@ -27,19 +29,17 @@ public class BodyFatRecyclerViewAdapter extends RecyclerView.Adapter<BodyFatRecy
     private ImageView next;
 
     private static final String TAG = "BodyFatRecyclerViewAdapter";
-    private SharedPreferences SPSaveTheCounter;
-    private SharedPreferences.Editor editor;
 
 
     //vars
     private List<String> bodyFat;
-    private List<String> mImageUrls;
+    private List<Integer> mImageUrls;
     private Context mContext;
+    public static boolean isSelected;
 
-    public BodyFatRecyclerViewAdapter(Context context, List<String> bodyFat, List<String> imageUrls) {
-
+    public BodyFatRecyclerViewAdapter(Context context, List<String> bodyFat, List<Integer> image) {
         this.bodyFat = bodyFat;
-        this.mImageUrls = imageUrls;
+        this.mImageUrls = image;
         this.mContext = context;
     }
 
@@ -50,10 +50,13 @@ public class BodyFatRecyclerViewAdapter extends RecyclerView.Adapter<BodyFatRecy
         return new ViewHolder(view);
     }
 
-    @SuppressLint("LongLogTag")
+    @SuppressLint({"LongLogTag", "SetTextI18n"})
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: called.");
+        final PrefsUtils prefsUtils = new PrefsUtils();
+        prefsUtils.createSharedPreferencesFiles(mContext, UserRegister.SharedPreferencesFile);
+
 
         Glide.with(mContext)
                 .asBitmap()
@@ -70,18 +73,16 @@ public class BodyFatRecyclerViewAdapter extends RecyclerView.Adapter<BodyFatRecy
 
                 Toast.makeText(mContext, bodyFat.get(position), Toast.LENGTH_SHORT).show();
 
-                createSharedPreferencesFiles();
-
                 if(mContext instanceof BodyFatActivity) {
-                    sharedPreferencesSaveData("bodyFat", bodyFat.get(position));
+                    prefsUtils.saveData("bodyFat", bodyFat.get(position));
+                    isSelected = true;
+
                 }
 
                 if(mContext instanceof FatTargetActivity) {
-                    sharedPreferencesSaveData("fatTarget", bodyFat.get(position));
+                    prefsUtils.saveData("fatTarget",bodyFat.get(position));
                 }
             }
-
-
         });
     }
 
@@ -104,18 +105,5 @@ public class BodyFatRecyclerViewAdapter extends RecyclerView.Adapter<BodyFatRecy
     }
 
 
-    @SuppressLint("WrongConstant")
-    private void createSharedPreferencesFiles() {
-        SPSaveTheCounter = mContext.getSharedPreferences("userInfo",Context.MODE_NO_LOCALIZED_COLLATORS);
-    }
 
-    private void sharedPreferencesSaveData(String key, String mName) {
-        editor = SPSaveTheCounter.edit();
-        try {
-            editor.putString(key, mName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        editor.apply();
-    }
 }

@@ -6,16 +6,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -54,6 +55,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         setToolBar();
         init(view);
         seeWorkout.setOnClickListener(this);
@@ -73,7 +75,6 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-     //   loadExerciseFromFb();
     }
 
     @Override
@@ -136,11 +137,17 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         progressdialog.hide();
 
-                        if (task.getResult() != null)
+                        if (task.getResult() != null && !task.getResult().getDocuments().isEmpty()) {
+
                             exerciseExist = task.getResult().getDocuments().size() > 0;
 
-                        haveExercise(exerciseExist);
-                        progressdialog.hide();
+                            haveExercise(exerciseExist);
+                            progressdialog.hide();
+                        }
+
+
+                    //    haveExercise(exerciseExist);
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

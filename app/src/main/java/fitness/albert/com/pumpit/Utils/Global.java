@@ -24,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class Global {
     private static final String BASE_URL = "https://trackapi.nutritionix.com/v2/";
     public static final String NUTRIENTS = "natural/nutrients";
-    public static final String INSTANT = "search/instant";
+    public static final String SEARCH_INSTANT = "search/instant";
     public static final String x_app_id ="fa8678e7";
     public static final String x_app_key ="153a6d177ad9532a8c610eb59f6455a3";
 

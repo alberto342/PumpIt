@@ -293,7 +293,6 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
         if (firstQty != quantityViewCustom.getQuantity() || !spinnerSelectedItem.equals(oldServingUnit)) {
             updateNutrition();
         }
@@ -337,12 +336,14 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
                                         public void onSuccess(Void aVoid) {
                                             progressdialog.hide();
                                             Log.d(TAG, "DocumentSnapshot successfully updated!");
+
                                             //oldServingUnit = spinnerSelectedItem;
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
+                                            progressdialog.hide();
                                             Log.w(TAG, "Error updating document", e);
                                         }
                                     });

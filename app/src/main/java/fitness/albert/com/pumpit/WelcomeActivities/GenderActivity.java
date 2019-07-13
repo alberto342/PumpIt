@@ -1,26 +1,19 @@
 package fitness.albert.com.pumpit.WelcomeActivities;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
-import fitness.albert.com.pumpit.R;
+import androidx.appcompat.app.AppCompatActivity;
+
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.UserRegister;
+import fitness.albert.com.pumpit.R;
 
 public class GenderActivity extends AppCompatActivity {
 
-    private SharedPreferences SPSaveTheCounter;
-    private SharedPreferences.Editor editor;
-
-    private ImageView female;
-    private ImageView male;
-    private boolean isMale = false;
-
-    private UserRegister user = new UserRegister();
+    PrefsUtils prefsUtils = new PrefsUtils();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,17 +21,14 @@ public class GenderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gender);
 
         getSupportActionBar().hide();
-
         init();
-//        this.user.getSharedPreferencesFiles();
-        createSharedPreferencesFiles();
+        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
     }
 
 
     private void init() {
-        male = findViewById(R.id.btn_male);
-        female = findViewById(R.id.btn_female);
-
+        ImageView male = findViewById(R.id.btn_male);
+        ImageView female = findViewById(R.id.btn_female);
         male.setOnClickListener(onClickListener);
         female.setOnClickListener(onClickListener);
     }
@@ -48,15 +38,14 @@ public class GenderActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.btn_female:
-                    isMale = false;
-//                    user.saveData("isMale", isMale);
-                    sharedPreferencesSaveData("isMale", isMale);
+                    boolean isMale = false;
+                    prefsUtils.saveData("isMale", isMale);
                     nextActivity();
                     break;
 
                 case R.id.btn_male:
                     isMale = true;
-                    sharedPreferencesSaveData("isMale", isMale);
+                    prefsUtils.saveData("isMale", isMale);
                     nextActivity();
                     break;
             }
@@ -68,18 +57,5 @@ public class GenderActivity extends AppCompatActivity {
         startActivity(new Intent(GenderActivity.this, AgeActivity.class));
     }
 
-    @SuppressLint("WrongConstant")
-    private void createSharedPreferencesFiles() {
-        SPSaveTheCounter = getSharedPreferences("userInfo",MODE_NO_LOCALIZED_COLLATORS);
-    }
 
-    private void sharedPreferencesSaveData(String key, Boolean isMale) {
-        editor = SPSaveTheCounter.edit();
-        try {
-            editor.putBoolean(key, isMale);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        editor.apply();
-    }
 }

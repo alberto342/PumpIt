@@ -4,16 +4,21 @@ package fitness.albert.com.pumpit.fragment.profile;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,6 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.Model.PrefsUtils;
 import fitness.albert.com.pumpit.Model.TDEECalculator;
 import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
@@ -39,9 +46,9 @@ public class ProfileFragment extends Fragment {
     private TextView nameTv, bmiTv, myWeightTv, myGoalWeightTv, bmiResultTv;
     private ImageView profileImg, btnAccountSetting, btnProfile, btnMyGoals, btnDiary,
             btnWaterTracker, btnNotification, btnUnits, btnDataExport, btnHelp, btnAbout;
+    private ProgressBar progressBar;
     private UserRegister userRegister = new UserRegister();
-
-
+    private PrefsUtils prefsUtils = new PrefsUtils();
 
 
     public ProfileFragment() {
@@ -50,7 +57,7 @@ public class ProfileFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false);
@@ -60,19 +67,13 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
-
         init(view);
 
-
         if (mAuth.getCurrentUser() != null) {
-
             loadData();
         }
-
+        setHasOptionsMenu(true);
         clickOnBtn();
-
-
     }
 
     private void init(View view) {
@@ -92,7 +93,23 @@ public class ProfileFragment extends Fragment {
         btnDataExport = view.findViewById(R.id.btn_data_export);
         btnHelp = view.findViewById(R.id.btn_help);
         btnAbout = view.findViewById(R.id.btn_about);
+        progressBar = view.findViewById(R.id.pb_profile);
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_setting, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.m_setting) {
+            startActivity(new Intent(getActivity(), SettingsActivity.class));
+            Log.d(TAG, "onOptionsItemSelected:  Menu selected");
+        }
+        return true;
     }
 
 
@@ -163,40 +180,28 @@ public class ProfileFragment extends Fragment {
         }
     };
 
-    private String getEmailRegister() {
-        String email = null;
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            email = mAuth.getCurrentUser().getEmail();
+    private void loadData() {
+        FireBaseInit fireBaseInit = new FireBaseInit(getActivity());
+        fireBaseInit.setIntoPrefs();
+        prefsUtils.createSharedPreferencesFiles(getActivity(), "user");
+        if (prefsUtils.getString("firstName", " ").equals(" ")) {
+            loadFromFb();
+            loadFromPrefs();
+            progressBar.setVisibility(View.INVISIBLE);
+        } else {
+            loadFromPrefs();
+            progressBar.setVisibility(View.INVISIBLE);
         }
-        return email;
     }
 
 
-    private void loadData() {
-
-
-
-        final TDEECalculator cal = new TDEECalculator();
-
-        db.collection("users").document(getEmailRegister()).get()
+    private void loadFromFb() {
+        db.collection("users").document(FireBaseInit.getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         userRegister = documentSnapshot.toObject(UserRegister.class);
-                        userRegister.setFullName(userRegister.getFirstName() + " " +  userRegister.getLestName());
-
-                        cal.setHeight(documentSnapshot.getDouble("height"));
-                        cal.setWeight(documentSnapshot.getDouble("weight"));
-
-                        nameTv.setText(userRegister.getFullName());
-                        cal.setBmi(cal.getHeight(), cal.getWeight());
-                        bmiTv.setText("BMI: " + String.valueOf(cal.getBmi()) + "\n" + cal.bmiTable(cal.getBmi()));
-                        myWeightTv.setText(String.valueOf("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
-
-
-
-
+                        saveIntoPrefs();
                         Log.d(TAG, "TestGetUserProfile: " + documentSnapshot.getData());
                     }
                 })
@@ -209,6 +214,37 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    private void loadFromPrefs() {
+        final TDEECalculator cal = new TDEECalculator();
+        String firstName = prefsUtils.getString("firstName", "");
+        String lestName = prefsUtils.getString("lestName", "");
+        String activityLevel = prefsUtils.getString("activityLevel", "");
+        String bodyFat = prefsUtils.getString("bodyFat", "");
+        String fatTarget = prefsUtils.getString("fatTarget", "");
+        String programSelect = prefsUtils.getString("programSelect", "");
+        float weight = prefsUtils.getFloat("weight", 0f);
+        int height = prefsUtils.getInt("height", 0);
+        boolean isMale = prefsUtils.getBoolean("isMale", false);
+
+        nameTv.setText(firstName + " " + lestName);
+        cal.setHeight((double) height);
+        cal.setWeight((double) weight);
+        cal.setBmi(cal.getHeight(), cal.getWeight());
+        bmiTv.setText("BMI: " + (cal.getBmi()) + "\n" + cal.bmiTable(cal.getBmi()));
+        myWeightTv.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
+    }
+
+    private void saveIntoPrefs() {
+        prefsUtils.saveData("firstName", userRegister.getFirstName());
+        prefsUtils.saveData("lestName", userRegister.getLestName());
+        prefsUtils.saveData("activityLevel", userRegister.getActivityLevel());
+        prefsUtils.saveData("bodyFat", userRegister.getBodyFat());
+        prefsUtils.saveData("fatTarget", userRegister.getFatTarget());
+        prefsUtils.saveData("height", userRegister.getHeight());
+        prefsUtils.saveData("weight", userRegister.getWeight());
+        prefsUtils.saveData("programSelect", userRegister.getMyProgram());
+        prefsUtils.saveData("isMale", userRegister.isMale());
+    }
 
     private void checkFat() {
         //get Fat target
@@ -228,7 +264,7 @@ public class ProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         // add img to the server
-        if(requestCode==1&&resultCode==RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             saveUserNameInServer(data.getData());
         }
     }
@@ -237,7 +273,7 @@ public class ProfileFragment extends Fragment {
         int myNum = 0;
         try {
             myNum = Integer.parseInt(txt);
-        } catch(NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) {
             System.out.println("Could not parse " + nfe);
         }
         return myNum;
@@ -251,24 +287,8 @@ public class ProfileFragment extends Fragment {
         transaction.commit();
     }
 
+
     private void saveUserNameInServer(final Uri data) {
         userRegister.setImagesRefPath("/profileimage.jpeg");
     }
-
-//
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.setting_toolbar, menu);
-//        MenuItem searchItem = menu.findItem(R.id.action_search);
-//        SearchView searchView = (SearchView) searchItem.getActionView();
-//        searchView.setOnQueryTextListener(this);
-//        searchView.setQueryHint("Search");
-//
-//
-//        super.onCreateOptionsMenu(menu, inflater);
-//    }
-
-
-
-
 }

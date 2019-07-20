@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import fitness.albert.com.pumpit.Model.DayContainerModel;
-import fitness.albert.com.pumpit.Model.Event;
+import fitness.albert.com.pumpit.model.DayContainerModel;
+import fitness.albert.com.pumpit.model.Event;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.listener.CalenderDayClickListener;
 import fitness.albert.com.pumpit.listener.OnMonthChangedListener;

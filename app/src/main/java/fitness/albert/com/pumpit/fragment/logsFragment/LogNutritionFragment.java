@@ -29,14 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import fitness.albert.com.pumpit.Adapter.BreakfastListAdapter;
-import fitness.albert.com.pumpit.Adapter.DinnerListAdapter;
-import fitness.albert.com.pumpit.Adapter.LunchListAdapter;
-import fitness.albert.com.pumpit.Adapter.SnacksListAdapter;
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.SwipeHelper;
-import fitness.albert.com.pumpit.Model.UserRegister;
+import fitness.albert.com.pumpit.adapter.BreakfastListAdapter;
+import fitness.albert.com.pumpit.adapter.DinnerListAdapter;
+import fitness.albert.com.pumpit.adapter.LunchListAdapter;
+import fitness.albert.com.pumpit.adapter.SnacksListAdapter;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.Foods;
+import fitness.albert.com.pumpit.model.SwipeHelper;
+import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
 /**

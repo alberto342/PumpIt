@@ -24,9 +24,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.PrefsUtils;
-import fitness.albert.com.pumpit.Model.WorkoutPlans;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.PrefsUtils;
+import fitness.albert.com.pumpit.model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.CustomPlanActivity;
 import fitness.albert.com.pumpit.workout.FindWorkoutActivity;

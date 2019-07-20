@@ -8,13 +8,14 @@
     android:background="@color/background"
     android:orientation="vertical"
     tools:context=".fragment.NutritionFragment">
-    
+
 
     <devs.mulham.horizontalcalendar.HorizontalCalendarView
         android:id="@+id/calendar_view_custom"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="25dp"
         android:background="@color/colorDarkBlue"
         app:layout_constraintBottom_toTopOf="@+id/guideline135"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,48 +31,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.08" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline134"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.18" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline133"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.23" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline128"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.47" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline129"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.52" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline130"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.75" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline131"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline136"
@@ -94,145 +53,275 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.25" />
 
-    <TextView
-        android:id="@+id/tv_remaining"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_weight="1"
-        android:hint="1940"
-        android:textAlignment="center"
-        android:textColor="@color/md_green_600"
-        android:textColorHint="@android:color/darker_gray"
-        app:layout_constraintBottom_toTopOf="@+id/guideline136"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline131" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout9"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView19"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="="
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/guideline136"
-        app:layout_constraintEnd_toStartOf="@+id/guideline131"
-        app:layout_constraintStart_toStartOf="@+id/guideline130" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline153"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.95" />
 
-    <TextView
-        android:id="@+id/tv_food"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="0"
-        android:textAlignment="center"
-        android:textColor="@android:color/holo_red_dark"
-        app:layout_constraintBottom_toTopOf="@+id/guideline136"
-        app:layout_constraintEnd_toStartOf="@+id/guideline128"
-        app:layout_constraintStart_toStartOf="@+id/guideline133" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline149"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.05" />
 
-    <TextView
-        android:id="@+id/tv_exercise"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="0"
-        android:textAlignment="center"
-        android:textColor="@color/yellow_dolly"
-        app:layout_constraintBottom_toTopOf="@+id/guideline136"
-        app:layout_constraintEnd_toStartOf="@+id/guideline130"
-        app:layout_constraintStart_toStartOf="@+id/guideline129" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline146"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.8" />
 
-    <TextView
-        android:id="@+id/textView23"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="-"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/guideline136"
-        app:layout_constraintEnd_toStartOf="@+id/guideline133"
-        app:layout_constraintStart_toStartOf="@+id/guideline134" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline145"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.18" />
 
-    <TextView
-        android:id="@+id/tv_goal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:hint="2654"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textColorHint="@color/gray"
-        app:layout_constraintBottom_toTopOf="@+id/guideline136"
-        app:layout_constraintEnd_toStartOf="@+id/guideline134"
-        app:layout_constraintStart_toStartOf="parent" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline132"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.23" />
 
-    <TextView
-        android:id="@+id/textView21"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="+"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/guideline136"
-        app:layout_constraintEnd_toStartOf="@+id/guideline129"
-        app:layout_constraintStart_toStartOf="@+id/guideline128" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline75"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.47" />
 
-    <TextView
-        android:id="@+id/textView29"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Exercise"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toStartOf="@+id/guideline130"
-        app:layout_constraintStart_toStartOf="@+id/guideline129"
-        app:layout_constraintTop_toTopOf="@+id/guideline136" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline74"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.52" />
 
-    <TextView
-        android:id="@+id/textView30"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_weight="1"
-        android:text="Remaining"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline131"
-        app:layout_constraintTop_toTopOf="@+id/guideline136" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline72"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
 
-    <TextView
-        android:id="@+id/textView27"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Goal"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toStartOf="@+id/guideline134"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline136" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline66"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.15" />
 
-    <TextView
-        android:id="@+id/textView28"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Food"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toStartOf="@+id/guideline128"
-        app:layout_constraintStart_toStartOf="@+id/guideline133"
-        app:layout_constraintTop_toTopOf="@+id/guideline136" />
+        <TextView
+            android:id="@+id/textView19"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="="
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/guideline66"
+            app:layout_constraintEnd_toStartOf="@+id/tv_remaining"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline72" />
+
+        <TextView
+            android:id="@+id/tv_exercise"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0"
+            android:textAlignment="center"
+            android:textColor="@color/yellow_dolly"
+            app:layout_constraintBottom_toTopOf="@+id/guideline66"
+            app:layout_constraintEnd_toStartOf="@+id/guideline72"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline74" />
+
+        <TextView
+            android:id="@+id/textView23"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="-"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/guideline66"
+            app:layout_constraintEnd_toStartOf="@+id/guideline132"
+            app:layout_constraintStart_toStartOf="@+id/guideline145" />
+
+        <TextView
+            android:id="@+id/tv_remaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="1940"
+            android:textAlignment="center"
+            android:textColor="@color/md_green_600"
+            android:textColorHint="@android:color/darker_gray"
+            app:layout_constraintBottom_toTopOf="@+id/guideline66"
+            app:layout_constraintEnd_toStartOf="@+id/guideline153"
+            app:layout_constraintStart_toStartOf="@+id/guideline146" />
+
+        <TextView
+            android:id="@+id/tv_food"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_red_dark"
+            app:layout_constraintBottom_toTopOf="@+id/guideline66"
+            app:layout_constraintEnd_toStartOf="@+id/guideline75"
+            app:layout_constraintStart_toStartOf="@+id/guideline132" />
+
+        <TextView
+            android:id="@+id/textView21"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="+"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/guideline66"
+            app:layout_constraintEnd_toStartOf="@+id/guideline74"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline75" />
+
+        <TextView
+            android:id="@+id/tv_goal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="2654"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textColorHint="@color/gray"
+            app:layout_constraintBottom_toTopOf="@+id/guideline66"
+            app:layout_constraintEnd_toStartOf="@+id/guideline145"
+            app:layout_constraintStart_toStartOf="@+id/guideline149" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout8"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline152"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.05" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline148"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.15" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline131"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.8" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline130"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline133"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.23" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline128"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.47" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline134"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.18" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline129"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.52" />
+
+        <TextView
+            android:id="@+id/textView28"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Food"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toStartOf="@+id/guideline128"
+            app:layout_constraintStart_toStartOf="@+id/guideline133"
+            app:layout_constraintTop_toTopOf="@+id/guideline148" />
+
+        <TextView
+            android:id="@+id/textView27"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Goal"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toStartOf="@+id/guideline134"
+            app:layout_constraintStart_toStartOf="@+id/guideline152"
+            app:layout_constraintTop_toTopOf="@+id/guideline148" />
+
+        <TextView
+            android:id="@+id/textView30"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Remaining"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            app:layout_constraintStart_toStartOf="@+id/guideline131"
+            app:layout_constraintTop_toTopOf="@+id/guideline148" />
+
+        <TextView
+            android:id="@+id/textView29"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Exercise"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toStartOf="@+id/guideline130"
+            app:layout_constraintStart_toStartOf="@+id/guideline129"
+            app:layout_constraintTop_toTopOf="@+id/guideline148" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -435,6 +524,7 @@
 
 
             <LinearLayout
+                android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -468,19 +558,84 @@
                     android:layout_marginBottom="15dp"
                     android:src="@mipmap/add_snacks" />
 
-                <ImageView
-                    android:id="@+id/iv_add_water"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="15dp"
-                    android:src="@mipmap/add_water" />
 
-                <ImageView
-                    android:id="@+id/iv_add_coffie"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingBottom="15dp"
-                    android:src="@mipmap/add_caffeine" />
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:background="@color/myBlue"
+                    android:orientation="vertical"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
+
+                    <TextView
+                        android:id="@+id/textView78"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Water"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="14dp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_water_ml"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0.00 L"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="18dp" />
+
+                </LinearLayout>
+
+
+                <TableLayout
+                    android:id="@+id/tab_layout_0"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:background="@color/myBlue"
+                    android:paddingBottom="50dp">
+
+                    <TableRow
+                        android:id="@+id/tab_layout_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp">
+
+                        <ImageView
+                            android:id="@+id/iv_water_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/add_water_icon" />
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/tab_layout_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp" />
+
+                    <TableRow
+                        android:id="@+id/tab_layout_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp" />
+
+                    <TableRow
+                        android:id="@+id/tab_layout_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp" />
+                </TableLayout>
+
             </LinearLayout>
         </ScrollView>
 

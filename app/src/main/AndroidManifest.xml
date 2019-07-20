@@ -18,7 +18,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".fragment.profile.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
         <activity android:name=".workout.FinisherWorkoutActivity" />
         <activity android:name=".workout.ShowLogExercise" />
         <activity android:name=".fragment.logsFragment.LogTabActivity" />
@@ -35,14 +35,14 @@
         <activity android:name=".workout.CustomPlanActivity" />
         <activity android:name=".workout.ShowExerciseResult" />
         <activity android:name=".workout.ExerciseDetailActivity" />
-        <activity android:name=".ShowSnackActivity" />
-        <activity android:name=".ShowLunchActivity" />
-        <activity android:name=".ShowDinnerActivity" />
-        <activity android:name=".ShowBreakfastActivity" />
-        <activity android:name=".ShowAllNutritionActivity" />
-        <activity android:name=".ShowItemFoodActivity" />
+        <activity android:name=".nutrition.ShowSnackActivity" />
+        <activity android:name=".nutrition.ShowLunchActivity" />
+        <activity android:name=".nutrition.ShowDinnerActivity" />
+        <activity android:name=".nutrition.ShowBreakfastActivity" />
+        <activity android:name=".nutrition.ShowAllNutritionActivity" />
+        <activity android:name=".nutrition.ShowItemFoodActivity" />
         <activity
-            android:name=".WelcomeActivities.WelcomeActivity"
+            android:name=".welcome.WelcomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -52,46 +52,46 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FragmentNavigationActivity"
+            android:name=".fragment.FragmentNavigationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.GoalActivity"
+            android:name=".welcome.GoalActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.GenderActivity"
+            android:name=".welcome.GenderActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.AgeActivity"
+            android:name=".welcome.AgeActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.WeightActivity"
+            android:name=".welcome.WeightActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.HeightActivity"
+            android:name=".welcome.HeightActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.BodyFatActivity"
+            android:name=".welcome.BodyFatActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.FatTargetActivity"
+            android:name=".welcome.FatTargetActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Register.RegisterActivity"
+            android:name=".register.RegisterActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Register.EmailRegisterActivity"
+            android:name=".register.EmailRegisterActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".workout.AddExerciseActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SearchFoodsActivity"
+            android:name=".nutrition.SearchFoodsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ShowFoodBeforeAddedActivity"
+            android:name=".nutrition.ShowFoodBeforeAddedActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 

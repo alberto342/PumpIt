@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fitness.albert.com.pumpit.fragment.FragmentNavigationActivity;
+
 public class LoginActivity extends AppCompatActivity { //implements GoogleApiClient.OnConnectionFailedListener
 
     private EditText inputEmail, inputPassword;

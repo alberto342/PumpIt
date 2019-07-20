@@ -22,10 +22,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import fitness.albert.com.pumpit.Adapter.FinishWorkoutAdapter;
-import fitness.albert.com.pumpit.Model.FinishTraining;
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.SwipeHelper;
+import fitness.albert.com.pumpit.adapter.FinishWorkoutAdapter;
+import fitness.albert.com.pumpit.model.FinishTraining;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.SwipeHelper;
 import fitness.albert.com.pumpit.R;
 
 /**

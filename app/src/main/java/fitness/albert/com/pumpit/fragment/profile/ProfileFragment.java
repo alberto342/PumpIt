@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.fragment.profile;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,10 +27,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.PrefsUtils;
-import fitness.albert.com.pumpit.Model.TDEECalculator;
-import fitness.albert.com.pumpit.Model.UserRegister;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.PrefsUtils;
+import fitness.albert.com.pumpit.model.TDEECalculator;
+import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.fragment.profile.AccountSettings.AccountFragment;
 import fitness.albert.com.pumpit.fragment.profile.ProfileChange.ChangeProfileFragment;
@@ -49,6 +50,7 @@ public class ProfileFragment extends Fragment {
     private ProgressBar progressBar;
     private UserRegister userRegister = new UserRegister();
     private PrefsUtils prefsUtils = new PrefsUtils();
+    private TDEECalculator cal = new TDEECalculator();
 
 
     public ProfileFragment() {
@@ -183,10 +185,11 @@ public class ProfileFragment extends Fragment {
     private void loadData() {
         FireBaseInit fireBaseInit = new FireBaseInit(getActivity());
         fireBaseInit.setIntoPrefs();
-        prefsUtils.createSharedPreferencesFiles(getActivity(), "user");
-        if (prefsUtils.getString("firstName", " ").equals(" ")) {
+        prefsUtils.createSharedPreferencesFiles(getActivity(), UserRegister.SharedPreferencesFile);
+
+        if (prefsUtils.getString("first_name", " ").equals(" ")) {
             loadFromFb();
-            loadFromPrefs();
+            //loadFromPrefs();
             progressBar.setVisibility(View.INVISIBLE);
         } else {
             loadFromPrefs();
@@ -198,10 +201,18 @@ public class ProfileFragment extends Fragment {
     private void loadFromFb() {
         db.collection("users").document(FireBaseInit.getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @SuppressLint({"SetTextI18n", "DefaultLocale"})
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         userRegister = documentSnapshot.toObject(UserRegister.class);
+
                         saveIntoPrefs();
+                        nameTv.setText(userRegister.getFirstName() + " " + userRegister.getLestName());
+                        cal.setHeight((double) userRegister.getHeight());
+                        cal.setWeight((double) userRegister.getWeight());
+                        cal.setBmi(cal.getHeight(), cal.getWeight());
+                        bmiTv.setText("BMI: " + (cal.getBmi()) + "\n" + cal.bmiTable(cal.getBmi()));
+                        myWeightTv.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
                         Log.d(TAG, "TestGetUserProfile: " + documentSnapshot.getData());
                     }
                 })
@@ -215,16 +226,16 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadFromPrefs() {
-        final TDEECalculator cal = new TDEECalculator();
-        String firstName = prefsUtils.getString("firstName", "");
-        String lestName = prefsUtils.getString("lestName", "");
-        String activityLevel = prefsUtils.getString("activityLevel", "");
-        String bodyFat = prefsUtils.getString("bodyFat", "");
-        String fatTarget = prefsUtils.getString("fatTarget", "");
-        String programSelect = prefsUtils.getString("programSelect", "");
+        String firstName = prefsUtils.getString("first_name", "");
+        String lestName = prefsUtils.getString("lest_name", "");
+        String activityLevel = prefsUtils.getString("activity_level", "");
+        String bodyFat = prefsUtils.getString("body_fat", "");
+        String fatTarget = prefsUtils.getString("fat_target", "");
+        String programSelect = prefsUtils.getString("program_select", "");
+        String dateOfBirth = prefsUtils.getString("date_of_birth", "");
         float weight = prefsUtils.getFloat("weight", 0f);
         int height = prefsUtils.getInt("height", 0);
-        boolean isMale = prefsUtils.getBoolean("isMale", false);
+        boolean isMale = prefsUtils.getBoolean("is_male", false);
 
         nameTv.setText(firstName + " " + lestName);
         cal.setHeight((double) height);
@@ -232,18 +243,30 @@ public class ProfileFragment extends Fragment {
         cal.setBmi(cal.getHeight(), cal.getWeight());
         bmiTv.setText("BMI: " + (cal.getBmi()) + "\n" + cal.bmiTable(cal.getBmi()));
         myWeightTv.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
+
+
+//        String[] splitDate = dateOfBirth.split("/");
+//        int month = Integer.valueOf(splitDate[0]);
+//        int day = Integer.valueOf(splitDate[1]);
+//        int year = Integer.valueOf(splitDate[2]);
+
+        // TODO: 2019-07-14 chack the date on the firbase, its null bicuase not have date
+        UserRegister userRegister = new UserRegister();
+        Log.d(TAG, "loadFromPrefs: "  + dateOfBirth);
     }
 
+
     private void saveIntoPrefs() {
-        prefsUtils.saveData("firstName", userRegister.getFirstName());
-        prefsUtils.saveData("lestName", userRegister.getLestName());
-        prefsUtils.saveData("activityLevel", userRegister.getActivityLevel());
-        prefsUtils.saveData("bodyFat", userRegister.getBodyFat());
-        prefsUtils.saveData("fatTarget", userRegister.getFatTarget());
+        prefsUtils.saveData("first_name", userRegister.getFirstName());
+        prefsUtils.saveData("lest_name", userRegister.getLestName());
+        prefsUtils.saveData("activity_level", userRegister.getActivityLevel());
+        prefsUtils.saveData("body_fat", userRegister.getBodyFat());
+        prefsUtils.saveData("fat_target", userRegister.getFatTarget());
         prefsUtils.saveData("height", userRegister.getHeight());
         prefsUtils.saveData("weight", userRegister.getWeight());
-        prefsUtils.saveData("programSelect", userRegister.getMyProgram());
-        prefsUtils.saveData("isMale", userRegister.isMale());
+        prefsUtils.saveData("program_select", userRegister.getMyProgram());
+        prefsUtils.saveData("is_male", userRegister.isMale());
+        prefsUtils.saveData("date_of_birth", userRegister.getDateOfBirth());
     }
 
     private void checkFat() {

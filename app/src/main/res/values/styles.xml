@@ -3,9 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#3c4397</item>
+        <item name="colorPrimary">@color/colorDarkBlue</item>
         <item name="colorPrimaryDark">#000000</item>
-        <item name="colorAccent">#3c4397</item>
+        <item name="colorAccent">@color/myBlue</item>
         <!--<item name="colorAccent">@color/colorAccent</item>-->
     </style>
 
@@ -40,8 +40,8 @@
         <item name="colorAccent">@android:color/white</item>
         <item name="android:textColorHint">@color/colorPrimary</item>
         <item name="colorControlNormal">@color/background</item>
-        <item name="colorControlActivated">@color/colorDarkBlue</item>
-        <item name="colorControlHighlight">@color/common_google_signin_btn_text_light_pressed</item>
+        <item name="colorControlActivated">@color/myBlue</item>
+        <item name="colorControlHighlight">@color/background</item>
     </style>
 
 

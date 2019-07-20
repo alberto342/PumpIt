@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import fitness.albert.com.pumpit.Adapter.TrainingAdapter;
-import fitness.albert.com.pumpit.Adapter.WorkoutAdapter;
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.PrefsUtils;
-import fitness.albert.com.pumpit.Model.TrackerExercise;
-import fitness.albert.com.pumpit.Model.Training;
-import fitness.albert.com.pumpit.Model.Workout;
-import fitness.albert.com.pumpit.Model.WorkoutPlans;
+import fitness.albert.com.pumpit.adapter.TrainingAdapter;
+import fitness.albert.com.pumpit.adapter.WorkoutAdapter;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.PrefsUtils;
+import fitness.albert.com.pumpit.model.TrackerExercise;
+import fitness.albert.com.pumpit.model.Training;
+import fitness.albert.com.pumpit.model.Workout;
+import fitness.albert.com.pumpit.model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 
 public class TrainingActivity extends AppCompatActivity {

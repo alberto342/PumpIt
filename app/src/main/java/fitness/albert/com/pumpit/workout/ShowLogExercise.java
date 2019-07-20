@@ -19,8 +19,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import fitness.albert.com.pumpit.Model.FinishTraining;
-import fitness.albert.com.pumpit.Model.FireBaseInit;
+import fitness.albert.com.pumpit.model.FinishTraining;
+import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.fragment.logsFragment.LogFragment;
 

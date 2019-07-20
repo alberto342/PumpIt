@@ -12,7 +12,7 @@ import android.widget.ImageView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
+import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.R;
 
 public class ExerciseDetailActivity extends AppCompatActivity implements View.OnClickListener {

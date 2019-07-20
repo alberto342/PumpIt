@@ -28,11 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import fitness.albert.com.pumpit.Adapter.WorkoutPlanAdapter;
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.PrefsUtils;
-import fitness.albert.com.pumpit.Model.Workout;
-import fitness.albert.com.pumpit.Model.WorkoutPlans;
+import fitness.albert.com.pumpit.adapter.WorkoutPlanAdapter;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.PrefsUtils;
+import fitness.albert.com.pumpit.model.Workout;
+import fitness.albert.com.pumpit.model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
 

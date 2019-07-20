@@ -28,12 +28,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import fitness.albert.com.pumpit.Model.DayContainerModel;
-import fitness.albert.com.pumpit.Model.Event;
-import fitness.albert.com.pumpit.Model.FinishTraining;
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.UserRegister;
+import fitness.albert.com.pumpit.model.DayContainerModel;
+import fitness.albert.com.pumpit.model.Event;
+import fitness.albert.com.pumpit.model.FinishTraining;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.Foods;
+import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.helper.CalenderEvent;
 import fitness.albert.com.pumpit.listener.CalenderDayClickListener;
@@ -57,7 +57,6 @@ public class LogFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_logs, container, false);
     }
 

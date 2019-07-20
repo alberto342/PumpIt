@@ -2,11 +2,12 @@ package fitness.albert.com.pumpit.workout;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -17,10 +18,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import fitness.albert.com.pumpit.Adapter.ChangePlanAdapter;
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.adapter.ChangePlanAdapter;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.WorkoutPlans;
 
 public class ChangePlanActivity extends AppCompatActivity {
 

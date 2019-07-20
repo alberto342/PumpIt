@@ -14,10 +14,10 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
-import fitness.albert.com.pumpit.Adapter.CustomExerciseAdapter;
-import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
-import fitness.albert.com.pumpit.Model.CustomExerciseName;
-import fitness.albert.com.pumpit.Model.Exercise;
+import fitness.albert.com.pumpit.adapter.CustomExerciseAdapter;
+import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
+import fitness.albert.com.pumpit.model.CustomExerciseName;
+import fitness.albert.com.pumpit.model.Exercise;
 import fitness.albert.com.pumpit.R;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;

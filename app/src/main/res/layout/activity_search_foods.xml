@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    tools:context=".SearchFoodsActivity">
+    tools:context=".nutrition.SearchFoodsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar_search"

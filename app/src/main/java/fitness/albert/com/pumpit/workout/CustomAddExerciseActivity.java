@@ -6,8 +6,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,14 +13,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import fitness.albert.com.pumpit.Model.CustomExerciseName;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.helper.ImageUtils;
+import fitness.albert.com.pumpit.model.CustomExerciseName;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -73,7 +74,7 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
         imageViewLoad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (EditTxtIsEmpty(exerciseName.getText().toString(), descriptionExercise.getText().toString())) {
+                if (editTxtIsEmpty(exerciseName.getText().toString(), descriptionExercise.getText().toString())) {
                     imageutils.imagepicker(1);
                 }
             }
@@ -156,7 +157,7 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
 
         final CustomExerciseName customExerciseName = new CustomExerciseName(exercise, muscleGroup, muscleGroup2, exerciseDescription, imgName, imgPatch);
 
-        if (EditTxtIsEmpty(exercise, exerciseDescription)) {
+        if (editTxtIsEmpty(exercise, exerciseDescription)) {
 
             realm.getSchema();
 
@@ -185,7 +186,7 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
         }
     }
 
-    private boolean EditTxtIsEmpty(String exercise, String exerciseDescription) {
+    private boolean editTxtIsEmpty(String exercise, String exerciseDescription) {
         if (exercise.isEmpty()) {
             setError(exerciseName, "Enter Name of Exercise");
             return false;

@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import fitness.albert.com.pumpit.Adapter.ExerciseAdapter.ExerciseAdapter;
-import fitness.albert.com.pumpit.Adapter.TrainingAdapter;
-import fitness.albert.com.pumpit.Model.FinishTraining;
-import fitness.albert.com.pumpit.Model.FireBaseInit;
-import fitness.albert.com.pumpit.Model.TrackerExercise;
-import fitness.albert.com.pumpit.Model.UserRegister;
+import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
+import fitness.albert.com.pumpit.adapter.TrainingAdapter;
+import fitness.albert.com.pumpit.model.FinishTraining;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.TrackerExercise;
+import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
 public class WorkoutStartActivity extends AppCompatActivity implements View.OnClickListener {

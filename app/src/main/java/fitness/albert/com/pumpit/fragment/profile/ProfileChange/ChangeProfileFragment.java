@@ -3,14 +3,15 @@ package fitness.albert.com.pumpit.fragment.profile.ProfileChange;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -18,7 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import fitness.albert.com.pumpit.Model.UserRegister;
+import fitness.albert.com.pumpit.model.PrefsUtils;
+import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
 /**
@@ -28,9 +30,8 @@ public class ChangeProfileFragment extends Fragment {
 
     private TextView tvFirstName, tvLastName, tvGender, tvAge, tvHeight;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    UserRegister user = new UserRegister();
+   private UserRegister user = new UserRegister();
     private String TAG = "ChangeProfileFragment";
-
 
 
     public ChangeProfileFragment() {
@@ -39,7 +40,7 @@ public class ChangeProfileFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_change_profile, container, false);
@@ -52,7 +53,6 @@ public class ChangeProfileFragment extends Fragment {
         init(view);
         getUserData();
     }
-
 
 
     private void init(View view) {
@@ -75,7 +75,7 @@ public class ChangeProfileFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
-            switch(v.getId()) {
+            switch (v.getId()) {
 
                 case R.id.tv_p_first_name:
                     break;
@@ -98,12 +98,13 @@ public class ChangeProfileFragment extends Fragment {
     };
 
 
-
-
     private void getUserData() {
         final ProgressDialog progressdialog = new ProgressDialog(getActivity());
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
+        PrefsUtils prefsUtils = new PrefsUtils();
+        prefsUtils.createSharedPreferencesFiles(getActivity(), UserRegister.SharedPreferencesFile);
+        final String dayOfBirth = prefsUtils.getString("date_of_birth", "");
 
         db.collection(UserRegister.fireBaseUsers).document(getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -113,15 +114,13 @@ public class ChangeProfileFragment extends Fragment {
 
                         tvFirstName.setText(user.getFirstName());
                         tvLastName.setText(user.getLestName());
-                        tvAge.setText(String.valueOf(user.getAge()));
+                        tvAge.setText( String.valueOf(user.date(dayOfBirth)));
 
                         String male = (user.isMale()) ? "female" : "male";
                         tvGender.setText(male);
                         tvHeight.setText(String.valueOf(user.getHeight()));
 
                         Log.d(TAG, "Success get data" + documentSnapshot.getData());
-
-
                         progressdialog.hide();
                     }
                 })
@@ -142,14 +141,6 @@ public class ChangeProfileFragment extends Fragment {
         }
         return email;
     }
-
-
-
-
-
-
-
-
 
 
 }

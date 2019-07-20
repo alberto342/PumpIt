@@ -2,11 +2,6 @@ package fitness.albert.com.pumpit.fragment.profile.AccountSettings;
 
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +12,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,9 +34,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import fitness.albert.com.pumpit.Model.Foods;
-import fitness.albert.com.pumpit.Model.UserRegister;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.Foods;
+import fitness.albert.com.pumpit.model.UserRegister;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -89,8 +90,6 @@ public class ChangeEmailFragment extends Fragment {
         btnDoneConfirmEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
 
 
                     if(etMyEmail.getText().toString().isEmpty() && etCurrentPass.getText().toString().isEmpty() || emailSend.getVisibility() == View.VISIBLE) {
@@ -158,7 +157,6 @@ public class ChangeEmailFragment extends Fragment {
     private void updateEmail() {
         progressBar.setVisibility(View.VISIBLE);
         btnDoneConfirmEmail.setImageResource(R.mipmap.emty_btn);
-
 
         final DocumentReference userRef =  db.collection(UserRegister.fireBaseUsers).document(getEmailRegister());
 

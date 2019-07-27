@@ -3,27 +3,27 @@ package fitness.albert.com.pumpit.nutrition;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -43,6 +43,7 @@ import fitness.albert.com.pumpit.adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.Foods;
 import fitness.albert.com.pumpit.model.FullNutrients;
+import fitness.albert.com.pumpit.model.Tags;
 import fitness.albert.com.pumpit.model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
 
@@ -54,7 +55,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
     private Spinner spinnerServingUnit;
     private String spinnerSelectedItem, docId, oldServingUnit;
     private QuantityView quantityViewCustom;
-    private TextView tvEnergy, tvCarbs, tvProtein, tvFat, tvAllNutrition;
+    private TextView tvEnergy, tvCarbs, tvProtein, tvFat, tvAllNutrition, tvFoodName, tvGroupTag;
     private Map<String, Float> allServingWeight = new HashMap<>();
     private List<String> spinnerList = new ArrayList<>();
     private List<Float> servingWeightList = new ArrayList<>();
@@ -64,6 +65,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
     private boolean testOnce = false;
     private ImageView foodItem;
     private int firstQty;
+    private ProgressBar progressBar;
 
 
 
@@ -72,7 +74,13 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_dinner);
         init();
+        Toolbar toolbar = findViewById(R.id.food_toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getData();
+        initCollapsingToolbar();
     }
 
     private void init() {
@@ -82,51 +90,48 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         tvProtein = findViewById(R.id.tv_protein_item);
         tvFat = findViewById(R.id.tv_fat_item);
         foodItem = findViewById(R.id.iv_food_item);
-        tvAllNutrition = findViewById(R.id.tv_dinner_all_foods);
-
-        setActionBar();
-
+        tvAllNutrition = findViewById(R.id.content_tv_all_nutrition);
+        tvFoodName = findViewById(R.id.tv_show_food_name);
+        tvGroupTag = findViewById(R.id.tv_show_group_tag);
+        progressBar = findViewById(R.id.pb_show_food);
         quantityViewCustom = findViewById(R.id.quantity_view);
         quantityViewCustom.setOnQuantityChangeListener(this);
     }
 
-    private void setActionBar() {
-        ActionBar mToolbar;
-        mToolbar = getSupportActionBar();
-        String foodName = DinnerListAdapter.foodName;
-        String foodNameCapitalizeFirstLetter = foodName.substring(0, 1).toUpperCase() + foodName.substring(1);
-        assert mToolbar != null;
-        mToolbar.setTitle(foodNameCapitalizeFirstLetter);
+    // Initializing collapsing toolbar
+    // Will show and hide the toolbar title on scroll
+    private void initCollapsingToolbar() {
 
-        // Create a TextView programmatically.
-        TextView tv = new TextView(getApplicationContext());
+        final String foodName = DinnerListAdapter.foodName;
 
-        // Create a LayoutParams for TextView
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                android.app.ActionBar.LayoutParams.MATCH_PARENT, // Width of TextView
-                android.app.ActionBar.LayoutParams.WRAP_CONTENT);
+        tvFoodName.setText(foodName);
 
-        // Apply the layout parameters to TextView widget
-        tv.setLayoutParams(lp);
+        final CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.nutrition_collapsing_toolbar);
+        collapsingToolbar.setTitle(" ");
 
-        // Set text to display in TextView
-        tv.setText(mToolbar.getTitle());
+        AppBarLayout appBarLayout = findViewById(R.id.nutrition_appbar);
+        appBarLayout.setExpanded(true);
 
-        // Set the text color of TextView
-        tv.setTextColor(Color.WHITE);
+        // hiding & showing the title when toolbar expanded & collapsed
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = false;
+            int scrollRange = -1;
 
-        //set the text size
-        tv.setTextSize(20);
-
-        // Set TextView text alignment to center
-        tv.setGravity(Gravity.CENTER);
-
-        mToolbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-
-        //Set the newly created TextView as ActionBar custom view
-        mToolbar.setCustomView(tv);
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    collapsingToolbar.setTitle(foodName);
+                    isShow = true;
+                } else if (isShow) {
+                    collapsingToolbar.setTitle(" ");
+                    isShow = false;
+                }
+            }
+        });
     }
-
 
 
     private void getData() {
@@ -135,7 +140,6 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         List<String> allFoods = new ArrayList<>();
 
         if (bundle != null) {
-
             Picasso.get()
                     .load(bundle.getString("foodPhoto"))
                     .placeholder(R.mipmap.ic_launcher)
@@ -150,6 +154,8 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
             int qty = bundle.getInt("qty");
             firstQty = bundle.getInt("qty");
             oldServingUnit = bundle.getString("servingUnit");
+            int foodGroup = bundle.getInt("foodGroup");
+            tvGroupTag.setText(Tags.foodGroup(foodGroup));
 
             //Get Serving Unit
             if (oldServingUnit == null) {
@@ -173,11 +179,12 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
             }
 
             for (int r = 0; r < bundle.getInt("fullNutrientsSize"); r++) {
-                atterId.add(bundle.getInt("AttrId" + r));
+                atterId.add(bundle.getInt("attrId" + r));
                 values.add(bundle.getFloat("values" + r));
-                FullNutrients fullNutrients = new FullNutrients(bundle.getInt("AttrId" + r), bundle.getFloat("values" + r));
-                allFoods.add(fullNutrients.getNutrients(bundle.getInt("AttrId" + r)));
+                FullNutrients fullNutrients = new FullNutrients(bundle.getInt("attrId" + r), bundle.getFloat("values" + r));
+                allFoods.add(fullNutrients.getNutrients(bundle.getInt("attrId" + r)));
             }
+
 
             //DELEDED IF NOT NEED
             changeDataView(1);
@@ -190,12 +197,9 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         }
         tvAllNutrition.setText(all.toString());
 
+        progressBar.setVisibility(View.INVISIBLE);
         addItemsOnSpinner();
     }
-
-
-
-
 
 
     //Calculation the quantity + -
@@ -302,14 +306,6 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         tvAllNutrition.setText(all.toString());
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (firstQty != quantityViewCustom.getQuantity() || !spinnerSelectedItem.equals(oldServingUnit)) {
-            updateNutrition();
-        }
-    }
-
 
     private void updateNutrition() {
         progressdialog = new ProgressDialog(this);
@@ -372,6 +368,20 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
                         }
                     }
                 });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (firstQty != quantityViewCustom.getQuantity() || !spinnerSelectedItem.equals(oldServingUnit)) {
+            updateNutrition();
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
 }

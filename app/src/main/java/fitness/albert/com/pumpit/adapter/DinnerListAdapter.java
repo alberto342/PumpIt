@@ -24,13 +24,12 @@ import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.nutrition.ShowAllNutritionActivity;
 import fitness.albert.com.pumpit.nutrition.ShowDinnerActivity;
 
-public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final String TAG = "DinnerListAdapter";
     private Context mContext;
     private List<Foods> foodsList;
     public static String foodName;
-
 
 
     public DinnerListAdapter(Context mContext, List<Foods> foodsList) {
@@ -67,8 +66,8 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 .into(holder.ivImage);
 
         holder.tvFoodName.setText(foodsList.get(position).getFoodName());
-        holder.tvCalories.setText(String.format(Locale.getDefault(),"%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNfCalories(), foodsList.get(position).getNfTotalCarbohydrate()));
-        holder.tvProtein.setText(String.format(Locale.getDefault(),"%.0f Protein",foodsList.get(position).getNfProtein()));
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNfCalories(), foodsList.get(position).getNfTotalCarbohydrate()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNfProtein()));
         holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServingQty());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +98,8 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 i.putExtra("qty", foodsList.get(position).getServingQty());
                 i.putExtra("servingUnit", foodsList.get(position).getServingUnit());
                 i.putExtra("altMeasuresSize", foodsList.get(position).getAltMeasures().size());
+                i.putExtra("fullNutrientsSize", foodsList.get(position).getFullNutrients().size());
+                i.putExtra("foodGroup", foodsList.get(position).getTags().getFoodGroup());
 
 
                 for (int r = 0; r < foodsList.get(position).getAltMeasures().size(); r++) {
@@ -106,16 +107,15 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     i.putExtra("measureServingWeight" + r, foodsList.get(position).getAltMeasures().get(r).getServing_weight());
                 }
 
-                for(int r=0; r< foodsList.get(position).getFullNutrients().size(); r++) {
-                    i.putExtra("AttrId" + r, foodsList.get(position).getFullNutrients().get(r).getAttrId());
-                    i.putExtra("values" + r,foodsList.get(position).getFullNutrients().get(r).getValue());
+                for (int r = 0; r < foodsList.get(position).getFullNutrients().size(); r++) {
+                    i.putExtra("attrId" + r, foodsList.get(position).getFullNutrients().get(r).getAttrId());
+                    i.putExtra("values" + r, foodsList.get(position).getFullNutrients().get(r).getValue());
                 }
+
                 mContext.startActivity(i);
             }
         });
     }
-
-
 
 
     @Override
@@ -139,8 +139,6 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public List<Foods> getData() {
         return foodsList;
     }
-
-
 
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

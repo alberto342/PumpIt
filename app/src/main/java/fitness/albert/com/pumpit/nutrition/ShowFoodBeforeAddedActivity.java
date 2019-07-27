@@ -3,6 +3,7 @@ package fitness.albert.com.pumpit.nutrition;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -17,11 +18,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
@@ -48,15 +51,16 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     //Todo check if spinner is empty
     // TODO: 2019-07-09 on change quantity manuel its not show up
 
+    private final String TAG = "ShowFoodBeforeAddedActivity";
     private QuantityView quantityViewCustom;
     private ProgressBar progressBar;
     private Spinner spinnerServingUnit;
     private String spinnerSelectedItem, foodName;
     private TextView tvEnergy, tvCrabs, tvProtein, tvFat, tvFullNutrition, tvFoodName, tvGroupTag;
     private ImageView ivFoodImg, btnSaveFood;
-    private final String TAG = "ShowFoodBeforeAddedActivity";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private boolean testOnce = false;
+    private CoordinatorLayout coordinatorLayout;
 
 
     @Override
@@ -96,6 +100,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         tvGroupTag = findViewById(R.id.tv_show_group_tag);
         quantityViewCustom = findViewById(R.id.quantityView_custom);
         quantityViewCustom.setOnQuantityChangeListener(this);
+        coordinatorLayout = findViewById(R.id.main_content);
     }
 
 
@@ -156,7 +161,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
 
@@ -169,7 +174,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         spinnerServingUnit.setAdapter(dataAdapter);
 
         spinnerServingUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @SuppressLint("LongLogTag")
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
@@ -193,6 +197,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             }
         });
     }
+
 
     @SuppressLint("LongLogTag")
     private void calculateOnSpinnerChange() {
@@ -297,6 +302,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         }
     }
 
+
     @SuppressLint("LongLogTag")
     private void saveDataToFirestore() {
 
@@ -304,13 +310,13 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
         float calAltMeasures;
 
-        if(spinnerSelectedItem == null) {
+        if (spinnerSelectedItem == null) {
             spinnerSelectedItem = "1 packet";
         }
 
 
         if (spinnerSelectedItem.equals("g")) {
-            calAltMeasures = measureMapIsNull / getServingWeightGrams() /100 * quantityViewCustom.getQuantity();
+            calAltMeasures = measureMapIsNull / getServingWeightGrams() / 100 * quantityViewCustom.getQuantity();
         } else {
             calAltMeasures = measureMapIsNull / getServingWeightGrams() * quantityViewCustom.getQuantity();
         }
@@ -360,10 +366,10 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                 }
             }
 
-            //CollectionPatch -> get myEmail -> get myMeal -> get the dayDate
             db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                     .collection(getMeal()).document(UserRegister.getTodayData())
-                    .collection(Foods.All_NUTRITION).add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
+                    .collection(Foods.All_NUTRITION)
+                    .add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @SuppressLint("LongLogTag")
                         @Override
@@ -390,7 +396,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         //SETUP REEALM
         RealmConfiguration config = new RealmConfiguration.Builder().name(CalenderEvent.REALM_FILE_EVENT).deleteRealmIfMigrationNeeded().build();
         Realm realm = Realm.getInstance(config);
-        final CalenderEvent calenderEvent = new CalenderEvent(UserRegister.getTodayData(), true,0,0);
+        final CalenderEvent calenderEvent = new CalenderEvent(UserRegister.getTodayData(), true, 0, 0);
 
         realm.getSchema();
         realm.executeTransaction(new Realm.Transaction() {
@@ -400,11 +406,11 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
                 String date = realm.where(CalenderEvent.class).equalTo("date", UserRegister.getTodayData()).findFirst().getDate();
 
-                if(date != null && !date.equals(UserRegister.getTodayData())) {
+                if (date != null && !date.equals(UserRegister.getTodayData())) {
                     Number currentIdNum = realm.where(CalenderEvent.class).max("id");
                     int nextId;
 
-                    if(currentIdNum == null) {
+                    if (currentIdNum == null) {
                         nextId = 1;
                     } else {
                         nextId = currentIdNum.intValue() + 1;
@@ -414,7 +420,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
                     realm.insertOrUpdate(calenderEvent);
 
-                    Log.d(TAG,"Success saved into realm");
+                    Log.d(TAG, "Success saved into realm");
                 }
             }
         });
@@ -422,7 +428,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
     //get Meal from SharedPreferences file
     public String getMeal() {
-
         SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
         boolean breakfast = pref.getBoolean("dinner", false);
@@ -451,7 +456,11 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             @Override
             public void onClick(View v) {
                 saveDataToFirestore();
-               // saveDataIntoRealm();
+                final Snackbar snackbar = Snackbar
+                        .make(coordinatorLayout, "Item was save", Snackbar.LENGTH_LONG);
+                snackbar.setActionTextColor(Color.YELLOW);
+                snackbar.show();
+                // saveDataIntoRealm();
 
                 //save activity to sharedPreferences
                 PrefsUtils prefsUtils = new PrefsUtils();

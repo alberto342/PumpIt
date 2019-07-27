@@ -6,6 +6,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,17 +34,19 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.Foods;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.UserRegister;
-import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.nutrition.SearchFoodsActivity;
 import fitness.albert.com.pumpit.nutrition.ShowAllNutritionActivity;
 
@@ -56,10 +60,11 @@ public class NutritionFragment extends Fragment {
     private PrefsUtils prefsUtils = new PrefsUtils();
     private UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs, waterMl;
-    private int calculationGoal, waterCount = 0, waterCount2 = 0, waterCount3 = 0, waterCount4 = 0;
+    private int calculationGoal;
     private FragmentActivity myContext;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
     // final Calendar myCalendar = Calendar.getInstance();
+    private int ly1ElementCount =0, ly2ElementCount =0, ly3ElementCount =0, ly4ElementCount =0;
 
 
     public NutritionFragment() {
@@ -87,6 +92,8 @@ public class NutritionFragment extends Fragment {
         emailIsOnNutrition();
         datePicker(view);
         setViewDrink(view);
+
+
         // setToolBar(view);
     }
 
@@ -286,7 +293,7 @@ public class NutritionFragment extends Fragment {
         prefsUtils.saveData("dinner", dinner);
         prefsUtils.saveData("breakfast", breakfast);
         prefsUtils.saveData("lunch", lunch);
-        prefsUtils.saveData("Snack", snack);
+        prefsUtils.saveData("snack", snack);
 
         startActivity(new Intent(getActivity(), SearchFoodsActivity.class));
         Objects.requireNonNull(getActivity()).getFragmentManager().popBackStack();
@@ -295,7 +302,6 @@ public class NutritionFragment extends Fragment {
 
     private void getMealFromFs(String keyValue, String date) {
         //get NUTRITION from firestone
-
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
                 .collection(keyValue).document(date)
                 .collection(Foods.All_NUTRITION).get()
@@ -397,7 +403,7 @@ public class NutritionFragment extends Fragment {
     }
 
 
-    // TODO: 2019-07-20 fix bug add water
+
     private void setViewDrink(View rowView) {
         final TextView tvWaterMl = rowView.findViewById(R.id.tv_water_ml);
         final TableRow tableLayout1 = rowView.findViewById(R.id.tab_layout_1);
@@ -405,58 +411,199 @@ public class NutritionFragment extends Fragment {
         final TableRow tableLayout3 = rowView.findViewById(R.id.tab_layout_3);
         final TableRow tableLayout4 = rowView.findViewById(R.id.tab_layout_4);
         final ImageView addWater = rowView.findViewById(R.id.iv_water_icon);
+        final ImageView addWater2 = rowView.findViewById(R.id.iv_water_icon_2);
+        final ImageView addWater3 = rowView.findViewById(R.id.iv_water_icon_3);
+        final ImageView addWater4 = rowView.findViewById(R.id.iv_water_icon_4);
+        tvWaterMl.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+                waterTrackerSaved(tvWaterMl.getText().toString());
+            }
+        });
+
 
         final boolean[] isRemovable1 = {true};
         final boolean[] isRemovable2 = {true};
         final boolean[] isRemovable3 = {true};
 
-        final ImageView ivFullWater = new ImageView(getActivity());
-        ivFullWater.setBackgroundResource(R.mipmap.full_water);
 
         addWater.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ImageView ivFullWater = new ImageView(getActivity());
+                ivFullWater.setImageResource(R.mipmap.full_water);
 
-                //add water in the view
-                if (waterCount < 6) {
+                Log.d(TAG, "onClick: add water " + ly1ElementCount);
+
+                if (ly1ElementCount < 6) {
                     tableLayout1.addView(ivFullWater);
-                    waterCount++;
-                } else if (waterCount2 < 6) {
-                    tableLayout2.addView(ivFullWater);
-                    waterCount2++;
-                    isRemovable1[0] = false;
-                } else if (waterCount3 < 6) {
-                    tableLayout3.addView(ivFullWater);
-                    isRemovable2[0] = false;
-                    waterCount3++;
-                } else if (waterCount4 < 6) {
-                    tableLayout4.addView(ivFullWater);
-                    waterCount4++;
-                    isRemovable3[0] = false;
+                    ly1ElementCount++;
+                    waterMl += 0.25f;
                 }
 
-                waterMl += 0.25f;
+                if (ly1ElementCount == 6) {
+                    addWater.setImageResource(R.mipmap.full_water);
+                    addWater2.setVisibility(View.VISIBLE);
+                    isRemovable1[0] = false;
+                }
+
 
                 ivFullWater.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (waterCount > 0 && waterCount <= 6 && isRemovable1[0]) {
-                            onRemoveWater(tableLayout1);
-                            waterCount--;
-                        } else if (waterCount2 > 0 && waterCount2 <= 6 && isRemovable2[0]) {
-                            Log.d(TAG, "onClick: " + waterCount2 + " count1: " + waterCount + " boolean: " + isRemovable1[0]);
-                            onRemoveWater(tableLayout2);
-                            waterCount2--;
 
-                        } else if (waterCount3 > 0 && waterCount3 <= 6 && isRemovable3[0]) {
-                            onRemoveWater(tableLayout3);
-                            waterCount3--;
-                        } else if (waterCount4 > 0 && waterCount4 <= 6) {
-                            onRemoveWater(tableLayout4);
-                            waterCount4--;
+                        Log.d(TAG, "onClick: remove water " + ly1ElementCount);
+
+                        if (ly1ElementCount >= 1 && ly1ElementCount <= 6 && isRemovable1[0]) {
+                            tableLayout1.removeViewAt(1);
+                            ly1ElementCount--;
+                            waterMl -= 0.25f;
                         }
 
-                        waterMl -= 0.25f;
+                        tvWaterMl.setText(waterMl + " L");
+                    }
+                });
+
+                tvWaterMl.setText(waterMl + " L");
+            }
+        });
+        addWater2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d(TAG, "onClick: add water 2: " + ly2ElementCount);
+
+                ImageView ivFullWater = new ImageView(getActivity());
+                ivFullWater.setImageResource(R.mipmap.full_water);
+
+                if (ly2ElementCount < 6) {
+                    tableLayout2.addView(ivFullWater);
+                    ly2ElementCount++;
+                    waterMl += 0.25f;
+                    isRemovable1[0] = false;
+                }
+
+                if (ly2ElementCount == 6) {
+                    addWater2.setImageResource(R.mipmap.full_water);
+                    addWater3.setVisibility(View.VISIBLE);
+                    isRemovable2[0] = false;
+                }
+
+                ivFullWater.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d(TAG, "onClick: remove water 2: " + ly2ElementCount);
+
+                        if (ly2ElementCount >= 1 && ly2ElementCount <= 6 && isRemovable2[0]) {
+                            tableLayout2.removeViewAt(1);
+                            ly2ElementCount--;
+                            waterMl -= 0.25f;
+                        }
+
+                        if (ly2ElementCount == 0) {
+                            isRemovable1[0] = true;
+                            addWater.setVisibility(View.VISIBLE);
+                            addWater.setImageResource(R.mipmap.add_water_icon);
+                            addWater2.setVisibility(View.GONE);
+                        }
+
+                        tvWaterMl.setText(waterMl + " L");
+                    }
+                });
+
+                tvWaterMl.setText(waterMl + " L");
+
+            }
+        });
+        addWater3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d(TAG, "onClick: add water 3: " + ly3ElementCount);
+
+                ImageView ivFullWater = new ImageView(getActivity());
+                ivFullWater.setImageResource(R.mipmap.full_water);
+
+                if (ly3ElementCount < 6) {
+                    tableLayout3.addView(ivFullWater);
+                    ly3ElementCount++;
+                    isRemovable2[0] = false;
+                    waterMl += 0.25f;
+                }
+
+                if (ly3ElementCount == 6) {
+                    addWater3.setImageResource(R.mipmap.full_water);
+                    addWater4.setVisibility(View.VISIBLE);
+                    isRemovable3[0] = false;
+                }
+
+                ivFullWater.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d(TAG, "onClick: remove water 3: " + ly3ElementCount);
+                        if (ly3ElementCount >= 1 && ly3ElementCount <= 6 && isRemovable3[0]) {
+                            tableLayout3.removeViewAt(1);
+                            ly3ElementCount--;
+                            waterMl -= 0.25f;
+                        }
+
+                        if (ly3ElementCount == 0) {
+                            isRemovable2[0] = true;
+                            addWater2.setVisibility(View.VISIBLE);
+                            addWater2.setImageResource(R.mipmap.add_water_icon);
+                            addWater3.setVisibility(View.GONE);
+                        }
+
+                        tvWaterMl.setText(waterMl + " L");
+                    }
+                });
+
+                tvWaterMl.setText(waterMl + " L");
+            }
+        });
+        addWater4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: add water 4: " + ly4ElementCount);
+
+                ImageView ivFullWater = new ImageView(getActivity());
+                ivFullWater.setImageResource(R.mipmap.full_water);
+
+                if (ly4ElementCount < 6) {
+                    tableLayout4.addView(ivFullWater);
+                    ly4ElementCount++;
+                    isRemovable3[0] = false;
+                    waterMl += 0.25f;
+                }
+
+                ivFullWater.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d(TAG, "onClick: remove water 4: " + ly4ElementCount);
+                        if (ly4ElementCount >= 1 && ly4ElementCount <= 6) {
+                            tableLayout4.removeViewAt(1);
+                            ly4ElementCount--;
+                            waterMl -= 0.25f;
+                        }
+
+                        if (ly4ElementCount == 0) {
+                            isRemovable3[0] = true;
+                            addWater3.setVisibility(View.VISIBLE);
+                            addWater3.setImageResource(R.mipmap.add_water_icon);
+                            addWater4.setVisibility(View.GONE);
+                        }
+
                         tvWaterMl.setText(waterMl + " L");
                     }
                 });
@@ -466,12 +613,26 @@ public class NutritionFragment extends Fragment {
         });
     }
 
-    private void onRemoveWater(TableRow tableRow) {
-        if (tableRow != null) {
-            tableRow.removeViewAt(1);
-        }
-    }
+    private void waterTrackerSaved(String waterTracker) {
 
+        Map<String, String> waterTrk = new HashMap<>();
+        waterTrk.put("waterTracker", waterTracker);
+
+        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(Foods.WATER_TRACKER)
+                .document(UserRegister.getTodayData())
+                .set(waterTrk).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Success saved waterTracker ");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(TAG, "onFailure: " + e.getMessage());
+            }
+        });
+
+    }
 
     private String monthAdded(int month) {
         List<String> monthName = new ArrayList<>();
@@ -489,5 +650,7 @@ public class NutritionFragment extends Fragment {
         monthName.add("Dec");
         return monthName.get(month);
     }
+
+
 }
 

@@ -15,6 +15,7 @@ public class Foods {
     public static final String SNACK = "snack";
     public static final String NUTRITION = "nutrition";
     public static final String All_NUTRITION = "all_nutrition";
+    public static final String WATER_TRACKER = "water_tracker";
 
     public Foods() {
     }

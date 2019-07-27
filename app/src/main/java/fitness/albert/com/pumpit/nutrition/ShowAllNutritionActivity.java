@@ -122,7 +122,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                 .build();
 
         calendarView.setCalendarListener(new HorizontalCalendarListener() {
-            @SuppressLint("LongLogTag")
+            @SuppressLint({"LongLogTag", "WrongConstant"})
             @Override
             public void onDateSelected(Calendar date, int position) {
 
@@ -160,8 +160,16 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         progressFat.setProgress(0);
         progressProtien.setProgress(0);
         getUserDataAndSetGoal();
-
+        foodListBreakfast.clear();
+        foodListDinner.clear();
+        foodListLunch.clear();
+        foodListSnacks.clear();
+        breakfastContainer.setVisibility(View.GONE);
+        lunchContainer.setVisibility(View.GONE);
+        dinnerContainer.setVisibility(View.GONE);
+        snacksContainer.setVisibility(View.GONE);
     }
+
 
     @Override
     protected void onResume() {
@@ -216,7 +224,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                             updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
                             updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
                             updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
-
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
                         }
@@ -299,22 +306,28 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
+
         switch (nutrition) {
             case Foods.BREAKFAST:
-                final BreakfastListAdapter breakfastAdapter = new BreakfastListAdapter(this, foodList);
+                BreakfastListAdapter breakfastAdapter = new BreakfastListAdapter(this, foodList);
                 recyclerView.setAdapter(breakfastAdapter);
+                breakfastAdapter.notifyDataSetChanged();
                 break;
             case Foods.LUNCH:
                 LunchListAdapter lunchAdapter = new LunchListAdapter(this, foodList);
                 recyclerView.setAdapter(lunchAdapter);
+                lunchAdapter.notifyDataSetChanged();
                 break;
             case Foods.DINNER:
                 DinnerListAdapter dinnerAdapter = new DinnerListAdapter(this, foodList);
                 recyclerView.setAdapter(dinnerAdapter);
+                dinnerAdapter.notifyDataSetChanged();
                 break;
             case Foods.SNACK:
                 SnacksListAdapter snacksAdapter = new SnacksListAdapter(this, foodList);
                 recyclerView.setAdapter(snacksAdapter);
+                snacksAdapter.notifyDataSetChanged();
+
         }
     }
 
@@ -338,13 +351,13 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
                 final Snackbar snackbar = Snackbar
                         .make(constraintLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
-                snackbar.setAction("UNDO", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mAdapter.restoreItem(item, position);
-                        recyclerView.scrollToPosition(position);
-                    }
-                });
+//                snackbar.setAction("UNDO", new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        mAdapter.restoreItem(item, position);
+//                        recyclerView.scrollToPosition(position);
+//                    }
+//                });
                 snackbar.setActionTextColor(Color.YELLOW);
                 snackbar.show();
             }
@@ -426,6 +439,5 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         this.foodListLunch.clear();
         this.foodListSnacks.clear();
     }
-
 
 }

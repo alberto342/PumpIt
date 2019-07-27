@@ -97,6 +97,8 @@ public class LunchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 i.putExtra("qty", foodsList.get(position).getServingQty());
                 i.putExtra("servingUnit", foodsList.get(position).getServingUnit());
                 i.putExtra("altMeasuresSize", foodsList.get(position).getAltMeasures().size());
+                i.putExtra("fullNutrientsSize", foodsList.get(position).getFullNutrients().size());
+                i.putExtra("foodGroup", foodsList.get(position).getTags().getFoodGroup());
 
 
                 for (int r = 0; r < foodsList.get(position).getAltMeasures().size(); r++) {

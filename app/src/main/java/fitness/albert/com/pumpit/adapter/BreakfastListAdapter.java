@@ -18,8 +18,8 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 import java.util.Locale;
 
-import fitness.albert.com.pumpit.model.Foods;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.Foods;
 import fitness.albert.com.pumpit.nutrition.ShowAllNutritionActivity;
 import fitness.albert.com.pumpit.nutrition.ShowBreakfastActivity;
 
@@ -29,7 +29,6 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
     private Context mContext;
     private List<Foods> foodsList;
     public static String foodName;
-
 
 
     public BreakfastListAdapter(Context mContext, List<Foods> foodsList) {
@@ -50,11 +49,11 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
         super.onBindViewHolder(holder, position, payloads);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         bindViews((ViewHolder) holder, position);
     }
-
 
     @SuppressLint({"LongLogTag", "SetTextI18n"})
     private void bindViews(final ViewHolder holder, final int position) {
@@ -97,20 +96,23 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 i.putExtra("servingUnit", foodsList.get(position).getServingUnit());
                 i.putExtra("altMeasuresSize", foodsList.get(position).getAltMeasures().size());
                 i.putExtra("fullNutrientsSize", foodsList.get(position).getFullNutrients().size());
+                i.putExtra("foodGroup", foodsList.get(position).getTags().getFoodGroup());
+
 
                 for (int r = 0; r < foodsList.get(position).getAltMeasures().size(); r++) {
                     i.putExtra("measure" + r, foodsList.get(position).getAltMeasures().get(r).getMeasure());
                     i.putExtra("measureServingWeight" + r, foodsList.get(position).getAltMeasures().get(r).getServing_weight());
                 }
 
-                for(int r=0; r< foodsList.get(position).getFullNutrients().size(); r++) {
-                    i.putExtra("AttrId" + r, foodsList.get(position).getFullNutrients().get(r).getAttrId());
-                    i.putExtra("values" + r,foodsList.get(position).getFullNutrients().get(r).getValue());
+                for (int r = 0; r < foodsList.get(position).getFullNutrients().size(); r++) {
+                    i.putExtra("attrId" + r, foodsList.get(position).getFullNutrients().get(r).getAttrId());
+                    i.putExtra("values" + r, foodsList.get(position).getFullNutrients().get(r).getValue());
                 }
+
                 mContext.startActivity(i);
 
 
-             //   ((Activity) mContext).recreate();
+                //   ((Activity) mContext).recreate();
 
 //                mContext.startActivity(new Intent(mContext, ShowBreakfastActivity.class));
 //                foodsList.clear();
@@ -118,7 +120,6 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         });
     }
-
 
 
     @Override
@@ -142,7 +143,6 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
     public List<Foods> getData() {
         return foodsList;
     }
-
 
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -174,6 +174,5 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
         //Auto-generated method stub
         return position;
     }
-
 
 }

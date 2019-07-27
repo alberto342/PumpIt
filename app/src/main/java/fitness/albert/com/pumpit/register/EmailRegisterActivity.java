@@ -174,8 +174,7 @@ public class EmailRegisterActivity extends AppCompatActivity {
                                     progressBar.setVisibility(View.GONE);
 
                                     if (!task.isSuccessful()) {
-                                        Toast.makeText(EmailRegisterActivity.this, "Authentication failed." + task.getException(),
-                                                Toast.LENGTH_SHORT).show();
+                                        errorMessage(inputEmail, "Authentication failed." + task.getException());
                                     } else {
                                         //save data to firebase
                                         db.collection("users").document(userRegister.getEmail()).set(saveData)

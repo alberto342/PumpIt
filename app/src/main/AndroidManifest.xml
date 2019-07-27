@@ -35,10 +35,18 @@
         <activity android:name=".workout.CustomPlanActivity" />
         <activity android:name=".workout.ShowExerciseResult" />
         <activity android:name=".workout.ExerciseDetailActivity" />
-        <activity android:name=".nutrition.ShowSnackActivity" />
-        <activity android:name=".nutrition.ShowLunchActivity" />
-        <activity android:name=".nutrition.ShowDinnerActivity" />
-        <activity android:name=".nutrition.ShowBreakfastActivity" />
+        <activity
+            android:name=".nutrition.ShowSnackActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".nutrition.ShowLunchActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".nutrition.ShowDinnerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".nutrition.ShowBreakfastActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".nutrition.ShowAllNutritionActivity" />
         <activity android:name=".nutrition.ShowItemFoodActivity" />
         <activity

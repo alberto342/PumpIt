@@ -51,9 +51,6 @@ public class WorkoutActivity extends AppCompatActivity
     private List<Workout> workoutList;
     private TextView tvNameOfPlan, tvNameOfPlanSmall, tvActiveWorkout, tvChangePlan;
     private ImageView ivActivityPlan;
-    /**
-     *
-     */
     private RecyclerView view;
     private WorkoutAdapter workoutAdapter;
     public static String workoutId;

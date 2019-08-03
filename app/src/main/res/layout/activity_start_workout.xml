@@ -26,6 +26,7 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:background="@color/colorDarkBlue"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -38,6 +39,7 @@
             android:textColor="@color/white"
             android:textSize="21dp"
             android:textStyle="bold"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,7 +50,6 @@
         android:id="@+id/rv_start_workout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_start_workout"
         app:layout_constraintEnd_toEndOf="parent"

@@ -5,9 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,16 +15,24 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.adapter.WorkoutAdapter;
 import fitness.albert.com.pumpit.model.FireBaseInit;
@@ -37,7 +42,6 @@ import fitness.albert.com.pumpit.model.Training;
 import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.model.Workout;
 import fitness.albert.com.pumpit.model.WorkoutPlans;
-import fitness.albert.com.pumpit.R;
 
 
 public class TrackerExerciseFragment extends Fragment {
@@ -48,7 +52,9 @@ public class TrackerExerciseFragment extends Fragment {
     private EditText weight, reps, setsRest, exerciseRest;
     private Button btnAddTracker, saveTracker;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+    private PrefsUtils prefsUtilsGetActivity = new PrefsUtils();
+    private PrefsUtils prefsUtilsDefaultExercise = new PrefsUtils();
+    private boolean workoutNameExist;
 
     public TrackerExerciseFragment() {
 
@@ -102,8 +108,6 @@ public class TrackerExerciseFragment extends Fragment {
         setsRest = view.findViewById(R.id.et_rest_between_sets);
         exerciseRest = view.findViewById(R.id.et_sec_rest_after_exercise);
     }
-
-
 
 
     @Override
@@ -168,18 +172,20 @@ public class TrackerExerciseFragment extends Fragment {
         saveTracker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveTrackerIntoFb();
+                receiveData();
             }
         });
     }
 
 
-    private void saveTrackerIntoFb() {
+    private void receiveData() {
+        PrefsUtils prefsUtilsGetID = new PrefsUtils();
+        prefsUtilsGetID.createSharedPreferencesFiles(getActivity(), "exercise");
+        final String getPlanId = prefsUtilsGetID.getString("planName", "");
 
-        final PrefsUtils prefsUtils = new PrefsUtils();
-
-        prefsUtils.createSharedPreferencesFiles(getActivity(), "exercise");
-        final String getPlanId = prefsUtils.getString("planName", "");
+        prefsUtilsGetActivity.createSharedPreferencesFiles(getActivity(), PrefsUtils.START_WORKOUT);
+        String activity1 = prefsUtilsGetActivity.getString("activity", "");
+        String activity2 = prefsUtilsGetActivity.getString("activity2", "");
 
 //        String rest = setsRest.getText().toString();
 //        String[] parts = rest.split(" ");
@@ -194,7 +200,6 @@ public class TrackerExerciseFragment extends Fragment {
         List<TrackerExercise> trackerExerciseList = new ArrayList<>();
 
         for (int i = 0; i < trackerList.size(); i++) {
-
             switch (i % 2) {
                 case 0:
                     weightList.add(new TrackerExercise(Float.valueOf(trackerList.get(i).toString())));
@@ -212,60 +217,137 @@ public class TrackerExerciseFragment extends Fragment {
         final Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2,
                 Integer.valueOf(setsRest.getText().toString()), Integer.valueOf(exerciseRest.getText().toString()),
                 ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
+        if (activity1.equals("StartWorkoutActivity") && activity2.equals("ShowExerciseResultActivity")) {
+            saveTrackerFromStartWorkout(getPlanId, training);
+        } else {
+            saveTrackerIntoFb(getPlanId, training);
+        }
+    }
 
+
+    private void saveTrackerIntoFb(final String getPlanId, final Training training) {
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
-                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    final String workoutDayNameId = task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
+                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            final String workoutDayNameId = task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
+                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                                    .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME)
+                                    .document(workoutDayNameId).collection(Workout.EXERCISE_NAME)
+                                    .document(ExerciseAdapter.exerciseName)
+                                    .set(training)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Log.d(TAG, "onComplete: success saved  workout tracker");
+                                            Intent intent = new Intent(getActivity(), TrainingActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            startActivity(intent);
+                                            Objects.requireNonNull(getActivity()).finish();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d(TAG, "Error writing document", e);
+                                        }
+                                    });
+                        }
+                    }
+                });
+    }
 
-                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
-                            .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME)
-                            .document(workoutDayNameId).collection(Workout.EXERCISE_NAME)
-                            .document(ExerciseAdapter.exerciseName)
-                            .set(training).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+    private void saveTrackerFromStartWorkout(final String getPlanId, final Training training) {
+        prefsUtilsDefaultExercise.createSharedPreferencesFiles(getActivity(), PrefsUtils.DEFAULT_EXERCISE);
+        final String defaultExercise = prefsUtilsDefaultExercise.getString("e_" + currentDayName(), "");
+
+        if (defaultExercise.isEmpty()) {
+            createWorkoutDayName(getPlanId);
+        } else {
+            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                    .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME)
+                    .document(defaultExercise).collection(Workout.EXERCISE_NAME)
+                    .document(ExerciseAdapter.exerciseName).set(training)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
 
-                            Intent intent = new Intent(getActivity(), TrainingActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                            updateWorkoutDayName(getPlanId, defaultExercise);
+                            prefsUtilsGetActivity.removeAll(getActivity(), PrefsUtils.START_WORKOUT);
+                            Intent intent = new Intent(getActivity(), StartWorkoutActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
                             Objects.requireNonNull(getActivity()).finish();
                         }
                     })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "Error writing document", e);
-                                }
-                            });
-                }
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.i(TAG, "onFailure: " + e.getMessage());
+                        }
+                    });
+        }
+    }
+
+
+    private void createWorkoutDayName(String getPlanId) {
+        Log.i(TAG, "createWorkoutDayName:  workoutNameExist: " + workoutNameExist);
+
+        prefsUtilsDefaultExercise.createSharedPreferencesFiles(getActivity(), PrefsUtils.DEFAULT_EXERCISE);
+
+        Workout workout = new Workout(UserRegister.getTodayData(), dayWorkout(), currentDayName(), 0, 0);
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).add(workout).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                prefsUtilsDefaultExercise.saveData("e_" + currentDayName(), documentReference.getId());
+                workoutNameExist = true;
+                Log.d(TAG, "onSuccess:  Create Workout Day Name");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(TAG, "onFailure: " + e.getMessage());
+            }
+        });
+    }
+
+    private void updateWorkoutDayName(final String getPlanId, final String workoutId) {
+
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                .collection(Workout.WORKOUT_NAME).document(getPlanId)
+                .collection(Workout.WORKOUT_DAY_NAME).document(workoutId)
+                .collection(Workout.EXERCISE_NAME)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                int sizeOfExercise = task.getResult().size();
+
+                DocumentReference reference = db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                        .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).document(workoutId);
+                reference.update("numOfExercise", sizeOfExercise);
             }
         });
 
-//
-//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
-//                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME)
-//                .document(WorkoutAdapter.workoutDayName).collection(Workout.EXERCISE_NAME)
-//                .document(ExerciseAdapter.exerciseName)
-//                .set(training).addOnCompleteListener(new OnCompleteListener<Void>() {
-//            @Override
-//            public void onComplete(@NonNull Task<Void> task) {
-//                Log.d(TAG, "DocumentSnapshot successfully written!");
-//
-//
-//                startActivity(new Intent(getActivity(), TrainingActivity.class));
-//                Objects.requireNonNull(getActivity()).finish();
-//                //prefsUtils.removeSingle(getActivity(), "exercise", "planName");
-//            }
-//        })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.d(TAG, "Error writing document", e);
-//                    }
-//                });
+
+    }
+
+
+    private String currentDayName() {
+        Calendar calendar = Calendar.getInstance();
+        String[] days = new String[]{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        Log.d(TAG, "currentDayName: " + " The day is: " + days[calendar.get(Calendar.DAY_OF_WEEK) - 1]);
+        return days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+    }
+
+    private String dayWorkout() {
+        Calendar calendar = Calendar.getInstance();
+        String[] days = new String[]{"Workout 1", "Workout 2", "Workout 3", "Workout 4", "Workout 5", "Workout 6", "Workout 7"};
+        Log.d(TAG, "currentDayName: " + " The day is: " + days[calendar.get(Calendar.DAY_OF_WEEK) - 1]);
+        return days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
     }
 
 

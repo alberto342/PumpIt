@@ -212,7 +212,6 @@
     </string-array>
 
 
-
     <string-array name="list_preference_level">
         <item>General Fitness</item>
         <item>Bulking</item>
@@ -224,7 +223,6 @@
         <item>Day of Week</item>
         <item>Numerical</item>
     </string-array>
-
 
 
     <string-array name="multi_select_list_preference_default_value" />
@@ -291,14 +289,6 @@
     <string name="date_of_birth">Date Of Birth</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
-
-
-
-
-
-
-
-
 
 
     <!-- Messages Preferences -->

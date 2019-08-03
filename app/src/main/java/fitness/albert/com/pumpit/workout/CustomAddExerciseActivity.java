@@ -43,13 +43,9 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_add_exercise);
-
         imageutils = new ImageUtils(this);
-
         init();
-
         Objects.requireNonNull(getSupportActionBar()).hide();
-
         //SETUP REEALM
         RealmConfiguration config = new RealmConfiguration.Builder().name(CustomExerciseName.REALM_FILE_EXERCISE).deleteRealmIfMigrationNeeded().build();
         realm = Realm.getInstance(config);
@@ -179,7 +175,7 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
                     realm.insertOrUpdate(customExerciseName);
 
                     Log.d(TAG,"Success saved into realm");
-                    startActivity(new Intent(CustomAddExerciseActivity.this, ShowExerciseResult.class));
+                    startActivity(new Intent(CustomAddExerciseActivity.this, ShowExerciseResultActivity.class));
                     finish();
                 }
             });

@@ -354,7 +354,7 @@ public class NutritionFragment extends Fragment {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        db.collection(UserRegister.fireBaseUsers).document(FireBaseInit.getEmailRegister()).get()
+        db.collection(UserRegister.FIRE_BASE_USERS).document(FireBaseInit.getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {

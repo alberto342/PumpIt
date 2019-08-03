@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -17,9 +19,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import fitness.albert.com.pumpit.LoginActivity;
 import fitness.albert.com.pumpit.R;
-import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.fragment.logsFragment.LogFragment;
 import fitness.albert.com.pumpit.fragment.profile.ProfileFragment;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 
 public class FragmentNavigationActivity extends AppCompatActivity {
 
@@ -138,4 +140,24 @@ public class FragmentNavigationActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you what to Exit ?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        FragmentNavigationActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }

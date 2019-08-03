@@ -9,11 +9,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import fitness.albert.com.pumpit.fragment.FragmentNavigationActivity;
 import fitness.albert.com.pumpit.LoginActivity;
-import fitness.albert.com.pumpit.model.PrefsUtils;
-import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.fragment.FragmentNavigationActivity;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 
 public class GoalActivity extends AppCompatActivity {
 
@@ -32,7 +31,7 @@ public class GoalActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
 
         if (auth.getCurrentUser() != null) {
             startActivity(new Intent(this, FragmentNavigationActivity.class));

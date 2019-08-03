@@ -2,16 +2,19 @@ package fitness.albert.com.pumpit.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.Objects;
 
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 
 public class AddExerciseActivity extends AppCompatActivity implements View.OnClickListener {
+
 
     private ImageView btnBack, btnFront, imgFace;
     private TextView chest, shoulder, abs, thigh, allExercise, biceps, forearm, cardio, stretch;
@@ -73,9 +76,11 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        switch (id) {
 
-            case  R.id.btn_back:
+        Intent intent = new Intent(this, ShowExerciseResultActivity.class);
+
+        switch (id) {
+            case R.id.btn_back:
                 imgFace.setImageResource(R.mipmap.back_view_exercise);
                 btnFront.setVisibility(View.VISIBLE);
                 btnBack.setVisibility(View.INVISIBLE);
@@ -92,7 +97,7 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
                 glutes.setVisibility(View.VISIBLE);
                 break;
 
-            case  R.id.btn_front:
+            case R.id.btn_front:
                 imgFace.setImageResource(R.mipmap.front_view_exercise);
                 btnFront.setVisibility(View.INVISIBLE);
                 btnBack.setVisibility(View.VISIBLE);
@@ -110,82 +115,102 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.tv_chest:
+                intent.putExtra("exerciseType", "Chest");
                 categorySelected = "Chest";
                 category2Selected = "null";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_shoulder:
+                intent.putExtra("exerciseType", "Shoulders");
                 categorySelected = "Shoulders";
                 category2Selected = "null";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_abs:
+                intent.putExtra("exerciseType", "Abs");
                 categorySelected = "Abs";
                 category2Selected = "null";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_thigh:
+                intent.putExtra("exerciseType", "Thigh");
                 categorySelected = "Legs";
                 category2Selected = "null";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_all:
+                intent.putExtra("exerciseType", "All Exercises");
                 categorySelected = "All";
                 category2Selected = "null";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_biceps:
+                intent.putExtra("exerciseType", "Biceps");
                 categorySelected = "Arms";
                 category2Selected = "biceps";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_forearm:
+                intent.putExtra("exerciseType", "Forearms");
                 categorySelected = "Arms";
                 category2Selected = "forearms";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_cardio:
+                intent.putExtra("exerciseType", "Cardio");
                 categorySelected = "Cardio";
                 category2Selected = "null";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_triceps:
+                intent.putExtra("exerciseType", "Triceps");
                 categorySelected = "Arms";
                 category2Selected = "triceps";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_glutes:
+                intent.putExtra("exerciseType", "Glutes");
                 categorySelected = "Legs";
                 category2Selected = "glutes";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_back:
+                intent.putExtra("exerciseType", "Back");
                 categorySelected = "Back";
                 category2Selected = "null";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_calf:
+                intent.putExtra("exerciseType", "Calf");
                 categorySelected = "Legs";
                 category2Selected = "calf";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
 
             case R.id.tv_stretch:
+                intent.putExtra("exerciseType", "Stretch");
                 categorySelected = "Stretch";
                 category2Selected = "null";
-                startActivity(new Intent(this, ShowExerciseResult.class));
+                startActivity(intent);
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        PrefsUtils prefsUtils = new PrefsUtils();
+        prefsUtils.removeSingle(this, PrefsUtils.START_WORKOUT, "activity");
     }
 }

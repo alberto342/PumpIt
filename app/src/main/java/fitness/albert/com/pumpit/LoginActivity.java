@@ -184,7 +184,7 @@ public class LoginActivity extends AppCompatActivity { //implements GoogleApiCli
     private void resetPassword() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.activity_reset_password, null);
+        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.dialog_reset_password, null);
 
 
         dialogBuilder.setView(dialogView);

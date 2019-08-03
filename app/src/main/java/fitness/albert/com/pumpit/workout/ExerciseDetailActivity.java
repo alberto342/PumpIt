@@ -1,19 +1,20 @@
 package fitness.albert.com.pumpit.workout;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
 
 public class ExerciseDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -46,6 +47,7 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 
         setTheFragmentSwitch();
     }
+
 
 
     private void setTheFragmentSwitch() {

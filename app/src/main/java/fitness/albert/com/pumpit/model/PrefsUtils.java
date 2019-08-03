@@ -10,7 +10,8 @@ public class PrefsUtils {
     public static final String EXERCISE = "exercise";
     public static final String DEFAULT_EXERCISE = "defaultExercise";
     public static final String PLAN_NAME = "planName";
-
+    public static final String START_WORKOUT = "start_workout";
+    public static final String SETTINGS_PREFERENCES_FILE = "fitness.albert.com.pumpit_preferences";
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor editor;
 

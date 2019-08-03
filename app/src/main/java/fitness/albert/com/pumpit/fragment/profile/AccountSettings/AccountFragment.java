@@ -35,7 +35,7 @@ import fitness.albert.com.pumpit.model.FireBaseInit;
 public class AccountFragment extends Fragment {
 
 
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private TextView btnEmail, btnPassword, btnDeleteAccount, btnLogout, tvMyEmail;
     private ImageView goToEmail, goToPassword;
     private FirebaseAuth.AuthStateListener authListener;

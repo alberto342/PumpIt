@@ -103,10 +103,10 @@ public class ChangeProfileFragment extends Fragment {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
         PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(getActivity(), UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
         final String dayOfBirth = prefsUtils.getString("date_of_birth", "");
 
-        db.collection(UserRegister.fireBaseUsers).document(getEmailRegister()).get()
+        db.collection(UserRegister.FIRE_BASE_USERS).document(getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {

@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".workout.ShowExerciseImgActivity"></activity>
         <activity
             android:name=".fragment.profile.SettingsActivity"
             android:label="@string/title_activity_settings" />
@@ -33,7 +34,7 @@
         <activity android:name=".workout.WorkoutActivity" />
         <activity android:name=".workout.WorkoutPlansActivity" />
         <activity android:name=".workout.CustomPlanActivity" />
-        <activity android:name=".workout.ShowExerciseResult" />
+        <activity android:name=".workout.ShowExerciseResultActivity" />
         <activity android:name=".workout.ExerciseDetailActivity" />
         <activity
             android:name=".nutrition.ShowSnackActivity"

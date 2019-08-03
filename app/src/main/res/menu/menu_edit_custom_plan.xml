@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_ok_plan"
-        android:icon="@mipmap/ic_ok_v"
+        android:icon="@drawable/ic_done"
         android:title="ok"
         app:showAsAction="never|always|collapseActionView" />
 

@@ -58,7 +58,7 @@ public class FireBaseInit {
     }
 
     public void setIntoPrefs() {
-        prefsUtils.createSharedPreferencesFiles(context, UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(context, PrefsUtils.SETTINGS_PREFERENCES_FILE);
         prefsUtils.saveData("userEmail", getEmailRegister());
     }
 

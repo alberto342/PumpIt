@@ -24,21 +24,20 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.WorkoutPlans;
-import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.CustomPlanActivity;
 import fitness.albert.com.pumpit.workout.FindWorkoutActivity;
 import fitness.albert.com.pumpit.workout.StartWorkoutActivity;
-import fitness.albert.com.pumpit.workout.WorkoutPlansActivity;
 
 
 public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
     private boolean exerciseExist;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private TextView exerciseName, level, workoutComplete, emptyExercise, seeWorkout;
+    private TextView exerciseName, level, workoutComplete, emptyExercise;
     private ImageView btnAdd, findWorkout, btnStartWorkout;
 
     public WorkoutFragment() {
@@ -58,7 +57,6 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
         setToolBar();
         init(view);
-        seeWorkout.setOnClickListener(this);
         findWorkout.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
         btnStartWorkout.setOnClickListener(this);
@@ -84,7 +82,6 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     }
 
     private void init(View view) {
-        seeWorkout = view.findViewById(R.id.tv_see_workout);
         findWorkout = view.findViewById(R.id.btn_find_workout);
         emptyExercise = view.findViewById(R.id.empty_exersis);
         level = view.findViewById(R.id.level);
@@ -112,12 +109,6 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.btn_find_workout:
                 startActivity(new Intent(getActivity(), FindWorkoutActivity.class));
-//
-//                Fragment fragment = new FindWorkoutFragment();
-//                loadFragment(fragment);
-                break;
-            case R.id.tv_see_workout:
-                startActivity(new Intent(getActivity(), WorkoutPlansActivity.class));
                 break;
             case R.id.btn_workout:
                 startActivity(new Intent(getActivity(), StartWorkoutActivity.class));
@@ -138,9 +129,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                         progressdialog.hide();
 
                         if (task.getResult() != null && !task.getResult().getDocuments().isEmpty()) {
-
                             exerciseExist = task.getResult().getDocuments().size() > 0;
-
                             haveExercise(exerciseExist);
                             progressdialog.hide();
                         }
@@ -167,7 +156,6 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
             PrefsUtils prefsUtils = new PrefsUtils();
             prefsUtils.createSharedPreferencesFiles(getActivity(), PrefsUtils.EXERCISE);
 
-            seeWorkout.setVisibility(TextView.VISIBLE);
             emptyExercise.setVisibility(TextView.INVISIBLE);
             btnAdd.setVisibility(View.INVISIBLE);
             level.setVisibility(TextView.VISIBLE);
@@ -185,10 +173,10 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
         } else {
             btnAdd.setVisibility(View.VISIBLE);
             emptyExercise.setVisibility(TextView.VISIBLE);
-            seeWorkout.setVisibility(TextView.INVISIBLE);
             level.setVisibility(TextView.INVISIBLE);
             workoutComplete.setVisibility(TextView.INVISIBLE);
             exerciseName.setVisibility(TextView.INVISIBLE);
         }
     }
+
 }

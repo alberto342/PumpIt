@@ -47,7 +47,7 @@ public class Global {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 
         @SuppressLint("InflateParams")
-        View dialogView= inflater.inflate(R.layout.layout_not_internet_connection, null);
+        View dialogView= inflater.inflate(R.layout.dialog_not_internet_connection, null);
         dialogBuilder.setView(dialogView);
         alert = dialogBuilder.create();
 

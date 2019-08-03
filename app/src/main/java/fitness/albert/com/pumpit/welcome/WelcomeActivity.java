@@ -57,7 +57,7 @@ public class WelcomeActivity extends AppCompatActivity {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        final String TAG = "ShowExerciseResult";
+        final String TAG = "ShowExerciseResultActivity";
         boolean realmExisting;
 
         List<String> imgNameList = new ArrayList<>();

@@ -18,9 +18,8 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-import fitness.albert.com.pumpit.model.PrefsUtils;
-import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.welcome.BodyFatActivity;
 import fitness.albert.com.pumpit.welcome.FatTargetActivity;
 
@@ -55,7 +54,7 @@ public class BodyFatRecyclerViewAdapter extends RecyclerView.Adapter<BodyFatRecy
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: called.");
         final PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(mContext, UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(mContext, PrefsUtils.SETTINGS_PREFERENCES_FILE);
 
 
         Glide.with(mContext)

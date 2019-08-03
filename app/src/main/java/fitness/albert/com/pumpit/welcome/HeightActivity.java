@@ -15,9 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.reflect.Field;
 
-import fitness.albert.com.pumpit.model.PrefsUtils;
-import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 
 public class HeightActivity extends AppCompatActivity {
 
@@ -33,7 +32,7 @@ public class HeightActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
         init();
-        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
 
         //Set a value change listener for NumPicker
         valueChangedListener();

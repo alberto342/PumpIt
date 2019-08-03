@@ -14,11 +14,10 @@ public class UserRegister {
 
     //    public static final String NAME_KEY = "name";
 //    public static final String EMAIL_KEY ="email";
-    // public static final String SharedPreferencesFile = "user_info";
-    public static final String SharedPreferencesFile = "fitness.albert.com.pumpit_preferences";
+    // public static final String SETTINGS_PREFERENCES_FILE = "user_info";
+   // public static final String SETTINGS_PREFERENCES_FILE = "fitness.albert.com.pumpit_preferences";
 
-
-    public static final String fireBaseUsers = "users";
+    public static final String FIRE_BASE_USERS = "users";
 
     private int age;
     private String imagesRefPath;  //profile img url

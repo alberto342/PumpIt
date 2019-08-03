@@ -3,8 +3,6 @@ package fitness.albert.com.pumpit.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +10,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.List;
 
-import fitness.albert.com.pumpit.model.PrefsUtils;
-import fitness.albert.com.pumpit.model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.PrefsUtils;
+import fitness.albert.com.pumpit.model.Workout;
+import fitness.albert.com.pumpit.model.WorkoutPlans;
 import fitness.albert.com.pumpit.workout.StartWorkoutActivity;
 
 public class ChangePlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -24,6 +33,9 @@ public class ChangePlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private final String TAG = "ChangePlanAdapter";
     private Context mContext;
     private List<WorkoutPlans> workoutPlansList;
+    private PrefsUtils prefsUtils = new PrefsUtils();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     public ChangePlanAdapter(Context mContext, List<WorkoutPlans> workoutPlansList) {
         this.mContext = mContext;
@@ -63,12 +75,34 @@ public class ChangePlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             public void onClick(View v) {
                 holder.btnSelectedPlan.setImageResource(R.mipmap.ic_ok_selected);
 
-                PrefsUtils prefsUtils = new PrefsUtils();
-                prefsUtils.createSharedPreferencesFiles(mContext, "exercise");
+                prefsUtils.createSharedPreferencesFiles(mContext, PrefsUtils.EXERCISE);
                 prefsUtils.saveData("default_plan", workoutPlansList.get(position).getRoutineName());
+                receivedIdFromFb(position);
                 Log.d(TAG, "default program active");
                 mContext.startActivity(new Intent(mContext, StartWorkoutActivity.class));
                 ((Activity) mContext).finish();
+            }
+        });
+    }
+
+
+    private void receivedIdFromFb(int position) {
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+                .whereEqualTo("routineName", workoutPlansList.get(position).getRoutineName()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (int i = 0; i < task.getResult().size(); i++) {
+                                String id = task.getResult().getDocuments().get(i).getId();
+                                prefsUtils.saveData("planName", id);
+                            }
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(TAG, "onFailure: " + e.getMessage());
             }
         });
     }

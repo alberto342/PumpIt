@@ -13,9 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Calendar;
 
-import fitness.albert.com.pumpit.model.PrefsUtils;
-import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 
 public class AgeActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
@@ -72,7 +71,7 @@ public class AgeActivity extends AppCompatActivity implements DatePickerDialog.O
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         String date = month+1 + "/" + dayOfMonth + "/" + year;
         PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
         prefsUtils.saveData("date_of_birth", date);
         mDisplayDate.setText(getAge(year, month, dayOfMonth));
 

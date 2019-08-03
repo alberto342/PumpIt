@@ -80,17 +80,16 @@ public class PlanFragment extends Fragment {
 
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main_add, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_plans) {
             startActivity(new Intent(getActivity(), CustomPlanActivity.class));
-            Objects.requireNonNull(getActivity()).finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -111,10 +110,10 @@ public class PlanFragment extends Fragment {
                             public void onClick(int pos) {
                                 deleteItem(pos);
                                 deleteFromFb(pos);
+                                workoutAdapter.notifyDataSetChanged();
                             }
                         }
                 ));
-
                 underlayButtons.add(new SwipeHelper.UnderlayButton(
                         "Edit",
                         0,

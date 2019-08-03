@@ -33,7 +33,7 @@ public class WeightActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
         init();
-        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
         valueChangedListener();
         btnNextPressed();
     }

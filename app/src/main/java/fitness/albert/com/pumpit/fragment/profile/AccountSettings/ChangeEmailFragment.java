@@ -158,9 +158,9 @@ public class ChangeEmailFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
         btnDoneConfirmEmail.setImageResource(R.mipmap.emty_btn);
 
-        final DocumentReference userRef =  db.collection(UserRegister.fireBaseUsers).document(getEmailRegister());
+        final DocumentReference userRef =  db.collection(UserRegister.FIRE_BASE_USERS).document(getEmailRegister());
 
-        final DocumentReference newUserRef = db.collection(UserRegister.fireBaseUsers).document(etMyEmail.getText().toString());
+        final DocumentReference newUserRef = db.collection(UserRegister.FIRE_BASE_USERS).document(etMyEmail.getText().toString());
 
         final DocumentReference oldNutrition = db.collection(Foods.NUTRITION).document(getEmailRegister());
 

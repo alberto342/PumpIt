@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit.workout;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -68,7 +69,7 @@ public class ChangePlanActivity extends AppCompatActivity {
                                 initRecyclerView();
                             }
                         } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                            Log.i(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 })
@@ -84,6 +85,7 @@ public class ChangePlanActivity extends AppCompatActivity {
     private void initRecyclerView() {
         Log.d(TAG, "initRecyclerView: init ChangePlan recyclerView" + mRecyclerView);
 
+        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
         ChangePlanAdapter changePlanAdapter = new ChangePlanAdapter(this, workoutPlansList);

@@ -1,17 +1,32 @@
 package fitness.albert.com.pumpit.fragment.profile;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import fitness.albert.com.pumpit.LoginActivity;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.CustomPlanActivity;
 
@@ -98,7 +113,6 @@ public class SettingsActivity extends AppCompatActivity implements
     }
 
 
-
     public static class HeaderFragment extends PreferenceFragmentCompat {
 
         @Override
@@ -118,10 +132,88 @@ public class SettingsActivity extends AppCompatActivity implements
 
     public static class ChangeEmailFragment extends PreferenceFragmentCompat {
 
+        private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             //setPreferencesFromResource(R.xml.account_preferences, rootKey);
+            changeEmail();
         }
+
+
+        private void changeEmail() {
+            final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+            LayoutInflater inflater = getLayoutInflater();
+            @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.dialog_change_email, null);
+            dialogBuilder.setView(dialogView);
+
+            final EditText confirmationEmail = dialogView.findViewById(R.id.confirmation_email_input);
+            final Button btnChangeEmail = dialogView.findViewById(R.id.btn_change_email);
+            final Button btnBack = dialogView.findViewById(R.id.change_email_btn_back);
+            final ProgressBar progressBar = dialogView.findViewById(R.id.progress_bar_change_email);
+            final TextView emailMessage = dialogView.findViewById(R.id.change_email_message);
+
+            final AlertDialog dialog = dialogBuilder.create();
+            btnChangeEmail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String confirmation = confirmationEmail.getText().toString().trim();
+
+                    if (confirmation.isEmpty()) {
+                        confirmationEmail.setError("Enter confirmation email");
+                    }
+
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    user.updateEmail(confirmationEmail.getText().toString().trim())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d(TAG, "User email address updated.");
+                                        sendVerificationEmail(emailMessage);
+                                        progressBar.setVisibility(View.INVISIBLE);
+                                        if(!emailMessage.equals("Email not send")) {
+                                            dialog.dismiss();
+                                        }
+
+                                    }
+                                }
+                            });
+                }
+            });
+
+
+            btnBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+            dialog.show();
+        }
+
+
+        private void sendVerificationEmail(final TextView textView) {
+            user.sendEmailVerification()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                // after email is sent just logout the user and finish this activity
+                                FirebaseAuth.getInstance().signOut();
+                            } else {
+                                // email not sent, so display message and restart the activity or do whatever you wish to do
+                                textView.setText("Email not send");
+
+                            }
+                        }
+                    });
+        }
+
+
     }
 
     public static class ProfileFragment extends PreferenceFragmentCompat {
@@ -207,6 +299,18 @@ public class SettingsActivity extends AppCompatActivity implements
         }
     }
 
+
+    public static class LogOutFragment extends PreferenceFragmentCompat {
+
+        @Override
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(getActivity(), LoginActivity.class));
+            getActivity().finish();
+        }
+    }
+
+
     public static class SyncFragment extends PreferenceFragmentCompat {
 
         @Override
@@ -214,8 +318,6 @@ public class SettingsActivity extends AppCompatActivity implements
             startActivity(new Intent(getActivity(), CustomPlanActivity.class));
         }
     }
-
-
 
 
 }

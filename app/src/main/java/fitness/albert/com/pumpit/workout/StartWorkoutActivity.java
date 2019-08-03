@@ -7,10 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +17,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,7 +35,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.TrainingAdapter;
+import fitness.albert.com.pumpit.helper.SimpleItemTouchHelperCallback;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.SwipeHelper;
@@ -41,7 +45,6 @@ import fitness.albert.com.pumpit.model.TrackerExercise;
 import fitness.albert.com.pumpit.model.Training;
 import fitness.albert.com.pumpit.model.Workout;
 import fitness.albert.com.pumpit.model.WorkoutPlans;
-import fitness.albert.com.pumpit.R;
 
 public class StartWorkoutActivity extends AppCompatActivity {
 
@@ -57,6 +60,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
     public static List<Training> trainingList = new ArrayList<>();
     private TrainingAdapter trainingAdapter;
     private AlertDialog dialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +81,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
         mRecyclerView = findViewById(R.id.rv_start_workout);
         emptyWorkout = findViewById(R.id.tv_empty_workout);
         btnStartWorkout = findViewById(R.id.btn_start_workout);
+        setTitle("Your exercises for today (" + getDayOfTheWeek() + ")");
 
         todayExercises.setText("Your exercises for today (" + getDayOfTheWeek() + ")");
     }
@@ -91,10 +96,12 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_plans) {
+            PrefsUtils prefsUtils = new PrefsUtils();
+            prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.START_WORKOUT);
+            prefsUtils.saveData("activity", "StartWorkoutActivity");
             startActivity(new Intent(this, AddExerciseActivity.class));
-            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -103,7 +110,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private void getDayWorkout() {
         final List<WorkoutPlans> workoutPlansList = new ArrayList<>();
         final List<Workout> workoutList = new ArrayList<>();
-
         final String[] day = new String[1];
         final String[] part1 = new String[1];
 
@@ -111,9 +117,11 @@ public class StartWorkoutActivity extends AppCompatActivity {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
+        trainingList.clear();
 
         //get workout id
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                .collection(WorkoutPlans.WORKOUT_NAME).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -140,82 +148,80 @@ public class StartWorkoutActivity extends AppCompatActivity {
                             } else {
                                 Log.d(TAG, "Successfully get workout name id: " + workoutNameId);
 
-
                                 db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                                         .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId)
-                                        .collection(Workout.WORKOUT_DAY_NAME).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        .collection(Workout.WORKOUT_DAY_NAME).get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                                        if (task.isSuccessful() && task.getResult() != null) {
-                                            for (int i = 0; i < task.getResult().size(); i++) {
+                                                if (task.isSuccessful() && task.getResult() != null) {
+                                                    for (int i = 0; i < task.getResult().size(); i++) {
 
-                                                Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
-                                                workoutList.add(workout);
+                                                        Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
+                                                        workoutList.add(workout);
 
-                                                String splitWorkoutDayName = workoutList.get(i).getWorkoutDay();
-                                                String[] parts = splitWorkoutDayName.split(" ");
-                                                part1[0] = parts[0];
+                                                        String splitWorkoutDayName = workoutList.get(i).getWorkoutDay();
+                                                        String[] parts = splitWorkoutDayName.split(" ");
+                                                        part1[0] = parts[0];
 
-                                                Date d = new Date();
+                                                        Date d = new Date();
 
-                                                if (part1[0].equals("Day")) {
-                                                    day[0] = getDayOfTheWeekBeWorkout(d.getDay());
+                                                        if (part1[0].equals("Day")) {
+                                                            day[0] = getDayOfTheWeekBeWorkout(d.getDay());
 
-                                                } else {
-                                                    day[0] = getDayOfTheWeek();
-                                                }
+                                                        } else {
+                                                            day[0] = getDayOfTheWeek();
+                                                        }
 
-                                                if (workoutList.get(i).getWorkoutDay().equals(day[0])) {
+                                                        if (workoutList.get(i).getWorkoutDay().equals(day[0])) {
 
-                                                    workoutId = task.getResult().getDocuments().get(i).getId();
+                                                            workoutId = task.getResult().getDocuments().get(i).getId();
 
-                                                    Log.d(TAG, "Successfully get workout ID: " + workoutId);
+                                                            Log.d(TAG, "Successfully get workout ID: " + workoutId);
 
-                                                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
-                                                            .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
-                                                            .document(workoutId).collection(Workout.EXERCISE_NAME).get()
-                                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                @Override
-                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                    if (task.isSuccessful() && task.getResult() != null) {
+                                                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                                                                    .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId)
+                                                                    .collection(Workout.WORKOUT_DAY_NAME).document(workoutId)
+                                                                    .collection(Workout.EXERCISE_NAME).get()
+                                                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                            if (task.isSuccessful() && task.getResult() != null) {
+                                                                                boolean trainingListIsEmpty;
 
-                                                                        boolean trainingListIsEmpty;
+                                                                                for (int i = 0; i < task.getResult().size(); i++) {
+                                                                                    Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
+                                                                                    TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
+                                                                                    trackerExerciseList.add(trackerExercise);
+                                                                                    trainingList.add(training);
+                                                                                    initRecyclerView();
+                                                                                }
 
-                                                                        for (int i = 0; i < task.getResult().size(); i++) {
+                                                                                trainingListIsEmpty = trainingList.size() > 0;
+                                                                                Log.d(TAG, "Exercise Size: " + trainingList.size());
+                                                                                btnStartWorkout.setVisibility(View.VISIBLE);
+                                                                                emptyWorkout.setVisibility(View.INVISIBLE);
 
-                                                                            Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
-                                                                            TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
-                                                                            trackerExerciseList.add(trackerExercise);
-                                                                            trainingList.add(training);
-
-                                                                            initRecyclerView();
+                                                                                if (!trainingListIsEmpty) {
+                                                                                    emptyWorkout.setVisibility(View.VISIBLE);
+                                                                                    btnStartWorkout.setVisibility(View.INVISIBLE);
+                                                                                }
+                                                                            }
+                                                                            Log.d(TAG, "Successfully get workout");
                                                                         }
-
-                                                                        trainingListIsEmpty = trainingList.size() > 0;
-                                                                        Log.d(TAG, "Exercise Size: " + trainingList.size());
-                                                                        btnStartWorkout.setVisibility(View.VISIBLE);
-                                                                        emptyWorkout.setVisibility(View.INVISIBLE);
-
-                                                                        if (!trainingListIsEmpty) {
-                                                                            emptyWorkout.setVisibility(View.VISIBLE);
-                                                                            btnStartWorkout.setVisibility(View.INVISIBLE);
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.d(TAG, "Failure get workout: " + e);
                                                                         }
-                                                                    }
-                                                                    Log.d(TAG, "Successfully get workout");
-                                                                }
-                                                            })
-                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    Log.d(TAG, "Failure get workout: " + e);
-                                                                }
-                                                            });
+                                                                    });
+                                                        }
+                                                    }
                                                 }
                                             }
-                                        }
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
+                                        }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Log.d(TAG, "Failure" + e);
@@ -244,8 +250,8 @@ public class StartWorkoutActivity extends AppCompatActivity {
                             @Override
                             public void onClick(int pos) {
                                 deleteItemFromFb(pos);
-                                deleteItem(pos);
                                 updateNumberOfExercise();
+                                trainingAdapter.notifyDataSetChanged();
                             }
                         }
                 ));
@@ -261,20 +267,22 @@ public class StartWorkoutActivity extends AppCompatActivity {
                         }
                 ));
             }
+
+
         };
     }
 
     // TODO: 2019-05-10 check if exercise have on fb befor add
 
     private void deleteItem(final int position) {
-       // trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
+        // trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
         trainingList.remove(position);
         mRecyclerView.removeViewAt(position);
         trainingAdapter.notifyItemRemoved(position);
         trainingAdapter.notifyItemRangeChanged(position, trainingList.size());
     }
 
-    private void deleteItemFromFb(int position) {
+    private void deleteItemFromFb(final int position) {
         db.collection(WorkoutPlans.WORKOUT_PLANS)
                 .document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
                 .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
@@ -283,6 +291,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                        deleteItem(position);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -291,6 +300,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void updateNumberOfExercise() {
         db.collection(WorkoutPlans.WORKOUT_PLANS)
@@ -303,7 +313,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private void addLayoutRepsAndSets(int position) {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.layout_recive_reps_and_sets, null);
+        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.dialog_recive_reps_and_sets, null);
 
         ImageView btnDoneSetsReps = dialogView.findViewById(R.id.btn_done_edit_sets_reps);
         ImageView btnCancel = dialogView.findViewById(R.id.iv_cancel_weight_reps);
@@ -359,12 +369,17 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
 
     private void initRecyclerView() {
-
+        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-
         trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
+        trainingAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(trainingAdapter);
+
+        ItemTouchHelper.Callback callback =
+                new SimpleItemTouchHelperCallback(trainingAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(mRecyclerView);
 
         Log.d(TAG, "initRecyclerView: init recyclerView " + mRecyclerView);
     }

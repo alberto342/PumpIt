@@ -7,9 +7,8 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import fitness.albert.com.pumpit.model.PrefsUtils;
-import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 
 public class GenderActivity extends AppCompatActivity {
 
@@ -22,7 +21,7 @@ public class GenderActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
         init();
-        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
     }
 
 

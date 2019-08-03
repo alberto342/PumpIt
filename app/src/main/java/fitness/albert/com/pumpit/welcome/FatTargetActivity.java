@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.BodyFatRecyclerViewAdapter;
 import fitness.albert.com.pumpit.model.PrefsUtils;
-import fitness.albert.com.pumpit.model.UserRegister;
-import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.register.RegisterActivity;
 
 public class FatTargetActivity extends AppCompatActivity {
@@ -43,7 +42,7 @@ public class FatTargetActivity extends AppCompatActivity {
         Log.d(TAG, "initImageBitmaps: preparing bitmaps.");
 
         PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(this, UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
         boolean isMale = prefsUtils.getBoolean("is_male", Boolean.parseBoolean("null"));
 
         if (isMale) {

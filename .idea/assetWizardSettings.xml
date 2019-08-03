@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/private/var/folders/0g/2t5cpp5x0tz4f7d7gnv56w2m0000gn/T/AppTranslocation/0FE77528-8C86-454B-9827-2812BD160A6F/d/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/communication/ic_chat_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/private/var/folders/0g/2t5cpp5x0tz4f7d7gnv56w2m0000gn/T/AppTranslocation/D2FAD745-F5A7-40FB-8E75-89641D4C047B/d/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_done_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -55,7 +55,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_messages" />
+                                      <entry key="outputName" value="ic_done" />
                                       <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ffffff" />
                                     </map>

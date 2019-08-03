@@ -1,7 +1,9 @@
 package fitness.albert.com.pumpit.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,15 +16,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import fitness.albert.com.pumpit.model.TrackerExercise;
-import fitness.albert.com.pumpit.model.Training;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.helper.BitmapFromAssent;
+import fitness.albert.com.pumpit.helper.ItemTouchHelperAdapter;
+import fitness.albert.com.pumpit.helper.ItemTouchHelperViewHolder;
+import fitness.albert.com.pumpit.model.TrackerExercise;
+import fitness.albert.com.pumpit.model.Training;
+import fitness.albert.com.pumpit.workout.ShowExerciseImgActivity;
 
-public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements ItemTouchHelperAdapter {
 
     private Context mContext;
     private List<Training> trainingList;
@@ -63,7 +70,7 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 .load(bitmap)
                 .into(holder.ivTraining);
 
-       // int rep = trackerList.get(position).getRepNumber();
+        // int rep = trackerList.get(position).getRepNumber();
         int set = trainingList.get(position).getSizeOfRept();
 
         holder.trainingName.setText(trainingList.get(position).getExerciseName());
@@ -73,19 +80,38 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                posit = position;
+                Intent intent = new Intent(mContext, ShowExerciseImgActivity.class);
+                intent.putExtra("exerciseName", trainingList.get(position).getExerciseName());
+                intent.putExtra("imgName", trainingList.get(position).getImgName());
+
+                //posit = position;
                 Log.d(TAG, "onClick: " + trainingList.get(position).getExerciseName());
+                //mContext.startActivity(new Intent(mContext, ExerciseDetailActivity.class));
+
+                mContext.startActivity(intent);
             }
         });
     }
-
 
     @Override
     public int getItemCount() {
         return trainingList.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        Collections.swap(trainingList, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        trainingList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, ItemTouchHelperViewHolder {
 
         private ImageView ivTraining;
         private TextView trainingName, tvSetAndRep, tvRestTime;
@@ -93,7 +119,6 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public ViewHolder(View rowView) {
             super(rowView);
             rowView.setOnClickListener(this);
-
             this.ivTraining = rowView.findViewById(R.id.iv_training_thm);
             this.trainingName = rowView.findViewById(R.id.tv_training_name);
             this.tvSetAndRep = rowView.findViewById(R.id.tv_set_and_rep);
@@ -103,6 +128,16 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Override
         public void onClick(View v) {
 
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
         }
     }
 

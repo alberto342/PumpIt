@@ -3,8 +3,10 @@ package fitness.albert.com.pumpit.fragment.profile;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,20 +29,21 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.File;
+
+import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.fragment.profile.AccountSettings.AccountFragment;
+import fitness.albert.com.pumpit.fragment.profile.ProfileChange.ChangeProfileFragment;
+import fitness.albert.com.pumpit.helper.ImageUtils;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.TDEECalculator;
 import fitness.albert.com.pumpit.model.UserRegister;
-import fitness.albert.com.pumpit.R;
-import fitness.albert.com.pumpit.fragment.profile.AccountSettings.AccountFragment;
-import fitness.albert.com.pumpit.fragment.profile.ProfileChange.ChangeProfileFragment;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachmentListener {
 
     private String TAG = "ProfileFragment";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -51,6 +54,7 @@ public class ProfileFragment extends Fragment {
     private UserRegister userRegister = new UserRegister();
     private PrefsUtils prefsUtils = new PrefsUtils();
     private TDEECalculator cal = new TDEECalculator();
+    private ImageUtils imageutils;
 
 
     public ProfileFragment() {
@@ -69,7 +73,9 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        //fimageutils = new ImageUtils(getActivity());
         init(view);
+        imgProfileLoad();
 
         if (mAuth.getCurrentUser() != null) {
             loadData();
@@ -99,6 +105,15 @@ public class ProfileFragment extends Fragment {
 
     }
 
+    private void imgProfileLoad() {
+        profileImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageutils.imagepicker(1);
+            }
+        });
+    }
+
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_setting, menu);
@@ -106,7 +121,7 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.m_setting) {
             startActivity(new Intent(getActivity(), SettingsActivity.class));
             Log.d(TAG, "onOptionsItemSelected:  Menu selected");
@@ -185,7 +200,7 @@ public class ProfileFragment extends Fragment {
     private void loadData() {
         FireBaseInit fireBaseInit = new FireBaseInit(getActivity());
         fireBaseInit.setIntoPrefs();
-        prefsUtils.createSharedPreferencesFiles(getActivity(), UserRegister.SharedPreferencesFile);
+        prefsUtils.createSharedPreferencesFiles(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
 
         if (prefsUtils.getString("first_name", " ").equals(" ")) {
             loadFromFb();
@@ -235,7 +250,7 @@ public class ProfileFragment extends Fragment {
         String dateOfBirth = prefsUtils.getString("date_of_birth", "");
         float weight = prefsUtils.getFloat("weight", 0f);
         int height = prefsUtils.getInt("height", 0);
-        boolean isMale = prefsUtils.getBoolean("is_male", false);
+        //boolean isMale = prefsUtils.getBoolean("is_male", false);
 
         nameTv.setText(firstName + " " + lestName);
         cal.setHeight((double) height);
@@ -250,9 +265,7 @@ public class ProfileFragment extends Fragment {
 //        int day = Integer.valueOf(splitDate[1]);
 //        int year = Integer.valueOf(splitDate[2]);
 
-        // TODO: 2019-07-14 chack the date on the firbase, its null bicuase not have date
-        UserRegister userRegister = new UserRegister();
-        Log.d(TAG, "loadFromPrefs: "  + dateOfBirth);
+        Log.d(TAG, "loadFromPrefs: " + dateOfBirth);
     }
 
 
@@ -285,11 +298,13 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        imageutils.onActivityResult(requestCode, resultCode, data);
+    }
 
-        // add img to the server
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            saveUserNameInServer(data.getData());
-        }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        imageutils.request_permission_result(requestCode, permissions, grantResults);
     }
 
     private int convertingStringToInt(String txt) {
@@ -311,7 +326,12 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    private void saveUserNameInServer(final Uri data) {
-        userRegister.setImagesRefPath("/profileimage.jpeg");
+    @Override
+    public void image_attachment(int from, String filename, Bitmap file, Uri uri) {
+        String imgName = "profile_img.jpg";
+        profileImg.setImageBitmap(file);
+        String path = Environment.getExternalStorageDirectory() + File.separator + "Pumpit/ExercisePictures" + File.separator;
+        imageutils.createImage(file, imgName, path, false);
+        imageutils.getImage(imgName, path);
     }
 }

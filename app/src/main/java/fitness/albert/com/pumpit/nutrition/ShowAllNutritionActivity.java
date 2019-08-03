@@ -68,6 +68,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_all_nutrition);
+        setTitle("Nutrition");
 
         init();
         datePicker();
@@ -372,7 +373,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        db.collection(UserRegister.fireBaseUsers).document(FireBaseInit.getEmailRegister()).get()
+        db.collection(UserRegister.FIRE_BASE_USERS).document(FireBaseInit.getEmailRegister()).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {

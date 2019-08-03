@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fitness.albert.com.pumpit.LoginActivity;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.R;
 
@@ -215,7 +216,7 @@ public class EmailRegisterActivity extends AppCompatActivity {
 
 
     private void loadPreferences() {
-        SharedPreferences pref = getSharedPreferences(UserRegister.SharedPreferencesFile, Context.MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences(PrefsUtils.SETTINGS_PREFERENCES_FILE, Context.MODE_PRIVATE);
         this.programSelect = pref.getString("program_selected", "program_selected");
         this.dateOfBirth = pref.getString("date_of_birth", null);
         this.height = pref.getInt("height", 0);

@@ -1,49 +1,72 @@
 package fitness.albert.com.pumpit.workout;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.CustomExerciseAdapter;
 import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.model.CustomExerciseName;
 import fitness.albert.com.pumpit.model.Exercise;
-import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.PrefsUtils;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class ShowExerciseResult extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class ShowExerciseResultActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private Realm realm;
     RecyclerView recyclerView;
     private List<Exercise> realmList = new ArrayList<>();
     private ExerciseAdapter exerciseAdapter;
+    private PrefsUtils prefsUtils = new PrefsUtils();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_exercise_result);
+        setTitle(getExerciseType());
 
         //SETUP REEALM
         RealmConfiguration config = new RealmConfiguration.Builder().name(Exercise.REALM_FILE_GYM).deleteRealmIfMigrationNeeded().build();
         realm = Realm.getInstance(config);
         //Realm.setDefaultConfiguration(config);
 
+        pref();
         //  initRecyclerView();
 
+    }
+
+    private String getExerciseType() {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            return extras.getString("exerciseType");
+        }
+        return null;
+    }
+
+    private void pref() {
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.START_WORKOUT);
+        String activity = prefsUtils.getString("activity", "");
+        if (activity.equals("StartWorkoutActivity")) {
+            prefsUtils.saveData("activity2", "ShowExerciseResultActivity");
+        }
     }
 
     @Override
@@ -53,6 +76,7 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
         getCustomExercise();
     }
 
+    @SuppressLint("WrongConstant")
     private void initRecyclerView() {
 
         recyclerView = findViewById(R.id.rv_exercise_result);
@@ -60,14 +84,14 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         // realm = Realm.getDefaultInstance();
-
         recyclerView(this, realmList, AddExerciseActivity.categorySelected, AddExerciseActivity.category2Selected);
     }
 
 
+    @SuppressLint("LongLogTag")
     public void recyclerView(Context context, List<Exercise> exerciseList, String category, String category2) {
 
-        final String TAG = "ShowExerciseResult";
+        final String TAG = "ShowExerciseResultActivity";
         //realm.getSchema();
         RealmQuery<Exercise> query = realm.where(Exercise.class);
 
@@ -89,6 +113,7 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
         Log.d(TAG, "initRecyclerView: init recyclerView" + recyclerView);
     }
 
+    @SuppressLint("WrongConstant")
     private void getCustomExercise() {
         //SETUP REEALM
         RealmConfiguration config = new RealmConfiguration.Builder().name(CustomExerciseName.REALM_FILE_EXERCISE).deleteRealmIfMigrationNeeded().build();
@@ -125,7 +150,7 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (R.id.menu_cus_add_exercise == item.getItemId()) {
             startActivity(new Intent(this, CustomAddExerciseActivity.class));
         }
@@ -163,6 +188,7 @@ public class ShowExerciseResult extends AppCompatActivity implements SearchView.
     public void onBackPressed() {
         AddExerciseActivity.categorySelected = "null";
         AddExerciseActivity.category2Selected = "null";
+        prefsUtils.removeSingle(this,PrefsUtils.START_WORKOUT, "activity2");
         finish();
     }
 }

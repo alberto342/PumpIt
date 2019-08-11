@@ -25,7 +25,8 @@
         <activity android:name=".fragment.logsFragment.LogTabActivity" />
         <activity android:name=".workout.CustomAddExerciseActivity" />
         <activity android:name=".workout.ChangePlanActivity" />
-        <activity android:name=".workout.WorkoutStartActivity" />
+        <activity android:name=".workout.WorkoutStartActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".workout.StartWorkoutActivity" />
         <activity android:name=".workout.FindWorkoutActivity" />
         <activity android:name=".workout.EditCustomPlanActivity" />

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,16 +29,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.helper.CalenderEvent;
+import fitness.albert.com.pumpit.listener.CalenderDayClickListener;
+import fitness.albert.com.pumpit.listener.OnMonthChangedListener;
 import fitness.albert.com.pumpit.model.DayContainerModel;
 import fitness.albert.com.pumpit.model.Event;
 import fitness.albert.com.pumpit.model.FinishTraining;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.Foods;
 import fitness.albert.com.pumpit.model.UserRegister;
-import fitness.albert.com.pumpit.R;
-import fitness.albert.com.pumpit.helper.CalenderEvent;
-import fitness.albert.com.pumpit.listener.CalenderDayClickListener;
-import fitness.albert.com.pumpit.listener.OnMonthChangedListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -75,6 +76,17 @@ public class LogFragment extends Fragment {
         getMonthData(month, year);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+    }
 
     private void initCalendar(View view) {
         calenderEvent = view.findViewById(R.id.calender_event);

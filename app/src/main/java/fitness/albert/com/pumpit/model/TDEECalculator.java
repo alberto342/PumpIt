@@ -1,14 +1,16 @@
 package fitness.albert.com.pumpit.model;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import fitness.albert.com.pumpit.R;
 
 
 //BMR
 // MEN BMR = 66 + (Weight) * 13.8 + (Height) * 5 - (age) * 6.8
 // WOMAN BMR = 655 + (Weight) * 9.6 + (Height) * 1.8 - (age) * 4.7
-
 
 
 //BEE
@@ -45,11 +47,9 @@ import java.util.Map;
 // and 1800 calories for men (per day)
 
 
-
 //If our trainee from the previous example has a 3000 calorie TEE and wants to gain weight,
 // then we will take a 20% increase and get him to consume 3600 calories to increase the
 // maximum muscle and minimum fat increase.
-
 
 
 public class TDEECalculator {
@@ -68,21 +68,20 @@ public class TDEECalculator {
 
     public TDEECalculator(int age, Double height, Double weight, boolean isMale) {
         this.age = age;
-        this.bmi = (float) (weight / (height*height));
+        this.bmi = (float) (weight / (height * height));
         this.height = height;
         this.weight = weight;
         this.isMale = isMale;
     }
 
     public float setBmi(Double height, Double weight) {
-        height = height/100;
-        return this.bmi = (float) (weight / (height*height));
+        height = height / 100;
+        return this.bmi = (float) (weight / (height * height));
     }
 
     public float getBmi() {
         return bmi;
     }
-
 
 
     public void setBmi(float bmi) {
@@ -122,41 +121,60 @@ public class TDEECalculator {
         this.age = age;
     }
 
-    public String bmiTable(Float bmi) {
-        String bmiResult = null;
-        if(this.bmi < 16) {
-            return bmiResult = "Severe Thinness";
+    public String bmiTable() {
+        if (this.bmi < 16) {
+            return "Severe Thinness";
         }
-        if(this.bmi > 16 && this.bmi <= 17) {
-            return bmiResult = "Moderate Thinness";
+        if (this.bmi > 16 && this.bmi <= 17) {
+            return "Moderate Thinness";
         }
-        if(this.bmi > 17 && this.bmi <= 18.5) {
-            return bmiResult = "Mild Thinness";
+        if (this.bmi > 17 && this.bmi <= 18.5) {
+            return "Mild Thinness";
         }
-        if(this.bmi > 18.5 && this.bmi <= 25) {
-            return bmiResult = "Normal";
+        if (this.bmi > 18.5 && this.bmi <= 25) {
+            return "Normal";
         }
-        if(this.bmi > 25 && this.bmi <= 30) {
-            return bmiResult = "Overweight";
+        if (this.bmi > 25 && this.bmi <= 30) {
+            return "Overweight";
         }
-        if(this.bmi > 30 && this.bmi <= 35) {
-            return bmiResult = "Obese Class I";
+        if (this.bmi > 30 && this.bmi <= 35) {
+            return "Obese Class I";
         }
-        if(this.bmi > 35 && this.bmi <= 40) {
-            return bmiResult = "Obese Class II";
+        if (this.bmi > 35 && this.bmi <= 40) {
+            return "Obese Class II";
         }
-        if(this.bmi > 40) {
-            return bmiResult = "Obese Class III";
+        if (this.bmi > 40) {
+            return "Obese Class III";
         }
-        return bmiResult;
+        return "";
+    }
+
+    public int colorType(String bmiType) {
+        switch (bmiType) {
+            case "Severe Thinness":
+                return R.color.azure;
+            case "Moderate Thinness":
+                return R.color.indigo;
+            case "Mild Thinness":
+                return R.color.cyan;
+            case "Normal":
+                return R.color.md_green_500;
+            case "Overweight":
+                return R.color.orange;
+            case "Obese Class I":
+                return R.color.red_700;
+            case "Obese Class II":
+                return R.color.red_800;
+            case "Obese Class III":
+                return R.color.red_900;
+        }
+        return 0;
     }
 
 
-
-
     public int calculatorBMR() {
-        return (int) (isMale() ?  (66 + (this.weight) * 13.8 + (this.height) * 5 - (this.age) * 6.8)
-                :  (655 + (this.weight) * 9.6 + (this.height) * 1.8 - (this.age) * 4.7));
+        return (int) (isMale() ? (66 + (this.weight) * 13.8 + (this.height) * 5 - (this.age) * 6.8)
+                : (655 + (this.weight) * 9.6 + (this.height) * 1.8 - (this.age) * 4.7));
     }
 
     public Map<String, Integer> calculatorBEE() {
@@ -181,36 +199,35 @@ public class TDEECalculator {
                 vitaminB12, vitaminC, vitaminD, vitaminE, vitaminK, zinic, iron, magnesium, calcium,
                 selenium, ala, cla, sodium, potassium, nutritionalFiber, cholesterol;
 
-
-        if(this.isMale) {
-            if(this.age>= 19 && this.age <=50) {
-                 vitaminA = 900;
-                 thiaminB1 = 1.2f;
-                 riboflavinB2 = 1.3f;
-                 niacinB3 = 16;
-                 pantothenicB5 = 5;
-                 vitaminB6 = 1.3f;
-                 polatB9 = 400;
-                 vitaminB12 = 2.4f;
-                 vitaminC = 90;
-                 vitaminD = 5;
-                 vitaminE = 15;
-                 vitaminK = 120;
-                 zinic = 11;
-                 iron = 8;
-                 magnesium = 420;
-                 calcium = 1000;
-                 selenium = 55;
-                 ala = 1.6f;
-                 cla = 17;
-                 sodium = 1.5f;
-                 potassium = 4.7f;
-                 nutritionalFiber = 48;
-                 cholesterol = 300;
-            }
-            if(this.age>=51 && this.age <=70) {
+        if (this.isMale) {
+            if (this.age >= 19 && this.age <= 50) {
                 vitaminA = 900;
-                thiaminB1 = 1.2f ;
+                thiaminB1 = 1.2f;
+                riboflavinB2 = 1.3f;
+                niacinB3 = 16;
+                pantothenicB5 = 5;
+                vitaminB6 = 1.3f;
+                polatB9 = 400;
+                vitaminB12 = 2.4f;
+                vitaminC = 90;
+                vitaminD = 5;
+                vitaminE = 15;
+                vitaminK = 120;
+                zinic = 11;
+                iron = 8;
+                magnesium = 420;
+                calcium = 1000;
+                selenium = 55;
+                ala = 1.6f;
+                cla = 17;
+                sodium = 1.5f;
+                potassium = 4.7f;
+                nutritionalFiber = 48;
+                cholesterol = 300;
+            }
+            if (this.age >= 51 && this.age <= 70) {
+                vitaminA = 900;
+                thiaminB1 = 1.2f;
                 riboflavinB2 = 1.3f;
                 niacinB3 = 16;
                 pantothenicB5 = 5;
@@ -233,9 +250,9 @@ public class TDEECalculator {
                 nutritionalFiber = 30;
                 cholesterol = 300;
             }
-            if(this.age>70) {
+            if (this.age > 70) {
                 vitaminA = 900;
-                thiaminB1 = 1.2f ;
+                thiaminB1 = 1.2f;
                 riboflavinB2 = 1.3f;
                 niacinB3 = 16;
                 pantothenicB5 = 5;
@@ -259,9 +276,9 @@ public class TDEECalculator {
                 cholesterol = 300;
             }
         } else {
-            if(this.age>=19 && this.age <=50) {
+            if (this.age >= 19 && this.age <= 50) {
                 vitaminA = 700;
-                thiaminB1 = 1.1f ;
+                thiaminB1 = 1.1f;
                 riboflavinB2 = 1.1f;
                 niacinB3 = 14;
                 pantothenicB5 = 5;
@@ -285,9 +302,9 @@ public class TDEECalculator {
                 cholesterol = 300;
             }
 
-            if(this.age >= 51 && this.age <=70) {
+            if (this.age >= 51 && this.age <= 70) {
                 vitaminA = 700;
-                thiaminB1 = 1.1f ;
+                thiaminB1 = 1.1f;
                 riboflavinB2 = 1.1f;
                 niacinB3 = 14;
                 pantothenicB5 = 5;
@@ -313,7 +330,7 @@ public class TDEECalculator {
 
             if (this.age > 70) {
                 vitaminA = 700;
-                thiaminB1 = 1.1f ;
+                thiaminB1 = 1.1f;
                 riboflavinB2 = 1.1f;
                 niacinB3 = 14;
                 pantothenicB5 = 5;
@@ -339,6 +356,17 @@ public class TDEECalculator {
         }
     }
 
+    public int splitChronometer(String tag, String mChronometer) {
+        String[] chronometerSplit = mChronometer.split(":");
+        int hours = Integer.parseInt(chronometerSplit[0]);
+        int min = Integer.parseInt(chronometerSplit[1]);
+        Log.d(tag, "splitChronometer " + " hours: " + hours + " Min: " + min);
+        return hours + min;
+    }
+
+    public int caloriesBurned(int time) {
+        return time * 4;
+    }
 
 
 }

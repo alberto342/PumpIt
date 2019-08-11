@@ -37,6 +37,7 @@ import fitness.albert.com.pumpit.adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.api.RestApi;
 import fitness.albert.com.pumpit.model.Common;
 import fitness.albert.com.pumpit.model.CommonListResponse;
+import fitness.albert.com.pumpit.model.Event;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.FoodListResponse;
 import fitness.albert.com.pumpit.model.Foods;
@@ -62,6 +63,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
     private Foods foods = new Foods();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private MaterialSearchBar searchBar;
+    private PrefsUtils prefsUtils = new PrefsUtils();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -233,7 +235,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
     }
 
     private void saveAll() {
-        PrefsUtils prefsUtils = new PrefsUtils();
+        final PrefsUtils prefsUtils = new PrefsUtils();
         prefsUtils.createSharedPreferencesFiles(this, Foods.SHARED_PREFERENCES_FILE);
 
         boolean dinner = prefsUtils.getBoolean(Foods.DINNER, false);
@@ -261,6 +263,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
+                                Event.saveEvent(SearchFoodsActivity.this);
                                 Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                             }
                         })
@@ -277,6 +280,8 @@ public class SearchFoodsActivity extends AppCompatActivity {
         Toast.makeText(SearchFoodsActivity.this, "Save successfully", Toast.LENGTH_SHORT).show();
         finish();
     }
+
+
 
 
     private void openVoiceRecognizer() {

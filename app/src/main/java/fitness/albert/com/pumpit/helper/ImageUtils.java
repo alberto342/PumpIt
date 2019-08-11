@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,13 +35,19 @@ import java.io.IOException;
 
 public class ImageUtils {
 
-    private Context context;
+    Context context;
     private Activity current_activity;
+    private Fragment current_fragment;
+    private static final String TAG = "ImageUtils";
 
     private ImageAttachmentListener imageAttachment_callBack;
+
+    private String selected_path = "";
     private Uri imageUri;
     private File path = null;
+
     private int from = 0;
+    private boolean isFragment = false;
 
     public ImageUtils(Activity act) {
 
@@ -49,6 +56,17 @@ public class ImageUtils {
         imageAttachment_callBack = (ImageAttachmentListener) context;
     }
 
+    public ImageUtils(Activity act, Fragment fragment, boolean isFragment) {
+
+        this.context = act;
+        this.current_activity = act;
+        imageAttachment_callBack = (ImageAttachmentListener) fragment;
+        if (isFragment) {
+            this.isFragment = true;
+            current_fragment = fragment;
+        }
+
+    }
 
     /**
      * Get file name from path
@@ -327,7 +345,10 @@ public class ImageUtils {
         this.from = from;
 
         if (Build.VERSION.SDK_INT >= 23) {
-            permission_check(1);
+            if (isFragment)
+                permission_check_fragment(1);
+            else
+                permission_check(1);
         } else {
             camera_call();
         }
@@ -344,7 +365,10 @@ public class ImageUtils {
         this.from = from;
 
         if (Build.VERSION.SDK_INT >= 23) {
-            permission_check(2);
+            if (isFragment)
+                permission_check_fragment(2);
+            else
+                permission_check(2);
         } else {
             galley_call();
         }
@@ -428,6 +452,47 @@ public class ImageUtils {
     }
 
 
+    /**
+     * Check permission
+     *
+     * @param code
+     */
+
+    public void permission_check_fragment(final int code) {
+        Log.d(TAG, "permission_check_fragment: " + code);
+        int hasWriteContactsPermission = ContextCompat.checkSelfPermission(current_activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(current_activity,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                showMessageOKCancel("For adding images , You need to provide permission to access your files",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                current_fragment.requestPermissions(
+                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        code);
+                            }
+                        });
+                return;
+            }
+
+            current_fragment.requestPermissions(
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    code);
+            return;
+        }
+
+        if (code == 1)
+            camera_call();
+        else if (code == 2)
+            galley_call();
+    }
+
+
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(current_activity)
                 .setMessage(message)
@@ -448,7 +513,11 @@ public class ImageUtils {
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent1.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        current_activity.startActivityForResult(intent1, 0);
+
+        if (isFragment)
+            current_fragment.startActivityForResult(intent1, 0);
+        else
+            current_activity.startActivityForResult(intent1, 0);
     }
 
     /**
@@ -456,10 +525,15 @@ public class ImageUtils {
      */
 
     public void galley_call() {
+        Log.d(TAG, "galley_call: ");
 
         Intent intent2 = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent2.setType("image/*");
-        current_activity.startActivityForResult(intent2, 1);
+
+        if (isFragment)
+            current_fragment.startActivityForResult(intent2, 1);
+        else
+            current_activity.startActivityForResult(intent2, 1);
 
     }
 
@@ -505,7 +579,6 @@ public class ImageUtils {
         String file_name;
         Bitmap bitmap;
 
-        String selected_path = "";
         switch (requestCode) {
             case 0:
 
@@ -700,5 +773,6 @@ public class ImageUtils {
     public interface ImageAttachmentListener {
         public void image_attachment(int from, String filename, Bitmap file, Uri uri);
     }
+
 
 }

@@ -63,6 +63,8 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
         loadExerciseFromFb();
     }
 
+
+
     private void setToolBar() {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         assert activity != null;
@@ -79,6 +81,13 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         loadExerciseFromFb();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
     }
 
     private void init(View view) {

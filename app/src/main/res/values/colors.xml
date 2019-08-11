@@ -21,4 +21,11 @@
     <color name="dark_blue">#042543</color>
     <color name="light_green">#7ED321</color>
     <color name="transparent_blue">#D93c4397</color>
+    <color name="azure">#2196F3</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="cyan">#0097A7</color>
+    <color name="orange">#FF9800</color>
+    <color name="red_700">#d32f2f</color>
+    <color name="red_800">#c62828</color>
+    <color name="red_900">#b71c1c</color>
 </resources>

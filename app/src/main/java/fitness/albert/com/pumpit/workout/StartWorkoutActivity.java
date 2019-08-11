@@ -66,7 +66,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_workout);
-
         init();
         getDayWorkout();
         setBtnStartWorkout();
@@ -267,12 +266,8 @@ public class StartWorkoutActivity extends AppCompatActivity {
                         }
                 ));
             }
-
-
         };
     }
-
-    // TODO: 2019-05-10 check if exercise have on fb befor add
 
     private void deleteItem(final int position) {
         // trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);

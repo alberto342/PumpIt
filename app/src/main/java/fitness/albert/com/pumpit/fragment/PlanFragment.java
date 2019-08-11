@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,13 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.WorkoutPlanAdapter;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.SwipeHelper;
 import fitness.albert.com.pumpit.model.Workout;
 import fitness.albert.com.pumpit.model.WorkoutPlans;
-import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.workout.CustomPlanActivity;
 import fitness.albert.com.pumpit.workout.EditCustomPlanActivity;
 
@@ -78,6 +79,17 @@ public class PlanFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+    }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {

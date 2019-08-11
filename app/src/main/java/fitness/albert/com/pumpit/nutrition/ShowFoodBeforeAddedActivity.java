@@ -36,6 +36,7 @@ import java.util.Locale;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.FoodListAdapter;
 import fitness.albert.com.pumpit.model.CalenderEvent;
+import fitness.albert.com.pumpit.model.Event;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.Foods;
 import fitness.albert.com.pumpit.model.FullNutrients;
@@ -375,6 +376,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
                             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                            Event.saveEvent(ShowFoodBeforeAddedActivity.this);
                             FoodListAdapter.measure.clear();
                             finish();
                         }

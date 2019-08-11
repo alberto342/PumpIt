@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -32,22 +33,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.File;
 
 import fitness.albert.com.pumpit.R;
-import fitness.albert.com.pumpit.fragment.profile.AccountSettings.AccountFragment;
-import fitness.albert.com.pumpit.fragment.profile.ProfileChange.ChangeProfileFragment;
 import fitness.albert.com.pumpit.helper.ImageUtils;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.TDEECalculator;
 import fitness.albert.com.pumpit.model.UserRegister;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachmentListener {
 
     private String TAG = "ProfileFragment";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private TextView nameTv, bmiTv, myWeightTv, myGoalWeightTv, bmiResultTv;
+    private TextView tvName, tvBmi, tvMyWeigh, tvMyGoalWeight, tvBmiResult, tvBmiType;
     private ImageView profileImg, btnAccountSetting, btnProfile, btnMyGoals, btnDiary,
             btnWaterTracker, btnNotification, btnUnits, btnDataExport, btnHelp, btnAbout;
     private ProgressBar progressBar;
@@ -66,14 +63,15 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        return inflater.inflate(R.layout.fragment_profile4, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        //fimageutils = new ImageUtils(getActivity());
+        imageutils = new ImageUtils(getActivity(), this, true);
+
         init(view);
         imgProfileLoad();
 
@@ -81,27 +79,40 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
             loadData();
         }
         setHasOptionsMenu(true);
-        clickOnBtn();
+        //clickOnBtn();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
     }
 
     private void init(View view) {
-        nameTv = view.findViewById(R.id.txt_name);
-        bmiTv = view.findViewById(R.id.txt_bmi);
-        myWeightTv = view.findViewById(R.id.my_weight);
-        myGoalWeightTv = view.findViewById(R.id.goal_weight);
+        tvName = view.findViewById(R.id.txt_name);
+        tvBmi = view.findViewById(R.id.txt_bmi);
+        tvMyWeigh = view.findViewById(R.id.my_weight);
+        tvMyGoalWeight = view.findViewById(R.id.goal_weight);
         profileImg = view.findViewById(R.id.profile_pic);
-        bmiResultTv = view.findViewById(R.id.bmiResult);
-        btnAccountSetting = view.findViewById(R.id.btn_account_setting);
-        btnProfile = view.findViewById(R.id.btn_profile);
-        btnMyGoals = view.findViewById(R.id.btn_my_goals);
-        btnDiary = view.findViewById(R.id.btn_diary);
-        btnWaterTracker = view.findViewById(R.id.btn_water_tracker);
-        btnNotification = view.findViewById(R.id.btn_notification);
-        btnUnits = view.findViewById(R.id.btn_units);
-        btnDataExport = view.findViewById(R.id.btn_data_export);
-        btnHelp = view.findViewById(R.id.btn_help);
-        btnAbout = view.findViewById(R.id.btn_about);
-        progressBar = view.findViewById(R.id.pb_profile);
+        tvBmiType = view.findViewById(R.id.tv_bmi_type);
+        //tvBmiResult = view.findViewById(R.id.bmi_result);
+//        btnAccountSetting = view.findViewById(R.id.btn_account_setting);
+//        btnProfile = view.findViewById(R.id.btn_profile);
+//        btnMyGoals = view.findViewById(R.id.btn_my_goals);
+//        btnDiary = view.findViewById(R.id.btn_diary);
+//        btnWaterTracker = view.findViewById(R.id.btn_water_tracker);
+//        btnNotification = view.findViewById(R.id.btn_notification);
+//        btnUnits = view.findViewById(R.id.btn_units);
+//        btnDataExport = view.findViewById(R.id.btn_data_export);
+//        btnHelp = view.findViewById(R.id.btn_help);
+//        btnAbout = view.findViewById(R.id.btn_about);
+//        progressBar = view.findViewById(R.id.pb_profile);
 
     }
 
@@ -130,72 +141,72 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     }
 
 
-    private void clickOnBtn() {
-        btnAccountSetting.setOnClickListener(onClickListener);
-        btnProfile.setOnClickListener(onClickListener);
-        btnMyGoals.setOnClickListener(onClickListener);
-        btnDiary.setOnClickListener(onClickListener);
-        btnWaterTracker.setOnClickListener(onClickListener);
-        btnNotification.setOnClickListener(onClickListener);
-        btnUnits.setOnClickListener(onClickListener);
-        btnDataExport.setOnClickListener(onClickListener);
-        btnHelp.setOnClickListener(onClickListener);
-        btnAbout.setOnClickListener(onClickListener);
-    }
+//    private void clickOnBtn() {
+//        btnAccountSetting.setOnClickListener(onClickListener);
+//        btnProfile.setOnClickListener(onClickListener);
+//        btnMyGoals.setOnClickListener(onClickListener);
+//        btnDiary.setOnClickListener(onClickListener);
+//        btnWaterTracker.setOnClickListener(onClickListener);
+//        btnNotification.setOnClickListener(onClickListener);
+//        btnUnits.setOnClickListener(onClickListener);
+//        btnDataExport.setOnClickListener(onClickListener);
+//        btnHelp.setOnClickListener(onClickListener);
+//        btnAbout.setOnClickListener(onClickListener);
+//    }
 
 
-    private View.OnClickListener onClickListener = new View.OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.btn_account_setting:
-                    Fragment AccountFragment = new AccountFragment();
-                    loadFragment(AccountFragment);
-                    break;
-
-                case R.id.btn_profile:
-                    Fragment profileFragment = new ChangeProfileFragment();
-                    loadFragment(profileFragment);
-                    break;
-
-                case R.id.btn_my_goals:
-                    Fragment myGoalsFragment = new ChangeMyGoalsFragment();
-                    loadFragment(myGoalsFragment);
-                    break;
-
-                case R.id.btn_diary:
-                    Fragment diaryFragment = new ChangeDiaryFragment();
-                    loadFragment(diaryFragment);
-                    break;
-
-                case R.id.btn_water_tracker:
-                    Fragment waterTrackerFragment = new WaterTrackerFragment();
-                    loadFragment(waterTrackerFragment);
-                    break;
-
-                case R.id.btn_notification:
-                    break;
-
-                case R.id.btn_units:
-                    Fragment unitsFragment = new UnitsFragment();
-                    loadFragment(unitsFragment);
-                    break;
-
-                case R.id.btn_data_export:
-                    Fragment dataExportFragment = new DataExportFragment();
-                    loadFragment(dataExportFragment);
-                    break;
-
-                case R.id.btn_help:
-                    break;
-
-                case R.id.btn_about:
-                    break;
-
-            }
-        }
-    };
+//    private View.OnClickListener onClickListener = new View.OnClickListener() {
+//
+//        @Override
+//        public void onClick(View v) {
+//            switch (v.getId()) {
+//                case R.id.btn_account_setting:
+//                    Fragment AccountFragment = new  SettingsActivity.AccountFragment();
+//                    loadFragment(AccountFragment);
+//                    break;
+//
+//                case R.id.btn_profile:
+//                    Fragment profileFragment = new ChangeProfileFragment();
+//                    loadFragment(profileFragment);
+//                    break;
+//
+//                case R.id.btn_my_goals:
+//                    Fragment myGoalsFragment = new ChangeMyGoalsFragment();
+//                    loadFragment(myGoalsFragment);
+//                    break;
+//
+//                case R.id.btn_diary:
+//                    Fragment diaryFragment = new ChangeDiaryFragment();
+//                    loadFragment(diaryFragment);
+//                    break;
+//
+//                case R.id.btn_water_tracker:
+//                    Fragment waterTrackerFragment = new WaterTrackerFragment();
+//                    loadFragment(waterTrackerFragment);
+//                    break;
+//
+//                case R.id.btn_notification:
+//                    break;
+//
+//                case R.id.btn_units:
+//                    Fragment unitsFragment = new UnitsFragment();
+//                    loadFragment(unitsFragment);
+//                    break;
+//
+//                case R.id.btn_data_export:
+//                    Fragment dataExportFragment = new DataExportFragment();
+//                    loadFragment(dataExportFragment);
+//                    break;
+//
+//                case R.id.btn_help:
+//                    break;
+//
+//                case R.id.btn_about:
+//                    break;
+//
+//            }
+//        }
+//    };
 
     private void loadData() {
         FireBaseInit fireBaseInit = new FireBaseInit(getActivity());
@@ -204,11 +215,11 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
 
         if (prefsUtils.getString("first_name", " ").equals(" ")) {
             loadFromFb();
-            //loadFromPrefs();
-            progressBar.setVisibility(View.INVISIBLE);
+            loadFromPrefs();
+            // progressBar.setVisibility(View.INVISIBLE);
         } else {
             loadFromPrefs();
-            progressBar.setVisibility(View.INVISIBLE);
+            // progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -219,16 +230,18 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
                     @SuppressLint({"SetTextI18n", "DefaultLocale"})
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        userRegister = documentSnapshot.toObject(UserRegister.class);
-
-                        saveIntoPrefs();
-                        nameTv.setText(userRegister.getFirstName() + " " + userRegister.getLestName());
-                        cal.setHeight((double) userRegister.getHeight());
-                        cal.setWeight((double) userRegister.getWeight());
-                        cal.setBmi(cal.getHeight(), cal.getWeight());
-                        bmiTv.setText("BMI: " + (cal.getBmi()) + "\n" + cal.bmiTable(cal.getBmi()));
-                        myWeightTv.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
-                        Log.d(TAG, "TestGetUserProfile: " + documentSnapshot.getData());
+                        if (documentSnapshot != null) {
+                            userRegister = documentSnapshot.toObject(UserRegister.class);
+                            saveIntoPrefs();
+                            tvName.setText(userRegister.getFirstName() + " " + userRegister.getLestName());
+                            cal.setHeight((double) userRegister.getHeight());
+                            cal.setWeight((double) userRegister.getWeight());
+                            cal.setBmi(cal.getHeight(), cal.getWeight());
+                            tvBmi.setText("BMI: " + (cal.getBmi()));
+                            tvBmiType.setText(cal.bmiTable());
+                            tvMyWeigh.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
+                            Log.d(TAG, "TestGetUserProfile: " + documentSnapshot.getData());
+                        }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -252,20 +265,17 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         int height = prefsUtils.getInt("height", 0);
         //boolean isMale = prefsUtils.getBoolean("is_male", false);
 
-        nameTv.setText(firstName + " " + lestName);
+        tvName.setText(firstName + " " + lestName);
         cal.setHeight((double) height);
         cal.setWeight((double) weight);
         cal.setBmi(cal.getHeight(), cal.getWeight());
-        bmiTv.setText("BMI: " + (cal.getBmi()) + "\n" + cal.bmiTable(cal.getBmi()));
-        myWeightTv.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
+        tvBmi.setText("BMI: " + (cal.getBmi()));
 
-
-//        String[] splitDate = dateOfBirth.split("/");
-//        int month = Integer.valueOf(splitDate[0]);
-//        int day = Integer.valueOf(splitDate[1]);
-//        int year = Integer.valueOf(splitDate[2]);
-
-        Log.d(TAG, "loadFromPrefs: " + dateOfBirth);
+        String type = cal.bmiTable();
+        int color = cal.colorType(type);
+        tvBmiType.setText(cal.bmiTable());
+        tvBmiType.setTextColor(color);
+        tvMyWeigh.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
     }
 
 
@@ -304,6 +314,7 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d("Fragment", "onRequestPermissionsResult: " + requestCode);
         imageutils.request_permission_result(requestCode, permissions, grantResults);
     }
 

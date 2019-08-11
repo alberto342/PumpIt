@@ -80,7 +80,6 @@ public class TrackerExerciseFragment extends Fragment {
         btnAddTracker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (weight.getText().toString().isEmpty() && reps.getText().toString().isEmpty()) {
                     setError(weight, "Enter weight");
                     return;
@@ -120,6 +119,11 @@ public class TrackerExerciseFragment extends Fragment {
     }
 
 
+
+
+
+
+
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
@@ -142,15 +146,15 @@ public class TrackerExerciseFragment extends Fragment {
         LayoutInflater layoutInflater = (LayoutInflater) Objects.requireNonNull(getActivity()).getBaseContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") final View newView = layoutInflater.inflate(R.layout.row_workout_tracker, null);
-        TextView textOut = newView.findViewById(R.id.tv_weight);
-        textOut.setText(newText);
-        TextView texOut2 = newView.findViewById(R.id.tv_reps);
-        texOut2.setText(newTex2);
-        final TextView count = newView.findViewById(R.id.tv_count);
+        TextView tvWeight = newView.findViewById(R.id.tv_weight);
+        tvWeight.setText(newText);
+        TextView tvReps = newView.findViewById(R.id.tv_reps);
+        tvReps.setText(newTex2);
+        final TextView tvCount = newView.findViewById(R.id.tv_count);
         if (trackerList.size() == 0) {
-            count.setText(String.valueOf(1));
+            tvCount.setText(String.valueOf(1));
         } else {
-            count.setText(String.valueOf(trackerList.size() / 2 + 1));
+            tvCount.setText(String.valueOf(trackerList.size() / 2 + 1));
         }
 
         ImageButton buttonRemove = newView.findViewById(R.id.iv_remove_tracker);
@@ -160,6 +164,7 @@ public class TrackerExerciseFragment extends Fragment {
                 ((LinearLayout) newView.getParent()).removeView(newView);
                 trackerList.remove(newText);
                 trackerList.remove(newTex2);
+
             }
         });
         container.addView(newView);
@@ -300,7 +305,8 @@ public class TrackerExerciseFragment extends Fragment {
 
         Workout workout = new Workout(UserRegister.getTodayData(), dayWorkout(), currentDayName(), 0, 0);
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
-                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).add(workout).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).add(workout)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 prefsUtilsDefaultExercise.saveData("e_" + currentDayName(), documentReference.getId());

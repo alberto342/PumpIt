@@ -3,55 +3,63 @@ package fitness.albert.com.pumpit.workout;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.adapter.TrainingAdapter;
+import fitness.albert.com.pumpit.fragment.FragmentNavigationActivity;
+import fitness.albert.com.pumpit.model.Event;
 import fitness.albert.com.pumpit.model.FinishTraining;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.TrackerExercise;
 import fitness.albert.com.pumpit.model.UserRegister;
-import fitness.albert.com.pumpit.R;
 
 public class WorkoutStartActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final String TAG = "WorkoutStartActivity";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private TextView exerciseName, timerUp, btnAddNewSet, btnRemoveSte, exercisesLeft, countReps;
-    private ImageView timeRest, editStartWorkout, imgExercise, nextExercise, playWorkout, stopWorkout, ivIsFinish;
+    private TextView tvExerciseName, tvTimerUp, btnAddNewSet, btnRemoveSte, tvExercisesLeft, tvCountReps;
+    private ImageView imgExercise, ivPlayWorkout, ivStopWorkout, ivIsFinish;
     private CountDownTimer countDownTimer;
     private AlertDialog dialog;
     private long timeWhenStopped = 0;
     private Chronometer mChronometer;
-    private boolean isStop, countDownTimerIsRunning, finishIsOkSelected;
+    private boolean isPause, countDownTimerIsRunning, finishIsOkSelected, isFinishedWorkout, isKeyboardShowing;
     private LinearLayout container;
     private int countAddSets = 0, countExercisesLeft = 1;
-    private EditText weight, reps;
-    private View rowView;
+    private EditText etWeight, etReps;
+    private View vRowView;
     private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
 
+
+    // TODO: 2019-08-07 check the timer 30 sec on 2 click its stop
 
 
     @Override
@@ -61,49 +69,91 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
         init();
 
+        checkKeyboard();
+
         setupChronometer();
 
-        onAddField(rowView);
+        onAddField(vRowView);
     }
+
 
     @SuppressLint("SetTextI18n")
     private void init() {
         mChronometer = findViewById(R.id.chronometer);
-        timeRest = findViewById(R.id.iv_time_rest);
-        editStartWorkout = findViewById(R.id.iv_edite_start_workout);
+        ImageView timeRest = findViewById(R.id.iv_time_rest);
+        ImageView editStartWorkout = findViewById(R.id.iv_edite_start_workout);
         imgExercise = findViewById(R.id.iv_exercise_img_start_workout);
-        nextExercise = findViewById(R.id.iv_next_exercise_next_workout);
-        playWorkout = findViewById(R.id.iv_play_workout);
-        stopWorkout = findViewById(R.id.iv_stop_workout);
-        exerciseName = findViewById(R.id.tv_exercise_name_start_wokout);
-        timerUp = findViewById(R.id.tv_start_workout_time_up);
+        ImageView nextExercise = findViewById(R.id.iv_next_exercise_next_workout);
+        ivPlayWorkout = findViewById(R.id.iv_play_workout);
+        ivStopWorkout = findViewById(R.id.iv_stop_workout);
+        tvExerciseName = findViewById(R.id.tv_exercise_name_start_wokout);
+        tvTimerUp = findViewById(R.id.tv_start_workout_time_up);
         container = findViewById(R.id.ll_container_reps);
         btnAddNewSet = findViewById(R.id.tv_add_new_set);
         btnRemoveSte = findViewById(R.id.tv_remove_set);
-        exercisesLeft = findViewById(R.id.tv_exercise_left);
+        tvExercisesLeft = findViewById(R.id.tv_exercise_left);
 
         // onAddField(container);
         assert StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName() != null;
-        exerciseName.setText(StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName());
+        tvExerciseName.setText(StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getExerciseName());
 
-
-        exerciseImg();
+        exerciseImg(TrainingAdapter.posit);
 
         //exercise left
-        exercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
+        tvExercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
 
         timeRest.setOnClickListener(this);
         editStartWorkout.setOnClickListener(this);
-        playWorkout.setOnClickListener(this);
-        stopWorkout.setOnClickListener(this);
+        ivPlayWorkout.setOnClickListener(this);
+        ivStopWorkout.setOnClickListener(this);
         nextExercise.setOnClickListener(this);
         btnAddNewSet.setOnClickListener(this);
         btnRemoveSte.setOnClickListener(this);
     }
 
-    private void exerciseImg() {
+    private void checkKeyboard() {
+
+        final LinearLayout contentView = findViewById(R.id.ly_play_stop);
+        final LinearLayout llImg = findViewById(R.id.ly_img);
+
+        contentView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+
+                        Rect r = new Rect();
+                        contentView.getWindowVisibleDisplayFrame(r);
+                        int screenHeight = contentView.getRootView().getHeight();
+
+                        // r.bottom is the position above soft keypad or device button.
+                        // if keypad is shown, the r.bottom is smaller than that before.
+                        int keypadHeight = screenHeight - r.bottom;
+
+                        Log.d(TAG, "keypadHeight = " + keypadHeight);
+
+                        if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                            // keyboard is opened
+                            if (!isKeyboardShowing) {
+                                isKeyboardShowing = true;
+                                llImg.setVisibility(View.GONE);
+                                contentView.setVisibility(View.GONE);
+                            }
+                        } else {
+                            // keyboard is closed
+                            if (isKeyboardShowing) {
+                                isKeyboardShowing = false;
+                                llImg.setVisibility(View.VISIBLE);
+                                contentView.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                });
+
+    }
+
+    private void exerciseImg(int position) {
         try {
-            String imgFile = "file:///android_asset/images/" + StartWorkoutActivity.trainingList.get(TrainingAdapter.posit).getImgName();
+            String imgFile = "file:///android_asset/images/" + StartWorkoutActivity.trainingList.get(position).getImgName();
 
             Glide.with(this)
                     .asGif()
@@ -161,9 +211,9 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void initLayoutReps(View rowView) {
-        countReps = rowView.findViewById(R.id.tv_count_reps_added);
-        weight = rowView.findViewById(R.id.et_wight_set_workout);
-        reps = rowView.findViewById(R.id.et_reps_set_workout);
+        tvCountReps = rowView.findViewById(R.id.tv_count_reps_added);
+        etWeight = rowView.findViewById(R.id.et_wight_set_workout);
+        etReps = rowView.findViewById(R.id.et_reps_set_workout);
         ivIsFinish = rowView.findViewById(R.id.iv_finish_workout);
     }
 
@@ -203,11 +253,11 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
             //rest timer
             case R.id.iv_time_rest:
                 if (countDownTimerIsRunning) {
-                    countDownTimer.cancel();
                     countDownTimerIsRunning = false;
+                    countDownTimer.cancel();
                 } else {
-                    addLayoutTimeRestSelected();
                     countDownTimerIsRunning = true;
+                    addLayoutTimeRestSelected();
                 }
                 break;
             //edit
@@ -228,7 +278,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 break;
             //remove set
             case R.id.tv_remove_set:
-                container.removeView(rowView);
+                container.removeView(vRowView);
                 btnRemoveSte.setVisibility(View.INVISIBLE);
                 btnAddNewSet.setVisibility(View.VISIBLE);
                 countAddSets--;
@@ -237,10 +287,16 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 }
                 break;
             case R.id.tv_s15:
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                }
                 countDownTimer(15000);
                 dialog.dismiss();
                 break;
             case R.id.tv_s20:
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                }
                 countDownTimer(20000);
                 dialog.dismiss();
                 break;
@@ -357,7 +413,9 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 dialog.dismiss();
                 break;
             case R.id.btn_cancel_rest_timer:
-                assert countDownTimer != null;
+                if (countDownTimer == null) {
+                    countDownTimer(0);
+                }
                 countDownTimer.cancel();
                 countDownTimer.onFinish();
                 dialog.dismiss();
@@ -368,43 +426,34 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
     @SuppressLint("SetTextI18n")
     public void startStopChronometer(int view) {
+
+        LinearLayout llDuration = findViewById(R.id.ly_duration);
+
         //play
         if (view == R.id.iv_play_workout) {
-            playWorkout.setVisibility(View.INVISIBLE);
-            stopWorkout.setImageResource(R.mipmap.ic_pause);
-
+            isPause = false;
+            llDuration.setBackgroundResource(R.color.background);
+            if (countDownTimer == null) {
+                countDownTimer(0);
+            }
+            ivPlayWorkout.setVisibility(View.INVISIBLE);
+            ivStopWorkout.setImageResource(R.mipmap.ic_pause);
             mChronometer.setBase(SystemClock.elapsedRealtime() - timeWhenStopped);
             mChronometer.start();
+            countDownTimer.start();
         }
         //pause
-        if (view == R.id.iv_stop_workout && !isStop) {
-
-            stopWorkout.setImageResource(R.mipmap.ic_stop);
-            playWorkout.setVisibility(View.VISIBLE);
-
+        if (view == R.id.iv_stop_workout && !isPause) {
+            isPause = true;
+            llDuration.setBackgroundResource(R.color.red_900);
+            ivStopWorkout.setImageResource(R.mipmap.ic_stop);
+            ivPlayWorkout.setVisibility(View.VISIBLE);
             mChronometer.stop();
             timeWhenStopped = SystemClock.elapsedRealtime() - mChronometer.getBase();
-
-        } else if (view == R.id.iv_stop_workout) {
-            //stop
-            mChronometer.setBase(SystemClock.elapsedRealtime());
-            timeWhenStopped = 0;
-            isStop = false;
-            mChronometer.setText("00:00:00");
+        } else if (isPause) {
+            isPause = false;
+            whatFinished();
         }
-    }
-
-
-    private void chronoStart() {
-        // on first start
-        if (timeWhenStopped == 0)
-            mChronometer.setBase(SystemClock.elapsedRealtime());
-            // on resume after pause
-        else {
-            long intervalOnPause = (SystemClock.elapsedRealtime() - timeWhenStopped);
-            mChronometer.setBase(mChronometer.getBase() + intervalOnPause);
-        }
-        mChronometer.start();
     }
 
 
@@ -413,14 +462,15 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
             @SuppressLint({"SetTextI18n", "DefaultLocale"})
             public void onTick(long millisUntilFinished) {
 
-                timerUp.setText("" + String.format("%d :%d",
+                tvTimerUp.setText("" + String.format("%d :%d",
                         TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished),
                         TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) -
                                 TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
             }
+
             @SuppressLint("SetTextI18n")
             public void onFinish() {
-                timerUp.setText("");
+                tvTimerUp.setText("");
             }
         }.start();
     }
@@ -428,16 +478,23 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
     private void setExerciseIntoFb() {
 
-        if (weight.getText().toString().isEmpty() || weight.getText() == null || reps.getText().toString().isEmpty() || reps.getText() == null) {
-            countAddSets--;
+        String exerciseImgName = null;
+
+        if (countExercisesLeft == 1) {
+            exerciseImgName = StartWorkoutActivity.trainingList.get(0).getImgName();
+            Log.d(TAG, "test Exercise Img: " + exerciseImgName);
         }
 
+
+        if (etWeight.getText().toString().isEmpty() || etWeight.getText() == null || etReps.getText().toString().isEmpty() || etReps.getText() == null) {
+            countAddSets--;
+        }
 
         for (int i = 0; i < trackerExerciseList.size(); i++) {
             Log.d(TAG, "exercise recording: " + trackerExerciseList.get(i).getWeight());
         }
 
-        Log.d(TAG, "countExercisesLeft: " + countExercisesLeft);
+        Log.d(TAG, "countExercisesLeft before change: " + countExercisesLeft);
 
         boolean isBlow = countExercisesLeft < StartWorkoutActivity.trainingList.size();
 
@@ -446,7 +503,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
             Log.d(TAG, "isBlow: " + isBlow);
             if (!isBlow) {
                 countExercisesLeft--;
-                isBlow =  countExercisesLeft < StartWorkoutActivity.trainingList.size();
+                isBlow = countExercisesLeft < StartWorkoutActivity.trainingList.size();
                 Log.d(TAG, "countExercisesLeft: " + countExercisesLeft + " blow " + StartWorkoutActivity.trainingList.size());
             } else {
                 isIn = false;
@@ -454,65 +511,41 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         }
         Log.d(TAG, "countExercise: " + countExercisesLeft);
 
+        String currentImgName = exerciseImgName != null ? exerciseImgName : StartWorkoutActivity.trainingList.get(countExercisesLeft).getImgName();
 
-        FinishTraining finishTraining = new FinishTraining(exerciseName.getText().toString(),
+        FinishTraining finishTraining = new FinishTraining(tvExerciseName.getText().toString(),
                 trackerExerciseList, 0,
                 StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestBetweenSet(),
                 StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise(),
-                StartWorkoutActivity.trainingList.get(countExercisesLeft).getImgName(),
+                currentImgName,
                 UserRegister.getTodayData(), StartWorkoutActivity.trainingList.get(countExercisesLeft).isFavorite(),
                 mChronometer.getText().toString(), false, "", "", "", 0f, 0);
 
         db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-                .collection(UserRegister.getTodayData()).add(finishTraining).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Log.d(TAG, "Document successfully written!");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error writing document", e);
-            }
-        });
-
-
-
-
-
-//            if (countExercisesLeft < StartWorkoutActivity.trainingList.size()) {
-//                FinishTraining finishTraining = new FinishTraining(exerciseName.getText().toString(),
-//                        trackerExerciseList, 0,
-//                        StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestBetweenSet(),
-//                        StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise(),
-//                        StartWorkoutActivity.trainingList.get(countExercisesLeft).getImgName(),
-//                        UserRegister.getTodayData(), StartWorkoutActivity.trainingList.get(countExercisesLeft).isFavorite(),
-//                        mChronometer.getText().toString(), 0, "", "", "", 0f, 0);
-//
-//                db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-//                        .collection(UserRegister.getTodayData()).add(finishTraining).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                    @Override
-//                    public void onSuccess(DocumentReference documentReference) {
-//                        Log.d(TAG, "Document successfully written!");
-//                    }
-//                }).addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.w(TAG, "Error writing document", e);
-//                    }
-//                });
-//            }
+                .collection(UserRegister.getTodayData()).document(tvExerciseName.getText().toString())
+                .set(finishTraining)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        //save workout event for calendar
+                        Event.saveEvent(WorkoutStartActivity.this);
+                        Log.d(TAG, "Document successfully written!\n Img name: " + StartWorkoutActivity.trainingList.get(countExercisesLeft - 2).getImgName());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error writing document: " + e);
+                    }
+                });
     }
-
 
     private void addLayoutTimeRestSelected() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.layout_select_rest_time, null);
-
         dialogBuilder.setView(dialogView);
         initRestTimerLayout(dialogView);
-
         dialog = dialogBuilder.create();
         dialog.show();
     }
@@ -521,80 +554,82 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     @SuppressLint("SetTextI18n")
     private void nextExerciseClicked() {
 
+        if (isFinishedWorkout) {
+            startActivity(new Intent(this, FinisherWorkoutActivity.class));
+            finish();
+        }
+
         //save into fb
         setExerciseIntoFb();
 
+        if (countDownTimer == null) {
+            countDownTimer(0);
+        }
+        countDownTimer.cancel();
+        countDownTimer.onFinish();
+
+        Log.d(TAG, "nextExerciseClicked: " + " countExercisesLeft: " + countExercisesLeft + " training size: " + StartWorkoutActivity.trainingList.size());
+
         if (countExercisesLeft == StartWorkoutActivity.trainingList.size() || countExercisesLeft == 0) {
-            onClick(stopWorkout);
+            onClick(ivStopWorkout);
             if (countDownTimer != null) {
                 countDownTimer.cancel();
                 countDownTimer.onFinish();
             }
         } else {
             //exercise name
-            exerciseName.setText(StartWorkoutActivity.trainingList.get(countExercisesLeft).getExerciseName());
+            tvExerciseName.setText(StartWorkoutActivity.trainingList.get(countExercisesLeft).getExerciseName());
 
             //exercise img
-            try {
-                String imgFile = "file:///android_asset/images/" + StartWorkoutActivity.trainingList.get(countExercisesLeft).getImgName();
+            exerciseImg(countExercisesLeft);
 
-                Glide.with(this)
-                        .asGif()
-                        .load(imgFile)
-                        .into(imgExercise);
-                Log.d(TAG, "Img successfully loaded " + ExerciseAdapter.exerciseImg);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             container.removeAllViews();
             //set timer
             Log.d(TAG, "countExercisesLeft:" + countExercisesLeft);
             countDownTimer(StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise() * 1000);
-          //  countDownTimer(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getRestAfterExercise() * 1000);
+            //  countDownTimer(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getRestAfterExercise() * 1000);
 
             //count for exercise left
             countExercisesLeft++;
-            exercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
+            tvExercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
+
+            if (countExercisesLeft == StartWorkoutActivity.trainingList.size()) {
+                isFinishedWorkout = true;
+            }
 
             trackerExerciseList.clear();
             countAddSets = 0;
-            onAddField(rowView);
+            onAddField(vRowView);
         }
     }
 
 
     private boolean setWeightAndReptIntoList() {
-
         TrackerExercise trackerExercise = new TrackerExercise();
 
+        boolean weightIsText = etWeight.getText() == null || etWeight.getText().toString().isEmpty();
+        boolean repsIsText = etReps.getText() == null || etReps.getText().toString().isEmpty();
 
-
-        boolean weightIsText = weight.getText() == null || weight.getText().toString().isEmpty();
-
-        boolean repsIsText = reps.getText() == null || reps.getText().toString().isEmpty();
-
-        if (weight.getText() == null || weight.getText().toString().isEmpty() && weight.getHint() == null) {
-            weight.setError("Please enter weight");
+        if (etWeight.getText() == null || etWeight.getText().toString().isEmpty() && etWeight.getHint() == null) {
+            etWeight.setError("Please enter etWeight");
             return false;
         }
 
-        if (reps.getText() == null || reps.getText().toString().isEmpty() && reps.getHint() == null) {
-            reps.setError("Please enter reps");
+        if (etReps.getText() == null || etReps.getText().toString().isEmpty() && etReps.getHint() == null) {
+            etReps.setError("Please enter etReps");
             return false;
         }
-
 
         if (weightIsText) {
-            trackerExercise.setWeight(Float.valueOf(weight.getHint().toString()));
+            trackerExercise.setWeight(Float.valueOf(etWeight.getHint().toString()));
         } else {
-            trackerExercise.setWeight(Float.valueOf(weight.getText().toString()));
+            trackerExercise.setWeight(Float.valueOf(etWeight.getText().toString()));
         }
 
-
         if (repsIsText) {
-            trackerExercise.setRepNumber(Integer.valueOf(reps.getHint().toString()));
+            trackerExercise.setRepNumber(Integer.valueOf(etReps.getHint().toString()));
         } else {
-            trackerExercise.setRepNumber(Integer.valueOf(reps.getText().toString()));
+            trackerExercise.setRepNumber(Integer.valueOf(etReps.getText().toString()));
         }
 
         trackerExerciseList.add(trackerExercise);
@@ -605,23 +640,22 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         return true;
     }
 
-
     //add sets exercise
     @SuppressLint("InflateParams")
     public void onAddField(View v) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        rowView = inflater.inflate(R.layout.layout_start_workout_reps, null);
-        initLayoutReps(rowView);
+        vRowView = inflater.inflate(R.layout.layout_start_workout_reps, null);
+        initLayoutReps(vRowView);
 
-        container.addView(rowView, container.getChildCount() - 1);
-        countReps.setText(String.valueOf(countAddSets + 1));
+        container.addView(vRowView, container.getChildCount() - 1);
+        tvCountReps.setText(String.valueOf(countAddSets + 1));
 
         for (int i = 0; i < StartWorkoutActivity.trainingList.size(); i++) {
             if (countExercisesLeft - 1 < StartWorkoutActivity.trainingList.size()) {
                 for (int j = 0; j < StartWorkoutActivity.trainingList.get(i).getTrackerExercises().size(); j++) {
                     if (countAddSets < StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().size()) {
-                        weight.setHint(String.valueOf(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().get(countAddSets).getWeight()));
-                        reps.setHint(String.valueOf(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().get(countAddSets).getRepNumber()));
+                        etWeight.setHint(String.valueOf(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().get(countAddSets).getWeight()));
+                        etReps.setHint(String.valueOf(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().get(countAddSets).getRepNumber()));
                     }
                 }
             }
@@ -630,21 +664,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         btnRemoveSte.setVisibility(View.VISIBLE);
         btnAddNewSet.setVisibility(View.INVISIBLE);
 
-//        final boolean toExit = false;
-//        final Thread t = new Thread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//
-//                Log.d(TAG, "countAddSets: " + countAddSets);
-//
-//                try {
-//                    Thread.sleep(500);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
         ivIsFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -668,9 +687,37 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-    public void onDelete(View v) {
-        container.removeView((View) v.getParent());
-    }
+//    public void onDelete(View v) {
+//        container.removeView((View) v.getParent());
+//    }
 
+    private void whatFinished() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you what to finish ?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivity(new Intent(WorkoutStartActivity.this, FragmentNavigationActivity.class));
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ivPlayWorkout.setVisibility(View.INVISIBLE);
+                        ivStopWorkout.setImageResource(R.mipmap.ic_pause);
+                        mChronometer.setBase(SystemClock.elapsedRealtime() - timeWhenStopped);
+                        if (countDownTimer != null) {
+                            countDownTimer.cancel();
+                        }
+                        mChronometer.start();
+                        countDownTimer.start();
+                        dialogInterface.cancel();
+                    }
+                });
+        androidx.appcompat.app.AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 
 }

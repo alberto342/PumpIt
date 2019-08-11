@@ -97,6 +97,18 @@ public class NutritionFragment extends Fragment {
         // setToolBar(view);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+    }
+
     private void setToolBar(View view) {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         assert activity != null;

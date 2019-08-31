@@ -4,7 +4,6 @@ package fitness.albert.com.pumpit.fragment;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,7 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,6 +41,7 @@ import java.util.Objects;
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.FinishTraining;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.Foods;
 import fitness.albert.com.pumpit.model.PrefsUtils;
@@ -54,17 +53,15 @@ import fitness.albert.com.pumpit.nutrition.ShowAllNutritionActivity;
 public class NutritionFragment extends Fragment {
 
     private final String TAG = "NutritionFragment";
-    private TextView tvGoal, tvFood, tvExersice, tvRemaining, tvFat, tvProtien, tvCarbs;
+    private TextView tvGoal, tvFood, tvExercise, tvRemaining, tvFat, tvProtien, tvCarbs;
     private List<Foods> foodList = new ArrayList<>();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private PrefsUtils prefsUtils = new PrefsUtils();
     private UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs, waterMl;
     private int calculationGoal;
-    private FragmentActivity myContext;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
-    // final Calendar myCalendar = Calendar.getInstance();
-    private int ly1ElementCount =0, ly2ElementCount =0, ly3ElementCount =0, ly4ElementCount =0;
+    private int ly1ElementCount = 0, ly2ElementCount = 0, ly3ElementCount = 0, ly4ElementCount = 0;
 
 
     public NutritionFragment() {
@@ -87,36 +84,26 @@ public class NutritionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         init(view);
+        getCaloriesBurned();
         mealFromFs();
         getUserDataAndSetGoal();
         emailIsOnNutrition();
         datePicker(view);
         setViewDrink(view);
-
-
-        // setToolBar(view);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
-    private void setToolBar(View view) {
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        assert activity != null;
-        assert activity.getSupportActionBar() != null;
-        activity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorDarkBlue)));
-        activity.getSupportActionBar().setTitle(UserRegister.getTodayData());
-        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-    }
 
 
     private void init(View view) {
@@ -127,9 +114,8 @@ public class NutritionFragment extends Fragment {
         ImageView btnAddSnacks = view.findViewById(R.id.btn_add_snacks);
         TextView tvDetails = view.findViewById(R.id.tv_details);
 
-
         tvGoal = view.findViewById(R.id.tv_goal);
-        tvExersice = view.findViewById(R.id.tv_exercise);
+        tvExercise = view.findViewById(R.id.tv_exercise);
         tvFood = view.findViewById(R.id.tv_food);
         tvRemaining = view.findViewById(R.id.tv_remaining);
         tvFat = view.findViewById(R.id.tv_fat);
@@ -148,37 +134,6 @@ public class NutritionFragment extends Fragment {
         tvDetails.setOnClickListener(onClickListener);
     }
 
-//    private void datePickerDialog() {
-//
-//        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-//
-//            @Override
-//            public void onDateSet(DatePicker view, int year, int monthOfYear,
-//                                  int dayOfMonth) {
-//                myCalendar.set(Calendar.YEAR, year);
-//                myCalendar.set(Calendar.MONTH, monthOfYear);
-//                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-//                updateLabel();
-//            }
-//
-//        };
-//        toolbarTxt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                new DatePickerDialog(getActivity(), date, myCalendar
-//                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-//                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-//            }
-//        });
-//    }
-//
-//    private void updateLabel() {
-//        String myFormat = "MM/dd/yy"; //In which you need put here
-//        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-//
-//        toolbarTxt.setText(sdf.format(myCalendar.getTime()));
-//    }
-
 
     private void mealFromFs() {
         //   if (isOnNutrition) {
@@ -186,10 +141,10 @@ public class NutritionFragment extends Fragment {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        getMealFromFs(Foods.BREAKFAST, UserRegister.getTodayData());
-        getMealFromFs(Foods.SNACK, UserRegister.getTodayData());
-        getMealFromFs(Foods.LUNCH, UserRegister.getTodayData());
-        getMealFromFs(Foods.DINNER, UserRegister.getTodayData());
+        getMealFromFs(Foods.BREAKFAST, UserRegister.getTodayDate());
+        getMealFromFs(Foods.SNACK, UserRegister.getTodayDate());
+        getMealFromFs(Foods.LUNCH, UserRegister.getTodayDate());
+        getMealFromFs(Foods.DINNER, UserRegister.getTodayDate());
         progressdialog.hide();
         //   }
     }
@@ -311,6 +266,32 @@ public class NutritionFragment extends Fragment {
         Objects.requireNonNull(getActivity()).getFragmentManager().popBackStack();
     }
 
+    private void getCaloriesBurned() {
+        final int[] caloriesBurned = {0};
+        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
+                .collection(UserRegister.getTodayDate()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful() && task.getResult() != null) {
+
+                            for(int i=0; i<task.getResult().size(); i++) {
+                                FinishTraining finishTraining = task.getResult().getDocuments().get(i).toObject(FinishTraining.class);
+                                caloriesBurned[0] += finishTraining.getCaloriesBurned();
+                            }
+                            tvExercise.setText(String.valueOf(caloriesBurned[0]));
+                            Log.d(TAG, "Calories Burned: " + caloriesBurned[0]);
+                        }
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, "onFailure: " + e);
+            }
+        });
+    }
+
 
     private void getMealFromFs(String keyValue, String date) {
         //get NUTRITION from firestone
@@ -340,8 +321,7 @@ public class NutritionFragment extends Fragment {
                                 tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
                                 tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
                                 tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
-                                //Need to be calculation
-                                tvRemaining.setText(String.format(Locale.getDefault(), "%.0f", kcal));
+                                tvRemaining.setText(String.format(Locale.getDefault(), "%.0f", calculationGoal - kcal +  Integer.parseInt(tvExercise.getText().toString())));
 
                                 updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
                                 updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
@@ -415,7 +395,6 @@ public class NutritionFragment extends Fragment {
     }
 
 
-
     private void setViewDrink(View rowView) {
         final TextView tvWaterMl = rowView.findViewById(R.id.tv_water_ml);
         final TableRow tableLayout1 = rowView.findViewById(R.id.tab_layout_1);
@@ -451,6 +430,7 @@ public class NutritionFragment extends Fragment {
 
 
         addWater.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
                 ImageView ivFullWater = new ImageView(getActivity());
@@ -472,6 +452,7 @@ public class NutritionFragment extends Fragment {
 
 
                 ivFullWater.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onClick(View view) {
 
@@ -491,6 +472,7 @@ public class NutritionFragment extends Fragment {
             }
         });
         addWater2.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
 
@@ -513,6 +495,7 @@ public class NutritionFragment extends Fragment {
                 }
 
                 ivFullWater.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onClick(View view) {
                         Log.d(TAG, "onClick: remove water 2: " + ly2ElementCount);
@@ -539,6 +522,7 @@ public class NutritionFragment extends Fragment {
             }
         });
         addWater3.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
 
@@ -561,6 +545,7 @@ public class NutritionFragment extends Fragment {
                 }
 
                 ivFullWater.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onClick(View view) {
                         Log.d(TAG, "onClick: remove water 3: " + ly3ElementCount);
@@ -585,6 +570,7 @@ public class NutritionFragment extends Fragment {
             }
         });
         addWater4.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: add water 4: " + ly4ElementCount);
@@ -600,6 +586,7 @@ public class NutritionFragment extends Fragment {
                 }
 
                 ivFullWater.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onClick(View view) {
                         Log.d(TAG, "onClick: remove water 4: " + ly4ElementCount);
@@ -631,7 +618,7 @@ public class NutritionFragment extends Fragment {
         waterTrk.put("waterTracker", waterTracker);
 
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(Foods.WATER_TRACKER)
-                .document(UserRegister.getTodayData())
+                .document(UserRegister.getTodayDate())
                 .set(waterTrk).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

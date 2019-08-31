@@ -92,7 +92,7 @@ public class LogFragment extends Fragment {
         calenderEvent = view.findViewById(R.id.calender_event);
 
         if (date == null) {
-            date = UserRegister.getTodayData();
+            date = UserRegister.getTodayDate();
         }
     }
 

@@ -258,13 +258,11 @@ public class UserRegister {
     }
 
     public Map<String, Integer> calculatorBEE() {
-
         Map<String, Integer> calcBEE = new HashMap<>();
         calcBEE.put("setOfTheDay", (int) (calculatorBMR() * 1.2));
         calcBEE.put("activeLightweight", (int) (calculatorBMR() * 1.375));
         calcBEE.put("activeMedium", (int) (calculatorBMR() * 1.55));
         calcBEE.put("anUnusualActivist", (int) (calculatorBMR() * 1.9));
-
         return calcBEE;
     }
 
@@ -273,7 +271,7 @@ public class UserRegister {
         return (int) (calculatorBEE().get(valueKey) * 1.1);
     }
 
-    public static String getTodayData() {
+    public static String getTodayDate() {
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
         return df.format(c);

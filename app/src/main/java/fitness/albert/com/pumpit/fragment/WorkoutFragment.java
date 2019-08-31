@@ -1,6 +1,7 @@
 package fitness.albert.com.pumpit.fragment;
 
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,13 +21,17 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.model.Event;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.PrefsUtils;
+import fitness.albert.com.pumpit.model.UserRegister;
+import fitness.albert.com.pumpit.model.Workout;
 import fitness.albert.com.pumpit.model.WorkoutPlans;
 import fitness.albert.com.pumpit.workout.CustomPlanActivity;
 import fitness.albert.com.pumpit.workout.FindWorkoutActivity;
@@ -35,10 +40,13 @@ import fitness.albert.com.pumpit.workout.StartWorkoutActivity;
 
 public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
+    private static final String TAG = "WorkoutFragment";
     private boolean exerciseExist;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private TextView exerciseName, level, workoutComplete, emptyExercise;
-    private ImageView btnAdd, findWorkout, btnStartWorkout;
+    private TextView tvExerciseName, tvWorkoutComplete, tvEmptyExercise;
+    private ImageView btnAdd, ivFindWorkout, btnStartWorkout;
+    private PrefsUtils prefsUtils = new PrefsUtils();
+    private int exComplete =0;
 
     public WorkoutFragment() {
     }
@@ -57,12 +65,22 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
         setToolBar();
         init(view);
-        findWorkout.setOnClickListener(this);
+        prefsUtils.createSharedPreferencesFiles(getActivity(), PrefsUtils.EXERCISE);
+        checkIfDateIsChange();
+
+        ivFindWorkout.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
         btnStartWorkout.setOnClickListener(this);
         loadExerciseFromFb();
     }
 
+    private void checkIfDateIsChange() {
+        String todayData = prefsUtils.getString("today_date", "");
+
+        if(!todayData.equals(UserRegister.getTodayDate())) {
+            prefsUtils.saveData("exercise_complete", 0);
+        }
+    }
 
 
     private void setToolBar() {
@@ -81,34 +99,24 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         loadExerciseFromFb();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
     private void init(View view) {
-        findWorkout = view.findViewById(R.id.btn_find_workout);
-        emptyExercise = view.findViewById(R.id.empty_exersis);
-        level = view.findViewById(R.id.level);
-        workoutComplete = view.findViewById(R.id.workout_complate);
-        exerciseName = view.findViewById(R.id.workout_name);
+        ivFindWorkout = view.findViewById(R.id.btn_find_workout);
+        tvEmptyExercise = view.findViewById(R.id.empty_exersis);
+        tvWorkoutComplete = view.findViewById(R.id.workout_complate);
+        tvExerciseName = view.findViewById(R.id.workout_name);
         btnAdd = view.findViewById(R.id.btn_add);
         btnStartWorkout = view.findViewById(R.id.btn_workout);
     }
 
-
-//    private void loadFragment(Fragment fragment) {
-//        if (getFragmentManager() != null) {
-//            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//            transaction.replace(R.id.frame_container, fragment);
-//            transaction.addToBackStack(null);
-//            transaction.commit();
-//        }
-//    }
 
     @Override
     public void onClick(View v) {
@@ -131,61 +139,109 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
         progressdialog.setMessage("Please Wait....");
         progressdialog.show();
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
+        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                .collection(WorkoutPlans.WORKOUT_NAME).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         progressdialog.hide();
 
-                        if (task.getResult() != null && !task.getResult().getDocuments().isEmpty()) {
+                        if (task.isSuccessful() && !task.getResult().getDocuments().isEmpty()) {
                             exerciseExist = task.getResult().getDocuments().size() > 0;
                             haveExercise(exerciseExist);
                             progressdialog.hide();
                         }
-
-
-                    //    haveExercise(exerciseExist);
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
+                        Log.w(TAG, "onFailure: " + e);
                     }
                 });
     }
 
-    private void haveExercise(boolean exerciseExist) {
+
+    //check if have default plan
+    private void haveExercise(boolean exerciseExisting) {
 
         final String routineName;
         final String TAG = "WorkoutFragment";
 
-        if (exerciseExist) {
-            PrefsUtils prefsUtils = new PrefsUtils();
-            prefsUtils.createSharedPreferencesFiles(getActivity(), PrefsUtils.EXERCISE);
+        if (exerciseExisting) {
+            checkHowManyExercises();
 
-            emptyExercise.setVisibility(TextView.INVISIBLE);
+            tvEmptyExercise.setVisibility(TextView.INVISIBLE);
             btnAdd.setVisibility(View.INVISIBLE);
-            level.setVisibility(TextView.VISIBLE);
-            workoutComplete.setVisibility(TextView.VISIBLE);
-            exerciseName.setVisibility(TextView.VISIBLE);
+            tvWorkoutComplete.setVisibility(TextView.VISIBLE);
+            tvExerciseName.setVisibility(TextView.VISIBLE);
 
             if (!prefsUtils.getString(PrefsUtils.DEFAULT_PLAN, "").isEmpty()) {
                 routineName = prefsUtils.getString(PrefsUtils.DEFAULT_PLAN, "");
                 Log.d(TAG, "routineName: " + routineName);
 
-                exerciseName.setText(routineName);
-                exerciseName.setTextColor(Color.WHITE);
+                tvExerciseName.setText(routineName);
+                tvExerciseName.setTextColor(Color.WHITE);
             }
             prefsUtils.saveData("defaultExercise", true);
         } else {
             btnAdd.setVisibility(View.VISIBLE);
-            emptyExercise.setVisibility(TextView.VISIBLE);
-            level.setVisibility(TextView.INVISIBLE);
-            workoutComplete.setVisibility(TextView.INVISIBLE);
-            exerciseName.setVisibility(TextView.INVISIBLE);
+            tvEmptyExercise.setVisibility(TextView.VISIBLE);
+            tvWorkoutComplete.setVisibility(TextView.INVISIBLE);
+            tvExerciseName.setVisibility(TextView.INVISIBLE);
         }
     }
 
+
+    private void checkHowManyExercises() {
+
+        Event event = new Event();
+        final String planName = prefsUtils.getString("planName", "");
+        exComplete = prefsUtils.getInt("exercise_complete", 0);
+
+        if (!planName.isEmpty()) {
+            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                    .collection(WorkoutPlans.WORKOUT_NAME).document(planName)
+                    .collection(Workout.WORKOUT_DAY_NAME)
+                    .whereEqualTo("workoutDay", event.getDayName()).get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful() && task.getResult() != null) {
+
+                                for(int i=0 ; i< task.getResult().size(); i++) {
+                                    String id = task.getResult().getDocuments().get(i).getId();
+                                    Log.d(TAG, "onComplete get id of exercise: " + id);
+
+                                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+                                            .collection(WorkoutPlans.WORKOUT_NAME).document(planName)
+                                            .collection(Workout.WORKOUT_DAY_NAME).document(id)
+                                            .collection(Workout.EXERCISE_NAME).get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @SuppressLint("SetTextI18n")
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                    if(!queryDocumentSnapshots.isEmpty()) {
+
+                                                        int sizeOfExercise = queryDocumentSnapshots.getDocuments().size();
+                                                        tvWorkoutComplete.setText(exComplete + "/" + sizeOfExercise + " Workout complete");
+                                                    }
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "onFailure check size of exercise ");
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "onFailure: check How Many Exercises " + e);
+                }
+            });
+        }
+    }
 }

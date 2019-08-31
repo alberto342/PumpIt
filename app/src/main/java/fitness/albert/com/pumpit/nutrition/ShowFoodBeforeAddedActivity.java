@@ -368,7 +368,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             }
 
             db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                    .collection(getMeal()).document(UserRegister.getTodayData())
+                    .collection(getMeal()).document(UserRegister.getTodayDate())
                     .collection(Foods.All_NUTRITION)
                     .add(FoodListAdapter.mListItem.get(FoodListAdapter.mItemPosition))
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -398,7 +398,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         //SETUP REEALM
         RealmConfiguration config = new RealmConfiguration.Builder().name(CalenderEvent.REALM_FILE_EVENT).deleteRealmIfMigrationNeeded().build();
         Realm realm = Realm.getInstance(config);
-        final CalenderEvent calenderEvent = new CalenderEvent(UserRegister.getTodayData(), true, 0, 0);
+        final CalenderEvent calenderEvent = new CalenderEvent(UserRegister.getTodayDate(), true, 0, 0);
 
         realm.getSchema();
         realm.executeTransaction(new Realm.Transaction() {
@@ -406,9 +406,9 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             @Override
             public void execute(@NonNull Realm realm) {
 
-                String date = realm.where(CalenderEvent.class).equalTo("date", UserRegister.getTodayData()).findFirst().getDate();
+                String date = realm.where(CalenderEvent.class).equalTo("date", UserRegister.getTodayDate()).findFirst().getDate();
 
-                if (date != null && !date.equals(UserRegister.getTodayData())) {
+                if (date != null && !date.equals(UserRegister.getTodayDate())) {
                     Number currentIdNum = realm.where(CalenderEvent.class).max("id");
                     int nextId;
 

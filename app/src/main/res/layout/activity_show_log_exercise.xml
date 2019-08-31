@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".workout.ShowLogExercise">
+    tools:context=".workout.ShowLogExerciseActivity">
 
     <TextView
         android:id="@+id/log_show_exercise_name"

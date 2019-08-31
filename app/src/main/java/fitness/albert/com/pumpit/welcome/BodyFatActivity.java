@@ -1,11 +1,13 @@
 package fitness.albert.com.pumpit.welcome;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +20,7 @@ import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.BodyFatRecyclerViewAdapter;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 
-public class BodyFatActivity extends AppCompatActivity {
+public class BodyFatActivity extends AppCompatActivity implements BodyFatRecyclerViewAdapter.OnBodyFatListener {
 
     private static final String TAG = "BodyFatActivity";
     private ImageView next;
@@ -61,7 +63,7 @@ public class BodyFatActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(layoutManager);
-        BodyFatRecyclerViewAdapter adapter = new BodyFatRecyclerViewAdapter(this, bodyFat, mImage);
+        BodyFatRecyclerViewAdapter adapter = new BodyFatRecyclerViewAdapter(this, bodyFat, mImage, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -116,4 +118,19 @@ public class BodyFatActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onBodyFatClick(int position) {
+        PrefsUtils prefsUtils = new PrefsUtils();
+        Log.d(TAG, "onBodyFatClick: " + position);
+        if (position >= 0) {
+            next.setVisibility(View.VISIBLE);
+
+            TextView tvBodyFatType = findViewById(R.id.tv_body_fat_type);
+            tvBodyFatType.setText("Body Fat: " + bodyFat.get(position));
+
+            prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
+            prefsUtils.saveData("body_fat", bodyFat.get(position));
+        }
+    }
 }

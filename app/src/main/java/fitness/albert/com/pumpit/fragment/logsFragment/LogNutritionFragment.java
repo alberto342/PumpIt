@@ -258,7 +258,7 @@ public class LogNutritionFragment extends Fragment {
 
     private void delNutrition(final String nutrition, ArrayList<Foods> foodsArrayList, int pos) {
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(nutrition).document(UserRegister.getTodayData()).collection(Foods.All_NUTRITION)
+                .collection(nutrition).document(UserRegister.getTodayDate()).collection(Foods.All_NUTRITION)
                 .whereEqualTo("food_name", foodsArrayList.get(pos).getFoodName())
                 .whereEqualTo("serving_qty", foodsArrayList.get(pos).getServingQty()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -269,7 +269,7 @@ public class LogNutritionFragment extends Fragment {
                                 String docId = task.getResult().getDocuments().get(i).getId();
                                 Log.d(TAG, "id: " + docId);
                                 db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                        .collection(nutrition).document(UserRegister.getTodayData())
+                                        .collection(nutrition).document(UserRegister.getTodayDate())
                                         .collection(Foods.All_NUTRITION).document(docId)
                                         .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override

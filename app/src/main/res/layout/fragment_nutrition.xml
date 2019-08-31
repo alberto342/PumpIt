@@ -165,7 +165,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="1940"
+            android:hint=""
             android:textAlignment="center"
             android:textColor="@color/md_green_600"
             android:textColorHint="@android:color/darker_gray"

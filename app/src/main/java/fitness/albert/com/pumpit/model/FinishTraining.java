@@ -9,34 +9,30 @@ public class FinishTraining extends Training{
 
     private String chrTotalTraining;
     private Boolean exerciseComplete;
-    private String chrWasted;
-    private String chrActual;
-    private String chrRestTime;
-    private float totalWeight;
-    private int newRecord;
+    private int caloriesBurned;
 
     public FinishTraining() {
     }
 
-    public FinishTraining(String chrTotalTraining, Boolean exerciseComplete, String chrWasted, String chrActual, String chrRestTime, float totalWeight, int newRecord) {
+    public FinishTraining(String chrTotalTraining, Boolean exerciseComplete) {
         this.chrTotalTraining = chrTotalTraining;
         this.exerciseComplete = exerciseComplete;
-        this.chrWasted = chrWasted;
-        this.chrActual = chrActual;
-        this.chrRestTime = chrRestTime;
-        this.totalWeight = totalWeight;
-        this.newRecord = newRecord;
     }
 
-    public FinishTraining(String exerciseName, List<TrackerExercise> trackerExercises, int sizeOfRept, int restBetweenSet, int restAfterExercise, String imgName, String date, boolean isFavorite, String chrTotalTraining, Boolean exerciseComplete, String chrWasted, String chrActual, String chrRestTime, float totalWeight, int newRecord) {
+    public FinishTraining(String exerciseName, List<TrackerExercise> trackerExercises, int sizeOfRept,
+                          int restBetweenSet, int restAfterExercise, String imgName, String date,
+                          boolean isFavorite, String chrTotalTraining, int caloriesBurned) {
         super(exerciseName, trackerExercises, sizeOfRept, restBetweenSet, restAfterExercise, imgName, date, isFavorite);
         this.chrTotalTraining = chrTotalTraining;
-        this.exerciseComplete = exerciseComplete;
-        this.chrWasted = chrWasted;
-        this.chrActual = chrActual;
-        this.chrRestTime = chrRestTime;
-        this.totalWeight = totalWeight;
-        this.newRecord = newRecord;
+        this.caloriesBurned = caloriesBurned;
+    }
+
+    public int getCaloriesBurned() {
+        return caloriesBurned;
+    }
+
+    public void setCaloriesBurned(int caloriesBurned) {
+        this.caloriesBurned = caloriesBurned;
     }
 
     public static String getTrainingLog() {
@@ -63,43 +59,4 @@ public class FinishTraining extends Training{
         this.exerciseComplete = exerciseComplete;
     }
 
-    public String getChrWasted() {
-        return chrWasted;
-    }
-
-    public void setChrWasted(String chrWasted) {
-        this.chrWasted = chrWasted;
-    }
-
-    public String getChrActual() {
-        return chrActual;
-    }
-
-    public void setChrActual(String chrActual) {
-        this.chrActual = chrActual;
-    }
-
-    public String getChrRestTime() {
-        return chrRestTime;
-    }
-
-    public void setChrRestTime(String chrRestTime) {
-        this.chrRestTime = chrRestTime;
-    }
-
-    public float getTotalWeight() {
-        return totalWeight;
-    }
-
-    public void setTotalWeight(float totalWeight) {
-        this.totalWeight = totalWeight;
-    }
-
-    public int getNewRecord() {
-        return newRecord;
-    }
-
-    public void setNewRecord(int newRecord) {
-        this.newRecord = newRecord;
-    }
 }

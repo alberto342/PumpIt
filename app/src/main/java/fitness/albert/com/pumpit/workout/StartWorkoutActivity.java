@@ -281,7 +281,8 @@ public class StartWorkoutActivity extends AppCompatActivity {
         db.collection(WorkoutPlans.WORKOUT_PLANS)
                 .document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
                 .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
-                .document(workoutId).collection(Workout.EXERCISE_NAME).document(trainingList.get(position).getExerciseName()).delete()
+                .document(workoutId).collection(Workout.EXERCISE_NAME)
+                .document(trainingList.get(position).getExerciseName()).delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -347,14 +348,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
         etWeight.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getWeight()));
         etReps.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getRepNumber()));
-
-//            DocumentReference reference = db.collection(WorkoutPlans.WORKOUT_PLANS)
-//                    .document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
-//                    .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
-//                    .document(workoutId).collection(Workout.EXERCISE_NAME).document(trainingList.get(position).getExerciseName());
-//
-//            reference.update("repNumber", etReps.getText().toString());
-//            reference.update("weight", etWeight.getText().toString());
     }
 
 

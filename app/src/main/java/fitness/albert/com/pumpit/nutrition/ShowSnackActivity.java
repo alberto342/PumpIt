@@ -316,7 +316,7 @@ public class ShowSnackActivity extends AppCompatActivity implements QuantityView
         progressdialog.show();
 
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(Foods.SNACK).document(UserRegister.getTodayData())
+                .collection(Foods.SNACK).document(UserRegister.getTodayDate())
                 .collection(Foods.All_NUTRITION)
                 .whereEqualTo("foodName", SnacksListAdapter.foodName)
                 .whereEqualTo("servingUnit", oldServingUnit)
@@ -330,7 +330,7 @@ public class ShowSnackActivity extends AppCompatActivity implements QuantityView
                                 docId = document.getId();
                             }
                             DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                    .collection(Foods.SNACK).document(UserRegister.getTodayData())
+                                    .collection(Foods.SNACK).document(UserRegister.getTodayDate())
                                     .collection(Foods.All_NUTRITION).document(docId);
 
                             int qty = quantityViewCustom.getQuantity();

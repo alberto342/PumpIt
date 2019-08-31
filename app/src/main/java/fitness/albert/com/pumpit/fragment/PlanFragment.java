@@ -52,7 +52,7 @@ public class PlanFragment extends Fragment {
     private final String TAG = "PlanFragment";
     public static List<WorkoutPlans> workoutPlansList;
     public static String planName;
-    public static String routineName; // chack in EditCustomPlanActivity
+    public static String routineName; // check in EditCustomPlanActivity
     private WorkoutPlanAdapter workoutAdapter;
 
 

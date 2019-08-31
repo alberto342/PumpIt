@@ -21,7 +21,7 @@
             android:name=".fragment.profile.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity android:name=".workout.FinisherWorkoutActivity" />
-        <activity android:name=".workout.ShowLogExercise" />
+        <activity android:name=".workout.ShowLogExerciseActivity" />
         <activity android:name=".fragment.logsFragment.LogTabActivity" />
         <activity android:name=".workout.CustomAddExerciseActivity" />
         <activity android:name=".workout.ChangePlanActivity" />

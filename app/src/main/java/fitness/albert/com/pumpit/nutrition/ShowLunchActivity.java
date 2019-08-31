@@ -314,7 +314,7 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
         progressdialog.show();
 
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(Foods.LUNCH).document(UserRegister.getTodayData())
+                .collection(Foods.LUNCH).document(UserRegister.getTodayDate())
                 .collection(Foods.All_NUTRITION)
                 .whereEqualTo("foodName", LunchListAdapter.foodName)
                 .whereEqualTo("servingUnit", oldServingUnit)
@@ -328,7 +328,7 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
                                 docId = document.getId();
                             }
                             DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                    .collection(Foods.LUNCH).document(UserRegister.getTodayData())
+                                    .collection(Foods.LUNCH).document(UserRegister.getTodayDate())
                                     .collection(Foods.All_NUTRITION).document(docId);
 
                             int qty = quantityViewCustom.getQuantity();

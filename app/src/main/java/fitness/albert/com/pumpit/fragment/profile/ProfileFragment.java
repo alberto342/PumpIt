@@ -101,6 +101,7 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         tvMyGoalWeight = view.findViewById(R.id.goal_weight);
         profileImg = view.findViewById(R.id.profile_pic);
         tvBmiType = view.findViewById(R.id.tv_bmi_type);
+
         //tvBmiResult = view.findViewById(R.id.bmi_result);
 //        btnAccountSetting = view.findViewById(R.id.btn_account_setting);
 //        btnProfile = view.findViewById(R.id.btn_profile);
@@ -241,6 +242,8 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
                             tvBmiType.setText(cal.bmiTable());
                             tvMyWeigh.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
                             Log.d(TAG, "TestGetUserProfile: " + documentSnapshot.getData());
+
+                            prefsUtils.saveData("starting_weight", String.valueOf(userRegister.getWeight()));
                         }
                     }
                 })
@@ -263,7 +266,13 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         String dateOfBirth = prefsUtils.getString("date_of_birth", "");
         float weight = prefsUtils.getFloat("weight", 0f);
         int height = prefsUtils.getInt("height", 0);
+        String goal = prefsUtils.getString("goal_weight","");
         //boolean isMale = prefsUtils.getBoolean("is_male", false);
+
+
+        if(!goal.isEmpty()) {
+            tvMyGoalWeight.setText("Goal: " + goal + "kg");
+        }
 
         tvName.setText(firstName + " " + lestName);
         cal.setHeight((double) height);

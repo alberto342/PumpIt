@@ -38,6 +38,7 @@ import java.util.List;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.WorkoutAdapter;
 import fitness.albert.com.pumpit.adapter.WorkoutPlanAdapter;
+import fitness.albert.com.pumpit.model.Event;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.SwipeHelper;
@@ -62,6 +63,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
+        setTitle("Plan");
 
         init();
         getPlanFormFb();
@@ -197,7 +199,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private void saveDay(String workoutDayName, String workoutDay) {
-        Workout workout = new Workout(UserRegister.getTodayData(), workoutDayName, workoutDay, 0, 0);
+        Workout workout = new Workout(UserRegister.getTodayDate(), workoutDayName, workoutDay, 0, 0);
         if (!getWorkPlanId().equals("null")) {
             db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
                     .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId())
@@ -261,6 +263,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
                 android.R.layout.simple_spinner_item, workoutDayList);
         daysWeekAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         pickWorkoutDay.setAdapter(daysWeekAdapter);
+
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -351,6 +354,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
+                                deleteFromPref();
                                 deleteFromFirebase(pos);
                                 deleteItem(pos);
                                 workoutAdapter.notifyDataSetChanged();
@@ -420,6 +424,12 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         mRecyclerView.removeViewAt(position);
         workoutAdapter.notifyItemRemoved(position);
         workoutAdapter.notifyItemRangeChanged(position, workoutList.size());
+    }
+
+
+    private void deleteFromPref() {
+        PrefsUtils prefsUtils = new PrefsUtils();
+        prefsUtils.removeSingle(this,PrefsUtils.DEFAULT_EXERCISE,"e_" + Event.getDayName());
     }
 
 
@@ -557,6 +567,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
         workoutAdapter = new WorkoutAdapter(this, workoutList);
         mRecyclerView.setAdapter(workoutAdapter);
+        workoutAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -572,11 +583,5 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(getIntent());
                 break;
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
     }
 }

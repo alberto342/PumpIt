@@ -1,5 +1,6 @@
 package fitness.albert.com.pumpit.model;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import java.text.SimpleDateFormat;
@@ -58,6 +59,13 @@ public class Event {
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.US);
         return df.format(c);
+    }
+
+    public static String getDayName() {
+        Calendar cal = Calendar.getInstance();
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat monthDate = new SimpleDateFormat("EEEE");
+        return monthDate.format(cal.getTime());
     }
 
     public String getMonthData(int numMonth, int year) {

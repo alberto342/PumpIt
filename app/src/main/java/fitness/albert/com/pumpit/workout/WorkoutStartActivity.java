@@ -34,10 +34,11 @@ import java.util.concurrent.TimeUnit;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.adapter.TrainingAdapter;
-import fitness.albert.com.pumpit.fragment.FragmentNavigationActivity;
 import fitness.albert.com.pumpit.model.Event;
 import fitness.albert.com.pumpit.model.FinishTraining;
 import fitness.albert.com.pumpit.model.FireBaseInit;
+import fitness.albert.com.pumpit.model.PrefsUtils;
+import fitness.albert.com.pumpit.model.TDEECalculator;
 import fitness.albert.com.pumpit.model.TrackerExercise;
 import fitness.albert.com.pumpit.model.UserRegister;
 
@@ -46,7 +47,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     private final String TAG = "WorkoutStartActivity";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView tvExerciseName, tvTimerUp, btnAddNewSet, btnRemoveSte, tvExercisesLeft, tvCountReps;
-    private ImageView imgExercise, ivPlayWorkout, ivStopWorkout, ivIsFinish;
+    private ImageView imgExercise, ivPlayWorkout, ivStopWorkout, ivIsFinish, ivTimeRest;
     private CountDownTimer countDownTimer;
     private AlertDialog dialog;
     private long timeWhenStopped = 0;
@@ -60,6 +61,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
 
     // TODO: 2019-08-07 check the timer 30 sec on 2 click its stop
+    // TODO: 2019-08-16 check the picture not good
 
 
     @Override
@@ -80,7 +82,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
     @SuppressLint("SetTextI18n")
     private void init() {
         mChronometer = findViewById(R.id.chronometer);
-        ImageView timeRest = findViewById(R.id.iv_time_rest);
+        ivTimeRest = findViewById(R.id.iv_time_rest);
         ImageView editStartWorkout = findViewById(R.id.iv_edite_start_workout);
         imgExercise = findViewById(R.id.iv_exercise_img_start_workout);
         ImageView nextExercise = findViewById(R.id.iv_next_exercise_next_workout);
@@ -102,7 +104,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         //exercise left
         tvExercisesLeft.setText(countExercisesLeft + "/" + StartWorkoutActivity.trainingList.size());
 
-        timeRest.setOnClickListener(this);
+        ivTimeRest.setOnClickListener(this);
         editStartWorkout.setOnClickListener(this);
         ivPlayWorkout.setOnClickListener(this);
         ivStopWorkout.setOnClickListener(this);
@@ -148,7 +150,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                         }
                     }
                 });
-
     }
 
     private void exerciseImg(int position) {
@@ -437,6 +438,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 countDownTimer(0);
             }
             ivPlayWorkout.setVisibility(View.INVISIBLE);
+            ivTimeRest.setImageResource(R.mipmap.ic_timer);
             ivStopWorkout.setImageResource(R.mipmap.ic_pause);
             mChronometer.setBase(SystemClock.elapsedRealtime() - timeWhenStopped);
             mChronometer.start();
@@ -448,6 +450,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
             llDuration.setBackgroundResource(R.color.red_900);
             ivStopWorkout.setImageResource(R.mipmap.ic_stop);
             ivPlayWorkout.setVisibility(View.VISIBLE);
+            ivTimeRest.setImageResource(R.mipmap.ic_timer_stop);
             mChronometer.stop();
             timeWhenStopped = SystemClock.elapsedRealtime() - mChronometer.getBase();
         } else if (isPause) {
@@ -478,13 +481,21 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
     private void setExerciseIntoFb() {
 
-        String exerciseImgName = null;
+        PrefsUtils prefsUtils = new PrefsUtils();
+        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
+        float weight = prefsUtils.getFloat("weight", 0f);
+        TDEECalculator tdeeCalculator = new TDEECalculator();
+
+        int chronometerInMin = tdeeCalculator.splitChronometer(TAG, mChronometer.getText().toString());
+        int caloriesBurned = (int) (tdeeCalculator.caloriesBurned(weight) * chronometerInMin);
+        String exerciseImgName;
 
         if (countExercisesLeft == 1) {
             exerciseImgName = StartWorkoutActivity.trainingList.get(0).getImgName();
             Log.d(TAG, "test Exercise Img: " + exerciseImgName);
+        } else {
+            exerciseImgName = StartWorkoutActivity.trainingList.get(countExercisesLeft-1).getImgName();
         }
-
 
         if (etWeight.getText().toString().isEmpty() || etWeight.getText() == null || etReps.getText().toString().isEmpty() || etReps.getText() == null) {
             countAddSets--;
@@ -493,8 +504,6 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         for (int i = 0; i < trackerExerciseList.size(); i++) {
             Log.d(TAG, "exercise recording: " + trackerExerciseList.get(i).getWeight());
         }
-
-        Log.d(TAG, "countExercisesLeft before change: " + countExercisesLeft);
 
         boolean isBlow = countExercisesLeft < StartWorkoutActivity.trainingList.size();
 
@@ -511,25 +520,24 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         }
         Log.d(TAG, "countExercise: " + countExercisesLeft);
 
-        String currentImgName = exerciseImgName != null ? exerciseImgName : StartWorkoutActivity.trainingList.get(countExercisesLeft).getImgName();
+       // String currentImgName = exerciseImgName != null ? exerciseImgName : StartWorkoutActivity.trainingList.get(countExercisesLeft-1).getImgName();
 
         FinishTraining finishTraining = new FinishTraining(tvExerciseName.getText().toString(),
                 trackerExerciseList, 0,
                 StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestBetweenSet(),
                 StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise(),
-                currentImgName,
-                UserRegister.getTodayData(), StartWorkoutActivity.trainingList.get(countExercisesLeft).isFavorite(),
-                mChronometer.getText().toString(), false, "", "", "", 0f, 0);
+                exerciseImgName, UserRegister.getTodayDate(),
+                StartWorkoutActivity.trainingList.get(countExercisesLeft).isFavorite(), mChronometer.getText().toString(), caloriesBurned);
 
         db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-                .collection(UserRegister.getTodayData()).document(tvExerciseName.getText().toString())
+                .collection(UserRegister.getTodayDate()).document(tvExerciseName.getText().toString())
                 .set(finishTraining)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         //save workout event for calendar
                         Event.saveEvent(WorkoutStartActivity.this);
-                        Log.d(TAG, "Document successfully written!\n Img name: " + StartWorkoutActivity.trainingList.get(countExercisesLeft - 2).getImgName());
+                        Log.d(TAG, "Document successfully written!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -558,6 +566,9 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
             startActivity(new Intent(this, FinisherWorkoutActivity.class));
             finish();
         }
+        
+
+
 
         //save into fb
         setExerciseIntoFb();
@@ -691,6 +702,9 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 //        container.removeView((View) v.getParent());
 //    }
 
+
+
+
     private void whatFinished() {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         builder.setMessage("Are you sure you what to finish ?")
@@ -698,7 +712,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        startActivity(new Intent(WorkoutStartActivity.this, FragmentNavigationActivity.class));
+                        startActivity(new Intent(WorkoutStartActivity.this, FinisherWorkoutActivity.class));
                         finish();
                     }
                 })
@@ -719,5 +733,4 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         androidx.appcompat.app.AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
 }

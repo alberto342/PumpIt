@@ -41,6 +41,7 @@
                     android:padding="@dimen/common_4"
                     android:paddingStart="@dimen/common_16"
                     android:textColor="@color/white"
+                    android:textColorHint="@color/gray"
                     android:textSize="14sp" />
 
                 <TextView
@@ -48,11 +49,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint=""
+                    android:hint="@string/general_fitness"
                     android:letterSpacing="0.1"
                     android:padding="@dimen/common_4"
                     android:paddingStart="@dimen/common_16"
                     android:textColor="@color/md_green_500"
+                    android:textColorHint="@color/gray"
                     android:textSize="14sp" />
 
 

@@ -316,7 +316,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
         progressdialog.show();
 
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(Foods.BREAKFAST).document(UserRegister.getTodayData())
+                .collection(Foods.BREAKFAST).document(UserRegister.getTodayDate())
                 .collection(Foods.All_NUTRITION)
                 .whereEqualTo("foodName", BreakfastListAdapter.foodName)
                 .whereEqualTo("servingUnit", oldServingUnit)
@@ -330,7 +330,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
                                 docId = document.getId();
                             }
                             DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                    .collection(Foods.BREAKFAST).document(UserRegister.getTodayData())
+                                    .collection(Foods.BREAKFAST).document(UserRegister.getTodayDate())
                                     .collection(Foods.All_NUTRITION).document(docId);
 
                             int qty = quantityViewCustom.getQuantity();

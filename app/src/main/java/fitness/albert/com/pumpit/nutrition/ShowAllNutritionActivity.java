@@ -74,10 +74,10 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         datePicker();
         getUserDataAndSetGoal();
 
-        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast, UserRegister.getTodayData());
-        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch, UserRegister.getTodayData());
-        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner, UserRegister.getTodayData());
-        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks, UserRegister.getTodayData());
+        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast, UserRegister.getTodayDate());
+        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch, UserRegister.getTodayDate());
+        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner, UserRegister.getTodayDate());
+        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks, UserRegister.getTodayDate());
 
         enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.BREAKFAST);
         enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
@@ -258,7 +258,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
     private void deleteFromFirebase(final String keyValue, final String foodName, final int qty) {
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(UserRegister.getTodayData())
+                .collection(keyValue).document(UserRegister.getTodayDate())
                 .collection(Foods.All_NUTRITION).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @SuppressLint("LongLogTag")
@@ -277,7 +277,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
                                     //delete from firebase
                                     db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                            .collection(keyValue).document(UserRegister.getTodayData())
+                                            .collection(keyValue).document(UserRegister.getTodayDate())
                                             .collection(Foods.All_NUTRITION).document(id).delete();
 
                                     Log.d(TAG, "DocumentSnapshot " + task.getResult().getDocuments().get(i).getId() + " successfully deleted!");

@@ -364,9 +364,8 @@ public class TDEECalculator {
         return hours + min;
     }
 
-    public int caloriesBurned(int time) {
-        return time * 4;
+
+    public float caloriesBurned(float weight) {
+        return weight * 7 / 60;
     }
-
-
 }

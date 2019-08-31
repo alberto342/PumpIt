@@ -55,6 +55,8 @@ public class ChangeProfileFragment extends Fragment {
     }
 
 
+
+
     private void init(View view) {
         tvFirstName = view.findViewById(R.id.tv_p_first_name);
         tvLastName = view.findViewById(R.id.tv_p_last_name);

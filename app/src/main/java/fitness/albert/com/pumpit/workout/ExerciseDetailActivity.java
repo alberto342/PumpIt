@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
@@ -22,8 +21,8 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
     private ImgExerciseFragment imgExerciseFragment;
     private InstructionsExerciseFragment instructionsExerciseFragment;
     private TrackerExerciseFragment trackerExerciseFragment;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final String TAG = "ExerciseDetailActivity";
+//    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+//    private final String TAG = "ExerciseDetailActivity";
     private ImageView imgFavorite;
     public static boolean isFavoriteSelected = false;
 
@@ -107,7 +106,7 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 //        String getPlanId = savePref.getString("planName", "");
 //
 //
-//        // Training training = new Training(ExerciseAdapter.exerciseName,0,0,20, ExerciseAdapter.exerciseImg, UserRegister.getTodayData(),false, 5.6f);
+//        // Training training = new Training(ExerciseAdapter.exerciseName,0,0,20, ExerciseAdapter.exerciseImg, UserRegister.getTodayDate(),false, 5.6f);
 //
 //        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).
 //                document(WorkoutAdapter.workoutDayName).collection(ExerciseAdapter.exerciseName)

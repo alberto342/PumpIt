@@ -2,14 +2,15 @@ package fitness.albert.com.pumpit.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -21,12 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.model.PrefsUtils;
 import fitness.albert.com.pumpit.model.UserRegister;
 import fitness.albert.com.pumpit.model.Workout;
 import fitness.albert.com.pumpit.model.WorkoutPlans;
-import fitness.albert.com.pumpit.R;
 
 public class CustomPlanActivity extends AppCompatActivity {
 
@@ -135,7 +136,7 @@ public class CustomPlanActivity extends AppCompatActivity {
 
 
         WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel,
-                routineType, dayType, routineDescription, UserRegister.getTodayData(), dayWeekPosition);
+                routineType, dayType, routineDescription, UserRegister.getTodayDate(), dayWeekPosition);
 
 
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)

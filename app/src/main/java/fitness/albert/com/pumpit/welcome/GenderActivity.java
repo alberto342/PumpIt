@@ -12,7 +12,7 @@ import fitness.albert.com.pumpit.model.PrefsUtils;
 
 public class GenderActivity extends AppCompatActivity {
 
-    PrefsUtils prefsUtils = new PrefsUtils();
+    private PrefsUtils prefsUtils = new PrefsUtils();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +37,11 @@ public class GenderActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.btn_female:
-                    boolean isMale = false;
-                    prefsUtils.saveData("is_male", isMale);
+                    prefsUtils.saveData("is_male", false);
                     nextActivity();
                     break;
-
                 case R.id.btn_male:
-                    isMale = true;
-                    prefsUtils.saveData("is_male", isMale);
+                    prefsUtils.saveData("is_male", true);
                     nextActivity();
                     break;
             }

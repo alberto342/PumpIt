@@ -3,23 +3,24 @@ package fitness.albert.com.pumpit.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 
 import java.util.List;
 import java.util.Locale;
 
-import fitness.albert.com.pumpit.model.FinishTraining;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.helper.BitmapFromAssent;
-import fitness.albert.com.pumpit.workout.ShowLogExercise;
+import fitness.albert.com.pumpit.model.FinishTraining;
+import fitness.albert.com.pumpit.workout.ShowLogExerciseActivity;
 
 public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -71,7 +72,7 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
             public void onClick(View v) {
 
 
-                Intent i = new Intent(mContext, ShowLogExercise.class);
+                Intent i = new Intent(mContext, ShowLogExerciseActivity.class);
                 i.putExtra("exerciseName", finishTrainingList.get(position).getExerciseName());
                 i.putExtra("trackerExercisesSize", finishTrainingList.get(position).getTrackerExercises().size());
 

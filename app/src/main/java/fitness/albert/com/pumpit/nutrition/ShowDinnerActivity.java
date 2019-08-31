@@ -313,7 +313,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
         progressdialog.show();
 
         db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(Foods.DINNER).document(UserRegister.getTodayData())
+                .collection(Foods.DINNER).document(UserRegister.getTodayDate())
                 .collection(Foods.All_NUTRITION)
                 .whereEqualTo("foodName", DinnerListAdapter.foodName)
                 .whereEqualTo("servingUnit", oldServingUnit)
@@ -327,7 +327,7 @@ public class ShowDinnerActivity extends AppCompatActivity  implements QuantityVi
                                 docId = document.getId();
                             }
                             DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                    .collection(Foods.DINNER).document(UserRegister.getTodayData())
+                                    .collection(Foods.DINNER).document(UserRegister.getTodayDate())
                                     .collection(Foods.All_NUTRITION).document(docId);
 
                             int qty = quantityViewCustom.getQuantity();

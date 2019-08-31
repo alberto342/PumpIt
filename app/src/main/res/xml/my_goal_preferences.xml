@@ -17,11 +17,6 @@
 <androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <EditTextPreference
-        app:key="goal"
-        app:title="goal"
-        app:useSimpleSummaryProvider="true" />
-
-    <EditTextPreference
         app:key="starting_weight"
         app:title="Starting Weight"
         app:useSimpleSummaryProvider="true" />

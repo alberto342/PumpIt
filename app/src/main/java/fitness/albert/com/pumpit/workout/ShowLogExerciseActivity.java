@@ -3,8 +3,6 @@ package fitness.albert.com.pumpit.workout;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,20 +11,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import fitness.albert.com.pumpit.model.FinishTraining;
-import fitness.albert.com.pumpit.model.FireBaseInit;
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.fragment.logsFragment.LogFragment;
+import fitness.albert.com.pumpit.model.FinishTraining;
+import fitness.albert.com.pumpit.model.FireBaseInit;
 
-public class ShowLogExercise extends AppCompatActivity implements View.OnClickListener {
+public class ShowLogExerciseActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final String TAG = "ShowLogExercise";
+    private final String TAG = "ShowLogExerciseActivity";
     private LinearLayout container;
     private TextView set, exerciseName;
     private EditText reps, weight;
@@ -126,7 +127,7 @@ public class ShowLogExercise extends AppCompatActivity implements View.OnClickLi
         });
 
 //         DocumentReference doc = db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-//                .collection(UserRegister.getTodayData()).document(docId[0]);
+//                .collection(UserRegister.getTodayDate()).document(docId[0]);
 
 
 

@@ -143,7 +143,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
 //        db.collection(Foods.NUTRITION)
 //                .document(getEmailRegister()).collection(Foods.BREAKFAST)
-//                .document(user.getTodayData()).collection(Foods.All_NUTRITION).document(id)
+//                .document(user.getTodayDate()).collection(Foods.All_NUTRITION).document(id)
 //                .get()
 //                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 //                    @Override
@@ -199,7 +199,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 
         db.collection(Foods.NUTRITION)
                 .document(getEmailRegister()).collection(Foods.BREAKFAST)
-                .document(user.getTodayData()).collection(Foods.All_NUTRITION)
+                .document(user.getTodayDate()).collection(Foods.All_NUTRITION)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

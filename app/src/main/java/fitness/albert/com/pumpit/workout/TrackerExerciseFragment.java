@@ -112,17 +112,10 @@ public class TrackerExerciseFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
         Log.i(TAG, "onSaveInstanceState()");
 
         outState.putCharSequenceArrayList("KEY_ITEMS", trackerList);
     }
-
-
-
-
-
-
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
@@ -221,7 +214,7 @@ public class TrackerExerciseFragment extends Fragment {
 
         final Training training = new Training(ExerciseAdapter.exerciseName, trackerExerciseList, trackerList.size() / 2,
                 Integer.valueOf(setsRest.getText().toString()), Integer.valueOf(exerciseRest.getText().toString()),
-                ExerciseAdapter.exerciseImg, UserRegister.getTodayData(), ExerciseDetailActivity.isFavoriteSelected);
+                ExerciseAdapter.exerciseImg, UserRegister.getTodayDate(), ExerciseDetailActivity.isFavoriteSelected);
         if (activity1.equals("StartWorkoutActivity") && activity2.equals("ShowExerciseResultActivity")) {
             saveTrackerFromStartWorkout(getPlanId, training);
         } else {
@@ -303,12 +296,13 @@ public class TrackerExerciseFragment extends Fragment {
 
         prefsUtilsDefaultExercise.createSharedPreferencesFiles(getActivity(), PrefsUtils.DEFAULT_EXERCISE);
 
-        Workout workout = new Workout(UserRegister.getTodayData(), dayWorkout(), currentDayName(), 0, 0);
+        Workout workout = new Workout(UserRegister.getTodayDate(), dayWorkout(), currentDayName(), 0, 0);
         db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
                 .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).add(workout)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
+
                 prefsUtilsDefaultExercise.saveData("e_" + currentDayName(), documentReference.getId());
                 workoutNameExist = true;
                 Log.d(TAG, "onSuccess:  Create Workout Day Name");

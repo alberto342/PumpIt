@@ -1,10 +1,12 @@
 package fitness.albert.com.pumpit.welcome;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -12,9 +14,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.model.Exercise;
 import fitness.albert.com.pumpit.model.PrefsUtils;
-import fitness.albert.com.pumpit.R;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -51,6 +53,7 @@ public class WelcomeActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("LongLogTag")
     private void readTxtFile() {
 
         final ProgressDialog progressdialog = new ProgressDialog(this);

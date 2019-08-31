@@ -22,7 +22,7 @@ import fitness.albert.com.pumpit.R;
 
 public class WeightActivity extends AppCompatActivity {
 
-   PrefsUtils prefsUtils = new PrefsUtils();
+    private PrefsUtils prefsUtils = new PrefsUtils();
     private NumberPicker pKg, pGram;
     private ImageView next;
 
@@ -39,14 +39,13 @@ public class WeightActivity extends AppCompatActivity {
     }
 
 
-
     private void valueChangedListener() {
         pKg.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 //Display the newly selected number from picker
 
-               // saveKg = newVal;
+                // saveKg = newVal;
             }
         });
 
@@ -82,27 +81,24 @@ public class WeightActivity extends AppCompatActivity {
 
     @SuppressLint("LongLogTag")
     public static void setNumberPickerTextColor(NumberPicker numberPicker, int color) {
-        try{
+        try {
             Field selectorWheelPaintField = numberPicker.getClass()
                     .getDeclaredField("mSelectorWheelPaint");
             selectorWheelPaintField.setAccessible(true);
-            ((Paint)selectorWheelPaintField.get(numberPicker)).setColor(color);
-        }
-        catch(NoSuchFieldException e){
+            ((Paint) selectorWheelPaintField.get(numberPicker)).setColor(color);
+        } catch (NoSuchFieldException e) {
             Log.w("setNumberPickerTextColor", e);
-        }
-        catch(IllegalAccessException e){
+        } catch (IllegalAccessException e) {
             Log.w("setNumberPickerTextColor", e);
-        }
-        catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             Log.w("setNumberPickerTextColor", e);
         }
 
         final int count = numberPicker.getChildCount();
-        for(int i = 0; i < count; i++){
+        for (int i = 0; i < count; i++) {
             View child = numberPicker.getChildAt(i);
-            if(child instanceof EditText)
-                ((EditText)child).setTextColor(color);
+            if (child instanceof EditText)
+                ((EditText) child).setTextColor(color);
         }
         numberPicker.invalidate();
     }
@@ -112,7 +108,7 @@ public class WeightActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 UserRegister user = new UserRegister();
-                prefsUtils.saveData("weight",user.customFloatNum(pKg.getValue(),pGram.getValue()));
+                prefsUtils.saveData("weight", user.customFloatNum(pKg.getValue(), pGram.getValue()));
                 startActivity(new Intent(WeightActivity.this, BodyFatActivity.class));
             }
         });

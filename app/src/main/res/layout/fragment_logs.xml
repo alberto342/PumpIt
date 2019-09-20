@@ -5,9 +5,9 @@
     android:id="@+id/logs_relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.logsFragment.LogFragment">
+    tools:context="com.albert.fitness.pumpit.fragment.logsFragment.LogFragment">
 
-    <fitness.albert.com.pumpit.helper.CalenderEvent
+    <com.albert.fitness.pumpit.helper.CalenderEvent
         android:id="@+id/calender_event"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".fragment.logsFragment.LogTabActivity">
+    tools:context="com.albert.fitness.pumpit.fragment.logsFragment.LogTabActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tablayout_logs"
@@ -38,7 +38,7 @@
             android:text="Workout" />
     </com.google.android.material.tabs.TabLayout>
 
-    <fitness.albert.com.pumpit.helper.NonSwipeableViewPager
+    <com.albert.fitness.pumpit.helper.NonSwipeableViewPager
         android:id="@+id/vp_logs"
         android:layout_width="0dp"
         android:layout_height="0dp"

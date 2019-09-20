@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    tools:context=".fragment.FindWorkoutFragment">
+    tools:context="com.albert.fitness.pumpit.fragment.FindWorkoutFragment">
 
 
     <com.google.android.material.tabs.TabLayout
@@ -37,7 +37,7 @@
     </com.google.android.material.tabs.TabLayout>
 
 
-    <fitness.albert.com.pumpit.helper.NonSwipeableViewPager
+    <com.albert.fitness.pumpit.helper.NonSwipeableViewPager
         android:id="@+id/view_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"

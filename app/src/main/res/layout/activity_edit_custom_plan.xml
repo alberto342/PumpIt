@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="horizontal"
-    tools:context=".workout.EditCustomPlanActivity">
+    tools:context="com.albert.fitness.pumpit.workout.EditCustomPlanActivity">
 
     <ScrollView
         android:layout_width="match_parent"

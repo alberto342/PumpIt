@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    tools:context=".workout.AddExerciseActivity">
+    tools:context="com.albert.fitness.pumpit.workout.AddExerciseActivity">
 
     <ImageView
         android:id="@+id/btn_front"

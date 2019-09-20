@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.logsFragment.LogWorkoutFragment">
+    tools:context="com.albert.fitness.pumpit.fragment.logsFragment.LogWorkoutFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_log_workout"

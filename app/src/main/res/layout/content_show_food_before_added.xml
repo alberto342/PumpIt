@@ -7,7 +7,7 @@
     android:background="@color/background"
     android:scrollbars="none"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".nutrition.ShowBreakfastActivity">
+    tools:context="com.albert.fitness.pumpit.nutrition.ShowBreakfastActivity">
 
 
     <LinearLayout

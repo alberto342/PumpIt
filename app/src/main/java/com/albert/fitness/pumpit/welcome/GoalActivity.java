@@ -7,16 +7,13 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.albert.fitness.pumpit.LoginActivity;
-import com.albert.fitness.pumpit.fragment.FragmentNavigationActivity;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 
 import fitness.albert.com.pumpit.R;
 
-import com.albert.fitness.pumpit.model.PrefsUtils;
-
 public class GoalActivity extends AppCompatActivity {
 
-    private PrefsUtils prefsUtils = new PrefsUtils();
+    private PrefsUtils prefsUtils;
 
     private ImageView loseWeight;
     private ImageView getFitter;
@@ -28,22 +25,10 @@ public class GoalActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goal);
-
         getSupportActionBar().hide();
-     //   FirebaseAuth auth = FirebaseAuth.getInstance();
-        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
 
-        boolean isUserExist = prefsUtils.getBoolean("isUser", false);
+        prefsUtils = new PrefsUtils(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
 
-        if(isUserExist) {
-            startActivity(new Intent(this, FragmentNavigationActivity.class));
-            finish();
-        }
-
-//        if (auth.getCurrentUser() != null) {
-//            startActivity(new Intent(this, FragmentNavigationActivity.class));
-//            finish();
-//        }
         findViews();
         setOnClickListener();
     }
@@ -85,7 +70,6 @@ public class GoalActivity extends AppCompatActivity {
                         break;
 
                     case R.id.btn_sign_in:
-                        signInActivity();
                         break;
                 }
             }
@@ -96,7 +80,5 @@ public class GoalActivity extends AppCompatActivity {
     }
 
 
-    private void signInActivity() {
-        startActivity(new Intent(this, LoginActivity.class));
-    }
+
 }

@@ -1,35 +1,65 @@
 package com.albert.fitness.pumpit.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
 
+import static androidx.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "training_table", foreignKeys = @ForeignKey(entity = WorkoutObj.class,
+        parentColumns = "workout_id", childColumns = "workout_id", onDelete = CASCADE))
 public class Training {
-
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "training_id")
+    private int trainingId;
+    @ColumnInfo(name = "img_name")
     private String imgName;
+    @ColumnInfo(name = "exercise_name")
     private String exerciseName;
+    @ColumnInfo(name = "rest_between_set")
     private int restBetweenSet;
+    @ColumnInfo(name = "rest_after_exercise")
     private int restAfterExercise;
-    private boolean isFavorite;
     private String date;
+    @ColumnInfo(name = "size_of_rept")
     private int sizeOfRept;
-    private List<TrackerExercise> trackerExercises;
+//    @ColumnInfo(name = "tracker_exercises")
+//    private List<TrackerExercise> trackerExercises;
+    @ColumnInfo(name = "workout_id")
+    private int workoutId;
 
 
     public Training() {
     }
 
-    public Training(String exerciseName, List<TrackerExercise> trackerExercises, int sizeOfRept, int restBetweenSet, int restAfterExercise, String imgName, String date, boolean isFavorite) {
+    public Training(String imgName, String exerciseName, int restBetweenSet, int restAfterExercise, String date, int sizeOfRept, int workoutId) {
+        this.imgName = imgName;
+        this.exerciseName = exerciseName;
+        this.restBetweenSet = restBetweenSet;
+        this.restAfterExercise = restAfterExercise;
+        this.date = date;
+        this.sizeOfRept = sizeOfRept;
+      //  this.trackerExercises = trackerExercises;
+        this.workoutId = workoutId;
+    }
+
+    public Training(String exerciseName, int sizeOfRept, int restBetweenSet, int restAfterExercise, String imgName, String date) {
         this.exerciseName = exerciseName;
         this.restBetweenSet = restBetweenSet;
         this.restAfterExercise = restAfterExercise;
         this.imgName = imgName;
-        this.isFavorite = isFavorite;
         this.date = date;
         this.sizeOfRept = sizeOfRept;
-        this.trackerExercises = new ArrayList<>();
-        this.trackerExercises = trackerExercises;
     }
 
+    public int getWorkoutId() {
+        return workoutId;
+    }
+
+    public void setWorkoutId(int workoutId) {
+        this.workoutId = workoutId;
+    }
 
     public int getSizeOfRept() {
         return sizeOfRept;
@@ -37,14 +67,6 @@ public class Training {
 
     public void setSizeOfRept(int sizeOfRept) {
         this.sizeOfRept = sizeOfRept;
-    }
-
-    public List<TrackerExercise> getTrackerExercises() {
-        return trackerExercises;
-    }
-
-    public void setTrackerExercises(List<TrackerExercise> trackerExercises) {
-        this.trackerExercises = trackerExercises;
     }
 
     public int getRestAfterExercise() {
@@ -55,6 +77,13 @@ public class Training {
         this.restAfterExercise = restAfterExercise;
     }
 
+    public int getTrainingId() {
+        return trainingId;
+    }
+
+    public void setTrainingId(int trainingId) {
+        this.trainingId = trainingId;
+    }
 
     public String getDate() {
         return date;
@@ -62,14 +91,6 @@ public class Training {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public boolean isFavorite() {
-        return isFavorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        isFavorite = favorite;
     }
 
     public String getImgName() {

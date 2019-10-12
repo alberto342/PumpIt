@@ -2,8 +2,6 @@ package com.albert.fitness.pumpit.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,30 +10,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.albert.fitness.pumpit.model.FireBaseInit;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.albert.fitness.pumpit.model.WorkoutPlanObj;
+import com.albert.fitness.pumpit.workout.WorkoutActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.workout.WorkoutActivity;
 
 public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private final String TAG = "WorkoutPlanAdapter";
     private Context mContext;
-    private List<WorkoutPlans> plansList;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private List<WorkoutPlanObj> plansList;
     public static int posit;
 
-    public WorkoutPlanAdapter(Context mContext, List<WorkoutPlans> plansList) {
+    public WorkoutPlanAdapter(Context mContext, List<WorkoutPlanObj> plansList) {
         this.mContext = mContext;
         this.plansList = plansList;
     }
@@ -44,7 +36,7 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(mContext).inflate(R.layout.item_workout_plans, parent, false);
+        final View view = LayoutInflater.from(mContext).inflate(R.layout.item_list_workout_plans, parent, false);
         return new ViewHolder(view);
     }
 
@@ -73,8 +65,17 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 posit = position;
 
-                getWorkPlanId(position);
-                mContext.startActivity(new Intent(mContext, WorkoutActivity.class));
+                plansList.get(position).getPlanId();
+
+                Intent i = new Intent(mContext, WorkoutActivity.class);
+                i.putExtra("id", plansList.get(position).getPlanId());
+                i.putExtra("workoutSize", plansList.get(position).getDaysWeekPosition());
+                i.putExtra("routineName", plansList.get(position).getRoutineName());
+                i.putExtra("difficultyLevel", plansList.get(position).getDifficultyLevel());
+                mContext.startActivity(i);
+
+                //  getWorkPlanId(position);
+               // mContext.startActivity(new Intent(mContext, WorkoutActivity.class));
             }
         });
 
@@ -82,7 +83,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         switch (type) {
             case "General Fitness":
-
                 Picasso.get()
                         .load(R.mipmap.ic_general_fitness)
                         .placeholder(R.mipmap.ic_launcher)
@@ -114,32 +114,9 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
     //Get workoutName item id
-    private void getWorkPlanId(final int position) {
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-                .collection(WorkoutPlans.WORKOUT_NAME).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-
-                            //     fireId = task.getResult().getDocuments().get(position).getId();
-
-                            Log.d(TAG, "Documents: " + task.getResult().getDocuments() +
-                                    "\nFireId: " + task.getResult().getDocuments().get(position).getId());
-
-                            PrefsUtils prefsUtils = new PrefsUtils();
-                            prefsUtils.createSharedPreferencesFiles(mContext, "exercise");
-                            prefsUtils.saveData("planName", task.getResult().getDocuments().get(position).getId());
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-    }
+//   PrefsUtils prefsUtils = new PrefsUtils();
+//   prefsUtils.createSharedPreferencesFiles(mContext, "exercise");
+//   prefsUtils.saveData("planName", task.getResult().getDocuments().get(position).getId());
 
 
     @Override
@@ -148,7 +125,7 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
 
-    public List<WorkoutPlans> getData() {
+    public List<WorkoutPlanObj> getData() {
         return plansList;
     }
 

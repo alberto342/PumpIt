@@ -13,7 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
+import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 
 public class ExerciseDetailActivity extends AppCompatActivity implements View.OnClickListener {
 

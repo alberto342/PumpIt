@@ -19,7 +19,7 @@ import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import com.albert.fitness.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
+import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.R;
 
 public class ImgExerciseFragment extends Fragment {

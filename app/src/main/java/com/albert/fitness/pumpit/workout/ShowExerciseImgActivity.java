@@ -16,7 +16,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
+import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 
 public class ShowExerciseImgActivity extends AppCompatActivity {
 

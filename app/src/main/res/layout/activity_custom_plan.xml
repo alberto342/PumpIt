@@ -23,7 +23,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="8dp"
-            android:text="Build Custom Plan"
+            android:text="@string/build_custom_plan"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp"
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="60dp"
-            android:text="Routine Name"
+            android:text="@string/routine_name"
             android:textColor="@color/white"
             app:layout_constraintBottom_toTopOf="@+id/guideline89"
             app:layout_constraintStart_toStartOf="parent"
@@ -107,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
-            android:text="Difficulty Level"
+            android:text="@string/difficulty_level"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline91" />
@@ -135,7 +135,7 @@
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
             android:ems="10"
-            android:hint="(e.g Richard's Summer Exercise Plan)"
+            android:hint="@string/e_g_richard_s_summer_exercise_plan"
             android:inputType="textPersonName"
             android:singleLine="false"
             android:textAlignment="gravity"
@@ -145,7 +145,8 @@
             app:layout_constraintBottom_toTopOf="@+id/guideline90"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_routine_name" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_routine_name"
+            android:autofillHints="" />
 
 
         <TextView
@@ -154,7 +155,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
-            android:text="Days/Week"
+            android:text="@string/days_week"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline90" />
@@ -180,7 +181,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
-            android:text="Day Type"
+            android:text="@string/day_type"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline92" />
@@ -207,7 +208,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
-            android:text="Routine Type"
+            android:text="@string/routine_type"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinner_difficulty_level" />
@@ -233,7 +234,7 @@
             android:layout_height="0dp"
             android:layout_marginStart="15dp"
             android:layout_marginTop="8dp"
-            android:text="Routine Description:"
+            android:text="@string/routine_description"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline95" />
@@ -247,7 +248,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="5dp"
             android:ems="10"
-            android:hint="Enter a description..."
+            android:hint="@string/enter_a_description"
             android:inputType="textPersonName"
             android:selectAllOnFocus="false"
             android:singleLine="true"
@@ -259,7 +260,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_routine_description"
-            tools:ignore="MissingConstraints" />
+            tools:ignore="MissingConstraints"
+            android:autofillHints="" />
 
 
         <ImageView
@@ -270,7 +272,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@mipmap/btn_create_workout" />
+            app:srcCompat="@mipmap/btn_create_workout"
+            android:contentDescription="TODO" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

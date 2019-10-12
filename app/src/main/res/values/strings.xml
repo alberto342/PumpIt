@@ -11,8 +11,6 @@
 
     <string name="foodName">Food name</string>
 
-    <string name="sign_up">sign up</string>
-
 
     <string name="general_fitness">General Fitness</string>
     <string name="bulking">Bulking</string>
@@ -174,6 +172,18 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
     <string name="key_email_address">email address</string>
+    <string name="weight">Weight</string>
+    <string name="sign_up">sign up</string>
+    <string name="your_full_name">Your Full Name</string>
+    <string name="build_custom_plan">Build Custom Plan</string>
+    <string name="routine_name">Routine Name</string>
+    <string name="difficulty_level">Difficulty Level</string>
+    <string name="e_g_richard_s_summer_exercise_plan">(e.g Richard\'s Summer Exercise Plan)</string>
+    <string name="days_week">Days/Week</string>
+    <string name="day_type">Day Type</string>
+    <string name="routine_type">Routine Type</string>
+    <string name="routine_description">Routine Description:</string>
+    <string name="enter_a_description">Enter a description...</string>
 
 
 </resources>

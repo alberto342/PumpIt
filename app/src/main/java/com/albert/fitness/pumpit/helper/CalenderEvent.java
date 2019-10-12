@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import com.albert.fitness.pumpit.model.DayContainerModel;
+import com.albert.fitness.pumpit.model.DayContainer;
 import com.albert.fitness.pumpit.model.Event;
 import fitness.albert.com.pumpit.R;
 
@@ -60,7 +60,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
 
     private Context mContext;
 
-    private List<DayContainerModel> dayContainerList;
+    private List<DayContainer> dayContainerList;
 
     private String mToday;
 
@@ -232,7 +232,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
                 days[index].setText(String.valueOf(prevCurrentDay));
                 days[index].setTextColor(mOffMonthDayColor);
 
-                final DayContainerModel model = new DayContainerModel();
+                final DayContainer model = new DayContainer();
                 model.setIndex(index);
                 model.setYear(prevYear);
                 model.setMonthNumber(prevMonth);
@@ -298,7 +298,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
             days[index].setText(String.valueOf(i));
             days[index].setTextColor(mCurrentMonthDayColor);
 
-            final DayContainerModel model = new DayContainerModel();
+            final DayContainer model = new DayContainer();
             model.setIndex(index);
             model.setYear(selectedYear);
             model.setMonthNumber(selectedMonth);
@@ -389,7 +389,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
             days[index].setText(String.valueOf(i));
             days[index].setTextColor(mOffMonthDayColor);
 
-            final DayContainerModel model = new DayContainerModel();
+            final DayContainer model = new DayContainer();
             model.setIndex(index);
             model.setYear(nextYear);
             model.setMonthNumber(nextMonth);
@@ -570,8 +570,8 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
         return buttonParams;
     }
 
-    private DayContainerModel getDaysContainerModel(String date) {
-        for (DayContainerModel model : dayContainerList) {
+    private DayContainer getDaysContainerModel(String date) {
+        for (DayContainer model : dayContainerList) {
             if (model.getDate().equals(date)) {
                 return model;
             }
@@ -608,7 +608,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
         preferenceHelper.write(textKey, event.getEventText());
         preferenceHelper.write(colorKey, event.getEventColor());
 
-        DayContainerModel model = getDaysContainerModel(date);
+        DayContainer model = getDaysContainerModel(date);
         if (model != null) {
             model.setHaveEvent(true);
             model.setEvent(event);
@@ -623,7 +623,7 @@ public class CalenderEvent extends LinearLayout implements View.OnClickListener 
         preferenceHelper.remove(textKey);
         preferenceHelper.remove(colorKey);
 
-        DayContainerModel model = getDaysContainerModel(date);
+        DayContainer model = getDaysContainerModel(date);
         if (model != null) {
             model.setHaveEvent(false);
             model.setEvent(null);

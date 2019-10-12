@@ -1,7 +1,6 @@
 package com.albert.fitness.pumpit.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,15 +11,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.albert.fitness.pumpit.helper.BitmapFromAssent;
+import com.albert.fitness.pumpit.model.FinishTraining;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
-import java.util.Locale;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.helper.BitmapFromAssent;
-import com.albert.fitness.pumpit.model.FinishTraining;
-import com.albert.fitness.pumpit.workout.ShowLogExerciseActivity;
 
 public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -60,30 +57,30 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         holder.exerciseName.setText(finishTrainingList.get(position).getExerciseName());
 
-        for(int i=0; i<finishTrainingList.get(position).getTrackerExercises().size(); i++) {
-            int repNumber =  finishTrainingList.get(position).getTrackerExercises().get(i).getRepNumber();
-            float weight = finishTrainingList.get(position).getTrackerExercises().get(i).getWeight();
-
-            holder.setNum.setText(String.format(Locale.US, "Set %d: %.2f x %d", i+1,weight,repNumber));
-        }
+//        for(int i=0; i<finishTrainingList.get(position).getTrackerExercises().size(); i++) {
+//            int repNumber =  finishTrainingList.get(position).getTrackerExercises().get(i).getRepNumber();
+//            float weight = finishTrainingList.get(position).getTrackerExercises().get(i).getWeight();
+//
+//            holder.setNum.setText(String.format(Locale.US, "Set %d: %.2f x %d", i+1,weight,repNumber));
+//        }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-                Intent i = new Intent(mContext, ShowLogExerciseActivity.class);
-                i.putExtra("exerciseName", finishTrainingList.get(position).getExerciseName());
-                i.putExtra("trackerExercisesSize", finishTrainingList.get(position).getTrackerExercises().size());
-
-                for(int p=0; p<finishTrainingList.get(position).getTrackerExercises().size(); p++) {
-                    int repNumber =  finishTrainingList.get(position).getTrackerExercises().get(p).getRepNumber();
-                    float weight = finishTrainingList.get(position).getTrackerExercises().get(p).getWeight();
-
-                    i.putExtra("repNumber" + p, repNumber);
-                    i.putExtra("weight" + p, weight);
-                }
-                mContext.startActivity(i);
+//                Intent i = new Intent(mContext, ShowLogExerciseActivity.class);
+//                i.putExtra("exerciseName", finishTrainingList.get(position).getExerciseName());
+//                i.putExtra("trackerExercisesSize", finishTrainingList.get(position).getTrackerExercises().size());
+//
+//                for(int p=0; p<finishTrainingList.get(position).getTrackerExercises().size(); p++) {
+//                    int repNumber =  finishTrainingList.get(position).getTrackerExercises().get(p).getRepNumber();
+//                    float weight = finishTrainingList.get(position).getTrackerExercises().get(p).getWeight();
+//
+//                    i.putExtra("repNumber" + p, repNumber);
+//                    i.putExtra("weight" + p, weight);
+//                }
+//                mContext.startActivity(i);
             }
         });
 

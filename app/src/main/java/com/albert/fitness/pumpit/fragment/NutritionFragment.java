@@ -43,9 +43,9 @@ import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import fitness.albert.com.pumpit.R;
 import com.albert.fitness.pumpit.model.FinishTraining;
-import com.albert.fitness.pumpit.model.FireBaseInit;
-import com.albert.fitness.pumpit.model.Foods;
-import com.albert.fitness.pumpit.model.PrefsUtils;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity;
 

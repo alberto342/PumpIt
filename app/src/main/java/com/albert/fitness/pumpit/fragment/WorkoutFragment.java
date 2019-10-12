@@ -2,7 +2,6 @@ package com.albert.fitness.pumpit.fragment;
 
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -19,8 +18,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.model.Event;
 import com.albert.fitness.pumpit.model.UserRegister;
+import com.albert.fitness.pumpit.model.Workout;
+import com.albert.fitness.pumpit.model.WorkoutPlans;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.workout.CustomPlanActivity;
+import com.albert.fitness.pumpit.workout.FindWorkoutActivity;
+import com.albert.fitness.pumpit.workout.StartWorkoutActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,13 +35,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.Workout;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
-import com.albert.fitness.pumpit.workout.CustomPlanActivity;
-import com.albert.fitness.pumpit.workout.FindWorkoutActivity;
-import com.albert.fitness.pumpit.workout.StartWorkoutActivity;
 
 
 public class WorkoutFragment extends Fragment implements View.OnClickListener {
@@ -45,8 +44,8 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView tvExerciseName, tvWorkoutComplete, tvEmptyExercise;
     private ImageView btnAdd, ivFindWorkout, btnStartWorkout;
-    private PrefsUtils prefsUtils = new PrefsUtils();
-    private int exComplete =0;
+    private PrefsUtils prefsUtils;
+    private int exComplete = 0;
 
     public WorkoutFragment() {
     }
@@ -65,19 +64,19 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
         setToolBar();
         init(view);
-        prefsUtils.createSharedPreferencesFiles(getActivity(), PrefsUtils.EXERCISE);
+        prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.EXERCISE);
         checkIfDateIsChange();
 
         ivFindWorkout.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
         btnStartWorkout.setOnClickListener(this);
-        loadExerciseFromFb();
+       // loadExerciseFromFb();
     }
 
     private void checkIfDateIsChange() {
         String todayData = prefsUtils.getString("today_date", "");
 
-        if(!todayData.equals(UserRegister.getTodayDate())) {
+        if (!todayData.equals(UserRegister.getTodayDate())) {
             prefsUtils.saveData("exercise_complete", 0);
         }
     }
@@ -98,7 +97,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        loadExerciseFromFb();
+      //  loadExerciseFromFb();
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
@@ -134,32 +133,32 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    private void loadExerciseFromFb() {
-        final ProgressDialog progressdialog = new ProgressDialog(getContext());
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-                .collection(WorkoutPlans.WORKOUT_NAME).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        progressdialog.hide();
-
-                        if (task.isSuccessful() && !task.getResult().getDocuments().isEmpty()) {
-                            exerciseExist = task.getResult().getDocuments().size() > 0;
-                            haveExercise(exerciseExist);
-                            progressdialog.hide();
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "onFailure: " + e);
-                    }
-                });
-    }
+//    private void loadExerciseFromFb() {
+//        final ProgressDialog progressdialog = new ProgressDialog(getContext());
+//        progressdialog.setMessage("Please Wait....");
+//        progressdialog.show();
+//
+//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+//                .collection(WorkoutPlans.WORKOUT_NAME).get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        progressdialog.hide();
+//
+//                        if (task.isSuccessful() && !task.getResult().getDocuments().isEmpty()) {
+//                            exerciseExist = task.getResult().getDocuments().size() > 0;
+//                            haveExercise(exerciseExist);
+//                            progressdialog.hide();
+//                        }
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.w(TAG, "onFailure: " + e);
+//                    }
+//                });
+//    }
 
 
     //check if have default plan
@@ -207,9 +206,9 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if(task.isSuccessful() && task.getResult() != null) {
+                            if (task.isSuccessful() && task.getResult() != null) {
 
-                                for(int i=0 ; i< task.getResult().size(); i++) {
+                                for (int i = 0; i < task.getResult().size(); i++) {
                                     String id = task.getResult().getDocuments().get(i).getId();
                                     Log.d(TAG, "onComplete get id of exercise: " + id);
 
@@ -221,8 +220,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
                                                 @SuppressLint("SetTextI18n")
                                                 @Override
                                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                                    if(!queryDocumentSnapshots.isEmpty()) {
-
+                                                    if (!queryDocumentSnapshots.isEmpty()) {
                                                         int sizeOfExercise = queryDocumentSnapshots.getDocuments().size();
                                                         tvWorkoutComplete.setText(exComplete + "/" + sizeOfExercise + " Workout complete");
                                                     }

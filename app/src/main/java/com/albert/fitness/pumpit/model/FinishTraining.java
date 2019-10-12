@@ -1,7 +1,5 @@
 package com.albert.fitness.pumpit.model;
 
-import java.util.List;
-
 public class FinishTraining extends Training{
 
     public static final String TRAINING_LOG = "trainingLog";
@@ -19,13 +17,13 @@ public class FinishTraining extends Training{
         this.exerciseComplete = exerciseComplete;
     }
 
-    public FinishTraining(String exerciseName, List<TrackerExercise> trackerExercises, int sizeOfRept,
-                          int restBetweenSet, int restAfterExercise, String imgName, String date,
-                          boolean isFavorite, String chrTotalTraining, int caloriesBurned) {
-        super(exerciseName, trackerExercises, sizeOfRept, restBetweenSet, restAfterExercise, imgName, date, isFavorite);
-        this.chrTotalTraining = chrTotalTraining;
-        this.caloriesBurned = caloriesBurned;
-    }
+//    public FinishTraining(String exerciseName, List<TrackerExercise> trackerExercises, int sizeOfRept,
+//                          int restBetweenSet, int restAfterExercise, String imgName, String date,
+//                          boolean isFavorite, String chrTotalTraining, int caloriesBurned) {
+//        super(exerciseName, trackerExercises, sizeOfRept, restBetweenSet, restAfterExercise, imgName, date, isFavorite);
+//        this.chrTotalTraining = chrTotalTraining;
+//        this.caloriesBurned = caloriesBurned;
+//    }
 
     public int getCaloriesBurned() {
         return caloriesBurned;

@@ -69,9 +69,6 @@
             android:name="com.albert.fitness.pumpit.welcome.GoalActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.albert.fitness.pumpit.LoginActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="com.albert.fitness.pumpit.workout.AddExerciseActivity"
             android:screenOrientation="portrait" />
         <activity

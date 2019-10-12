@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,9 +42,9 @@ import java.util.Objects;
 import fitness.albert.com.pumpit.R;
 import com.albert.fitness.pumpit.adapter.FoodListAdapter;
 import com.albert.fitness.pumpit.adapter.LunchListAdapter;
-import com.albert.fitness.pumpit.model.Foods;
-import com.albert.fitness.pumpit.model.FullNutrients;
-import com.albert.fitness.pumpit.model.Tags;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.model.nutrition.FullNutrients;
+import com.albert.fitness.pumpit.model.nutrition.Tags;
 
 import me.himanshusoni.quantityview.QuantityView;
 

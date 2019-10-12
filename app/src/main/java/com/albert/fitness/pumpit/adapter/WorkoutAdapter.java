@@ -2,20 +2,21 @@ package com.albert.fitness.pumpit.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.albert.fitness.pumpit.model.Workout;
 import com.albert.fitness.pumpit.workout.TrainingActivity;
 
 import java.util.List;
 import java.util.Locale;
 
-import com.albert.fitness.pumpit.model.Workout;
 import fitness.albert.com.pumpit.R;
 
 public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -56,7 +57,6 @@ public class WorkoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
        // double sec = sLengthTraining %1  * 60;
 
         int min =  (int) sLengthTraining; // 9 / 10
-
 
         holder.tvDay.setText(workoutList.get(position).getWorkoutDay());
         holder.tvDate.setText(workoutList.get(position).getDate());

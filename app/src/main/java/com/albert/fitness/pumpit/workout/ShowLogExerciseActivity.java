@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.albert.fitness.pumpit.fragment.logsFragment.LogFragment;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;

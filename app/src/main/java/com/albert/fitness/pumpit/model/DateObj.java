@@ -1,6 +1,7 @@
 package com.albert.fitness.pumpit.model;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "date_table")
@@ -8,10 +9,9 @@ public class DateObj {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-
-
     private String date;
 
+    @Ignore
     public DateObj() {
     }
 

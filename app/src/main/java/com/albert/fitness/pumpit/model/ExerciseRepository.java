@@ -9,10 +9,11 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class ExerciseRepository {
-    private ExerciseObjDAO exerciseObjDAO;
+    private ExerciseDAO exerciseObjDAO;
     private ExerciseCategoryDAO exerciseCategoryDAO;
+    private ExerciseSecondaryCategoryDAO secondaryCategoryDAO;
     private LiveData<List<ExerciseCategory>> exerciseCategory;
-    private LiveData<List<ExerciseObj>> exercise;
+    private LiveData<List<Exercise>> exercise;
     private Executor executor;
 
     public ExerciseRepository(Application application) {
@@ -26,7 +27,15 @@ public class ExerciseRepository {
         return exerciseCategoryDAO.getAllCategory();
     }
 
-    public LiveData<List<ExerciseObj>> getBooks(int categoryId) {
+    public LiveData<List<ExerciseSecondaryCategory>> getSecondaryCategories() {
+        return secondaryCategoryDAO.getAllSecondaryCategory();
+    }
+
+    public LiveData<List<Exercise>> getExercise(int categoryId) {
         return exerciseObjDAO.getExercise(categoryId);
+    }
+
+    public LiveData<List<Exercise>> getExerciseBySecondaryCategory(int categoryId) {
+        return  exerciseObjDAO.getExerciseBySecondaryCategory(categoryId);
     }
 }

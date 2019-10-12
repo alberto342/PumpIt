@@ -21,14 +21,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.albert.fitness.pumpit.LoginActivity;
+import com.albert.fitness.pumpit.welcome.WelcomeActivity;
+import com.albert.fitness.pumpit.workout.CustomPlanActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.workout.CustomPlanActivity;
 
 public class SettingsActivity extends AppCompatActivity implements
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback, Preference.OnPreferenceClickListener {
@@ -305,7 +305,7 @@ public class SettingsActivity extends AppCompatActivity implements
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(getActivity(), LoginActivity.class));
+            startActivity(new Intent(getActivity(), WelcomeActivity.class));
             getActivity().finish();
         }
     }

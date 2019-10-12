@@ -8,10 +8,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+
 import java.util.Objects;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.model.PrefsUtils;
 
 public class AddExerciseActivity extends AppCompatActivity implements View.OnClickListener {
 

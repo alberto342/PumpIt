@@ -5,14 +5,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.model.CustomExerciseName;
 import com.albert.fitness.pumpit.workout.ExerciseDetailActivity;
@@ -36,7 +37,7 @@ public class CustomExerciseAdapter extends RecyclerView.Adapter<CustomExerciseAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.item_custom_exercise, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.item_list_custom_exercise, parent, false);
         return new ViewHolder(v);
     }
 

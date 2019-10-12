@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,8 +35,8 @@ import java.util.Objects;
 import com.albert.fitness.pumpit.adapter.DinnerListAdapter;
 import com.albert.fitness.pumpit.adapter.LunchListAdapter;
 import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
-import com.albert.fitness.pumpit.model.Foods;
-import com.albert.fitness.pumpit.model.SwipeHelper;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.utils.SwipeHelper;
 
 import fitness.albert.com.pumpit.R;
 

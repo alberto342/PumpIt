@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.albert.fitness.pumpit.adapter.FinishWorkoutAdapter;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.albert.fitness.pumpit.model.FinishTraining;
-import com.albert.fitness.pumpit.model.SwipeHelper;
+import com.albert.fitness.pumpit.utils.SwipeHelper;
 import fitness.albert.com.pumpit.R;
 
 /**

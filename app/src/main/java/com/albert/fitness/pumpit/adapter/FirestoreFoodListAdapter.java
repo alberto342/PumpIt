@@ -30,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import com.albert.fitness.pumpit.model.Foods;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
 import fitness.albert.com.pumpit.R;
 
 public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -57,7 +57,7 @@ public class FirestoreFoodListAdapter extends RecyclerView.Adapter<RecyclerView.
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(mContext).inflate(R.layout.item_food_nutrition, parent, false);
+        final View view = LayoutInflater.from(mContext).inflate(R.layout.item_list_food_nutrition, parent, false);
         return new ViewHolder(view);
     }
 

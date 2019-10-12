@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.albert.fitness.pumpit.listener.CalenderDayClickListener;
 import com.albert.fitness.pumpit.listener.OnMonthChangedListener;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,10 +35,10 @@ import java.util.Objects;
 
 import fitness.albert.com.pumpit.R;
 import com.albert.fitness.pumpit.helper.CalenderEvent;
-import com.albert.fitness.pumpit.model.DayContainerModel;
+import com.albert.fitness.pumpit.model.DayContainer;
 import com.albert.fitness.pumpit.model.Event;
 import com.albert.fitness.pumpit.model.FinishTraining;
-import com.albert.fitness.pumpit.model.Foods;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -99,7 +99,7 @@ public class LogFragment extends Fragment {
     private void calenderOnClick() {
         calenderEvent.initCalderItemClickCallback(new CalenderDayClickListener() {
             @Override
-            public void onGetDay(DayContainerModel dayContainerModel) {
+            public void onGetDay(DayContainer dayContainerModel) {
 
                 String monthFromNum = monthAdded(dayContainerModel.getMonthNumber());
 

@@ -20,7 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,10 +39,10 @@ import fitness.albert.com.pumpit.R;
 import com.albert.fitness.pumpit.adapter.FoodListAdapter;
 import com.albert.fitness.pumpit.model.CalenderEvent;
 import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.model.Foods;
-import com.albert.fitness.pumpit.model.FullNutrients;
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.Tags;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.model.nutrition.FullNutrients;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.model.nutrition.Tags;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;

@@ -13,7 +13,14 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.adapter.TrainingAdapter;
+import com.albert.fitness.pumpit.adapter.WorkoutAdapter;
+import com.albert.fitness.pumpit.model.TrackerExercise;
+import com.albert.fitness.pumpit.model.Training;
+import com.albert.fitness.pumpit.model.Workout;
+import com.albert.fitness.pumpit.model.WorkoutPlans;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -26,13 +33,6 @@ import java.util.Collections;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.TrainingAdapter;
-import com.albert.fitness.pumpit.adapter.WorkoutAdapter;
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.TrackerExercise;
-import com.albert.fitness.pumpit.model.Training;
-import com.albert.fitness.pumpit.model.Workout;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
 
 public class TrainingActivity extends AppCompatActivity {
 

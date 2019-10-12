@@ -4,10 +4,6 @@ package com.albert.fitness.pumpit.workout;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,8 +13,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.albert.fitness.pumpit.adapter.WorkoutPlanAdapter;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.model.Workout;
+import com.albert.fitness.pumpit.model.WorkoutPlans;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,9 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.Workout;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
 import fitness.albert.com.pumpit.R;
 import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
 
@@ -68,7 +68,7 @@ public class MyPlansFragment extends Fragment
         setHasOptionsMenu(true);
         getPlanFormFb();
 
-        initRecyclerView();
+      //  initRecyclerView();
 
       //  setupSwipeMenu();
 
@@ -123,7 +123,7 @@ public class MyPlansFragment extends Fragment
                 new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
                     @Override
                     public void onClick(int pos) {
-                        deleteItem(pos);
+                     //   deleteItem(pos);
                         deleteFromFirebase(pos);
                     }
                 }
@@ -150,13 +150,13 @@ public class MyPlansFragment extends Fragment
     }
 
 
-    private void deleteItem(final int position) {
-        workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
-        workoutPlansList.remove(position);
-        mRecyclerView.removeViewAt(position);
-        workoutAdapter.notifyItemRemoved(position);
-        workoutAdapter.notifyItemRangeChanged(position, workoutPlansList.size());
-    }
+//    private void deleteItem(final int position) {
+//        workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
+//        workoutPlansList.remove(position);
+//        mRecyclerView.removeViewAt(position);
+//        workoutAdapter.notifyItemRemoved(position);
+//        workoutAdapter.notifyItemRangeChanged(position, workoutPlansList.size());
+//    }
 
 
     private void deleteFromFirebase(final int position) {
@@ -231,7 +231,7 @@ public class MyPlansFragment extends Fragment
                                 assert workoutPlans != null;
                                 planName = workoutPlans.getRoutineName();
 
-                                initRecyclerView();
+                             //   initRecyclerView();
                             }
 
                             if(workoutPlansList.size() == 1) {
@@ -258,14 +258,14 @@ public class MyPlansFragment extends Fragment
     }
 
 
-    private void initRecyclerView() {
-        // RecyclerView view;
-        Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + mRecyclerView);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
-
-        workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
-        mRecyclerView.setAdapter(workoutAdapter);
-    }
+//    private void initRecyclerView() {
+//        // RecyclerView view;
+//        Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + mRecyclerView);
+//
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+//        mRecyclerView.setLayoutManager(layoutManager);
+//
+//        workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
+//        mRecyclerView.setAdapter(workoutAdapter);
+//    }
 }

@@ -1,7 +1,7 @@
 package com.albert.fitness.pumpit.api;
 
-import com.albert.fitness.pumpit.model.CommonListResponse;
-import com.albert.fitness.pumpit.model.FoodListResponse;
+import com.albert.fitness.pumpit.model.nutrition.CommonListResponse;
+import com.albert.fitness.pumpit.model.nutrition.FoodListResponse;
 import com.albert.fitness.pumpit.retro_request.FoodRequest;
 import com.albert.fitness.pumpit.utils.Global;
 

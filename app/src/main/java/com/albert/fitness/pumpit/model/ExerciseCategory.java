@@ -14,17 +14,11 @@ public class ExerciseCategory {
     @ColumnInfo(name = "category_name")
     private String categoryName;
 
-    @ColumnInfo(name = "secondary_category")
-    private String secondaryCategory;
-
-
     public ExerciseCategory() {
     }
 
-    public ExerciseCategory(int id, String categoryName, String secondaryCategory) {
-        this.id = id;
+    public ExerciseCategory(String categoryName) {
         this.categoryName = categoryName;
-        this.secondaryCategory = secondaryCategory;
     }
 
     public int getId() {
@@ -43,13 +37,6 @@ public class ExerciseCategory {
         this.categoryName = categoryName;
     }
 
-    public String getSecondaryCategory() {
-        return secondaryCategory;
-    }
-
-    public void setSecondaryCategory(String secondaryCategory) {
-        this.secondaryCategory = secondaryCategory;
-    }
 
     @Override
     public String toString() {

@@ -24,7 +24,15 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.adapter.TrainingAdapter;
+import com.albert.fitness.pumpit.helper.SimpleItemTouchHelperCallback;
+import com.albert.fitness.pumpit.model.TrackerExercise;
+import com.albert.fitness.pumpit.model.Training;
+import com.albert.fitness.pumpit.model.Workout;
+import com.albert.fitness.pumpit.model.WorkoutPlans;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.utils.SwipeHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -37,14 +45,6 @@ import java.util.Date;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.TrainingAdapter;
-import com.albert.fitness.pumpit.helper.SimpleItemTouchHelperCallback;
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.SwipeHelper;
-import com.albert.fitness.pumpit.model.TrackerExercise;
-import com.albert.fitness.pumpit.model.Training;
-import com.albert.fitness.pumpit.model.Workout;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
 
 public class StartWorkoutActivity extends AppCompatActivity {
 
@@ -346,8 +346,8 @@ public class StartWorkoutActivity extends AppCompatActivity {
         EditText etWeight = view.findViewById(R.id.et_weight);
         EditText etReps = view.findViewById(R.id.et_reps);
 
-        etWeight.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getWeight()));
-        etReps.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getRepNumber()));
+//        etWeight.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getWeight()));
+//        etReps.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getRepNumber()));
     }
 
 

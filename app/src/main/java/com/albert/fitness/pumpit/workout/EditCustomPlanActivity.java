@@ -28,7 +28,7 @@ import java.util.List;
 
 import fitness.albert.com.pumpit.R;
 import com.albert.fitness.pumpit.fragment.PlanFragment;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.model.WorkoutPlans;
 
 public class EditCustomPlanActivity extends AppCompatActivity implements View.OnClickListener {

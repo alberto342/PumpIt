@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.albert.fitness.pumpit.fragment.FragmentNavigationActivity;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.nightonke.jellytogglebutton.JellyToggleButton;
 
 import java.lang.reflect.Field;
@@ -33,15 +34,13 @@ import java.util.regex.Pattern;
 
 import fitness.albert.com.pumpit.R;
 
-import com.albert.fitness.pumpit.model.PrefsUtils;
-
 @SuppressLint("Registered")
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     public static String TAG = "RegisterActivity";
     private EditText inputEmail, inputName;
     private ProgressBar progressBar;
-    private Boolean isMale;
+    private Boolean isMale = true;
     private Button btnSignUp, btnDateOfBirth, btnHeight, btnWeight;
     private JellyToggleButton switchIsMale;
     private TextView tvDate, tvHeight, tvWeight;
@@ -88,7 +87,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     public boolean isEmpty() {
         progressBar.setVisibility(View.GONE);
-
         if (inputEmail.getText().toString().isEmpty()) {
             errorMessage(inputEmail, "Enter email address");
             return false;
@@ -240,7 +238,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View v) {
                 tvWeight.setText(pKg.getValue() + "." + pGram.getValue() + " kg");
-                prefsUtils.saveData("weight", pKg.getValue() + "." + pGram.getValue());
+                prefsUtils.saveData("weight", Float.valueOf(pKg.getValue() + "." + pGram.getValue()));
                 dialog.dismiss();
             }
         });
@@ -268,8 +266,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void setBtnSignUp() {
-       progressBar.setVisibility(View.VISIBLE);
-       btnSignUp.setText("");
+        progressBar.setVisibility(View.VISIBLE);
+        btnSignUp.setText("");
         if (!isEmailValid(inputEmail.getText().toString())) {
             errorMessage(inputEmail, "Please enter a valid email address");
             progressBar.setVisibility(View.GONE);
@@ -278,7 +276,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
 
         //create user
-        if(isEmpty()) {
+        if (isEmpty()) {
             saveLastIntoPrefs();
             nextActivity();
         } else {

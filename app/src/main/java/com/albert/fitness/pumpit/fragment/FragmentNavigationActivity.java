@@ -1,9 +1,7 @@
 package com.albert.fitness.pumpit.fragment;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -13,13 +11,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import com.albert.fitness.pumpit.LoginActivity;
-import fitness.albert.com.pumpit.R;
 import com.albert.fitness.pumpit.fragment.logsFragment.LogFragment;
 import com.albert.fitness.pumpit.fragment.profile.ProfileFragment;
-import com.albert.fitness.pumpit.model.PrefsUtils;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.welcome.GoalActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import fitness.albert.com.pumpit.R;
 
 public class FragmentNavigationActivity extends AppCompatActivity {
 
@@ -35,30 +33,39 @@ public class FragmentNavigationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment_navigation);
-
+        checkFromWhereActivityFrom();
         toolbar = getSupportActionBar();
         assert toolbar != null;
         toolbar.setTitle("Workout");
-
         getCurrentUser();
-
         nutritionFragment = new NutritionFragment();
         planFragment = new PlanFragment();
         workoutFragment = new WorkoutFragment();
         logsFragment = new LogFragment();
         profileFragment = new ProfileFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, workoutFragment).commit();
-
         setTheFragmentSwitch();
+    }
+
+    private void checkFromWhereActivityFrom() {
+        PrefsUtils prefsUtils = new PrefsUtils(this, "activity");
+        String prevActivity = prefsUtils.getString("FROM_ACTIVITY", "");
+
+        //check if activity come from ShowFoodBeforeAddedActivity
+        assert prevActivity != null;
+        if (prevActivity.equals("ShowFoodBeforeAddedActivity")) {
+            prefsUtils.removeAll(this, "activity");
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, nutritionFragment).commit();
+        }
     }
 
     private void getCurrentUser() {
         PrefsUtils prefsUtils = new PrefsUtils();
         prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
-        boolean isUserExist = prefsUtils.getBoolean("isUser", false);
+        String name   = prefsUtils.getString("name", "");
 
-        if (!isUserExist) {
-            startActivity(new Intent(FragmentNavigationActivity.this, LoginActivity.class));
+        if (name.isEmpty()) {
+            startActivity(new Intent(FragmentNavigationActivity.this, GoalActivity.class));
             finish();
         }
 
@@ -101,22 +108,6 @@ public class FragmentNavigationActivity extends AppCompatActivity {
                 return true;
             }
         });
-    }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        SharedPreferences pref = getSharedPreferences("activity", Context.MODE_PRIVATE);
-        String prevActivity = pref.getString("FROM_ACTIVITY", "");
-
-        //check if activity come from ShowFoodBeforeAddedActivity
-        assert prevActivity != null;
-        if (prevActivity.equals("ShowFoodBeforeAddedActivity")) {
-            PrefsUtils prefsUtils = new PrefsUtils();
-            prefsUtils.removeAll(this, "activity");
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, nutritionFragment).commit();
-        }
     }
 
     @Override

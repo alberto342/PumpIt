@@ -13,8 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.albert.fitness.pumpit.fragment.FragmentNavigationActivity;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.model.FinishTraining;
+import com.albert.fitness.pumpit.model.TDEECalculator;
 import com.albert.fitness.pumpit.model.UserRegister;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -25,10 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
-
-import com.albert.fitness.pumpit.model.FinishTraining;
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.TDEECalculator;
 
 public class FinisherWorkoutActivity extends AppCompatActivity {
 
@@ -107,9 +106,9 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
                                 FinishTraining finishTraining = task.getResult().getDocuments().get(i).toObject(FinishTraining.class);
                                 finishTrainingList.add(finishTraining);
 
-                                for (int r = 0; r < finishTraining.getTrackerExercises().size(); r++) {
-                                    totalWeight[0] += finishTraining.getTrackerExercises().get(r).getWeight();
-                                }
+//                                for (int r = 0; r < finishTraining.getTrackerExercises().size(); r++) {
+//                                    totalWeight[0] += finishTraining.getTrackerExercises().get(r).getWeight();
+//                                }
                             }
                             tvTotalWeightCmp.setText(totalWeight[0] + " kg");
 
@@ -132,10 +131,10 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         int totalRestAfterExercise = 0;
         int totalRestBetweenSet = 0;
 
-        for (int i = 0; i < finishTrainingList.size(); i++) {
-            totalRestBetweenSet += finishTrainingList.get(i).getRestBetweenSet() * finishTrainingList.get(i).getTrackerExercises().size();
-            totalRestAfterExercise += finishTrainingList.get(i).getRestAfterExercise();
-        }
+//        for (int i = 0; i < finishTrainingList.size(); i++) {
+//            totalRestBetweenSet += finishTrainingList.get(i).getRestBetweenSet() * finishTrainingList.get(i).getTrackerExercises().size();
+//            totalRestAfterExercise += finishTrainingList.get(i).getRestAfterExercise();
+//        }
         totalRestBetweenSet = totalRestBetweenSet + totalRestAfterExercise;
 
         tvRest.setText(intIntoChronometer(totalRestBetweenSet * 1000));
@@ -148,9 +147,9 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         int totalTimeWaste;
 
 
-        for (int i = 0; i < finishTrainingList.size(); i++) {
-            trackerExercises += finishTrainingList.get(i).getTrackerExercises().size() * 45;
-        }
+//        for (int i = 0; i < finishTrainingList.size(); i++) {
+//            trackerExercises += finishTrainingList.get(i).getTrackerExercises().size() * 45;
+//        }
 
         totalTimeWaste = totalTrainingRecord - totalTimeRest - trackerExercises;
 

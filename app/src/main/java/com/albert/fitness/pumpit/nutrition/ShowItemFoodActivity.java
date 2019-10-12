@@ -42,8 +42,8 @@ import java.util.Map;
 import fitness.albert.com.pumpit.R;
 import com.albert.fitness.pumpit.adapter.FirestoreFoodListAdapter;
 import com.albert.fitness.pumpit.adapter.FoodListAdapter;
-import com.albert.fitness.pumpit.model.Foods;
-import com.albert.fitness.pumpit.model.PrefsUtils;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 
 import me.himanshusoni.quantityview.QuantityView;
 

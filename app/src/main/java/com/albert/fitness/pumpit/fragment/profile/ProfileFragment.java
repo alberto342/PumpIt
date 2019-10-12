@@ -24,16 +24,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.albert.fitness.pumpit.helper.ImageUtils;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.model.TDEECalculator;
 import com.albert.fitness.pumpit.model.UserRegister;
-import com.google.firebase.auth.FirebaseAuth;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 
 import java.io.File;
 
 import fitness.albert.com.pumpit.R;
-
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.TDEECalculator;
 
 
 public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachmentListener {
@@ -45,7 +42,7 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
             btnWaterTracker, btnNotification, btnUnits, btnDataExport, btnHelp, btnAbout;
     private ProgressBar progressBar;
     private UserRegister userRegister = new UserRegister();
-    private PrefsUtils prefsUtils = new PrefsUtils();
+    private PrefsUtils prefsUtils;
     private TDEECalculator cal = new TDEECalculator();
     private ImageUtils imageutils;
 
@@ -65,15 +62,12 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        //  FirebaseAuth mAuth = FirebaseAuth.getInstance();
         imageutils = new ImageUtils(getActivity(), this, true);
-
-        init(view);
+        prefsUtils = new PrefsUtils(getContext(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
+        initView(view);
+        loadFromPrefs();
         imgProfileLoad();
-
-        if (mAuth.getCurrentUser() != null) {
-            loadData();
-        }
         setHasOptionsMenu(true);
         //clickOnBtn();
     }
@@ -90,7 +84,9 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
     }
 
-    private void init(View view) {
+    private void initView(View view) {
+
+
         tvName = view.findViewById(R.id.txt_name);
         tvBmi = view.findViewById(R.id.txt_bmi);
         tvMyWeigh = view.findViewById(R.id.my_weight);
@@ -110,7 +106,6 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
 //        btnHelp = view.findViewById(R.id.btn_help);
 //        btnAbout = view.findViewById(R.id.btn_about);
 //        progressBar = view.findViewById(R.id.pb_profile);
-
     }
 
     private void imgProfileLoad() {
@@ -205,78 +200,21 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
 //        }
 //    };
 
-    private void loadData() {
-        FireBaseInit fireBaseInit = new FireBaseInit(getActivity());
-        fireBaseInit.setIntoPrefs();
-        prefsUtils.createSharedPreferencesFiles(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
 
 
-        if (prefsUtils.getString("first_name", " ").equals(" ")) {
-           // loadFromFb();
-            loadFromPrefs();
-            // progressBar.setVisibility(View.INVISIBLE);
-        }
-//        else {
-//            loadFromPrefs();
-//            // progressBar.setVisibility(View.INVISIBLE);
-//        }
-    }
-
-
-
-
-
-
-//    private void loadFromFb() {
-//        db.collection("users").document(FireBaseInit.getEmailRegister()).get()
-//                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                    @SuppressLint({"SetTextI18n", "DefaultLocale"})
-//                    @Override
-//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                        if (documentSnapshot != null) {
-//                            userRegister = documentSnapshot.toObject(UserRegister.class);
-//                            saveIntoPrefs();
-//                            tvName.setText(userRegister.getFirstName() + " " + userRegister.getLestName());
-//                            cal.setHeight((double) userRegister.getHeight());
-//                            cal.setWeight((double) userRegister.getWeight());
-//                            cal.setBmi(cal.getHeight(), cal.getWeight());
-//                            tvBmi.setText("BMI: " + (cal.getBmi()));
-//                            tvBmiType.setText(cal.bmiTable());
-//                            tvMyWeigh.setText(("Start: " + String.format("%.2f", cal.getWeight()) + "kg"));
-//                            Log.d(TAG, "TestGetUserProfile: " + documentSnapshot.getData());
-//
-//                            prefsUtils.saveData("starting_weight", String.valueOf(userRegister.getWeight()));
-//                        }
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.d(TAG, "Field to receive user data");
-//
-//                    }
-//                });
-//    }
 
     private void loadFromPrefs() {
-        String firstName = prefsUtils.getString("first_name", "");
-        String lestName = prefsUtils.getString("lest_name", "");
-        String activityLevel = prefsUtils.getString("activity_level", "");
-        String bodyFat = prefsUtils.getString("body_fat", "");
-        String fatTarget = prefsUtils.getString("fat_target", "");
+        String fullName = prefsUtils.getString("name", "");
         String programSelect = prefsUtils.getString("program_select", "");
         String dateOfBirth = prefsUtils.getString("date_of_birth", "");
         float weight = prefsUtils.getFloat("weight", 0f);
         int height = prefsUtils.getInt("height", 0);
-        String goal = prefsUtils.getString("goal_weight","");
+        String goal = prefsUtils.getString("goal_weight", "");
         //boolean isMale = prefsUtils.getBoolean("is_male", false);
 
+        tvMyGoalWeight.setText(goal.isEmpty() ? "Not Set Goal" : "Goal: " + goal + "kg");
 
-        if(!goal.isEmpty()) {
-            tvMyGoalWeight.setText("Goal: " + goal + "kg");
-        }
-
-        tvName.setText(firstName + " " + lestName);
+        tvName.setText(fullName);
         cal.setHeight((double) height);
         cal.setWeight((double) weight);
         cal.setBmi(cal.getHeight(), cal.getWeight());

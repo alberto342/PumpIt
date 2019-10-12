@@ -19,14 +19,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.albert.fitness.pumpit.model.FireBaseInit;
-import com.albert.fitness.pumpit.model.UserRegister;
+import com.albert.fitness.pumpit.adapter.TrainingAdapter;
+import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
+import com.albert.fitness.pumpit.model.TDEECalculator;
+import com.albert.fitness.pumpit.model.TrackerExercise;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -34,13 +34,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
-import com.albert.fitness.pumpit.adapter.TrainingAdapter;
-import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.model.FinishTraining;
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.TDEECalculator;
-import com.albert.fitness.pumpit.model.TrackerExercise;
 
 public class WorkoutStartActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -522,30 +515,29 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
 
        // String currentImgName = exerciseImgName != null ? exerciseImgName : StartWorkoutActivity.trainingList.get(countExercisesLeft-1).getImgName();
 
-        FinishTraining finishTraining = new FinishTraining(tvExerciseName.getText().toString(),
-                trackerExerciseList, 0,
-                StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestBetweenSet(),
-                StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise(),
-                exerciseImgName, UserRegister.getTodayDate(),
-                StartWorkoutActivity.trainingList.get(countExercisesLeft).isFavorite(), mChronometer.getText().toString(), caloriesBurned);
-
-        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-                .collection(UserRegister.getTodayDate()).document(tvExerciseName.getText().toString())
-                .set(finishTraining)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        //save workout event for calendar
-                        Event.saveEvent(WorkoutStartActivity.this);
-                        Log.d(TAG, "Document successfully written!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error writing document: " + e);
-                    }
-                });
+//        FinishTraining finishTraining = new FinishTraining(tvExerciseName.getText().toString(),
+//                trackerExerciseList, 0,
+//                StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestBetweenSet(),
+//                StartWorkoutActivity.trainingList.get(countExercisesLeft).getRestAfterExercise(),
+//                exerciseImgName, UserRegister.getTodayDate(), mChronometer.getText().toString(), caloriesBurned);
+//
+//        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
+//                .collection(UserRegister.getTodayDate()).document(tvExerciseName.getText().toString())
+//                .set(finishTraining)
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        //save workout event for calendar
+//                        Event.saveEvent(WorkoutStartActivity.this);
+//                        Log.d(TAG, "Document successfully written!");
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.w(TAG, "Error writing document: " + e);
+//                    }
+//                });
     }
 
     private void addLayoutTimeRestSelected() {
@@ -661,16 +653,16 @@ public class WorkoutStartActivity extends AppCompatActivity implements View.OnCl
         container.addView(vRowView, container.getChildCount() - 1);
         tvCountReps.setText(String.valueOf(countAddSets + 1));
 
-        for (int i = 0; i < StartWorkoutActivity.trainingList.size(); i++) {
-            if (countExercisesLeft - 1 < StartWorkoutActivity.trainingList.size()) {
-                for (int j = 0; j < StartWorkoutActivity.trainingList.get(i).getTrackerExercises().size(); j++) {
-                    if (countAddSets < StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().size()) {
-                        etWeight.setHint(String.valueOf(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().get(countAddSets).getWeight()));
-                        etReps.setHint(String.valueOf(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().get(countAddSets).getRepNumber()));
-                    }
-                }
-            }
-        }
+//        for (int i = 0; i < StartWorkoutActivity.trainingList.size(); i++) {
+//            if (countExercisesLeft - 1 < StartWorkoutActivity.trainingList.size()) {
+//                for (int j = 0; j < StartWorkoutActivity.trainingList.get(i).getTrackerExercises().size(); j++) {
+//                    if (countAddSets < StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().size()) {
+//                        etWeight.setHint(String.valueOf(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().get(countAddSets).getWeight()));
+//                        etReps.setHint(String.valueOf(StartWorkoutActivity.trainingList.get(countExercisesLeft - 1).getTrackerExercises().get(countAddSets).getRepNumber()));
+//                    }
+//                }
+//            }
+//        }
         countAddSets++;
         btnRemoveSte.setVisibility(View.VISIBLE);
         btnAddNewSet.setVisibility(View.INVISIBLE);

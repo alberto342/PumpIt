@@ -11,20 +11,23 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.adapter.CustomExerciseAdapter;
-import com.albert.fitness.pumpit.adapter.ExerciseAdapter.ExerciseAdapter;
+import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 import com.albert.fitness.pumpit.model.CustomExerciseName;
 import com.albert.fitness.pumpit.model.Exercise;
+import com.albert.fitness.pumpit.model.ExerciseCategory;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
-
-import com.albert.fitness.pumpit.model.PrefsUtils;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
@@ -33,11 +36,11 @@ import io.realm.RealmResults;
 
 public class ShowExerciseResultActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    private Realm realm;
     RecyclerView recyclerView;
     private List<Exercise> realmList = new ArrayList<>();
     private ExerciseAdapter exerciseAdapter;
     private PrefsUtils prefsUtils = new PrefsUtils();
+    private WelcomeActivityViewModel welcomeActivityViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +48,15 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
         setContentView(R.layout.activity_show_exercise_result);
         setTitle(getExerciseType());
 
-        //SETUP REEALM
-        RealmConfiguration config = new RealmConfiguration.Builder().name(Exercise.REALM_FILE_GYM).deleteRealmIfMigrationNeeded().build();
-        realm = Realm.getInstance(config);
-        //Realm.setDefaultConfiguration(config);
+        welcomeActivityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
+        welcomeActivityViewModel.getAllCategories().observe(this, new Observer<List<ExerciseCategory>>() {
+            @Override
+            public void onChanged(List<ExerciseCategory> exerciseCategories) {
+
+
+            }
+        });
+
 
         pref();
         //  initRecyclerView();
@@ -95,19 +103,19 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
 
         final String TAG = "ShowExerciseResultActivity";
         //realm.getSchema();
-        RealmQuery<Exercise> query = realm.where(Exercise.class);
+        //RealmQuery<Exercise> query = realm.where(Exercise.class);
 
-        if (category.contains("All")) {
-            query.findAll();
-        } else if (category2.contains("null")) {
-            query.equalTo("category", category);
-        } else {
-            query.equalTo("category_2", category2);
-        }
+//        if (category.contains("All")) {
+//            query.findAll();
+//        } else if (category2.contains("null")) {
+//            query.equalTo("category", category);
+//        } else {
+//            query.equalTo("category_2", category2);
+//        }
+//
+//        RealmResults<Exercise> result = query.findAll();
 
-        RealmResults<Exercise> result = query.findAll();
-
-        exerciseList.addAll(result);
+     //   exerciseList.addAll(result);
 
         exerciseAdapter = new ExerciseAdapter(context, exerciseList);
         recyclerView.setAdapter(exerciseAdapter);
@@ -172,9 +180,9 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
         List<Exercise> newList = new ArrayList<>();
 
         for (Exercise name : realmList) {
-            if (name.getName().toLowerCase().contains(userInput)) {
-                newList.add(name);
-            }
+//            if (name.getName().toLowerCase().contains(userInput)) {
+//                newList.add(name);
+//            }
         }
         exerciseAdapter.updateList(newList);
         return true;
@@ -183,7 +191,6 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
     }
 
     @Override

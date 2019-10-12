@@ -7,6 +7,10 @@ apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
+    dataBinding {
+        //noinspection DataBindingWithoutKapt
+        enabled = true
+    }
     defaultConfig {
         applicationId "fitness.albert.com.pumpit"
         minSdkVersion 21

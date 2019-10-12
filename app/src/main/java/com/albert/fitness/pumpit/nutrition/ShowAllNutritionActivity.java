@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,8 +42,8 @@ import com.albert.fitness.pumpit.adapter.DinnerListAdapter;
 import com.albert.fitness.pumpit.adapter.FirestoreFoodListAdapter;
 import com.albert.fitness.pumpit.adapter.LunchListAdapter;
 import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
-import com.albert.fitness.pumpit.model.Foods;
-import com.albert.fitness.pumpit.model.SwipeToDeleteCallback;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.utils.SwipeToDeleteCallback;
 
 public class ShowAllNutritionActivity extends AppCompatActivity {
 

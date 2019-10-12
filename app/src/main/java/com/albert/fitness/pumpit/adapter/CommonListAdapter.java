@@ -12,11 +12,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.albert.fitness.pumpit.model.nutrition.Common;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import com.albert.fitness.pumpit.model.Common;
 import fitness.albert.com.pumpit.R;
 
 public class CommonListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

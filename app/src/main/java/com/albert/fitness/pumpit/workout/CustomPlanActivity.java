@@ -1,6 +1,5 @@
 package com.albert.fitness.pumpit.workout;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,16 +8,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.model.DateObj;
 import com.albert.fitness.pumpit.model.UserRegister;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.albert.fitness.pumpit.model.WorkoutObj;
+import com.albert.fitness.pumpit.model.WorkoutPlanObj;
+import com.albert.fitness.pumpit.model.WorkoutPlans;
+import com.albert.fitness.pumpit.model.WorkoutRepository;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,25 +27,24 @@ import java.util.Objects;
 
 import fitness.albert.com.pumpit.R;
 
-import com.albert.fitness.pumpit.model.PrefsUtils;
-import com.albert.fitness.pumpit.model.Workout;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
-
 public class CustomPlanActivity extends AppCompatActivity {
 
+    private CustomPlanViewModel customPlanViewModel;
     private Spinner spDaysWeek, spDifficultyLevel, spDayType, spRoutineType;
     private EditText etRoutineDescription, etRoutineName;
     private ImageView btnCreateWorkout;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "CustomPlanActivity";
     private String workoutNameId;
+    private WorkoutRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_plan);
-
         Objects.requireNonNull(getSupportActionBar()).hide();
+        repository = new WorkoutRepository(getApplication());
+
+        customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
 
         init();
         addItemsIntoSpinner();
@@ -104,14 +104,13 @@ public class CustomPlanActivity extends AppCompatActivity {
     }
 
 
-    private void addDataIntoFireBase() {
+    private void saveData() {
         String daysWeek = null;
         String difficultyLevel = null;
         String dayType = null;
         String routineType = null;
         String routineDescription;
         final String routineName;
-
 
         if (spDaysWeek.getSelectedItem() != null && spDifficultyLevel.getSelectedItem() != null && spDayType.getSelectedItem() != null && spRoutineType != null) {
             daysWeek = spDaysWeek.getSelectedItem().toString();
@@ -123,69 +122,72 @@ public class CustomPlanActivity extends AppCompatActivity {
             dayType = spDayType.getSelectedItem().toString();
         }
 
-        final int dayWeekPosition = spDaysWeek.getSelectedItemPosition() + 1;
+        final int dayWeekPosition = spDaysWeek.getSelectedItemPosition();
         routineDescription = etRoutineDescription.getText().toString();
         routineName = etRoutineName.getText().toString();
 
         //check if have default exercise
-        PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(this, "exercise");
+        PrefsUtils prefsUtils = new PrefsUtils(this, "exercise");
 
-//        if(prefsUtils.getBoolean("defaultExercise", false)) {
-//            prefsUtils.saveData("defRoutineName",routineName);
-//        }
-
+        receiveDate();
 
         WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel,
                 routineType, dayType, routineDescription, UserRegister.getTodayDate(), dayWeekPosition);
 
 
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
-                .add(workoutPlans).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
+        WorkoutPlanObj workoutPlan = new WorkoutPlanObj(routineName, daysWeek
+                , difficultyLevel, routineType, dayType, routineDescription, UserRegister.getTodayDate(), dayWeekPosition);
 
-                if (task.isSuccessful() && task.getResult() != null) {
-                    workoutNameId = task.getResult().getId();
-                }
+        // repository.insertPlan(workoutPlan);
+        customPlanViewModel.AddNewPlan(workoutPlan);
 
-                for (int i = 1; i <= dayWeekPosition; i++) {
+       // receivePlanId(dayWeekPosition);
 
-                    Workout workout = new Workout("Workout " + i, "Day " + i, 0, 0);
-
-                    db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-                            .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
-                            .document("Workout " + i).set(workout)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    Log.d(TAG, "DocumentSnapshot successfully saved");
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "Failed to save " + e);
-                                }
-                            });
-                }
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
     }
 
+    private void receiveDate() {
+        customPlanViewModel.getAllDates().observe(this, new Observer<List<DateObj>>() {
+            @Override
+            public void onChanged(List<DateObj> dateObjs) {
+                DateObj date = new DateObj();
+                date.setDate(UserRegister.getTodayDate());
+                if(!dateObjs.isEmpty()) {
+                    Log.d(TAG, "ReceiveDate: " + dateObjs.get(dateObjs.size() - 1).getDate());
+                    if (!UserRegister.getTodayDate().equals(dateObjs.get(dateObjs.size() - 1).getDate())) {
+                        customPlanViewModel.addNewDate(date);
+                    }
+                } else {
+                    customPlanViewModel.addNewDate(date);
+                }
+            }
+        });
+    }
+
+    private void receivePlanId(final int position) {
+        customPlanViewModel.getAllPlan().observe(this, new Observer<List<WorkoutPlanObj>>() {
+            @Override
+            public void onChanged(List<WorkoutPlanObj> workoutPlanObjs) {
+                int planId;
+                if(workoutPlanObjs.isEmpty()) {
+                    planId = 0;
+                } else {
+                    planId = workoutPlanObjs.get(workoutPlanObjs.size()-1).getPlanId() +1;
+                }
+                for (int i = 0; i <= position; i++) {
+                    int num = i+1;
+                    WorkoutObj workoutObj = new WorkoutObj("", "Day " + num, "Workout " + num, planId);
+                    customPlanViewModel.addNewWorkout(workoutObj);
+                }
+            }
+        });
+    }
 
     private void onClick() {
         btnCreateWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addDataIntoFireBase();
-                startActivity(new Intent(CustomPlanActivity.this, WorkoutPlansActivity.class));
+                saveData();
+               // startActivity(new Intent(CustomPlanActivity.this, PlanFragment.class));
                 finish();
             }
         });

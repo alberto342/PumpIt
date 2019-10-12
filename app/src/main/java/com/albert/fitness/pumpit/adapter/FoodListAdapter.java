@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.albert.fitness.pumpit.model.Foods;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
 import fitness.albert.com.pumpit.R;
 
 public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

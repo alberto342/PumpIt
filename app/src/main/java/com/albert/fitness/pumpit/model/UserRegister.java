@@ -12,14 +12,7 @@ import java.util.Map;
 
 public class UserRegister {
 
-    //    public static final String NAME_KEY = "name";
-//    public static final String EMAIL_KEY ="email";
-    // public static final String SETTINGS_PREFERENCES_FILE = "user_info";
-   // public static final String SETTINGS_PREFERENCES_FILE = "fitness.albert.com.pumpit_preferences";
-
-    public static final String REALM_FILE_USERS = "users.realm";
     public static final String FIRE_BASE_USERS = "users";
-
     private int age;
     private String imagesRefPath;  //profile img url
     private String fullName;
@@ -36,12 +29,9 @@ public class UserRegister {
     private int meter;
     private int cm;
     private String myProgram;
-
     private String bodyFat;
     private String fatTarget;
     private String activityLevel;
-    //private final Map<String, Object> dataToSave = new HashMap<>();
-
 
     public enum TrainingType {
         BEGINNER,
@@ -206,9 +196,6 @@ public class UserRegister {
         this.activityLevel = activityLevel;
     }
 
-//    public Map<String, Object> getDataToSave() {
-//        return dataToSave;
-//    }
 
 
     public boolean splitName(String fullName) {
@@ -287,14 +274,6 @@ public class UserRegister {
                 +'}';
     }
 
-//    public String getEmailRegister() {
-//        String email = null;
-//        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-//        if (mAuth.getCurrentUser() != null) {
-//            email = mAuth.getCurrentUser().getEmail();
-//        }
-//        return email;
-//    }
 
 
 }

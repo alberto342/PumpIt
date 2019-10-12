@@ -21,7 +21,7 @@ import java.util.List;
 
 import fitness.albert.com.pumpit.R;
 import com.albert.fitness.pumpit.adapter.ChangePlanAdapter;
-import com.albert.fitness.pumpit.model.FireBaseInit;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.model.WorkoutPlans;
 
 public class ChangePlanActivity extends AppCompatActivity {

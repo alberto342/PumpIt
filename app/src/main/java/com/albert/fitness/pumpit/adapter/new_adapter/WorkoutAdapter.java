@@ -45,7 +45,6 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutO
         final DiffUtil.DiffResult result = DiffUtil.calculateDiff(new WorkoutObjDiffCallback(items, newItems), false);
         items = newItems;
         result.dispatchUpdatesTo(WorkoutAdapter.this);
-
     }
 
     class WorkoutObjViewHolder extends RecyclerView.ViewHolder {

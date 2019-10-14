@@ -35,7 +35,6 @@ import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.utils.SwipeHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -278,23 +277,23 @@ public class StartWorkoutActivity extends AppCompatActivity {
     }
 
     private void deleteItemFromFb(final int position) {
-        db.collection(WorkoutPlans.WORKOUT_PLANS)
-                .document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
-                .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
-                .document(workoutId).collection(Workout.EXERCISE_NAME)
-                .document(trainingList.get(position).getExerciseName()).delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                        deleteItem(position);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error deleting document", e);
-            }
-        });
+//        db.collection(WorkoutPlans.WORKOUT_PLANS)
+//                .document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
+//                .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
+//                .document(workoutId).collection(Workout.EXERCISE_NAME)
+//                .document(trainingList.get(position).getExerciseName()).delete()
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+//                        deleteItem(position);
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.w(TAG, "Error deleting document", e);
+//            }
+//        });
     }
 
 
@@ -359,10 +358,10 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private void initRecyclerView() {
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
-        trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
-        trainingAdapter.notifyDataSetChanged();
-        mRecyclerView.setAdapter(trainingAdapter);
+//        mRecyclerView.setLayoutManager(layoutManager);
+//        trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
+//        trainingAdapter.notifyDataSetChanged();
+//        mRecyclerView.setAdapter(trainingAdapter);
 
         ItemTouchHelper.Callback callback =
                 new SimpleItemTouchHelperCallback(trainingAdapter);

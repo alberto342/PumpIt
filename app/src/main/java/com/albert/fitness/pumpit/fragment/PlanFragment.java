@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.adapter.WorkoutPlanAdapter;
 import com.albert.fitness.pumpit.model.WorkoutPlanObj;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.utils.SwipeHelper;
 import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
@@ -43,10 +42,10 @@ public class PlanFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private final String TAG = "PlanFragment";
-    public static List<WorkoutPlans> workoutPlansList;
-    public static String planName;
+    private List<WorkoutPlanObj> workoutPlansList;
     public static String routineName; // check in EditCustomPlanActivity
     private WorkoutPlanAdapter planAdapter;
+    private CustomPlanViewModel customPlanViewModel;
 
     public PlanFragment() {
         // Required empty public constructor
@@ -61,30 +60,28 @@ public class PlanFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.fr_rv_workout_plans);
 
         setHasOptionsMenu(true);
-        //  getPlanFormFb();
-        //  initRecyclerView();
-        //  swipe();
+
+        swipe();
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        CustomPlanViewModel customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
+        customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
         customPlanViewModel.getAllPlan().observe(this, new Observer<List<WorkoutPlanObj>>() {
             @Override
-            public void onChanged(List<WorkoutPlanObj> workoutPlanObjs) {
-                if(!workoutPlanObjs.isEmpty()) {
-                    workoutPlanObjs.get(0).getRoutineType();
-                    initRecyclerView(workoutPlanObjs);
-
-                    PrefsUtils prefsUtils = new PrefsUtils(getActivity(), "exercise");
-                    prefsUtils.saveData("default_plan", workoutPlanObjs.get(0).getRoutineName());
+            public void onChanged(List<WorkoutPlanObj> workoutPlan) {
+                if (!workoutPlan.isEmpty()) {
+                    workoutPlansList = workoutPlan;
+                    initRecyclerView();
+                    PrefsUtils prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.EXERCISE);
+                    prefsUtils.saveData("default_plan", workoutPlan.get(0).getRoutineName());
+                    prefsUtils.saveData("sizeOfWorkoutPlan", workoutPlan.size());
                 }
             }
         });
     }
-
 
 
     @Override
@@ -127,7 +124,7 @@ public class PlanFragment extends Fragment {
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
-                                //    deleteItem(pos);
+                                deleteItem(pos);
                                 planAdapter.notifyDataSetChanged();
                             }
                         }
@@ -140,9 +137,10 @@ public class PlanFragment extends Fragment {
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
-                                routineName = workoutPlansList.get(pos).getRoutineName();
-                                Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlansList.get(pos).getRoutineName());
                                 Intent i = new Intent(Objects.requireNonNull(getActivity()).getBaseContext(), EditCustomPlanActivity.class);
+                                i.putExtra("planId",workoutPlansList.get(pos).getPlanId());
+                                //routineName = workoutPlansList.get(pos).getRoutineName();
+                                Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlansList.get(pos).getRoutineName());
                                 startActivity(i);
                             }
                         }
@@ -151,14 +149,15 @@ public class PlanFragment extends Fragment {
         };
     }
 
-//    private void deleteItem(final int position) {
-//        workoutAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
-//        workoutPlansList.remove(position);
-//        mRecyclerView.removeViewAt(position);
-//        workoutAdapter.notifyItemRemoved(position);
-//        workoutAdapter.notifyItemRangeChanged(position, workoutPlansList.size());
-//    }
-
+    private void deleteItem(final int position) {
+        customPlanViewModel.deleteWorkoutPlan(workoutPlansList.get(position));
+        planAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
+        workoutPlansList.remove(position);
+        mRecyclerView.removeViewAt(position);
+        planAdapter.notifyItemRemoved(position);
+        planAdapter.notifyItemRangeChanged(position, workoutPlansList.size());
+        Log.i(TAG, "success delete item");
+    }
 
 
 //data blding
@@ -173,12 +172,12 @@ public class PlanFragment extends Fragment {
 //    }
 
 
-    private void initRecyclerView(List<WorkoutPlanObj> workoutPlanObj) {
+    private void initRecyclerView() {
         // RecyclerView view;
         Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + mRecyclerView);
         @SuppressLint("WrongConstant") LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-        planAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlanObj);
+        planAdapter = new WorkoutPlanAdapter(getActivity(), workoutPlansList);
         mRecyclerView.setAdapter(planAdapter);
     }
 }

@@ -142,12 +142,18 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private void isActivatedPlan() {
-
         PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
         boolean defaultExercise = prefsUtils.getBoolean(PrefsUtils.DEFAULT_EXERCISE, false);
         String routineName = prefsUtils.getString(PrefsUtils.DEFAULT_PLAN, "");
+        int sizeOfWorkout = prefsUtils.getInt("sizeOfWorkoutPlan", -1);
 
-        if (defaultExercise && tvNameOfPlan.getText().toString().equals(routineName)) {
+        if (tvNameOfPlan.getText().toString().equals(routineName) && sizeOfWorkout == 1) {
+            tvChangePlan.setVisibility(View.INVISIBLE);
+            tvActiveWorkout.setVisibility(View.VISIBLE);
+            tvNameOfPlanSmall.setVisibility(View.VISIBLE);
+            tvNameOfPlan.setVisibility(View.INVISIBLE);
+            ivActivityPlan.setVisibility(View.GONE);
+        } else if (tvNameOfPlan.getText().toString().equals(routineName)) {
             tvChangePlan.setVisibility(View.VISIBLE);
             tvActiveWorkout.setVisibility(View.VISIBLE);
             tvNameOfPlanSmall.setVisibility(View.VISIBLE);
@@ -164,7 +170,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private void saveDay(String workoutDayName, String workoutDay) {
-        WorkoutObj workout = new WorkoutObj("00:00:00",workoutDayName,workoutDay,id);
+        WorkoutObj workout = new WorkoutObj("00:00:00", workoutDayName, workoutDay, id);
         customPlanViewModel.addNewWorkout(workout);
         Log.d(TAG, "DocumentSnapshot successfully saved this day");
     }
@@ -367,11 +373,11 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private void deleteItem(final int position) {
-     //   workoutAdapter = new WorkoutAdapter(this, workoutList);
+        //   workoutAdapter = new WorkoutAdapter(this, workoutList);
         workoutList.remove(position);
         mRecyclerView.removeViewAt(position);
-       // workoutAdapter.notifyItemRemoved(position);
-       // workoutAdapter.notifyItemRangeChanged(position, workoutList.size());
+        // workoutAdapter.notifyItemRemoved(position);
+        // workoutAdapter.notifyItemRangeChanged(position, workoutList.size());
     }
 
 
@@ -430,7 +436,6 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         final String TAG = "WorkoutActivity";
         mRecyclerView = findViewById(R.id.rv_workout);
         Log.d(TAG, "initRecyclerView: initView workout mRecyclerView" + mRecyclerView);
-        @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
         WorkoutAdapter workoutAdapter = new WorkoutAdapter();
@@ -439,6 +444,8 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         workoutAdapter.setListener(new WorkoutAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(WorkoutObj item) {
+                PrefsUtils prefsUtils = new PrefsUtils(WorkoutActivity.this, PrefsUtils.EXERCISE);
+                prefsUtils.saveData("workoutId", item.getWorkoutId());
                 startActivity(new Intent(WorkoutActivity.this, TrainingActivity.class));
                 finish();
             }
@@ -450,7 +457,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_change_plan:
-                startActivity(new Intent(WorkoutActivity.this, WorkoutPlansActivity.class));
+                startActivity(new Intent(WorkoutActivity.this, WorkoutChangePlansActivity.class));
                 finish();
                 break;
             case R.id.btn_set_as_activity_plan:

@@ -33,7 +33,7 @@
                 android:orientation="vertical">
 
                 <EditText
-                    android:id="@+id/et_sec_rest_after_exercise"
+                    android:id="@+id/et_rest_between_sets"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="15dp"
@@ -42,7 +42,7 @@
                     android:ems="10"
                     android:inputType="number"
                     android:padding="10dp"
-                    android:text="60"
+                    android:text="30"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textColorHint="@color/fui_bgPhone"
@@ -76,7 +76,7 @@
                 android:orientation="vertical">
 
                 <EditText
-                    android:id="@+id/et_rest_between_sets"
+                    android:id="@+id/et_sec_rest_after_exercise"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -84,7 +84,7 @@
                     android:ems="10"
                     android:inputType="number"
                     android:padding="10dp"
-                    android:text="30"
+                    android:text="60"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textColorHint="@color/fui_bgPhone"

@@ -14,6 +14,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.albert.fitness.pumpit.helper.BitmapFromAssent;
+import com.albert.fitness.pumpit.helper.ItemTouchHelperAdapter;
+import com.albert.fitness.pumpit.helper.ItemTouchHelperViewHolder;
+import com.albert.fitness.pumpit.model.Exercise;
+import com.albert.fitness.pumpit.model.Training;
 import com.albert.fitness.pumpit.workout.ShowExerciseImgActivity;
 import com.bumptech.glide.Glide;
 
@@ -22,24 +27,18 @@ import java.util.List;
 import java.util.Locale;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.helper.BitmapFromAssent;
-import com.albert.fitness.pumpit.helper.ItemTouchHelperAdapter;
-import com.albert.fitness.pumpit.helper.ItemTouchHelperViewHolder;
-import com.albert.fitness.pumpit.model.TrackerExercise;
-import com.albert.fitness.pumpit.model.Training;
 
 public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements ItemTouchHelperAdapter {
 
     private Context mContext;
     private List<Training> trainingList;
-    private List<TrackerExercise> trackerList;
-    public static int posit;
+    private List<Exercise> exerciseList;
 
-    public TrainingAdapter(Context mContext, List<Training> trainingList, List<TrackerExercise> trackerList) {
+    public TrainingAdapter(Context mContext, List<Training> trainingList, List<Exercise> exerciseList) {
         this.mContext = mContext;
         this.trainingList = trainingList;
-        this.trackerList = trackerList;
+        this.exerciseList = exerciseList;
     }
 
     @NonNull
@@ -64,7 +63,7 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         final String TAG = "TrainingAdapter";
 
-        Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, trainingList.get(position).getImgName());
+        Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, exerciseList.get(position).getImgName());
 
         Glide.with(mContext)
                 .load(bitmap)
@@ -72,22 +71,19 @@ public class TrainingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         // int rep = trackerList.get(position).getRepNumber();
         int set = trainingList.get(position).getSizeOfRept();
+        holder.trainingName.setText( exerciseList.get(position).getExerciseName());
 
-        holder.trainingName.setText(trainingList.get(position).getExerciseName());
+       // holder.trainingName.setText(trainingList.get(position).getExerciseName());
         holder.tvSetAndRep.setText(String.format(Locale.US, "%d SET(s)", set));
         holder.tvRestTime.setText(String.format(Locale.US, "Rest: %ds", trainingList.get(position).getRestBetweenSet()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick: " + exerciseList.get(position).getExerciseName());
                 Intent intent = new Intent(mContext, ShowExerciseImgActivity.class);
-                intent.putExtra("exerciseName", trainingList.get(position).getExerciseName());
-                intent.putExtra("imgName", trainingList.get(position).getImgName());
-
-                //posit = position;
-                Log.d(TAG, "onClick: " + trainingList.get(position).getExerciseName());
-                //mContext.startActivity(new Intent(mContext, ExerciseDetailActivity.class));
-
+                intent.putExtra("exerciseName", exerciseList.get(position).getExerciseName());
+                intent.putExtra("imgName", exerciseList.get(position).getImgName());
                 mContext.startActivity(intent);
             }
         });

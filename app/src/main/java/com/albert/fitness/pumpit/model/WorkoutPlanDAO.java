@@ -24,13 +24,9 @@ public interface WorkoutPlanDAO {
     @Query("SELECT * FROM plan_table")
     LiveData<List<WorkoutPlanObj>> getAllPlans();
 
+    @Query("SELECT * FROM plan_table WHERE plan_id ==:planId")
+    LiveData<WorkoutPlanObj> getPlan(int planId);
 
     @Query("SELECT * FROM plan_table WHERE date_id==:dateId")
-    LiveData<List<WorkoutPlanObj>> getPlans(int dateId);
-
-
-
-
-
-
+    LiveData<List<WorkoutPlanObj>> getPlansByDate(int dateId);
 }

@@ -35,7 +35,6 @@
                     android:id="@+id/tv_exercise_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="exercise name"
                     android:textColorHint="@color/gray" />
 
                 <TextView

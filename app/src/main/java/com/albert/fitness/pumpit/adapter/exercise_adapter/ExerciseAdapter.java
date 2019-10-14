@@ -27,9 +27,8 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
 
     private Context mContext;
     private List<Exercise> exerciseList;
-    public static String exerciseImg;
-    public static String exerciseName;
-
+    public  static String exerciseImg;
+    public static  int exerciseId;
 
     public ExerciseAdapter(Context c, List<Exercise> exerciseList) {
         this.mContext = c;
@@ -39,12 +38,12 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
     @NonNull
     @Override
     public ExerciseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.item_list_exercise, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.exercise_list_item, parent, false);
         return new ExerciseViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ExerciseViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ExerciseViewHolder holder, final int position) {
 
         final String TAG = "ExerciseAdapter";
 
@@ -56,14 +55,17 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
 
         holder.nameTxt.setText(exerciseList.get(position).getExerciseName());
 
-        holder.layout.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "Exercise position: " + exerciseList.get(position).getExerciseId());
                 int position = holder.getAdapterPosition();
+                Intent i = new Intent(mContext, ExerciseDetailActivity.class);
                 exerciseImg = exerciseList.get(position).getImgName();
-                exerciseName = exerciseList.get(position).getExerciseName();
-                mContext.startActivity(new Intent(mContext, ExerciseDetailActivity.class));
-                Log.d(TAG, "Exercise position: " + exerciseList.get(position).getExerciseName());
+                exerciseId = exerciseList.get(position).getExerciseId();
+                i.putExtra("exerciseId", exerciseList.get(position).getExerciseId());
+                i.putExtra("exerciseName", exerciseList.get(position).getExerciseName());
+                mContext.startActivity(i);
             }
         });
     }
@@ -90,5 +92,4 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseViewHolder> im
     public boolean onQueryTextChange(String s) {
         return false;
     }
-
 }

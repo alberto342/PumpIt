@@ -43,7 +43,7 @@ public class MyPlansFragment extends Fragment
     private RecyclerView mRecyclerView;
     private TextView noFoundPlan;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final String TAG = "WorkoutPlansActivity";
+    private final String TAG = "WorkoutChangePlansActivity";
     public static List<WorkoutPlans> workoutPlansList;
     public static String planName;
     public static String routineName; // chack in EditCustomPlanActivity

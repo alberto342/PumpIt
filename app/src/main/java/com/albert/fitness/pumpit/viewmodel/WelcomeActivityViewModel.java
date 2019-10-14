@@ -15,6 +15,8 @@ import java.util.List;
 public class WelcomeActivityViewModel extends AndroidViewModel {
 
     private ExerciseRepository repository;
+    private LiveData<List<Exercise>> allExercise;
+    private LiveData<Exercise> exerciseById;
     private LiveData<List<ExerciseCategory>> allCategories;
     private LiveData<List<Exercise>> exerciseOfSelectedCategory;
     private LiveData<List<Exercise>> secondaryCategory;
@@ -25,8 +27,16 @@ public class WelcomeActivityViewModel extends AndroidViewModel {
         repository = new ExerciseRepository(application);
     }
 
+    public LiveData<List<Exercise>> getAllExercise() {
+        return allExercise = repository.allExercise();
+    }
+
     public LiveData<List<ExerciseCategory>> getAllCategories() {
         return allCategories=repository.getCategories();
+    }
+
+    public LiveData<Exercise> getExerciseById(int id) {
+        return exerciseById = repository.getExerciseById(id);
     }
 
     public LiveData<List<Exercise>> getExerciseOfASelectedCategory(int categoryId) {

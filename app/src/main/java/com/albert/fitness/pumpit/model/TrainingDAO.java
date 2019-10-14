@@ -24,8 +24,10 @@ public interface TrainingDAO {
     @Query("SELECT * FROM training_table")
     LiveData<List<Training>> getAllTraining();
 
-
     @Query("SELECT * FROM training_table WHERE workout_id==:id")
     LiveData<List<Training>> getTrainings(int id);
+
+    @Query("SELECT * FROM training_table WHERE exercise_id==:id")
+    LiveData<List<Training>> getExercise(int id);
 
 }

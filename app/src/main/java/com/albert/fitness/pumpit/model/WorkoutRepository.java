@@ -13,11 +13,12 @@ public class WorkoutRepository {
     private WorkoutPlanDAO workoutPlanDAO;
     private DateDAO dateDAO;
     private TrainingDAO trainingDAO;
-
+    private TrackerExerciseDAO trackerExerciseDAO;
     private LiveData<List<WorkoutPlanObj>> workoutPlans;
     private LiveData<List<WorkoutObj>> workouts;
     private LiveData<List<DateObj>> dates;
     private LiveData<List<Training>> training;
+    private LiveData<List<TrackerExercise>> trackerExercise;
     private Executor executor;
 
     public WorkoutRepository(Application application) {
@@ -27,13 +28,14 @@ public class WorkoutRepository {
         workoutPlanDAO = workoutDatabase.workoutPlanDAO();
         dateDAO = workoutDatabase.dateDAO();
         trainingDAO = workoutDatabase.trainingDAO();
+        trackerExerciseDAO = workoutDatabase.trackerExerciseDAO();
     }
 
     public LiveData<List<DateObj>> getDate() {
         return dateDAO.getAllDate();
     }
 
-    public LiveData<List<WorkoutPlanObj>> getPlans() {
+    public LiveData<List<WorkoutPlanObj>> getPlansByDate() {
         return workoutPlanDAO.getAllPlans();
     }
 
@@ -41,12 +43,36 @@ public class WorkoutRepository {
         return workoutDAO.getAllWorkout();
     }
 
+    public LiveData<List<Training>> getTraining() {
+        return trainingDAO.getAllTraining();
+    }
+
+    public LiveData<List<Training>> getTrainingByWorkoutId(int workoutId) {
+        return trainingDAO.getTrainings(workoutId);
+    }
+
+    public LiveData<List<Training>> getTrainingExerciseName(int exercise) {
+        return trainingDAO.getExercise(exercise);
+    }
+
     public LiveData<List<WorkoutObj>> getWorkouts(int workoutId) {
         return workoutDAO.getWorkout(workoutId);
     }
 
-    public LiveData<List<WorkoutPlanObj>> getPlans(int planId) {
-        return workoutPlanDAO.getPlans(planId);
+    public LiveData<List<WorkoutPlanObj>> getPlansByDate(int planId) {
+        return workoutPlanDAO.getPlansByDate(planId);
+    }
+
+    public LiveData<WorkoutPlanObj> getPlan(int planId) {
+        return workoutPlanDAO.getPlan(planId);
+    }
+
+    public LiveData<List<TrackerExercise>> getAllTracker() {
+        return trackerExerciseDAO.getAllTrackerExercise();
+    }
+
+    public LiveData<List<TrackerExercise>> getTrackerExerciseByTrainingId(int trainingId) {
+        return trackerExerciseDAO.getTrackerExercises(trainingId);
     }
 
     public void insertDate(final DateObj date) {
@@ -79,7 +105,6 @@ public class WorkoutRepository {
         });
     }
 
-
     public void insertTraining(final Training training) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
         myExecutor.execute(new Runnable() {
@@ -90,6 +115,15 @@ public class WorkoutRepository {
         });
     }
 
+    public void insertTrackerExercise(final TrackerExercise trackerExercise) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                trackerExerciseDAO.insert(trackerExercise);
+            }
+        });
+    }
 
     public void deleteDate(final DateObj date) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
@@ -111,7 +145,6 @@ public class WorkoutRepository {
         });
     }
 
-
     public void deleteWorkout(final WorkoutObj workout) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
         myExecutor.execute(new Runnable() {
@@ -128,6 +161,16 @@ public class WorkoutRepository {
             @Override
             public void run() {
                 trainingDAO.delete(training);
+            }
+        });
+    }
+
+    public void deleteTrackerExercise(final TrackerExercise trackerExercise) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                trackerExerciseDAO.delete(trackerExercise);
             }
         });
     }
@@ -172,4 +215,13 @@ public class WorkoutRepository {
         });
     }
 
+    public void updateTTrackerExercise(final TrackerExercise trackerExercise) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                trackerExerciseDAO.update(trackerExercise);
+            }
+        });
+    }
 }

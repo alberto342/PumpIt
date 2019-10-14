@@ -34,10 +34,16 @@ public class Exercise {
     public Exercise() {
     }
 
-    public Exercise(int id, String exerciseName, String img_name, int categoryId) {
+    public Exercise(String exerciseName, String imgName) {
+        this.exerciseName = exerciseName;
+        this.imgName = imgName;
+    }
+
+
+    public Exercise(int id, String exerciseName, String imgName, int categoryId) {
         this.exerciseId = id;
         this.exerciseName = exerciseName;
-        this.imgName = img_name;
+        this.imgName = imgName;
         this.categoryId = categoryId;
     }
 

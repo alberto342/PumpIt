@@ -1,5 +1,6 @@
 package com.albert.fitness.pumpit.workout;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,30 +14,24 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.adapter.new_adapter.WorkoutPlanAdapter;
-import com.albert.fitness.pumpit.model.WorkoutObj;
+import com.albert.fitness.pumpit.adapter.WorkoutPlanAdapter;
 import com.albert.fitness.pumpit.model.WorkoutPlanObj;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
 import com.albert.fitness.pumpit.model.WorkoutRepository;
 import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
 import it.shadowsheep.recyclerviewswipehelper.RecyclerViewSwipeHelper;
 
-public class WorkoutPlansActivity extends AppCompatActivity
-        implements RecyclerViewSwipeHelper.RecyclerViewSwipeHelperDelegate, WorkoutPlanAdapter.Interaction {
+public class WorkoutChangePlansActivity extends AppCompatActivity
+        implements RecyclerViewSwipeHelper.RecyclerViewSwipeHelperDelegate {
 
     private CustomPlanViewModel customPlanViewModel;
-    private ArrayList<WorkoutPlanObj> workoutPlanList;
+    private List<WorkoutPlanObj> workoutPlanList;
     private WorkoutRepository repository;
     private RecyclerView mRecyclerView;
-    private final String TAG = "WorkoutPlansActivity";
-    public static List<WorkoutPlans> workoutPlansList;
+    private final String TAG = "WorkoutChangePlansActivity";
     public static String planName;
     public static String routineName; // check in EditCustomPlanActivity
     //private WorkoutPlanAdapter workoutAdapter;
@@ -50,23 +45,15 @@ public class WorkoutPlansActivity extends AppCompatActivity
         customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
 
         getAllPlans();
-
-
-      //  getPlanFormFb();
-
-
-
         //setupSwipeMenu();
     }
 
     private void getAllPlans() {
-        customPlanViewModel.getAllWorkouts().observe(this, new Observer<List<WorkoutObj>>() {
+        customPlanViewModel.getAllPlan().observe(this, new Observer<List<WorkoutPlanObj>>() {
             @Override
-            public void onChanged(List<WorkoutObj> workoutObjs) {
-               for(WorkoutObj workoutObj : workoutObjs) {
-                   Log.i(TAG, "getAllPlans: " + workoutObj.getWorkoutDay());
-                   initRecyclerView();
-               }
+            public void onChanged(List<WorkoutPlanObj> workoutPlan) {
+                workoutPlanList = workoutPlan;
+                initRecyclerView();
             }
         });
     }
@@ -135,10 +122,11 @@ public class WorkoutPlansActivity extends AppCompatActivity
                 R.dimen.ic_delete_size,
                 R.color.md_green_500,
                 new RecyclerViewSwipeHelper.SwipeButton.SwipeButtonClickListener() {
+                    @SuppressLint("LongLogTag")
                     @Override
                     public void onClick(int pos) {
-                        routineName = workoutPlansList.get(pos).getRoutineName();
-                        Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlansList.get(pos).getRoutineName());
+                        routineName = workoutPlanList.get(pos).getRoutineName();
+                        Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlanList.get(pos).getRoutineName());
 
                         Intent i = new Intent(getBaseContext(), EditCustomPlanActivity.class);
                         startActivity(i);
@@ -157,77 +145,14 @@ public class WorkoutPlansActivity extends AppCompatActivity
 //    }
 
 
-
-
-//    private void getPlanFormFb() {
-//        workoutPlansList = new ArrayList<>();
-//
-//        final ProgressDialog progressdialog = new ProgressDialog(this);
-//        progressdialog.setMessage("Please Wait....");
-//        progressdialog.show();
-//
-//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//
-//                        if (task.isSuccessful() && task.getResult() != null) {
-//                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
-//                                WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
-//                                workoutPlansList.add(workoutPlans);
-//
-//                                assert workoutPlans != null;
-//                                planName = workoutPlans.getRoutineName();
-//
-//                                initRecyclerView();
-//                            }
-//                            if (workoutPlansList.size() == 1) {
-//                                PrefsUtils prefsUtils = new PrefsUtils();
-//                                prefsUtils.createSharedPreferencesFiles(WorkoutPlansActivity.this, "exercise");
-//                                prefsUtils.saveData("default_plan", workoutPlansList.get(0).getRoutineName());
-//                            }
-//
-//                            progressdialog.hide();
-//
-//                        } else {
-//                            Log.d(TAG, "Error getting documents: ", task.getException());
-//                        }
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                });
-//    }
-
-
-//    private void initRecyclerView() {
-//        // RecyclerView view;
-//        mRecyclerView = findViewById(R.id.rv_workout_plans);
-//        Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + mRecyclerView);
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//        mRecyclerView.setLayoutManager(layoutManager);
-//        workoutAdapter = new WorkoutPlanAdapter(this, workoutPlansList);
-//        mRecyclerView.setAdapter(workoutAdapter);
-//    }
-
-
+    @SuppressLint("LongLogTag")
     private void initRecyclerView() {
         // RecyclerView view;
         mRecyclerView = findViewById(R.id.rv_workout_plans);
         Log.d(TAG, "initRecyclerView: init WorkoutPlan recyclerView" + mRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-        workoutAdapter = new WorkoutPlanAdapter(this);
-        workoutAdapter.submitList(workoutPlanList);
+        workoutAdapter = new WorkoutPlanAdapter(this, workoutPlanList);
         mRecyclerView.setAdapter(workoutAdapter);
-    }
-
-
-    @Override
-    public void onItemSelected(int position, @NotNull WorkoutPlanObj item) {
-        startActivity(new Intent(this, WorkoutActivity.class));
     }
 }

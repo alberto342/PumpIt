@@ -1,7 +1,6 @@
 package com.albert.fitness.pumpit.workout;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -16,7 +15,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 
 public class ShowExerciseImgActivity extends AppCompatActivity {
 
@@ -74,7 +72,7 @@ public class ShowExerciseImgActivity extends AppCompatActivity {
 
                     .into(exerciseImg);
 
-            Log.d(TAG, "Img successfully loaded " + ExerciseAdapter.exerciseImg);
+         //   Log.d(TAG, "Img successfully loaded " + ExerciseAdapter.exerciseImg);
 
         } catch (Exception e) {
             e.printStackTrace();

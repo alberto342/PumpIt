@@ -23,12 +23,20 @@ public class ExerciseRepository {
         exerciseObjDAO = exerciseDatabase.exerciseObjDAO();
     }
 
+    public LiveData<List<Exercise>> allExercise() {
+        return exerciseObjDAO.getAllExercise();
+    }
+
     public LiveData<List<ExerciseCategory>> getCategories() {
         return exerciseCategoryDAO.getAllCategory();
     }
 
     public LiveData<List<ExerciseSecondaryCategory>> getSecondaryCategories() {
         return secondaryCategoryDAO.getAllSecondaryCategory();
+    }
+
+    public LiveData<Exercise> getExerciseById(int id) {
+        return exerciseObjDAO.getExerciseById(id);
     }
 
     public LiveData<List<Exercise>> getExercise(int categoryId) {

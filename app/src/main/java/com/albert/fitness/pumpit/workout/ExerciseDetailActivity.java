@@ -1,5 +1,6 @@
 package com.albert.fitness.pumpit.workout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +14,6 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 
 public class ExerciseDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -21,10 +21,11 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
     private ImgExerciseFragment imgExerciseFragment;
     private InstructionsExerciseFragment instructionsExerciseFragment;
     private TrackerExerciseFragment trackerExerciseFragment;
-//    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-//    private final String TAG = "ExerciseDetailActivity";
+    //private final String TAG = "ExerciseDetailActivity";
     private ImageView imgFavorite;
     public static boolean isFavoriteSelected = false;
+    private String exerciseName;
+    int id;
 
 
     @Override
@@ -34,7 +35,8 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 
         toolbar = getSupportActionBar();
         assert toolbar != null;
-        toolbar.setTitle(ExerciseAdapter.exerciseName);
+        getExerciseById();
+        toolbar.setTitle(exerciseName);
 
         imgFavorite = findViewById(R.id.iv_add_favorite);
         imgFavorite.setOnClickListener(this);
@@ -47,6 +49,14 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
         setTheFragmentSwitch();
     }
 
+    private void getExerciseById() {
+        Intent i = getIntent();
+        Bundle b = i.getExtras();
+        if (b != null) {
+            id = b.getInt("exerciseId");
+            exerciseName = b.getString("exerciseName");
+        }
+    }
 
 
     private void setTheFragmentSwitch() {
@@ -55,10 +65,9 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
                 switch (item.getItemId()) {
                     case R.id.nav_img_exercise:
-                        toolbar.setTitle(ExerciseAdapter.exerciseName);
+                        toolbar.setTitle(exerciseName);
                         transaction.replace(R.id.container_workout_tracker, imgExerciseFragment).commit();
                         return true;
 
@@ -80,7 +89,6 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 
     @Override
     public void onClick(View v) {
-
         if (v.getId() == R.id.iv_add_favorite) {
             if (!isFavoriteSelected) {
                 imgFavorite.setImageResource(R.mipmap.ic_star_black);
@@ -94,19 +102,16 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 
 
     //method for save exercise and favorite, if selected, need to see if save button is click
-//    private void saveDataIntoFb() {
-//
-//        final PrefsUtils savePref = new PrefsUtils();
-//
+    private void saveDataIntoFb() {
+
+//        final PrefsUtils savePref = new PrefsUtils(this, "exercise");
+//        String getPlanId = savePref.getString("planName", "");
 //        List<Training> trainingList = new ArrayList<>();
 //
-//        Log.d(TAG, "Get SharedPreferencesFiles  - exercise");
+//        Training training = new Training(id,"","","","","");
+
 //
-//        savePref.createSharedPreferencesFiles(this, "exercise");
-//        String getPlanId = savePref.getString("planName", "");
-//
-//
-//        // Training training = new Training(ExerciseAdapter.exerciseName,0,0,20, ExerciseAdapter.exerciseImg, UserRegister.getTodayDate(),false, 5.6f);
+//        Training training = new Training(ExerciseAdapter.exerciseName, 0, 0, 20, ExerciseAdapter.exerciseImg, UserRegister.getTodayDate(), false, 5.6f);
 //
 //        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).
 //                document(WorkoutAdapter.workoutDayName).collection(ExerciseAdapter.exerciseName)
@@ -123,11 +128,5 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 //                        Log.d(TAG, "Error writing document", e);
 //                    }
 //                });
-//    }
-
-
-    @Override
-    public void onBackPressed() {
-        finish();
     }
 }

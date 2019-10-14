@@ -1,7 +1,6 @@
 package com.albert.fitness.pumpit.workout;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,11 +15,8 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.adapter.CustomExerciseAdapter;
 import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
-import com.albert.fitness.pumpit.model.CustomExerciseName;
 import com.albert.fitness.pumpit.model.Exercise;
-import com.albert.fitness.pumpit.model.ExerciseCategory;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
 
@@ -28,40 +24,73 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
 
 
 public class ShowExerciseResultActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    RecyclerView recyclerView;
-    private List<Exercise> realmList = new ArrayList<>();
-    private ExerciseAdapter exerciseAdapter;
-    private PrefsUtils prefsUtils = new PrefsUtils();
+    private ArrayList<Exercise> exerciseList;
+    private PrefsUtils prefsUtils;
     private WelcomeActivityViewModel welcomeActivityViewModel;
+    private ExerciseAdapter exerciseAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_exercise_result);
         setTitle(getExerciseType());
-
+        pref();
         welcomeActivityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
-        welcomeActivityViewModel.getAllCategories().observe(this, new Observer<List<ExerciseCategory>>() {
+        setUpLoadExercise();
+    }
+
+    private void setUpLoadExercise() {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            int category = extras.getInt("exerciseType");
+            int secondaryCategory = extras.getInt("category2");
+
+            if (category == 0) {
+                loadAllExercise();
+            } else if (secondaryCategory == 1) {
+                loadExerciseByCategory(category);
+            } else {
+                loadExerciseBySecondaryCategory(secondaryCategory);
+            }
+        }
+    }
+
+    private void loadAllExercise() {
+        welcomeActivityViewModel.getAllExercise().observe(this, new Observer<List<Exercise>>() {
             @Override
-            public void onChanged(List<ExerciseCategory> exerciseCategories) {
-
-
+            public void onChanged(List<Exercise> exercises) {
+                exerciseList = (ArrayList<Exercise>) exercises;
+                initRecyclerView();
             }
         });
-
-
-        pref();
-        //  initRecyclerView();
-
     }
+
+
+    private void loadExerciseByCategory(int category) {
+        welcomeActivityViewModel.getExerciseOfASelectedCategory(category).observe(this, new Observer<List<Exercise>>() {
+            @Override
+            public void onChanged(List<Exercise> exercises) {
+                exerciseList = (ArrayList<Exercise>) exercises;
+                initRecyclerView();
+            }
+        });
+    }
+
+
+    private void loadExerciseBySecondaryCategory(int category) {
+        welcomeActivityViewModel.getExerciseOfASelectedSecondaryCategory(category).observe(this, new Observer<List<Exercise>>() {
+            @Override
+            public void onChanged(List<Exercise> exercises) {
+                exerciseList = (ArrayList<Exercise>) exercises;
+                initRecyclerView();
+            }
+        });
+    }
+
 
     private String getExerciseType() {
         Bundle extras = getIntent().getExtras();
@@ -72,82 +101,51 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     }
 
     private void pref() {
-        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.START_WORKOUT);
+        prefsUtils = new PrefsUtils(this, PrefsUtils.START_WORKOUT);
         String activity = prefsUtils.getString("activity", "");
         if (activity.equals("StartWorkoutActivity")) {
             prefsUtils.saveData("activity2", "ShowExerciseResultActivity");
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initRecyclerView();
-        getCustomExercise();
-    }
 
-    @SuppressLint("WrongConstant")
+    @SuppressLint({"WrongConstant", "LongLogTag"})
     private void initRecyclerView() {
-
-        recyclerView = findViewById(R.id.rv_exercise_result);
+        final String TAG = "ShowExerciseResultActivity";
+        RecyclerView recyclerView = findViewById(R.id.rv_exercise_result);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-
-        // realm = Realm.getDefaultInstance();
-        recyclerView(this, realmList, AddExerciseActivity.categorySelected, AddExerciseActivity.category2Selected);
-    }
-
-
-    @SuppressLint("LongLogTag")
-    public void recyclerView(Context context, List<Exercise> exerciseList, String category, String category2) {
-
-        final String TAG = "ShowExerciseResultActivity";
-        //realm.getSchema();
-        //RealmQuery<Exercise> query = realm.where(Exercise.class);
-
-//        if (category.contains("All")) {
-//            query.findAll();
-//        } else if (category2.contains("null")) {
-//            query.equalTo("category", category);
-//        } else {
-//            query.equalTo("category_2", category2);
-//        }
-//
-//        RealmResults<Exercise> result = query.findAll();
-
-     //   exerciseList.addAll(result);
-
-        exerciseAdapter = new ExerciseAdapter(context, exerciseList);
+        exerciseAdapter = new ExerciseAdapter(this, exerciseList);
         recyclerView.setAdapter(exerciseAdapter);
 
         Log.d(TAG, "initRecyclerView: init recyclerView" + recyclerView);
     }
 
-    @SuppressLint("WrongConstant")
-    private void getCustomExercise() {
-        //SETUP REEALM
-        RealmConfiguration config = new RealmConfiguration.Builder().name(CustomExerciseName.REALM_FILE_EXERCISE).deleteRealmIfMigrationNeeded().build();
-        Realm realmExercise = Realm.getInstance(config);
 
-        String category = AddExerciseActivity.categorySelected;
-
-        RealmQuery<CustomExerciseName> query = realmExercise.where(CustomExerciseName.class);
-
-        query.equalTo("muscle_group", category);
-
-        RealmResults<CustomExerciseName> result = query.findAll();
-
-        List<CustomExerciseName> customExerciseNameList = new ArrayList<>(result);
-
-        RecyclerView recyclerView = findViewById(R.id.rv_custom_exercise);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-
-        if (!customExerciseNameList.isEmpty()) {
-            CustomExerciseAdapter customExerciseAdapter = new CustomExerciseAdapter(this, customExerciseNameList);
-            recyclerView.setAdapter(customExerciseAdapter);
-        }
-    }
+    //   private void getCustomExercise() {
+    //SETUP REEALM
+//        RealmConfiguration config = new RealmConfiguration.Builder().name(CustomExerciseName.REALM_FILE_EXERCISE).deleteRealmIfMigrationNeeded().build();
+//        Realm realmExercise = Realm.getInstance(config);
+//
+//        String category = AddExerciseActivity.categorySelected;
+//
+//        RealmQuery<CustomExerciseName> query = realmExercise.where(CustomExerciseName.class);
+//
+//        query.equalTo("muscle_group", category);
+//
+//        RealmResults<CustomExerciseName> result = query.findAll();
+//
+//        List<CustomExerciseName> customExerciseNameList = new ArrayList<>(result);
+//
+//        RecyclerView recyclerView = findViewById(R.id.rv_custom_exercise);
+//        recyclerView.setHasFixedSize(true);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+//
+//        if (!customExerciseNameList.isEmpty()) {
+//            CustomExerciseAdapter customExerciseAdapter = new CustomExerciseAdapter(this, customExerciseNameList);
+//            recyclerView.setAdapter(customExerciseAdapter);
+//        }
+    //   }
 
 
     @Override
@@ -175,29 +173,22 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
 
     @Override
     public boolean onQueryTextChange(String newText) {
-
         String userInput = newText.toLowerCase();
         List<Exercise> newList = new ArrayList<>();
 
-        for (Exercise name : realmList) {
-//            if (name.getName().toLowerCase().contains(userInput)) {
-//                newList.add(name);
-//            }
+        for (Exercise name : exerciseList) {
+            if (name.getExerciseName().toLowerCase().contains(userInput)) {
+                newList.add(name);
+            }
         }
         exerciseAdapter.updateList(newList);
         return true;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 
     @Override
     public void onBackPressed() {
-        AddExerciseActivity.categorySelected = "null";
-        AddExerciseActivity.category2Selected = "null";
-        prefsUtils.removeSingle(this,PrefsUtils.START_WORKOUT, "activity2");
+        prefsUtils.removeSingle(this, PrefsUtils.START_WORKOUT, "activity2");
         finish();
     }
 }

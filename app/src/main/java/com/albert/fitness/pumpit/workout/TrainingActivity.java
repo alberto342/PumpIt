@@ -9,18 +9,23 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.adapter.TrainingAdapter;
 import com.albert.fitness.pumpit.adapter.WorkoutAdapter;
+import com.albert.fitness.pumpit.model.Exercise;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.Training;
 import com.albert.fitness.pumpit.model.Workout;
 import com.albert.fitness.pumpit.model.WorkoutPlans;
 import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
+import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -42,6 +47,9 @@ public class TrainingActivity extends AppCompatActivity {
     private List<TrackerExercise> trackerExerciseList;
     private List<Training> trainingList;
     private final String TAG = "TrainingActivity";
+    private CustomPlanViewModel planViewModel;
+    private List<Exercise> exerciseList = new ArrayList<>();
+    private WelcomeActivityViewModel activityViewModel;
 
 
     @Override
@@ -49,11 +57,13 @@ public class TrainingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_training);
         setTitle("Training");
-
         init();
-        countExercise();
-        getTrainingFromFb();
-        itemTouchHelper();
+
+        planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
+        activityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
+        // countExercise();
+        getTraining();
+        // itemTouchHelper();
     }
 
 
@@ -73,7 +83,6 @@ public class TrainingActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_custom_add_exercise, menu);
-        // MenuItem menuItem = menu.findItem(R.id.menu_edit_training);
         return true;
     }
 
@@ -85,52 +94,85 @@ public class TrainingActivity extends AppCompatActivity {
         if (id == R.id.menu_custom_add_exercise) {
             startActivity(new Intent(TrainingActivity.this, AddExerciseActivity.class));
             finish();
-//            startActivity(new Intent(this, CustomAddExerciseActivity.class));
-//            finish();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void getTrainingFromFb() {
-        Log.d(TAG, "getTrainingFromFb: " + WorkoutActivity.workoutId);
-        db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-                .collection(Workout.WORKOUT_NAME).document(WorkoutActivity.workoutId)
-                .collection(Workout.WORKOUT_DAY_NAME).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            String workoutDayNameId = task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
-                            Log.d(TAG, "onComplete workoutDayNameId: " + workoutDayNameId);
-                            db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
-                                    .document(WorkoutActivity.workoutId).collection(Workout.WORKOUT_DAY_NAME).document(workoutDayNameId)
-                                    .collection(Workout.EXERCISE_NAME).get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful() && task.getResult() != null) {
-                                                for (int i = 0; i < task.getResult().size(); i++) {
-                                                    Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
-                                                    TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
-                                                    trackerExerciseList.add(trackerExercise);
-                                                    trainingList.add(training);
-                                                    initRecyclerView();
-                                                }
-                                                Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
-                                            } else {
-                                                Log.d(TAG, "No such document");
-                                            }
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.d(TAG, "get failed with ", e);
-                                        }
-                                    });
-                        }
+    private void getTraining() {
+        PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
+        int id = prefsUtils.getInt("workoutId", 0);
+
+        Log.d(TAG, "getTraining id: " + id);
+
+        planViewModel.getTrainingByWorkoutId(id).observe(this, new Observer<List<Training>>() {
+            @Override
+            public void onChanged(List<Training> trainings) {
+                if (trainings.isEmpty()) {
+                    Log.d(TAG, "onChanged: is empty");
+                } else {
+                    trainingList = trainings;
+                    for (Training t : trainings) {
+                        getExercise(t.getExerciseId());
+                        Log.d(TAG, "getTraining ExerciseId: " + t.getExerciseId());
                     }
-                });
+                }
+            }
+        });
+
+
+        // Log.d(TAG, "getTraining: " + WorkoutActivity.workoutId);
+//        db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
+//                .collection(Workout.WORKOUT_NAME).document(WorkoutActivity.workoutId)
+//                .collection(Workout.WORKOUT_DAY_NAME).get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful() && task.getResult() != null) {
+//                            String workoutDayNameId = task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
+//                            Log.d(TAG, "onComplete workoutDayNameId: " + workoutDayNameId);
+//                            db.collection(Workout.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
+//                                    .document(WorkoutActivity.workoutId).collection(Workout.WORKOUT_DAY_NAME).document(workoutDayNameId)
+//                                    .collection(Workout.EXERCISE_NAME).get()
+//                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                                        @Override
+//                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                                            if (task.isSuccessful() && task.getResult() != null) {
+//                                                for (int i = 0; i < task.getResult().size(); i++) {
+//                                                    Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
+//                                                    TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
+//                                                    trackerExerciseList.add(trackerExercise);
+//                                                    trainingList.add(training);
+//                                                    initRecyclerView();
+//                                                }
+//                                                Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
+//                                            } else {
+//                                                Log.d(TAG, "No such document");
+//                                            }
+//                                        }
+//                                    })
+//                                    .addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception e) {
+//                                            Log.d(TAG, "get failed with ", e);
+//                                        }
+//                                    });
+//                        }
+//                    }
+//                });
+    }
+
+    private void getExercise(int exerciseId) {
+        Log.d(TAG, "getExercise: " + exerciseId);
+        activityViewModel.getExerciseById(exerciseId).observe(this, new Observer<Exercise>() {
+            @Override
+            public void onChanged(Exercise exercise) {
+                if (exercise != null) {
+                    Log.d(TAG, "getExercise: " + exercise.getExerciseName());
+                    exerciseList.add(new Exercise(exercise.getExerciseName(), exercise.getImgName()));
+                    initRecyclerView();
+                }
+            }
+        });
     }
 
     private void countExercise() {
@@ -201,11 +243,10 @@ public class TrainingActivity extends AppCompatActivity {
 
 
     public void initRecyclerView() {
-
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvTraining.setLayoutManager(layoutManager);
-        trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
+        trainingAdapter = new TrainingAdapter(this, trainingList, exerciseList);
         trainingAdapter.notifyDataSetChanged();
         rvTraining.setAdapter(trainingAdapter);
         Log.d(TAG, "initRecyclerView: init recyclerView" + rvTraining);

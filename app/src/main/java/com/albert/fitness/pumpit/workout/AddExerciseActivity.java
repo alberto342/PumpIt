@@ -20,8 +20,6 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
     private ImageView btnBack, btnFront, imgFace;
     private TextView chest, shoulder, abs, thigh, allExercise, biceps, forearm, cardio, stretch;
     private TextView triceps, glutes, back, calf;
-    public static String categorySelected;
-    public static String category2Selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,93 +114,80 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.tv_chest:
-                intent.putExtra("exerciseType", "Chest");
-                categorySelected = "Chest";
-                category2Selected = "null";
+                intent.putExtra("exerciseType", 7);
+                intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_shoulder:
-                intent.putExtra("exerciseType", "Shoulders");
-                categorySelected = "Shoulders";
-                category2Selected = "null";
+                intent.putExtra("exerciseType", 3);
+                intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_abs:
-                intent.putExtra("exerciseType", "Abs");
-                categorySelected = "Abs";
-                category2Selected = "null";
+                intent.putExtra("exerciseType", 1);
+                intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_thigh:
-                intent.putExtra("exerciseType", "Thigh");
-                categorySelected = "Legs";
-                category2Selected = "null";
+                intent.putExtra("exerciseType", 5);
+                intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_all:
-                intent.putExtra("exerciseType", "All Exercises");
-                categorySelected = "All";
-                category2Selected = "null";
+                intent.putExtra("exerciseType", 0);
+                intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_biceps:
-                intent.putExtra("exerciseType", "Biceps");
-                categorySelected = "Arms";
-                category2Selected = "biceps";
+                intent.putExtra("exerciseType", 6);
+                intent.putExtra("category2", 2);
                 startActivity(intent);
                 break;
 
             case R.id.tv_forearm:
-                intent.putExtra("exerciseType", "Forearms");
-                categorySelected = "Arms";
-                category2Selected = "forearms";
+                intent.putExtra("exerciseType", 6);
+                intent.putExtra("category2", 4);
                 startActivity(intent);
                 break;
 
             case R.id.tv_cardio:
-                intent.putExtra("exerciseType", "Cardio");
-                categorySelected = "Cardio";
-                category2Selected = "null";
+                intent.putExtra("exerciseType", 4);
+                intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_triceps:
-                intent.putExtra("exerciseType", "Triceps");
-                categorySelected = "Arms";
-                category2Selected = "triceps";
+                intent.putExtra("exerciseType", 6);
+                intent.putExtra("category2", 3);
                 startActivity(intent);
                 break;
 
             case R.id.tv_glutes:
-                intent.putExtra("exerciseType", "Glutes");
-                categorySelected = "Legs";
-                category2Selected = "glutes";
+                intent.putExtra("exerciseType", 5);
+                intent.putExtra("category2", 7);
                 startActivity(intent);
                 break;
 
             case R.id.tv_back:
-                intent.putExtra("exerciseType", "Back");
-                categorySelected = "Back";
-                category2Selected = "null";
+                intent.putExtra("exerciseType", 8);
+                intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_calf:
-                intent.putExtra("exerciseType", "Calf");
-                categorySelected = "Legs";
-                category2Selected = "calf";
+                intent.putExtra("exerciseType", 5);
+                intent.putExtra("category2", 5);
                 startActivity(intent);
                 break;
 
             case R.id.tv_stretch:
-                intent.putExtra("exerciseType", "Stretch");
-                categorySelected = "Stretch";
-                category2Selected = "null";
+                intent.putExtra("exerciseType", 2);
+                intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
         }

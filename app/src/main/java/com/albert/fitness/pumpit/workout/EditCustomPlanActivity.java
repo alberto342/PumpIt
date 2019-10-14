@@ -1,6 +1,5 @@
 package com.albert.fitness.pumpit.workout;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,54 +10,42 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.albert.fitness.pumpit.model.WorkoutPlanObj;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.fragment.PlanFragment;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
 
 public class EditCustomPlanActivity extends AppCompatActivity implements View.OnClickListener {
 
-
     private final String TAG = "EditCustomPlanActivity";
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private EditText etRoutineName, etRoutineDescription;
     private ImageView ivDifficulty1, ivDifficulty2, ivDifficulty3, ivGeneralFitness, ivBulking, ivCutting, ivSportSpecific;
     private Spinner spDayType;
     private String type;
     private String difficultyLevel;
-    private List<WorkoutPlans> workoutPlansList;
-    private String workoutPlanId;
+    private CustomPlanViewModel planViewModel;
+    private WorkoutPlanObj workoutPlanObj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_custom_plan);
         setTitle("Custom Plan");
-
         init();
-
         setSpinnerDayType();
 
-        getDataFromFb();
+
+        getData();
     }
 
     private void init() {
-        workoutPlansList = new ArrayList<>();
         etRoutineName = findViewById(R.id.et_edit_routine_name);
         etRoutineDescription = findViewById(R.id.et_edite_routine_description);
         ivDifficulty1 = findViewById(R.id.iv_difficulty_1);
@@ -110,54 +97,38 @@ public class EditCustomPlanActivity extends AppCompatActivity implements View.On
         return super.onOptionsItemSelected(item);
     }
 
+    private void getData() {
+        planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
 
-    private void getDataFromFb() {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            int planId = extras.getInt("planId");
+            planViewModel.getPlan(planId).observe(this, new Observer<WorkoutPlanObj>() {
+                @Override
+                public void onChanged(WorkoutPlanObj workoutPlan) {
+                    Log.i(TAG, "getData: " + workoutPlan.getRoutineName());
+                    workoutPlanObj = workoutPlan;
 
-        CollectionReference reference = db.collection(WorkoutPlans.WORKOUT_PLANS).
-                document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME);
-
-        Query query = reference.whereEqualTo("routineName", PlanFragment.routineName);
-
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    for (int i = 0; i < task.getResult().size(); i++) {
-                        WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
-                        workoutPlansList.add(workoutPlans);
-
-                        etRoutineName.setText(workoutPlansList.get(i).getRoutineName());
-                        etRoutineDescription.setText(workoutPlansList.get(i).getRoutineDescription());
-                        getDifficultyLevel(workoutPlansList.get(i).getDifficultyLevel());
-                        getType(workoutPlansList.get(i).getRoutineType());
-                        Log.d(TAG, "Doc ID: " + task.getResult().getDocuments().get(i).getId() + "\ngetAllData: " + task.getResult().getDocuments());
-                    }
+                    etRoutineName.setText(workoutPlan.getRoutineName());
+                    etRoutineDescription.setText(workoutPlan.getRoutineDescription());
+                    getDifficultyLevel(workoutPlan.getDifficultyLevel());
+                    getType(workoutPlan.getRoutineType());
                 }
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure " + e);
-                    }
-                });
+            });
+        }
     }
 
 
     private void updateDataFb() {
-        DocumentReference workoutRef = db.collection(WorkoutPlans.WORKOUT_PLANS).
-                document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME).document(workoutPlanId);
-
-        workoutRef.update("routineName", etRoutineName.getText().toString());
-        workoutRef.update("routineDescription", etRoutineDescription.getText().toString());
+        workoutPlanObj.setRoutineName(etRoutineName.getText().toString());
+        workoutPlanObj.setRoutineDescription(etRoutineDescription.getText().toString());
         if (type != null) {
-            workoutRef.update("routineType", type);
+            workoutPlanObj.setRoutineType(type);
         }
         if (difficultyLevel != null) {
-            workoutRef.update("difficultyLevel", difficultyLevel);
+            workoutPlanObj.setDifficultyLevel(difficultyLevel);
         }
-
-        startActivity(new Intent(this, WorkoutPlansActivity.class));
+        planViewModel.updateWorkoutPlan(workoutPlanObj);
         finish();
     }
 

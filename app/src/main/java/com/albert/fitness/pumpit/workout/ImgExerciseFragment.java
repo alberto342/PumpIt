@@ -2,9 +2,6 @@ package com.albert.fitness.pumpit.workout;
 
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -19,10 +21,11 @@ import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 import fitness.albert.com.pumpit.R;
 
 public class ImgExerciseFragment extends Fragment {
+    private ProgressBar progress;
+    private ImageView exerciseImg;
 
     public ImgExerciseFragment() {
     }
@@ -32,7 +35,10 @@ public class ImgExerciseFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_img_exercise, container, false);
+        View view = inflater.inflate(R.layout.fragment_img_exercise, container, false);
+        progress = view.findViewById(R.id.progress_befor_img);
+        exerciseImg = view.findViewById(R.id.iv_exercise_img);
+        return view;
     }
 
     @Override
@@ -40,15 +46,9 @@ public class ImgExerciseFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         final String TAG = "ImgExerciseFragment";
-        ImageView exerciseImg;
-        final ProgressBar progress = view.findViewById(R.id.progress_befor_img);
-
-
-        exerciseImg = view.findViewById(R.id.iv_exercise_img);
 
         try {
             String imgFile = "file:///android_asset/images/" + ExerciseAdapter.exerciseImg;
-
 
             Glide.with(this)
                     .asGif()

@@ -3,6 +3,7 @@ package com.albert.fitness.pumpit.workout;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,12 +18,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.Training;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,14 +39,17 @@ import fitness.albert.com.pumpit.R;
 public class TrackerExerciseFragment extends Fragment {
 
     private LinearLayout container;
+    private CustomPlanViewModel planViewModel;
     private ArrayList<CharSequence> trackerList;
-    private final String TAG = "AndroidDynamicView";
-    private EditText weight, reps, setsRest, exerciseRest;
+    private static final String TAG = "TrackerExerciseFragment";
+    private EditText weight, reps, restBetweenSets, restAfterExercise;
     private Button btnAddTracker, saveTracker;
-   // private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private PrefsUtils prefsUtilsGetActivity = new PrefsUtils();
+    private PrefsUtils prefsUtilsGetActivity;
     private PrefsUtils prefsUtilsDefaultExercise = new PrefsUtils();
     private boolean workoutNameExist;
+    private int trainingId;
+    private List<Float> weightList = new ArrayList<>();
+    private List<Integer> repNumberList = new ArrayList<>();
 
     public TrackerExerciseFragment() {
 
@@ -60,11 +67,27 @@ public class TrackerExerciseFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
+
         init(view);
+        setTrackerExercise();
+        saveOnClick();
+        getLastTraining();
+    }
 
-        saveClick();
 
-        //set tracker exercise
+    private void init(View view) {
+        trackerList = new ArrayList<>();
+        weight = view.findViewById(R.id.et_set_weight);
+        reps = view.findViewById(R.id.et_reps);
+        btnAddTracker = view.findViewById(R.id.btn_add_tracker);
+        container = view.findViewById(R.id.container_tracker);
+        saveTracker = view.findViewById(R.id.btn_save_tracker);
+        restBetweenSets = view.findViewById(R.id.et_rest_between_sets);
+        restAfterExercise = view.findViewById(R.id.et_sec_rest_after_exercise);
+    }
+
+    private void setTrackerExercise() {
         btnAddTracker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,18 +105,6 @@ public class TrackerExerciseFragment extends Fragment {
                 reps.setText("");
             }
         });
-    }
-
-
-    private void init(View view) {
-        trackerList = new ArrayList<>();
-        weight = view.findViewById(R.id.et_set_weight);
-        reps = view.findViewById(R.id.et_reps);
-        btnAddTracker = view.findViewById(R.id.btn_add_tracker);
-        container = view.findViewById(R.id.container_tracker);
-        saveTracker = view.findViewById(R.id.btn_save_tracker);
-        setsRest = view.findViewById(R.id.et_rest_between_sets);
-        exerciseRest = view.findViewById(R.id.et_sec_rest_after_exercise);
     }
 
 
@@ -145,7 +156,6 @@ public class TrackerExerciseFragment extends Fragment {
                 ((LinearLayout) newView.getParent()).removeView(newView);
                 trackerList.remove(newText);
                 trackerList.remove(newTex2);
-
             }
         });
         container.addView(newView);
@@ -154,106 +164,80 @@ public class TrackerExerciseFragment extends Fragment {
     }
 
     //save all date into firebase
-    private void saveClick() {
+    private void saveOnClick() {
         saveTracker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                receiveData();
+                setData();
             }
         });
     }
 
 
-    private void receiveData() {
-        PrefsUtils prefsUtilsGetID = new PrefsUtils();
-        prefsUtilsGetID.createSharedPreferencesFiles(getActivity(), "exercise");
+    private void setData() {
+        PrefsUtils prefsUtilsGetID = new PrefsUtils(getActivity(), "exercise");
         final String getPlanId = prefsUtilsGetID.getString("planName", "");
 
-        prefsUtilsGetActivity.createSharedPreferencesFiles(getActivity(), PrefsUtils.START_WORKOUT);
+        int workoutId = prefsUtilsGetID.getInt("workoutId", 0);
+
+
+        prefsUtilsGetActivity = new PrefsUtils(getActivity(), PrefsUtils.START_WORKOUT);
         String activity1 = prefsUtilsGetActivity.getString("activity", "");
         String activity2 = prefsUtilsGetActivity.getString("activity2", "");
-
-//        String rest = setsRest.getText().toString();
-//        String[] parts = rest.split(" ");
-//        int restBetweenSet = Integer.parseInt(parts[0]);
-//
-//        String restExercise = exerciseRest.getText().toString();
-//        String[] part = restExercise.split(" ");
-//        int restAfterExercise = Integer.parseInt(part[0]);
-
-        final List<TrackerExercise> weightList = new ArrayList<>();
-        List<TrackerExercise> repNumberList = new ArrayList<>();
-        List<TrackerExercise> trackerExerciseList = new ArrayList<>();
 
         for (int i = 0; i < trackerList.size(); i++) {
             switch (i % 2) {
                 case 0:
-                    weightList.add(new TrackerExercise(Float.valueOf(trackerList.get(i).toString())));
+                    weightList.add(Float.valueOf(trackerList.get(i).toString()));
                     break;
                 case 1:
-                    repNumberList.add(new TrackerExercise(Integer.valueOf(trackerList.get(i).toString())));
+                    repNumberList.add(Integer.valueOf(trackerList.get(i).toString()));
                     break;
             }
         }
 
-        for (int i = 0; i < weightList.size(); i++) {
-            trackerExerciseList.add(new TrackerExercise(repNumberList.get(i).getRepNumber(), weightList.get(i).getWeight()));
-        }
-
-
-        final Training training = new Training(ExerciseAdapter.exerciseImg,ExerciseAdapter.exerciseName,
-                Integer.valueOf(setsRest.getText().toString()),Integer.valueOf(exerciseRest.getText().toString()),UserRegister.getTodayDate(),
-                trackerList.size() / 2,0);
-
-
-
-
-
+        Training training = new Training(ExerciseAdapter.exerciseId, Integer.valueOf(restBetweenSets.getText().toString()),
+                Integer.valueOf(this.restAfterExercise.getText().toString()), trackerList.size() / 2,
+                UserRegister.getTodayDate(), workoutId);
 
         if (activity1.equals("StartWorkoutActivity") && activity2.equals("ShowExerciseResultActivity")) {
-        //    saveTrackerFromStartWorkout(getPlanId, training);
+            saveTrackerFromStartWorkout(getPlanId, training);
         } else {
-        //    saveTrackerIntoFb(getPlanId, training);
+            saveTraining(training);
         }
     }
 
+    private void saveTraining(final Training training) {
+        planViewModel.addNewTraining(training);
+        Log.d(TAG, "onComplete: success saved  workout tracker");
+        Intent intent = new Intent(getActivity(), TrainingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        Objects.requireNonNull(getActivity()).finish();
 
-//    private void saveTrackerIntoFb(final String getPlanId, final Training training) {
-//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
-//                .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful() && task.getResult() != null) {
-//                            final String workoutDayNameId = task.getResult().getDocuments().get(WorkoutAdapter.pos).getId();
-//                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME)
-//                                    .document(getPlanId).collection(Workout.WORKOUT_DAY_NAME)
-//                                    .document(workoutDayNameId).collection(Workout.EXERCISE_NAME)
-//                                    .document(ExerciseAdapter.exerciseName)
-//                                    .set(training)
-//                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                        @Override
-//                                        public void onComplete(@NonNull Task<Void> task) {
-//                                            Log.d(TAG, "onComplete: success saved  workout tracker");
-//                                            Intent intent = new Intent(getActivity(), TrainingActivity.class);
-//                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                                            startActivity(intent);
-//                                            Objects.requireNonNull(getActivity()).finish();
-//                                        }
-//                                    })
-//                                    .addOnFailureListener(new OnFailureListener() {
-//                                        @Override
-//                                        public void onFailure(@NonNull Exception e) {
-//                                            Log.d(TAG, "Error writing document", e);
-//                                        }
-//                                    });
-//                        }
-//                    }
-//                });
-//    }
+        for(int i=0 ; i< repNumberList.size(); i++) {
+            TrackerExercise trackerExercise = new TrackerExercise(repNumberList.get(i),weightList.get(i),trainingId);
+            planViewModel.addNewTracker(trackerExercise);
+        }
+    }
+
+    private void getLastTraining() {
+        planViewModel.getAllTraining().observe(this, new Observer<List<Training>>() {
+            @Override
+            public void onChanged(List<Training> trainings) {
+                if (trainings.isEmpty()) {
+                    trainingId = 1;
+                } else {
+                    Log.d(TAG, "getLastTraining: " + trainings.get(trainings.size() - 1).getTrainingId());
+                    trainingId = trainings.get(trainings.size() - 1).getTrainingId();
+                }
+            }
+        });
+    }
 
 
-//    private void saveTrackerFromStartWorkout(final String getPlanId, final Training training) {
+
+    private void saveTrackerFromStartWorkout(final String getPlanId, final Training training) {
 //        prefsUtilsDefaultExercise.createSharedPreferencesFiles(getActivity(), PrefsUtils.DEFAULT_EXERCISE);
 //        final String defaultExercise = prefsUtilsDefaultExercise.getString("e_" + currentDayName(), "");
 //
@@ -268,7 +252,7 @@ public class TrackerExerciseFragment extends Fragment {
 //                        @Override
 //                        public void onComplete(@NonNull Task<Void> task) {
 //
-//                            updateWorkoutDayName(getPlanId, defaultExercise);
+//                          //  updateWorkoutDayName(getPlanId, defaultExercise);
 //                            prefsUtilsGetActivity.removeAll(getActivity(), PrefsUtils.START_WORKOUT);
 //                            Intent intent = new Intent(getActivity(), StartWorkoutActivity.class);
 //                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -283,12 +267,12 @@ public class TrackerExerciseFragment extends Fragment {
 //                        }
 //                    });
 //        }
-//    }
+    }
 
 
-//    private void createWorkoutDayName(String getPlanId) {
-//        Log.i(TAG, "createWorkoutDayName:  workoutNameExist: " + workoutNameExist);
-//
+    private void createWorkoutDayName(String getPlanId) {
+        Log.i(TAG, "createWorkoutDayName:  workoutNameExist: " + workoutNameExist);
+
 //        prefsUtilsDefaultExercise.createSharedPreferencesFiles(getActivity(), PrefsUtils.DEFAULT_EXERCISE);
 //
 //        Workout workout = new Workout(UserRegister.getTodayDate(), dayWorkout(), currentDayName(), 0, 0);
@@ -308,7 +292,7 @@ public class TrackerExerciseFragment extends Fragment {
 //                Log.i(TAG, "onFailure: " + e.getMessage());
 //            }
 //        });
-//    }
+    }
 
 //    private void updateWorkoutDayName(final String getPlanId, final String workoutId) {
 //

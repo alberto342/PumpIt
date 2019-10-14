@@ -24,6 +24,6 @@ public interface WorkoutDAO {
     @Query("SELECT * FROM workout_table")
     LiveData<List<WorkoutObj>> getAllWorkout();
 
-    @Query("SELECT * FROM workout_table WHERE workout_plan_id==:id")
+    @Query("SELECT * FROM workout_table WHERE workout_plan_id==:id ORDER BY workout_day_name ASC")
     LiveData<List<WorkoutObj>> getWorkout(int id);
 }

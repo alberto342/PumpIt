@@ -34,7 +34,7 @@
         <activity android:name="com.albert.fitness.pumpit.workout.ExerciseLogsActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.TrainingActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.WorkoutActivity" />
-        <activity android:name="com.albert.fitness.pumpit.workout.WorkoutPlansActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.WorkoutChangePlansActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.CustomPlanActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.ShowExerciseResultActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.ExerciseDetailActivity" />

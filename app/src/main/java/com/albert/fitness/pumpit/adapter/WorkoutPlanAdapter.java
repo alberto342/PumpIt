@@ -14,7 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.model.WorkoutPlanObj;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.workout.WorkoutActivity;
+import com.albert.fitness.pumpit.workout.WorkoutChangePlansActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -25,7 +27,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private Context mContext;
     private List<WorkoutPlanObj> plansList;
-    public static int posit;
 
     public WorkoutPlanAdapter(Context mContext, List<WorkoutPlanObj> plansList) {
         this.mContext = mContext;
@@ -62,8 +63,11 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         holder.itemPlanSelected.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(mContext instanceof WorkoutChangePlansActivity) {
+                    PrefsUtils prefsUtils = new PrefsUtils(mContext, PrefsUtils.EXERCISE);
+                    prefsUtils.saveData(PrefsUtils.DEFAULT_PLAN, plansList.get(0).getRoutineName());
+                }
 
-                posit = position;
 
                 plansList.get(position).getPlanId();
 
@@ -74,8 +78,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 i.putExtra("difficultyLevel", plansList.get(position).getDifficultyLevel());
                 mContext.startActivity(i);
 
-                //  getWorkPlanId(position);
-               // mContext.startActivity(new Intent(mContext, WorkoutActivity.class));
             }
         });
 
@@ -112,13 +114,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-
-    //Get workoutName item id
-//   PrefsUtils prefsUtils = new PrefsUtils();
-//   prefsUtils.createSharedPreferencesFiles(mContext, "exercise");
-//   prefsUtils.saveData("planName", task.getResult().getDocuments().get(position).getId());
-
-
     @Override
     public int getItemCount() {
         return plansList.size();
@@ -146,8 +141,6 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public ViewHolder(View rowView) {
             super(rowView);
             rowView.setOnClickListener(this);
-
-            //      ivImage = rowView.findViewById(R.id.iv_plan_icon);
             tvPlanName = rowView.findViewById(R.id.tv_workout_plan_name);
             itemPlanSelected = rowView.findViewById(R.id.item_plan_selected);
             tvGeneral = rowView.findViewById(R.id.tv_general);

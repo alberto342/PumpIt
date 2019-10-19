@@ -67,10 +67,7 @@ public class WorkoutPlanAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     PrefsUtils prefsUtils = new PrefsUtils(mContext, PrefsUtils.EXERCISE);
                     prefsUtils.saveData(PrefsUtils.DEFAULT_PLAN, plansList.get(0).getRoutineName());
                 }
-
-
                 plansList.get(position).getPlanId();
-
                 Intent i = new Intent(mContext, WorkoutActivity.class);
                 i.putExtra("id", plansList.get(position).getPlanId());
                 i.putExtra("workoutSize", plansList.get(position).getDaysWeekPosition());

@@ -6,13 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.albert.fitness.pumpit.workout.ImgExerciseFragment">
 
-    <ProgressBar
-        android:id="@+id/progress_befor_img"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
-        android:visibility="visible" />
-
     <ImageView
         android:id="@+id/iv_exercise_img"
         android:layout_width="match_parent"

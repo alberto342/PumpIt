@@ -10,12 +10,13 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.adapter.exercise_adapter.ExerciseAdapter;
+import com.albert.fitness.pumpit.adapter.new_adapter.ExerciseAdapter;
 import com.albert.fitness.pumpit.model.Exercise;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.databinding.ActivityShowExerciseResultBinding;
 
 
 public class ShowExerciseResultActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
@@ -32,12 +34,15 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     private PrefsUtils prefsUtils;
     private WelcomeActivityViewModel welcomeActivityViewModel;
     private ExerciseAdapter exerciseAdapter;
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_exercise_result);
+        ActivityShowExerciseResultBinding exerciseResultBinding =
+                DataBindingUtil.setContentView(this, R.layout.activity_show_exercise_result);
         setTitle(getExerciseType());
+        mRecyclerView = exerciseResultBinding.rvExerciseResult;
         pref();
         welcomeActivityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
         setUpLoadExercise();
@@ -46,7 +51,7 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     private void setUpLoadExercise() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            int category = extras.getInt("exerciseType");
+            int category = extras.getInt("category");
             int secondaryCategory = extras.getInt("category2");
 
             if (category == 0) {
@@ -95,7 +100,7 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     private String getExerciseType() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            return extras.getString("exerciseType");
+            return extras.getString("exerciseType") + " Exercise";
         }
         return null;
     }
@@ -109,17 +114,35 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     }
 
 
-    @SuppressLint({"WrongConstant", "LongLogTag"})
+
+
+
+    @SuppressLint("LongLogTag")
     private void initRecyclerView() {
         final String TAG = "ShowExerciseResultActivity";
-        RecyclerView recyclerView = findViewById(R.id.rv_exercise_result);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        exerciseAdapter = new ExerciseAdapter(this, exerciseList);
-        recyclerView.setAdapter(exerciseAdapter);
-
-        Log.d(TAG, "initRecyclerView: init recyclerView" + recyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
+        exerciseAdapter = new ExerciseAdapter();
+        exerciseAdapter.setItems(exerciseList);
+        mRecyclerView.setAdapter(exerciseAdapter);
+        Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);
+        exerciseAdapter.setListener(new ExerciseAdapter.OnItemClickListener() {
+            @SuppressLint("LongLogTag")
+            @Override
+            public void onItemClick(Exercise item) {
+                Log.d(TAG, "Exercise position: " + item.getExerciseId());
+                Intent i = new Intent(ShowExerciseResultActivity.this, ExerciseDetailActivity.class);
+                i.putExtra("exerciseId", item.getExerciseId());
+                i.putExtra("exerciseName", item.getExerciseName());
+                i.putExtra("imgUrl", item.getImgName());
+                startActivity(i);
+            }
+        });
     }
+
+
+
+
 
 
     //   private void getCustomExercise() {

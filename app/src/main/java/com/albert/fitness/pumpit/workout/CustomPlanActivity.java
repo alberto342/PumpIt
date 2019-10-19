@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.albert.fitness.pumpit.model.DateObj;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.model.WorkoutObj;
 import com.albert.fitness.pumpit.model.WorkoutPlanObj;
@@ -128,8 +127,7 @@ public class CustomPlanActivity extends AppCompatActivity {
 
         //check if have default exercise
         PrefsUtils prefsUtils = new PrefsUtils(this, "exercise");
-
-        receiveDate();
+        prefsUtils.saveData("default_plan", routineName);
 
         WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel,
                 routineType, dayType, routineDescription, UserRegister.getTodayDate(), dayWeekPosition);
@@ -145,23 +143,6 @@ public class CustomPlanActivity extends AppCompatActivity {
 
     }
 
-    private void receiveDate() {
-        customPlanViewModel.getAllDates().observe(this, new Observer<List<DateObj>>() {
-            @Override
-            public void onChanged(List<DateObj> dateObjs) {
-                DateObj date = new DateObj();
-                date.setDate(UserRegister.getTodayDate());
-                if(!dateObjs.isEmpty()) {
-                    Log.d(TAG, "ReceiveDate: " + dateObjs.get(dateObjs.size() - 1).getDate());
-                    if (!UserRegister.getTodayDate().equals(dateObjs.get(dateObjs.size() - 1).getDate())) {
-                        customPlanViewModel.addNewDate(date);
-                    }
-                } else {
-                    customPlanViewModel.addNewDate(date);
-                }
-            }
-        });
-    }
 
     private void receivePlanId(final int position) {
         customPlanViewModel.getAllPlan().observe(this, new Observer<List<WorkoutPlanObj>>() {

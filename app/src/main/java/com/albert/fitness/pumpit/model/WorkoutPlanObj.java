@@ -2,14 +2,10 @@ package com.albert.fitness.pumpit.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import static androidx.room.ForeignKey.CASCADE;
-
-@Entity(tableName = "plan_table", foreignKeys = @ForeignKey(entity = DateObj.class,
-        parentColumns = "id", childColumns = "date_id", onDelete = CASCADE))
+@Entity(tableName = "plan_table")
 public class WorkoutPlanObj {
 
     @PrimaryKey(autoGenerate = true)
@@ -33,9 +29,6 @@ public class WorkoutPlanObj {
 
     @ColumnInfo(name = "routine_description")
     private String routineDescription;
-
-    @ColumnInfo(name = "date_id")
-    private String dateId;
 
     private String date;
 
@@ -74,14 +67,6 @@ public class WorkoutPlanObj {
         this.routineDescription = routineDescription;
         this.date = date;
         this.daysWeekPosition = daysWeekPosition;
-    }
-
-    public String getDateId() {
-        return dateId;
-    }
-
-    public void setDateId(String dateId) {
-        this.dateId = dateId;
     }
 
     public int getPlanId() {

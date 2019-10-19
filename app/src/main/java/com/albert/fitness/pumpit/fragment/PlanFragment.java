@@ -43,9 +43,9 @@ public class PlanFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private final String TAG = "PlanFragment";
     private List<WorkoutPlanObj> workoutPlansList;
-    public static String routineName; // check in EditCustomPlanActivity
     private WorkoutPlanAdapter planAdapter;
     private CustomPlanViewModel customPlanViewModel;
+    private PrefsUtils prefsUtils = new PrefsUtils();
 
     public PlanFragment() {
         // Required empty public constructor
@@ -58,9 +58,7 @@ public class PlanFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_plan, container, false);
         mRecyclerView = view.findViewById(R.id.fr_rv_workout_plans);
-
         setHasOptionsMenu(true);
-
         swipe();
         return view;
     }
@@ -75,8 +73,9 @@ public class PlanFragment extends Fragment {
                 if (!workoutPlan.isEmpty()) {
                     workoutPlansList = workoutPlan;
                     initRecyclerView();
-                    PrefsUtils prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.EXERCISE);
+                    prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.EXERCISE);
                     prefsUtils.saveData("default_plan", workoutPlan.get(0).getRoutineName());
+                    prefsUtils.saveData("default_plan_id", workoutPlan.get(0).getPlanId());
                     prefsUtils.saveData("sizeOfWorkoutPlan", workoutPlan.size());
                 }
             }
@@ -124,6 +123,7 @@ public class PlanFragment extends Fragment {
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
+                                deleteFromPrefIfIsDef();
                                 deleteItem(pos);
                                 planAdapter.notifyDataSetChanged();
                             }
@@ -139,7 +139,6 @@ public class PlanFragment extends Fragment {
                             public void onClick(int pos) {
                                 Intent i = new Intent(Objects.requireNonNull(getActivity()).getBaseContext(), EditCustomPlanActivity.class);
                                 i.putExtra("planId",workoutPlansList.get(pos).getPlanId());
-                                //routineName = workoutPlansList.get(pos).getRoutineName();
                                 Log.d(TAG, "pos: " + pos + " Workout Name: " + workoutPlansList.get(pos).getRoutineName());
                                 startActivity(i);
                             }
@@ -157,6 +156,15 @@ public class PlanFragment extends Fragment {
         planAdapter.notifyItemRemoved(position);
         planAdapter.notifyItemRangeChanged(position, workoutPlansList.size());
         Log.i(TAG, "success delete item");
+    }
+
+    private void deleteFromPrefIfIsDef() {
+        String plan = prefsUtils.getString("default_plan" , "");
+        if( !plan.isEmpty() && workoutPlansList.get(0).getRoutineName().equals(plan)) {
+            prefsUtils.removeSingle(getContext(), PrefsUtils.EXERCISE,"default_plan");
+            prefsUtils.removeSingle(getContext(), PrefsUtils.EXERCISE, "default_plan_id");
+        }
+
     }
 
 

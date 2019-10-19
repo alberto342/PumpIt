@@ -11,6 +11,10 @@
 
     <string name="foodName">Food name</string>
 
+    <string name="zero_min">%d min(s)</string>
+    <string name="num_of_sets">%d SET(s)</string>
+    <string name="rest_time">Rest: %ds</string>
+
 
     <string name="general_fitness">General Fitness</string>
     <string name="bulking">Bulking</string>

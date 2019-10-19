@@ -7,12 +7,18 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.albert.fitness.pumpit.model.Training;
 import com.albert.fitness.pumpit.model.WorkoutObj;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.databinding.ItemWorkoutBinding;
@@ -20,6 +26,13 @@ import fitness.albert.com.pumpit.databinding.ItemWorkoutBinding;
 public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutObjViewHolder> {
     private OnItemClickListener listener;
     private ArrayList<WorkoutObj> items = new ArrayList<>();
+    private CustomPlanViewModel viewModel;
+    private FragmentActivity fragmentActivity;
+
+    public WorkoutAdapter(FragmentActivity context) {
+        fragmentActivity = context;
+        viewModel = ViewModelProviders.of(context).get(CustomPlanViewModel.class);
+    }
 
     @NonNull
     @Override
@@ -34,7 +47,42 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutO
     public void onBindViewHolder(@NonNull WorkoutObjViewHolder viewHolder, int i) {
         WorkoutObj item = items.get(i);
         viewHolder.listItemBinding.setWorkout(item);
+        getSizeOfTraining(item.getWorkoutId(), viewHolder);
     }
+
+    private void getSizeOfTraining(int workoutId, final WorkoutObjViewHolder viewHolder) {
+        viewModel.getTrainingByWorkoutId(workoutId).observe(fragmentActivity, new Observer<List<Training>>() {
+            @Override
+            public void onChanged(List<Training> trainings) {
+                if (trainings.isEmpty()) {
+                    viewHolder.listItemBinding.setTrainingSize(0);
+                    viewHolder.listItemBinding.setTotalTime(0);
+                } else {
+                    viewHolder.listItemBinding.setTrainingSize(trainings.size());
+
+                    //Calculation total training
+                    int totalTimeTraining = 0;
+                    int countRestAfterExercise = 0;
+                    int countRestBetweenSet = 0;
+                    int sizeOfRept = 0;
+                    float exerciseTime = 33 / 60;
+
+                    for (Training training : trainings) {
+                        countRestAfterExercise += training.getRestAfterExercise();
+                        countRestBetweenSet += training.getRestBetweenSet();
+                        sizeOfRept += training.getSizeOfRept();
+                    }
+
+                    float totalResetAfterExercise = countRestAfterExercise / 60;
+                    float totalRestBetweenSet = countRestBetweenSet / 60;
+
+                    totalTimeTraining += (exerciseTime * sizeOfRept) + (totalRestBetweenSet * sizeOfRept) + totalResetAfterExercise;
+                    viewHolder.listItemBinding.setTotalTime(totalTimeTraining);
+                }
+            }
+        });
+    }
+
 
     @Override
     public int getItemCount() {
@@ -47,10 +95,11 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutO
         result.dispatchUpdatesTo(WorkoutAdapter.this);
     }
 
+
     class WorkoutObjViewHolder extends RecyclerView.ViewHolder {
         private ItemWorkoutBinding listItemBinding;
 
-        public WorkoutObjViewHolder(@NonNull ItemWorkoutBinding listItemBinding) {
+        private WorkoutObjViewHolder(@NonNull ItemWorkoutBinding listItemBinding) {
             super(listItemBinding.getRoot());
             this.listItemBinding = listItemBinding;
             listItemBinding.getRoot().setOnClickListener(new View.OnClickListener() {
@@ -77,7 +126,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutO
         ArrayList<WorkoutObj> oldItemsList;
         ArrayList<WorkoutObj> newItemList;
 
-        public WorkoutObjDiffCallback(ArrayList<WorkoutObj> oldItemsList, ArrayList<WorkoutObj> newItemList) {
+        private WorkoutObjDiffCallback(ArrayList<WorkoutObj> oldItemsList, ArrayList<WorkoutObj> newItemList) {
             this.oldItemsList = oldItemsList;
             this.newItemList = newItemList;
         }

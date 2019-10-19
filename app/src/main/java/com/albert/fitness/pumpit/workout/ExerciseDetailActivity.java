@@ -24,9 +24,8 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
     //private final String TAG = "ExerciseDetailActivity";
     private ImageView imgFavorite;
     public static boolean isFavoriteSelected = false;
-    private String exerciseName;
+    private String exerciseName, imgName;
     int id;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +44,6 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
         instructionsExerciseFragment = new InstructionsExerciseFragment();
         trackerExerciseFragment = new TrackerExerciseFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.container_workout_tracker, imgExerciseFragment).commit();
-
         setTheFragmentSwitch();
     }
 
@@ -55,7 +53,17 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
         if (b != null) {
             id = b.getInt("exerciseId");
             exerciseName = b.getString("exerciseName");
+            imgName = b.getString("imgUrl");
         }
+    }
+
+    public String getExerciseName() {
+        return imgName;
+    }
+
+
+    public int getExerciseId() {
+        return id;
     }
 
 

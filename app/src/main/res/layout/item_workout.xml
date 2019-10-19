@@ -7,6 +7,14 @@
         <variable
             name="workout"
             type="com.albert.fitness.pumpit.model.WorkoutObj" />
+
+        <variable
+            name="trainingSize"
+            type="Integer" />
+
+        <variable
+            name="totalTime"
+            type="Integer" />
     </data>
 
 <LinearLayout
@@ -57,6 +65,7 @@
                     android:layout_weight="1"
                     android:gravity="right"
                     android:hint="date"
+                    android:text="@{workout.date}"
                     android:paddingRight="15dp"
                     android:textColor="@color/white"
                     android:textColorHint="@color/gray"
@@ -106,7 +115,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:text="0"
+                    android:text="@{String.valueOf(trainingSize)}"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
 
@@ -130,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="0 min(s)"
-                    android:text="@{workout.lengthTraining}"
+                    android:text="@{@string/zero_min(totalTime)}"
                     android:textColor="@color/white"
                     android:textColorHint="@color/white"
                     android:textSize="12sp" />

@@ -208,7 +208,6 @@
         android:id="@+id/sv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/btn_save_tracker"
         android:layout_below="@+id/ly_set_weight_rep"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="25dp">
@@ -219,19 +218,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" />
     </ScrollView>
-
-
-    <Button
-        android:id="@+id/btn_save_tracker"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="15dp"
-        android:background="@drawable/round"
-        android:text="Save"
-        android:textColor="@color/white" />
-
-
 
 
 </RelativeLayout>

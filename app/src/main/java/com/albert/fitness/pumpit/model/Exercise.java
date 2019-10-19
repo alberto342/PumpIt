@@ -1,9 +1,16 @@
 package com.albert.fitness.pumpit.model;
 
+import android.graphics.Bitmap;
+import android.widget.ImageView;
+
+import androidx.databinding.BindingAdapter;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
+
+import com.albert.fitness.pumpit.helper.BitmapFromAssent;
+import com.bumptech.glide.Glide;
 
 import java.util.Objects;
 
@@ -46,6 +53,16 @@ public class Exercise {
         this.imgName = imgName;
         this.categoryId = categoryId;
     }
+
+    @BindingAdapter({"img_name"})
+    public static void loadImage(ImageView view, String imageUrl) {
+        Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(view.getContext(), imageUrl);
+        Glide.with(view.getContext())
+                .load(bitmap)
+             //   .placeholder(R.drawable.loading)
+                .into(view);
+    }
+
 
     public int getExerciseId() {
         return exerciseId;

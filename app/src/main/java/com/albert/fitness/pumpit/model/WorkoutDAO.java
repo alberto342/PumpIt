@@ -26,4 +26,10 @@ public interface WorkoutDAO {
 
     @Query("SELECT * FROM workout_table WHERE workout_plan_id==:id ORDER BY workout_day_name ASC")
     LiveData<List<WorkoutObj>> getWorkout(int id);
+
+    @Query("SELECT * FROM workout_table WHERE workout_id ==:id")
+    LiveData<WorkoutObj> getWorkoutById(int id);
+
+    @Query("SELECT * FROM workout_table WHERE workout_day==:workoutDay")
+    LiveData<WorkoutObj> getWorkoutByWorkoutDay(String workoutDay);
 }

@@ -70,6 +70,12 @@ public class Event {
         return monthDate.format(cal.getTime());
     }
 
+    public static String getWorkoutDayName() {
+        Calendar calendar = Calendar.getInstance();
+        String[] days = new String[]{"Workout 1", "Workout 2", "Workout 3", "Workout 4", "Workout 5", "Workout 6", "Workout 7"};
+        return days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
+    }
+
     public String getMonthData(int numMonth, int year) {
         String date, digitMonth = null;
         int maxDay = maxDayInMonth(numMonth, year);

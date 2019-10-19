@@ -16,17 +16,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.albert.fitness.pumpit.workout.ShowExerciseImgActivity"></activity>
+        <activity android:name="com.albert.fitness.pumpit.workout.ShowExerciseImgActivity" />
         <activity
             android:name="com.albert.fitness.pumpit.fragment.profile.SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity android:name="com.albert.fitness.pumpit.welcome.RegisterActivity"/>
+        <activity android:name="com.albert.fitness.pumpit.welcome.RegisterActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.FinisherWorkoutActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.ShowLogExerciseActivity" />
         <activity android:name="com.albert.fitness.pumpit.fragment.logsFragment.LogTabActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.CustomAddExerciseActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.ChangePlanActivity" />
-        <activity android:name="com.albert.fitness.pumpit.workout.WorkoutStartActivity"
+        <activity
+            android:name="com.albert.fitness.pumpit.workout.WorkoutStartActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.albert.fitness.pumpit.workout.StartWorkoutActivity" />
         <activity android:name="com.albert.fitness.pumpit.workout.FindWorkoutActivity" />

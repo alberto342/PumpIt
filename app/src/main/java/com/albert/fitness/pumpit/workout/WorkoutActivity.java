@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.adapter.new_adapter.WorkoutAdapter;
 import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.model.Workout;
+import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.model.WorkoutObj;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.utils.SwipeHelper;
@@ -42,12 +42,14 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
     private final String TAG = "WorkoutActivity";
     private CustomPlanViewModel customPlanViewModel;
-    private List<Workout> workoutList;
+    private List<WorkoutObj> workoutList;
     private TextView tvNameOfPlan, tvNameOfPlanSmall, tvActiveWorkout, tvChangePlan;
     private ImageView ivActivityPlan;
     private RecyclerView mRecyclerView;
     public static String workoutId;
     private int id;
+
+    // TODO: 2019-10-18 workoutId is null
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         tvNameOfPlan.setText(routine);
         tvNameOfPlanSmall.setText(routine);
 
+        customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
 
         //save into pref
         PrefsUtils prefsUtils = new PrefsUtils(WorkoutActivity.this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
@@ -74,33 +77,31 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         //check the default
         isActivatedPlan();
 
-        customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
+        getWorkout(id, size, workoutId);
+        initRecyclerView();
+        //setupSwipeMenu();
+        swipe();
 
-        getWorkout(id, size);
-
-        //  getPlanFormFb();
-        //  initRecyclerView();
-        // swipe();
-        // setupSwipeMenu();
     }
 
-
-    private void getWorkout(final int id, final int size) {
+    private void getWorkout(final int id, final int size , final String workoutId) {
+        final PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
+        final boolean isFirstTime = prefsUtils.getBoolean("first_time " + workoutId, true);
         if (id != -1 && size != -1) {
             customPlanViewModel.getWorkoutNAmeOfASelectedPlan(id).observe(this, new Observer<List<WorkoutObj>>() {
                 @Override
-                public void onChanged(List<WorkoutObj> workoutObjs) {
-                    if (workoutObjs.isEmpty()) {
+                public void onChanged(List<WorkoutObj> workout) {
+                    workoutList = workout;
+                    if (workout.isEmpty() && isFirstTime) {
                         for (int i = 0; i <= size; i++) {
                             int num = i + 1;
-                            WorkoutObj workoutObj = new WorkoutObj("", "Day " + num, "Workout " + num, id);
+                            WorkoutObj workoutObj = new WorkoutObj( "Day " + num,
+                                    "Workout " + num, UserRegister.getTodayDate(), id);
                             customPlanViewModel.addNewWorkout(workoutObj);
+                            prefsUtils.saveData("first_time " + workoutId, false);
                         }
                     }
-                    for (WorkoutObj workoutObj : workoutObjs) {
-                        Log.d(TAG, "getWorkout: " + workoutObj.getWorkoutDayName());
-                        initRecyclerView(workoutObjs);
-                    }
+                    initRecyclerView();
                 }
             });
         }
@@ -118,10 +119,19 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         ivActivityPlan.setOnClickListener(this);
     }
 
-
     @Override
-    protected void onResume() {
-        super.onResume();
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.tv_change_plan:
+                startActivity(new Intent(WorkoutActivity.this, WorkoutChangePlansActivity.class));
+                finish();
+                break;
+            case R.id.btn_set_as_activity_plan:
+                changeDefault();
+                finish();
+                startActivity(getIntent());
+                break;
+        }
     }
 
     @Override
@@ -135,7 +145,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (R.id.add_plans == item.getItemId()) {
-            setEditLayout("");
+            setEditLayout(-1);
         }
         return true;
     }
@@ -143,7 +153,6 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
     private void isActivatedPlan() {
         PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
-        boolean defaultExercise = prefsUtils.getBoolean(PrefsUtils.DEFAULT_EXERCISE, false);
         String routineName = prefsUtils.getString(PrefsUtils.DEFAULT_PLAN, "");
         int sizeOfWorkout = prefsUtils.getInt("sizeOfWorkoutPlan", -1);
 
@@ -169,20 +178,16 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
+
+
     private void saveDay(String workoutDayName, String workoutDay) {
-        WorkoutObj workout = new WorkoutObj("00:00:00", workoutDayName, workoutDay, id);
+        WorkoutObj workout = new WorkoutObj(workoutDayName, workoutDay, UserRegister.getTodayDate(), id);
         customPlanViewModel.addNewWorkout(workout);
         Log.d(TAG, "DocumentSnapshot successfully saved this day");
     }
 
-    private String getWorkPlanId() {
-        PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.EXERCISE);
-        return prefsUtils.getString(PrefsUtils.PLAN_NAME, "null");
-    }
-
-    private void setEditLayout(final String workoutDayName) {
-        final boolean[] isEditSelected = new boolean[1];
+    private void setEditLayout(final int i) {
+        final WorkoutObj[] workout = new WorkoutObj[1];
 
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
@@ -196,11 +201,6 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         final ImageView cancel = dialogView.findViewById(R.id.iv_exit_custom_plan);
 
         final AlertDialog dialog = dialogBuilder.create();
-
-        if (!workoutDayName.isEmpty()) {
-            workoutName.setText(workoutDayName);
-            isEditSelected[0] = true;
-        }
 
         //set spinner
         List<String> workoutDayList = new ArrayList<>();
@@ -219,37 +219,29 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         pickWorkoutDay.setAdapter(daysWeekAdapter);
 
 
+        if (i != -1) {
+            customPlanViewModel.getWorkoutById(workoutList.get(i).getWorkoutId()).observe(this, new Observer<WorkoutObj>() {
+                @Override
+                public void onChanged(WorkoutObj workoutObj) {
+                    workout[0] = workoutObj;
+                    workoutName.setText(workoutObj.getWorkoutDayName());
+                }
+            });
+        }
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (workoutName.getText().toString().isEmpty()) {
                     workoutName.setError("Please enter Workout Day Name");
+                } else if (i == -1) {
+                    saveDay(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString());
+                } else {
+                    updateItemIfExisting(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString(), workout[0]);
                 }
-
                 //Check if the day existing
-//                db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-//                        .collection(WorkoutPlans.WORKOUT_NAME)
-//                        .document(workoutId).collection(Workout.WORKOUT_DAY_NAME)
-//                        .whereEqualTo("workoutDay", pickWorkoutDay.getSelectedItem().toString()).get()
-//                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                            @Override
-//                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                                Log.d(TAG, "onSuccess: " + queryDocumentSnapshots.isEmpty());
-//
-//                                if (queryDocumentSnapshots.isEmpty()) {
-//                                    if (!isEditSelected[0]) {
-//                                        saveDay(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString());
-//                                    } else {
-//                                        updateItem(workoutDayName, workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString());
-//                                        isEditSelected[0] = false;
-//                                    }
-//                                } else {
-//                                    Log.d(TAG, "SetEditLayout day is existing");
-//                                    onCreateDialog();
-//                                }
-//                            }
-//                        });
+
+
                 dialog.dismiss();
             }
         });
@@ -308,10 +300,8 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
-                                deleteFromPref();
-
                                 deleteItem(pos);
-                                //workoutAdapter.notifyDataSetChanged();
+                                deleteFromPref();
                             }
                         }
                 ));
@@ -323,7 +313,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
-                                setEditLayout(workoutList.get(pos).getWorkoutDayName());
+                                setEditLayout(pos);
                                 Log.d(TAG, "WorkoutDayName: " + workoutList.get(pos).getWorkoutDayName());
                             }
                         }
@@ -373,12 +363,16 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private void deleteItem(final int position) {
-        //   workoutAdapter = new WorkoutAdapter(this, workoutList);
-        workoutList.remove(position);
-        mRecyclerView.removeViewAt(position);
-        // workoutAdapter.notifyItemRemoved(position);
-        // workoutAdapter.notifyItemRangeChanged(position, workoutList.size());
+        customPlanViewModel.deleteWorkout(workoutList.get(position));
+//        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this);
+//        workoutAdapter.setItems((ArrayList<WorkoutObj>) workoutList);
+//        workoutList.remove(position);
+//        mRecyclerView.removeViewAt(position);
+//        workoutAdapter.notifyItemRemoved(position);
+//        workoutAdapter.notifyItemRangeChanged(position, workoutList.size());
+//        Log.i(TAG, "success delete item");
     }
+
 
 
     private void deleteFromPref() {
@@ -387,58 +381,29 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    private void updateItem(final String workoutDayName, final String workoutName, final String workoutDay) {
+    private void updateItemIfExisting(final String workoutName, final String workoutDay, WorkoutObj workout) {
+        workout.setWorkoutDayName(workoutName);
+        workout.setWorkoutDay(workoutDay);
+        customPlanViewModel.updateWorkout(workout);
 
-        final List<Workout> newWorkoutList = new ArrayList<>();
-
-        //get item id
-//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-//                .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId())
-//                .collection(Workout.WORKOUT_DAY_NAME).get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful() && task.getResult() != null) {
-//                            for (int i = 0; i < task.getResult().size(); i++) {
-//
-//                                Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
-//                                newWorkoutList.add(workout);
-//
-//                                if (workoutDayName.equals(newWorkoutList.get(i).getWorkoutDayName())) {
-//                                    String id = task.getResult().getDocuments().get(i).getId();
-//
-//                                    Log.d(TAG, "WorkoutName id: " + id);
-//
-//                                    //update item
-//                                    DocumentReference workoutRef = db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-//                                            .collection(WorkoutPlans.WORKOUT_NAME).document(getWorkPlanId()).collection(Workout.WORKOUT_DAY_NAME).document(id);
-//
-//                                    workoutRef.update("workoutDayName", workoutName);
-//                                    workoutRef.update("workoutDay", workoutDay);
-//                                    Log.d(TAG, "WorkoutDayName: " + workoutName + " Successfully update");
-//                                    workoutList.clear();
-//                                } else {
-//                                    Log.d(TAG, "Not found WorkoutName equal");
-//                                }
-//                            }
-//                        }
-//                    }
-//                });
+        Log.d(TAG, "WorkoutDayName: " + workoutName + " Successfully update");
+        workoutList.clear();
     }
 
     private void changeDefault() {
-        PrefsUtils prefsUtils = new PrefsUtils(this, "exercise");
-        prefsUtils.removeSingle(this, "exercise", "default_plan");
+        PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
+        prefsUtils.removeSingle(this, PrefsUtils.EXERCISE, "default_plan");
         prefsUtils.saveData("default_plan", tvNameOfPlan.getText().toString());
+        prefsUtils.saveData("default_plan_id",id);
     }
 
-    private void initRecyclerView(List<WorkoutObj> workoutList) {
+    private void initRecyclerView() {
         final String TAG = "WorkoutActivity";
         mRecyclerView = findViewById(R.id.rv_workout);
         Log.d(TAG, "initRecyclerView: initView workout mRecyclerView" + mRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-        WorkoutAdapter workoutAdapter = new WorkoutAdapter();
+        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this);
         workoutAdapter.setItems((ArrayList<WorkoutObj>) workoutList);
         mRecyclerView.setAdapter(workoutAdapter);
         workoutAdapter.setListener(new WorkoutAdapter.OnItemClickListener() {
@@ -451,22 +416,4 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
     }
-
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.tv_change_plan:
-                startActivity(new Intent(WorkoutActivity.this, WorkoutChangePlansActivity.class));
-                finish();
-                break;
-            case R.id.btn_set_as_activity_plan:
-                changeDefault();
-                finish();
-                startActivity(getIntent());
-                break;
-        }
-    }
-
-
 }

@@ -15,14 +15,13 @@ public class WorkoutObj {
     @ColumnInfo(name = "workout_id")
     private int workoutId;
 
-    @ColumnInfo(name = "length_training")
-    private String lengthTraining;
-
     @ColumnInfo(name = "workout_day_name")
     private String workoutDayName;
 
     @ColumnInfo(name = "workout_day")
     private String workoutDay;
+
+    private String date;
 
     @ColumnInfo(name = "workout_plan_id")
     private int workoutPlanId;
@@ -31,18 +30,18 @@ public class WorkoutObj {
     public WorkoutObj() {
     }
 
-    public WorkoutObj(String lengthTraining, String workoutDayName, String workoutDay, int workoutPlanId) {
-        this.lengthTraining = lengthTraining;
+    public WorkoutObj(String workoutDayName, String workoutDay, String date, int workoutPlanId) {
         this.workoutDayName = workoutDayName;
         this.workoutDay = workoutDay;
+        this.date = date;
         this.workoutPlanId = workoutPlanId;
     }
 
-    public WorkoutObj(int workoutId, String lengthTraining, String workoutDayName, String workoutDay, int workoutPlanId) {
+    public WorkoutObj(int workoutId, String workoutDayName, String workoutDay, String date, int workoutPlanId) {
         this.workoutId = workoutId;
-        this.lengthTraining = lengthTraining;
         this.workoutDayName = workoutDayName;
         this.workoutDay = workoutDay;
+        this.date = date;
         this.workoutPlanId = workoutPlanId;
     }
 
@@ -52,14 +51,6 @@ public class WorkoutObj {
 
     public void setWorkoutId(int workoutId) {
         this.workoutId = workoutId;
-    }
-
-    public String getLengthTraining() {
-        return lengthTraining;
-    }
-
-    public void setLengthTraining(String lengthTraining) {
-        this.lengthTraining = lengthTraining;
     }
 
     public String getWorkoutDayName() {
@@ -84,5 +75,13 @@ public class WorkoutObj {
 
     public void setWorkoutPlanId(int workoutPlanId) {
         this.workoutPlanId = workoutPlanId;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

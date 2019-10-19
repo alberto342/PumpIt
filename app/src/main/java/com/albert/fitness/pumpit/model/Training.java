@@ -19,14 +19,18 @@ public class Training {
 
     @ColumnInfo(name = "rest_between_set")
     private int restBetweenSet;
+
     @ColumnInfo(name = "rest_after_exercise")
     private int restAfterExercise;
+
     private String date;
+
     @ColumnInfo(name = "size_of_rept")
     private int sizeOfRept;
 
-    //    @ColumnInfo(name = "tracker_exercises")
-//    private List<TrackerExercise> trackerExercises;
+    @ColumnInfo(name = "index_of_Training")
+    private int indexOfTraining;
+
     @ColumnInfo(name = "workout_id")
     private int workoutId;
 
@@ -34,20 +38,22 @@ public class Training {
     public Training() {
     }
 
-    public Training(int exerciseId, int restBetweenSet, int restAfterExercise, int sizeOfRept, String date, int workoutId) {
+    public Training(int exerciseId, int restBetweenSet, int restAfterExercise, int sizeOfRept, String date,int index, int workoutId) {
         this.exerciseId = exerciseId;
         this.restBetweenSet = restBetweenSet;
         this.restAfterExercise = restAfterExercise;
         this.date = date;
         this.sizeOfRept = sizeOfRept;
+        this.indexOfTraining = index;
         this.workoutId = workoutId;
     }
 
-    public Training(int exerciseId, int sizeOfRept, int restBetweenSet, int restAfterExercise, String date) {
+    public Training(int exerciseId, int sizeOfRept, int restBetweenSet, int restAfterExercise,int index, String date) {
         this.exerciseId = exerciseId;
         this.restBetweenSet = restBetweenSet;
         this.restAfterExercise = restAfterExercise;
         this.date = date;
+        this.indexOfTraining = index;
         this.sizeOfRept = sizeOfRept;
     }
 
@@ -97,6 +103,14 @@ public class Training {
 
     public void setRestBetweenSet(int restBetweenSet) {
         this.restBetweenSet = restBetweenSet;
+    }
+
+    public int getIndexOfTraining() {
+        return indexOfTraining;
+    }
+
+    public void setIndexOfTraining(int indexOfTraining) {
+        this.indexOfTraining = indexOfTraining;
     }
 
     public int getExerciseId() {

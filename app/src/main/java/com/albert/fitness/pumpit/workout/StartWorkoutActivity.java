@@ -2,8 +2,8 @@ package com.albert.fitness.pumpit.workout;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,53 +20,53 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.adapter.TrainingAdapter;
-import com.albert.fitness.pumpit.helper.SimpleItemTouchHelperCallback;
+import com.albert.fitness.pumpit.adapter.new_adapter.TrainingAdapter;
+import com.albert.fitness.pumpit.model.Event;
+import com.albert.fitness.pumpit.model.Exercise;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.Training;
-import com.albert.fitness.pumpit.model.Workout;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.utils.SwipeHelper;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
+import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
+import fitness.albert.com.pumpit.databinding.ActivityStartWorkoutBinding;
 
 public class StartWorkoutActivity extends AppCompatActivity {
 
     private final String TAG = "StartWorkoutActivity";
     private RecyclerView mRecyclerView;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String workoutNameId;
-    private String workoutId;
     private TextView emptyWorkout;
-    private ProgressDialog progressdialog;
     private ImageView btnStartWorkout;
     private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
-    public static List<Training> trainingList = new ArrayList<>();
-    private TrainingAdapter trainingAdapter;
+    private List<Exercise> exerciseList = new ArrayList<>();
+    private List<Training> trainingList = new ArrayList<>();
     private AlertDialog dialog;
+    private CustomPlanViewModel planViewModel;
+    TrainingAdapter trainingAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start_workout);
+        ActivityStartWorkoutBinding startWorkoutBinding =
+                DataBindingUtil.setContentView(this, R.layout.activity_start_workout);
+        mRecyclerView = startWorkoutBinding.rvStartWorkout;
         init();
-        getDayWorkout();
+        planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
+        getWorkout();
+        checkIfHavePlans();
         setBtnStartWorkout();
         swipe();
     }
@@ -74,14 +74,20 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void init() {
-        TextView todayExercises;
-        todayExercises = findViewById(R.id.tv_today_exercise);
-        mRecyclerView = findViewById(R.id.rv_start_workout);
+        TextView todayExercises = findViewById(R.id.tv_today_exercise);
         emptyWorkout = findViewById(R.id.tv_empty_workout);
         btnStartWorkout = findViewById(R.id.btn_start_workout);
         setTitle("Your exercises for today (" + getDayOfTheWeek() + ")");
-
         todayExercises.setText("Your exercises for today (" + getDayOfTheWeek() + ")");
+    }
+
+    private void checkIfHavePlans() {
+        PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
+        int defPlan = prefsUtils.getInt("default_plan_id", -1);
+        if(defPlan == -1) {
+            alertDialogHavePlan();
+        }
+
     }
 
 
@@ -104,141 +110,58 @@ public class StartWorkoutActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void getWorkout() {
+        planViewModel.getAllTrainingByDate(Event.getDayName()).observe(this, new Observer<List<Training>>() {
+            @Override
+            public void onChanged(List<Training> trainings) {
+                if (trainings.isEmpty()) {
+                    btnStartWorkout.setVisibility(View.INVISIBLE);
+                    emptyWorkout.setVisibility(View.VISIBLE);
+                } else {
+                    btnStartWorkout.setVisibility(View.VISIBLE);
+                    emptyWorkout.setVisibility(View.INVISIBLE);
+                    trainingList = trainings;
+                    for (Training t : trainings) {
+                        getExercise(t.getExerciseId());
+                    }
+                }
+            }
+        });
+    }
 
-    private void getDayWorkout() {
-        final List<WorkoutPlans> workoutPlansList = new ArrayList<>();
-        final List<Workout> workoutList = new ArrayList<>();
-        final String[] day = new String[1];
-        final String[] part1 = new String[1];
 
-        progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
+    private void getExercise(final int exerciseId) {
+        WelcomeActivityViewModel activityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
+        activityViewModel.getExerciseById(exerciseId).observe(this, new Observer<Exercise>() {
+            @Override
+            public void onChanged(Exercise exercise) {
+                if (exercise != null) {
+                    exerciseList.add(new Exercise(exercise.getExerciseName(), exercise.getImgName()));
+                    initRecyclerView();
+                }
+            }
+        });
+    }
 
-        trainingList.clear();
-
-        //get workout id
-        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-                .collection(WorkoutPlans.WORKOUT_NAME).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+    private void getTracker(final int i) {
+        planViewModel.getTrackerExerciseByTraining(trainingList.get(i).getTrainingId())
+                .observe(this, new Observer<List<TrackerExercise>>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-
-                            for (int i = 0; i < task.getResult().size(); i++) {
-                                WorkoutPlans workoutPlans = task.getResult().getDocuments().get(i).toObject(WorkoutPlans.class);
-                                workoutPlansList.add(workoutPlans);
-
-                                PrefsUtils prefsUtils = new PrefsUtils();
-                                prefsUtils.createSharedPreferencesFiles(StartWorkoutActivity.this, "exercise");
-                                String routineName = prefsUtils.getString("default_plan", "");
-
-                                Log.d(TAG, "routineName: " + routineName + workoutPlansList.get(i).getRoutineName());
-
-                                if (routineName.equals(workoutPlansList.get(i).getRoutineName())) {
-                                    workoutNameId = task.getResult().getDocuments().get(i).getId();
-                                }
-                            }
-
-                            if (workoutNameId == null) {
-                                startActivity(new Intent(StartWorkoutActivity.this, ChangePlanActivity.class));
-                                finish();
-                            } else {
-                                Log.d(TAG, "Successfully get workout name id: " + workoutNameId);
-
-                                db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-                                        .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId)
-                                        .collection(Workout.WORKOUT_DAY_NAME).get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                                                if (task.isSuccessful() && task.getResult() != null) {
-                                                    for (int i = 0; i < task.getResult().size(); i++) {
-
-                                                        Workout workout = task.getResult().getDocuments().get(i).toObject(Workout.class);
-                                                        workoutList.add(workout);
-
-                                                        String splitWorkoutDayName = workoutList.get(i).getWorkoutDay();
-                                                        String[] parts = splitWorkoutDayName.split(" ");
-                                                        part1[0] = parts[0];
-
-                                                        Date d = new Date();
-
-                                                        if (part1[0].equals("Day")) {
-                                                            day[0] = getDayOfTheWeekBeWorkout(d.getDay());
-
-                                                        } else {
-                                                            day[0] = getDayOfTheWeek();
-                                                        }
-
-                                                        if (workoutList.get(i).getWorkoutDay().equals(day[0])) {
-
-                                                            workoutId = task.getResult().getDocuments().get(i).getId();
-
-                                                            Log.d(TAG, "Successfully get workout ID: " + workoutId);
-
-                                                            db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister())
-                                                                    .collection(WorkoutPlans.WORKOUT_NAME).document(workoutNameId)
-                                                                    .collection(Workout.WORKOUT_DAY_NAME).document(workoutId)
-                                                                    .collection(Workout.EXERCISE_NAME).get()
-                                                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                        @Override
-                                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                            if (task.isSuccessful() && task.getResult() != null) {
-                                                                                boolean trainingListIsEmpty;
-
-                                                                                for (int i = 0; i < task.getResult().size(); i++) {
-                                                                                    Training training = task.getResult().getDocuments().get(i).toObject(Training.class);
-                                                                                    TrackerExercise trackerExercise = task.getResult().getDocuments().get(i).toObject(TrackerExercise.class);
-                                                                                    trackerExerciseList.add(trackerExercise);
-                                                                                    trainingList.add(training);
-                                                                                    initRecyclerView();
-                                                                                }
-
-                                                                                trainingListIsEmpty = trainingList.size() > 0;
-                                                                                Log.d(TAG, "Exercise Size: " + trainingList.size());
-                                                                                btnStartWorkout.setVisibility(View.VISIBLE);
-                                                                                emptyWorkout.setVisibility(View.INVISIBLE);
-
-                                                                                if (!trainingListIsEmpty) {
-                                                                                    emptyWorkout.setVisibility(View.VISIBLE);
-                                                                                    btnStartWorkout.setVisibility(View.INVISIBLE);
-                                                                                }
-                                                                            }
-                                                                            Log.d(TAG, "Successfully get workout");
-                                                                        }
-                                                                    })
-                                                                    .addOnFailureListener(new OnFailureListener() {
-                                                                        @Override
-                                                                        public void onFailure(@NonNull Exception e) {
-                                                                            Log.d(TAG, "Failure get workout: " + e);
-                                                                        }
-                                                                    });
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d(TAG, "Failure" + e);
-                                    }
-                                });
-                            }
-                        } else {
-                            Log.d(TAG, "ERROR to received Id");
+                    public void onChanged(List<TrackerExercise> trackerExercises) {
+                        if (!trackerExercises.isEmpty()) {
+                            trackerExerciseList = trackerExercises;
+                            addLayoutRepsAndSets(i);
                         }
-                        progressdialog.hide();
                     }
                 });
     }
 
+    // TODO: 2019-10-18 on deleted not the current exercise remove from the screen
 
     private void swipe() {
         new SwipeHelper(this, mRecyclerView) {
             @Override
-            public void instantiateUnderlayButton(final RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
+            public void instantiateUnderlayButton(final RecyclerView.ViewHolder viewHolder, final List<UnderlayButton> underlayButtons) {
                 underlayButtons.add(new SwipeHelper.UnderlayButton(
                         "Delete",
                         0,
@@ -247,9 +170,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
                             @SuppressLint("NewApi")
                             @Override
                             public void onClick(int pos) {
-                                deleteItemFromFb(pos);
-                                updateNumberOfExercise();
-                                trainingAdapter.notifyDataSetChanged();
+                                planViewModel.deleteTraining(trainingList.get(pos));
                             }
                         }
                 ));
@@ -260,48 +181,12 @@ public class StartWorkoutActivity extends AppCompatActivity {
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
-                                addLayoutRepsAndSets(pos);
+                                getTracker(pos);
                             }
                         }
                 ));
             }
         };
-    }
-
-    private void deleteItem(final int position) {
-        // trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
-        trainingList.remove(position);
-        mRecyclerView.removeViewAt(position);
-        trainingAdapter.notifyItemRemoved(position);
-        trainingAdapter.notifyItemRangeChanged(position, trainingList.size());
-    }
-
-    private void deleteItemFromFb(final int position) {
-//        db.collection(WorkoutPlans.WORKOUT_PLANS)
-//                .document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
-//                .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
-//                .document(workoutId).collection(Workout.EXERCISE_NAME)
-//                .document(trainingList.get(position).getExerciseName()).delete()
-//                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
-//                        deleteItem(position);
-//                    }
-//                }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Log.w(TAG, "Error deleting document", e);
-//            }
-//        });
-    }
-
-
-    private void updateNumberOfExercise() {
-        db.collection(WorkoutPlans.WORKOUT_PLANS)
-                .document(FireBaseInit.getEmailRegister()).collection(WorkoutPlans.WORKOUT_NAME)
-                .document(workoutNameId).collection(Workout.WORKOUT_DAY_NAME)
-                .document(workoutId).update("numOfExercise", trainingList.size());
     }
 
 
@@ -314,14 +199,15 @@ public class StartWorkoutActivity extends AppCompatActivity {
         ImageView btnCancel = dialogView.findViewById(R.id.iv_cancel_weight_reps);
 
         for (int i = 0; i < trainingList.get(position).getSizeOfRept(); i++) {
-            //add weight and set into layout
-            addWeightAndSetIntoLayout(dialogView, position, i);
+            addWeightAndSetIntoLayout(dialogView, i);
         }
 
+        // TODO: 2019-10-17 check how to save this
         btnDoneSetsReps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setWeightAndRepsIntoFb();
+                addWeightAndSetIntoLayout(dialogView, -1);
+                dialog.dismiss();
             }
         });
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -335,40 +221,26 @@ public class StartWorkoutActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void addWeightAndSetIntoLayout(View view, int position, int i) {
-
+    private void addWeightAndSetIntoLayout(View view, final int i) {
         LayoutInflater inf = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") final View rowView = inf.inflate(R.layout.layout_weight_and_reps, null);
         final LinearLayout linearLayout = view.findViewById(R.id.linear_set_reps);
         linearLayout.addView(rowView);
 
-        EditText etWeight = view.findViewById(R.id.et_weight);
-        EditText etReps = view.findViewById(R.id.et_reps);
+        final EditText etWeight = view.findViewById(R.id.et_weight);
+        final EditText etReps = view.findViewById(R.id.et_reps);
 
-//        etWeight.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getWeight()));
-//        etReps.setText(String.valueOf(trainingList.get(position).getTrackerExercises().get(i).getRepNumber()));
-    }
-
-
-    private void setWeightAndRepsIntoFb() {
-
-    }
+        final TrackerExercise trackerExercise = new TrackerExercise(trackerExerciseList.get(i).getRepsNumber(),
+                trackerExerciseList.get(i).getWeight(), trainingList.get(i).getTrainingId());
+        trackerExercise.setTrackerId(trackerExerciseList.get(i).getTrackerId());
 
 
-    private void initRecyclerView() {
-        @SuppressLint("WrongConstant")
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//        mRecyclerView.setLayoutManager(layoutManager);
-//        trainingAdapter = new TrainingAdapter(this, trainingList, trackerExerciseList);
-//        trainingAdapter.notifyDataSetChanged();
-//        mRecyclerView.setAdapter(trainingAdapter);
-
-        ItemTouchHelper.Callback callback =
-                new SimpleItemTouchHelperCallback(trainingAdapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(mRecyclerView);
-
-        Log.d(TAG, "initRecyclerView: init recyclerView " + mRecyclerView);
+        if (i == -1) {
+            Log.d(TAG, "addWeightAndSetIntoLayout: " + etWeight.getText().toString());
+        } else {
+            etWeight.setText(String.valueOf(trackerExerciseList.get(i).getWeight()));
+            etReps.setText(String.valueOf(trackerExerciseList.get(i).getRepsNumber()));
+        }
     }
 
 
@@ -393,25 +265,25 @@ public class StartWorkoutActivity extends AppCompatActivity {
         return null;
     }
 
-    private String getDayOfTheWeekBeWorkout(int getDay) {
-        switch (getDay) {
-            case 0:
-                return "Day 1";
-            case 1:
-                return "Day 2";
-            case 2:
-                return "Day 3";
-            case 3:
-                return "Day 4";
-            case 4:
-                return "Day 5";
-            case 5:
-                return "Day 6";
-            case 6:
-                return "Day 7";
-        }
-        return "";
-    }
+//    private String getDayOfTheWeekBeWorkout(int getDay) {
+//        switch (getDay) {
+//            case 0:
+//                return "Day 1";
+//            case 1:
+//                return "Day 2";
+//            case 2:
+//                return "Day 3";
+//            case 3:
+//                return "Day 4";
+//            case 4:
+//                return "Day 5";
+//            case 5:
+//                return "Day 6";
+//            case 6:
+//                return "Day 7";
+//        }
+//        return "";
+//    }
 
     private void setBtnStartWorkout() {
         btnStartWorkout.setOnClickListener(new View.OnClickListener() {
@@ -422,11 +294,73 @@ public class StartWorkoutActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (progressdialog != null && progressdialog.isShowing()) {
-            progressdialog.cancel();
-        }
+
+
+
+    private void initRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
+        trainingAdapter = new TrainingAdapter(exerciseList);
+        trainingAdapter.setItems((ArrayList<Training>) trainingList);
+        mRecyclerView.setAdapter(trainingAdapter);
+        Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);
+        trainingAdapter.setListener(new TrainingAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Training item, int i) {
+
+            }
+        });
+//        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+//            @Override
+//            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+//                int from = viewHolder.getAdapterPosition();
+//                int to = target.getAdapterPosition();
+//                Collections.swap(trainingList, from, to);
+//                trainingAdapter.notifyItemMoved(from, to);
+//                return true;
+//            }
+//            @Override
+//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+//                planViewModel.deleteTraining(trainingList.get(viewHolder.getAdapterPosition()));
+//            }
+//        }).attachToRecyclerView(mRecyclerView);
     }
+
+    private void alertDialogHavePlan() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setMessage("Don't have any plansֿֿ, Do you want to add ?\n Note: if your not add plan your c'not add exercise !!!")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivity(new Intent(StartWorkoutActivity.this,CustomPlanActivity.class));
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        androidx.appcompat.app.AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+
+//    private void initRecyclerView() {
+//        @SuppressLint("WrongConstant")
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+//        mRecyclerView.setLayoutManager(layoutManager);
+//        trainingAdapter = new TrainingAdapter(this, trainingList, exerciseList);
+//        trainingAdapter.notifyDataSetChanged();
+//        mRecyclerView.setAdapter(trainingAdapter);
+//
+//        ItemTouchHelper.Callback callback =
+//                new SimpleItemTouchHelperCallback(trainingAdapter);
+//        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+//        touchHelper.attachToRecyclerView(mRecyclerView);
+//
+//        Log.d(TAG, "initRecyclerView: init recyclerView " + mRecyclerView);
+//    }
 }

@@ -40,8 +40,6 @@ public class EditCustomPlanActivity extends AppCompatActivity implements View.On
         setTitle("Custom Plan");
         init();
         setSpinnerDayType();
-
-
         getData();
     }
 
@@ -219,6 +217,5 @@ public class EditCustomPlanActivity extends AppCompatActivity implements View.On
                 type = "Sport Specific";
                 break;
         }
-
     }
 }

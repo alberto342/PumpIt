@@ -114,79 +114,92 @@ public class AddExerciseActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.tv_chest:
-                intent.putExtra("exerciseType", 7);
+                intent.putExtra("exerciseType", "Chest");
+                intent.putExtra("category", 7);
                 intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_shoulder:
-                intent.putExtra("exerciseType", 3);
+                intent.putExtra("exerciseType", "Shoulder");
+                intent.putExtra("category", 3);
                 intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_abs:
-                intent.putExtra("exerciseType", 1);
+                intent.putExtra("exerciseType", "Abs");
+                intent.putExtra("category", 1);
                 intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_thigh:
-                intent.putExtra("exerciseType", 5);
+                intent.putExtra("exerciseType", "Thigh");
+                intent.putExtra("category", 5);
                 intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_all:
-                intent.putExtra("exerciseType", 0);
+                intent.putExtra("exerciseType", "All");
+                intent.putExtra("category", 0);
                 intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_biceps:
-                intent.putExtra("exerciseType", 6);
+                intent.putExtra("exerciseType", "Biceps");
+                intent.putExtra("category", 6);
                 intent.putExtra("category2", 2);
                 startActivity(intent);
                 break;
 
             case R.id.tv_forearm:
-                intent.putExtra("exerciseType", 6);
+                intent.putExtra("exerciseType", "Forearm");
+                intent.putExtra("category", 6);
                 intent.putExtra("category2", 4);
                 startActivity(intent);
                 break;
 
             case R.id.tv_cardio:
-                intent.putExtra("exerciseType", 4);
+                intent.putExtra("exerciseType", "Cardio");
+                intent.putExtra("category", 4);
                 intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_triceps:
-                intent.putExtra("exerciseType", 6);
+                intent.putExtra("exerciseType", "Triceps");
+                intent.putExtra("category", 6);
                 intent.putExtra("category2", 3);
                 startActivity(intent);
                 break;
 
             case R.id.tv_glutes:
-                intent.putExtra("exerciseType", 5);
+                intent.putExtra("exerciseType", "Glutes");
+                intent.putExtra("category", 5);
                 intent.putExtra("category2", 7);
                 startActivity(intent);
                 break;
 
             case R.id.tv_back:
-                intent.putExtra("exerciseType", 8);
+                intent.putExtra("exerciseType", "Back");
+                intent.putExtra("category", 8);
                 intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;
 
             case R.id.tv_calf:
-                intent.putExtra("exerciseType", 5);
+                intent.putExtra("exerciseType", "Calf");
+                intent.putExtra("category", 5);
                 intent.putExtra("category2", 5);
                 startActivity(intent);
                 break;
 
             case R.id.tv_stretch:
-                intent.putExtra("exerciseType", 2);
+                intent.putExtra("exerciseType", "Stretch");
+                intent.putExtra("category", 2);
                 intent.putExtra("category2", 1);
                 startActivity(intent);
                 break;

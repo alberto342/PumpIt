@@ -55,15 +55,6 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/btn_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingStart="60dp"
-        android:paddingTop="50dp"
-        android:src="@mipmap/btn_add_button_blue"
-        android:visibility="invisible" />
-
-    <ImageView
         android:id="@+id/btn_workout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

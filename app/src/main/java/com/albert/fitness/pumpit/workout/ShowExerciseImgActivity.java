@@ -19,14 +19,11 @@ import fitness.albert.com.pumpit.R;
 public class ShowExerciseImgActivity extends AppCompatActivity {
 
     private ActionBar toolbar;
-    private static final String TAG = "ShowExerciseImgActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_exercise_img);
-
-
         toolbar = getSupportActionBar();
         assert toolbar != null;
         receiveImgAndName();
@@ -34,9 +31,7 @@ public class ShowExerciseImgActivity extends AppCompatActivity {
 
 
     private void receiveImgAndName() {
-
         ImageView exerciseImg = findViewById(R.id.iv_exercise_img);
-
         Bundle extras = getIntent().getExtras();
         String imgName = null;
         String exerciseName = null;
@@ -58,22 +53,17 @@ public class ShowExerciseImgActivity extends AppCompatActivity {
 
                     .listener(new RequestListener<GifDrawable>() {
                         @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
-                            //   progress.setVisibility(View.GONE);
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                                                    Target<GifDrawable> target, boolean isFirstResource) {
                             return false;
                         }
 
                         @Override
-                        public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
-                            //    progress.setVisibility(View.GONE);
+                        public boolean onResourceReady(GifDrawable resource, Object model,
+                                                       Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
                             return false;
                         }
-                    })
-
-                    .into(exerciseImg);
-
-         //   Log.d(TAG, "Img successfully loaded " + ExerciseAdapter.exerciseImg);
-
+                    }).into(exerciseImg);
         } catch (Exception e) {
             e.printStackTrace();
         }

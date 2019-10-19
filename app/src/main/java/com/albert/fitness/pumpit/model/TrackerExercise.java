@@ -2,13 +2,9 @@ package com.albert.fitness.pumpit.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-import static androidx.room.ForeignKey.CASCADE;
-
-@Entity(tableName = "tracker_exercise_table", foreignKeys = @ForeignKey(entity = Training.class,
-        parentColumns = "training_id", childColumns = "training_id", onDelete = CASCADE))
+@Entity(tableName = "tracker_exercise_table")
 public class TrackerExercise {
 
     @PrimaryKey(autoGenerate = true)
@@ -63,15 +59,6 @@ public class TrackerExercise {
     }
 
     public TrackerExercise(int repNumber) {
-        this.repsNumber = repNumber;
-    }
-
-
-    public int getRepNumber() {
-        return repsNumber;
-    }
-
-    public void setRepNumber(int repNumber) {
         this.repsNumber = repNumber;
     }
 

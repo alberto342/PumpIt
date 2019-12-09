@@ -9,14 +9,10 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.albert.fitness.pumpit.model.UserRegister;
-import com.albert.fitness.pumpit.model.WorkoutObj;
 import com.albert.fitness.pumpit.model.WorkoutPlanObj;
-import com.albert.fitness.pumpit.model.WorkoutPlans;
-import com.albert.fitness.pumpit.model.WorkoutRepository;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 
@@ -32,16 +28,13 @@ public class CustomPlanActivity extends AppCompatActivity {
     private Spinner spDaysWeek, spDifficultyLevel, spDayType, spRoutineType;
     private EditText etRoutineDescription, etRoutineName;
     private ImageView btnCreateWorkout;
-    private final String TAG = "CustomPlanActivity";
-    private String workoutNameId;
-    private WorkoutRepository repository;
+    //private String workoutNameId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_plan);
         Objects.requireNonNull(getSupportActionBar()).hide();
-        repository = new WorkoutRepository(getApplication());
 
         customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
 
@@ -116,6 +109,7 @@ public class CustomPlanActivity extends AppCompatActivity {
             difficultyLevel = spDifficultyLevel.getSelectedItem().toString();
             routineType = spRoutineType.getSelectedItem().toString();
 
+            String TAG = "CustomPlanActivity";
             Log.d(TAG, "Get spinner index" + spDaysWeek.getSelectedItemPosition());
 
             dayType = spDayType.getSelectedItem().toString();
@@ -129,14 +123,10 @@ public class CustomPlanActivity extends AppCompatActivity {
         PrefsUtils prefsUtils = new PrefsUtils(this, "exercise");
         prefsUtils.saveData("default_plan", routineName);
 
-        WorkoutPlans workoutPlans = new WorkoutPlans(routineName, daysWeek, difficultyLevel,
-                routineType, dayType, routineDescription, UserRegister.getTodayDate(), dayWeekPosition);
-
-
         WorkoutPlanObj workoutPlan = new WorkoutPlanObj(routineName, daysWeek
                 , difficultyLevel, routineType, dayType, routineDescription, UserRegister.getTodayDate(), dayWeekPosition);
 
-        // repository.insertPlan(workoutPlan);
+
         customPlanViewModel.AddNewPlan(workoutPlan);
 
        // receivePlanId(dayWeekPosition);
@@ -144,24 +134,24 @@ public class CustomPlanActivity extends AppCompatActivity {
     }
 
 
-    private void receivePlanId(final int position) {
-        customPlanViewModel.getAllPlan().observe(this, new Observer<List<WorkoutPlanObj>>() {
-            @Override
-            public void onChanged(List<WorkoutPlanObj> workoutPlanObjs) {
-                int planId;
-                if(workoutPlanObjs.isEmpty()) {
-                    planId = 0;
-                } else {
-                    planId = workoutPlanObjs.get(workoutPlanObjs.size()-1).getPlanId() +1;
-                }
-                for (int i = 0; i <= position; i++) {
-                    int num = i+1;
-                    WorkoutObj workoutObj = new WorkoutObj("", "Day " + num, "Workout " + num, planId);
-                    customPlanViewModel.addNewWorkout(workoutObj);
-                }
-            }
-        });
-    }
+//    private void receivePlanId(final int position) {
+//        customPlanViewModel.getAllPlan().observe(this, new Observer<List<WorkoutPlanObj>>() {
+//            @Override
+//            public void onChanged(List<WorkoutPlanObj> workoutPlanObjs) {
+//                int planId;
+//                if(workoutPlanObjs.isEmpty()) {
+//                    planId = 0;
+//                } else {
+//                    planId = workoutPlanObjs.get(workoutPlanObjs.size()-1).getPlanId() +1;
+//                }
+//                for (int i = 0; i <= position; i++) {
+//                    int num = i+1;
+//                    WorkoutObj workoutObj = new WorkoutObj("", "Day " + num, "Workout " + num, planId);
+//                    customPlanViewModel.addNewWorkout(workoutObj);
+//                }
+//            }
+//        });
+//    }
 
     private void onClick() {
         btnCreateWorkout.setOnClickListener(new View.OnClickListener() {

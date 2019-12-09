@@ -9,7 +9,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {WorkoutPlanObj.class, WorkoutObj.class, Training.class, TrackerExercise.class}, version = 1)
+@Database(entities = {WorkoutPlanObj.class, WorkoutObj.class, Training.class, TrackerExercise.class, FinishTraining.class}, version = 1)
 public abstract class WorkoutDatabase extends RoomDatabase {
 
     public abstract WorkoutPlanDAO workoutPlanDAO();
@@ -19,6 +19,8 @@ public abstract class WorkoutDatabase extends RoomDatabase {
     public abstract TrainingDAO trainingDAO();
 
     public abstract TrackerExerciseDAO trackerExerciseDAO();
+
+    public abstract FinishTrainingDAO finishTrainingDAO();
 
     private static WorkoutDatabase instance;
 
@@ -47,12 +49,14 @@ public abstract class WorkoutDatabase extends RoomDatabase {
         private WorkoutDAO workoutDAO;
         private TrainingDAO trainingDAO;
         private TrackerExerciseDAO trackerExerciseDAO;
+        private FinishTrainingDAO finishTrainingDAO;
 
         public InitialDataAsyncTask(WorkoutDatabase workoutDatabase) {
             workoutPlanDAO = workoutDatabase.workoutPlanDAO();
             workoutDAO = workoutDatabase.workoutDAO();
             trainingDAO = workoutDatabase.trainingDAO();
             trackerExerciseDAO = workoutDatabase.trackerExerciseDAO();
+            finishTrainingDAO = workoutDatabase.finishTrainingDAO();
         }
 
         @Override

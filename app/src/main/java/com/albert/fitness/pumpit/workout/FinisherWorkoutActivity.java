@@ -1,7 +1,6 @@
 package com.albert.fitness.pumpit.workout;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,22 +8,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.albert.fitness.pumpit.fragment.FragmentNavigationActivity;
+import com.albert.fitness.pumpit.model.Event;
 import com.albert.fitness.pumpit.model.FinishTraining;
 import com.albert.fitness.pumpit.model.TDEECalculator;
+import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.UserRegister;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
@@ -32,8 +28,6 @@ import fitness.albert.com.pumpit.R;
 public class FinisherWorkoutActivity extends AppCompatActivity {
 
     private static final String TAG = "FinisherWorkoutActivity";
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private List<FinishTraining> finishTrainingList = new ArrayList<>();
     private TDEECalculator tdeeCalculator = new TDEECalculator();
     private TextView tvNewRecord;
     private TextView tvTrainingRecord;
@@ -43,6 +37,8 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
     private TextView tvCompleteExercise;
     private TextView tvTotalWeightCmp;
     private int trackerExercises = 0;
+    private PrefsUtils prefsUtils;
+    private CustomPlanViewModel planViewModel;
 
 
     @Override
@@ -50,9 +46,51 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finisher_workout);
         setTitle("Finished Workout");
+        planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
+        prefsUtils = new PrefsUtils(FinisherWorkoutActivity.this, PrefsUtils.EXERCISE);
         initView();
+        getRecord();
+    }
 
-        getRecordFromFb();
+
+    private void getRecord() {
+        planViewModel.getLastFinishTrainingById().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                planViewModel.getFinishTrainingById(integer).observe(FinisherWorkoutActivity.this, new Observer<FinishTraining>() {
+                    @Override
+                    public void onChanged(FinishTraining finishTraining) {
+                        if (finishTraining != null) {
+                            getTrackerExercise(finishTraining.getFinishId());
+                            tvTrainingRecord.setText(finishTraining.getChrTotalTraining());
+                            prefsUtils.saveData("today_date", Event.getTodayData());
+                            totalTimeRest();
+                            totalTimeWaste();
+                            totalActual();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    private void getTrackerExercise(int id) {
+        final float[] totalWeight = {0};
+        planViewModel.getAllTrackerByFinishTrainingId(id).observe(this, new Observer<List<TrackerExercise>>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onChanged(List<TrackerExercise> trackerExercises) {
+                if (!trackerExercises.isEmpty()) {
+                    tvCompleteExercise.setText(String.valueOf(trackerExercises.size()));
+                    prefsUtils.saveData("exercise_complete", trackerExercises.size());
+
+                    for (TrackerExercise t : trackerExercises) {
+                        totalWeight[0] += t.getWeight();
+                    }
+                    tvTotalWeightCmp.setText(totalWeight[0] + " kg");
+                }
+            }
+        });
     }
 
     @SuppressLint("SetTextI18n")
@@ -72,55 +110,6 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
             public void onClick(View view) {
                 startActivity(new Intent(FinisherWorkoutActivity.this, FragmentNavigationActivity.class));
                 finish();
-            }
-        });
-    }
-
-    private void getRecordFromFb() {
-        final ProgressDialog progressdialog = new ProgressDialog(FinisherWorkoutActivity.this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-        final int[] totalWeight = {0};
-        final PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(this, PrefsUtils.EXERCISE);
-
-        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-                .collection(UserRegister.getTodayDate()).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        progressdialog.hide();
-
-                        if (task.isSuccessful() && task.getResult() != null) {
-
-                            FinishTraining chrTotalTraining = task.getResult().getDocuments().get(task.getResult().size() - 1).toObject(FinishTraining.class);
-
-                            tvTrainingRecord.setText(chrTotalTraining.getChrTotalTraining());
-                            tvCompleteExercise.setText(String.valueOf(task.getResult().size()));
-
-                            prefsUtils.saveData("exercise_complete", task.getResult().size());
-                            prefsUtils.saveData("today_date", UserRegister.getTodayDate());
-
-                            for (int i = 0; i < task.getResult().size(); i++) {
-                                FinishTraining finishTraining = task.getResult().getDocuments().get(i).toObject(FinishTraining.class);
-                                finishTrainingList.add(finishTraining);
-
-//                                for (int r = 0; r < finishTraining.getTrackerExercises().size(); r++) {
-//                                    totalWeight[0] += finishTraining.getTrackerExercises().get(r).getWeight();
-//                                }
-                            }
-                            tvTotalWeightCmp.setText(totalWeight[0] + " kg");
-
-                            totalTimeRest();
-                            totalTimeWaste();
-                            totalActual();
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "get failed with: " + e);
             }
         });
     }
@@ -163,7 +152,6 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         int rest = tdeeCalculator.splitChronometer(TAG, tvRest.getText().toString());
         int waste = tdeeCalculator.splitChronometer(TAG, tvWaste.getText().toString());
         int actual = training - rest - waste;
-
         tvActualRecord.setText(intIntoChronometer(actual));
     }
 

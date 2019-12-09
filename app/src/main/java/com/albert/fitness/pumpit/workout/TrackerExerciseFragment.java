@@ -35,31 +35,33 @@ import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import fitness.albert.com.pumpit.R;
 
 
 public class TrackerExerciseFragment extends Fragment {
 
+    private static final String TAG = "TrackerExerciseFragment";
     private LinearLayout container;
     private CustomPlanViewModel planViewModel;
     private ArrayList<CharSequence> trackerList;
-    private static final String TAG = "TrackerExerciseFragment";
-    private EditText weight, reps, restBetweenSets, restAfterExercise;
-    private Button btnAddTracker;
-    private PrefsUtils prefsUtilsGetActivity;
-    private int trainingId, workoutId, sizeOfTraining;
+    private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
     private List<Float> weightList = new ArrayList<>();
     private List<Integer> repNumberList = new ArrayList<>();
-    private PrefsUtils prefsUtils;
-    private int exerciseId;
-    private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
-    private boolean isInTraining = true;
+    private EditText weight, reps, restBetweenSets, restAfterExercise;
+    private Button btnAddTracker;
+    private PrefsUtils prefsUtilsGetActivity, prefsUtils;
+    private int trainingId, workoutId, sizeOfTraining, exerciseId;
+    private boolean isInTraining = true, createWorkout = true;
 
-    // TODO: 2019-10-17 need to check why in the first time save twice, and need to add index_of_training
+
+    // TODO: 2019-10-17 Need to add index_of_training
 
 
     public TrackerExerciseFragment() {
+
 
     }
 
@@ -239,21 +241,24 @@ public class TrackerExerciseFragment extends Fragment {
         Objects.requireNonNull(getActivity()).finish();
     }
 
+
     private void getLastTraining() {
-        planViewModel.getLastTrainingId().observe(this, new Observer<Integer>() {
+        planViewModel.getLastId().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 if (integer != null && isInTraining) {
                     //saveTracker(integer);
+                    prefsUtils.saveData("training_id", integer);
                     trainingId = integer + 1;
                     isInTraining = false;
-                } else {
+                } else if (prefsUtils.getInt("training_id", -1) == -1) {
                     trainingId = 1;
+                } else {
+                    trainingId = prefsUtils.getInt("training_id", 1) + 1;
                 }
             }
         });
     }
-
 
     private void saveTrackerFromStartWorkout(final Training training) {
         planViewModel.getWorkoutByWorkoutDay(Event.getDayName()).observe(this, new Observer<WorkoutObj>() {
@@ -262,7 +267,7 @@ public class TrackerExerciseFragment extends Fragment {
                 if (workoutObj == null) {
                     createWorkoutDayName();
                 }
-                getWorkoutOfCurrentDay(training);
+                getWorkoutOfCurrentDayAndAddTraining(training);
                 goToStartWorkoutActivity();
             }
         });
@@ -276,19 +281,27 @@ public class TrackerExerciseFragment extends Fragment {
         }
     }
 
-    private void getWorkoutOfCurrentDay(final Training training) {
+    private void getWorkoutOfCurrentDayAndAddTraining(final Training training) {
         planViewModel.getWorkoutByWorkoutDay(Event.getDayName()).observe(this, new Observer<WorkoutObj>() {
             @Override
             public void onChanged(WorkoutObj workoutObj) {
-                if (workoutObj != null) {
+                if (workoutObj != null && createWorkout) {
                     Log.d(TAG, "getWorkoutId: " + workoutObj.getWorkoutId());
                     training.setWorkoutId(workoutObj.getWorkoutId());
-                    planViewModel.addNewTrainingAndTracker(training, trackerExerciseList);
+
+                    // executor = Executors.newFixedThreadPool(5);
+                    Executor myExecutor = Executors.newSingleThreadExecutor();
+                    myExecutor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            planViewModel.addNewTrainingAndTracker(training, trackerExerciseList);
+                            createWorkout = false;
+                        }
+                    });
                 }
             }
         });
     }
-
 
 
     private void goToStartWorkoutActivity() {
@@ -298,16 +311,6 @@ public class TrackerExerciseFragment extends Fragment {
         startActivity(intent);
         Objects.requireNonNull(getActivity()).finish();
     }
-
-
-
-//    private String currentDayName() {
-//        Calendar calendar = Calendar.getInstance();
-//        String[] days = new String[]{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-//        Log.d(TAG, "currentDayName: " + " The day is: " + days[calendar.get(Calendar.DAY_OF_WEEK) - 1]);
-//        return days[calendar.get(Calendar.DAY_OF_WEEK) - 1];
-//    }
-
 
     private void setError(EditText text, String errorMessage) {
         if (text.getText().toString().isEmpty()) {

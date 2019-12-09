@@ -54,7 +54,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private List<Training> trainingList = new ArrayList<>();
     private AlertDialog dialog;
     private CustomPlanViewModel planViewModel;
-    TrainingAdapter trainingAdapter;
+    private TrainingAdapter trainingAdapter;
 
 
     @Override
@@ -83,11 +83,10 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
     private void checkIfHavePlans() {
         PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
-        int defPlan = prefsUtils.getInt("default_plan_id", -1);
-        if(defPlan == -1) {
+        String defPlan = prefsUtils.getString("default_plan", "");
+        if (defPlan.equals("")) {
             alertDialogHavePlan();
         }
-
     }
 
 
@@ -171,6 +170,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
                             @Override
                             public void onClick(int pos) {
                                 planViewModel.deleteTraining(trainingList.get(pos));
+                                planViewModel.deleteTrackerExerciseByTrainingId(trainingList.get(pos).getTrainingId());
                             }
                         }
                 ));
@@ -188,6 +188,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
             }
         };
     }
+
 
 
     private void addLayoutRepsAndSets(int position) {
@@ -233,7 +234,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
         final TrackerExercise trackerExercise = new TrackerExercise(trackerExerciseList.get(i).getRepsNumber(),
                 trackerExerciseList.get(i).getWeight(), trainingList.get(i).getTrainingId());
         trackerExercise.setTrackerId(trackerExerciseList.get(i).getTrackerId());
-
 
         if (i == -1) {
             Log.d(TAG, "addWeightAndSetIntoLayout: " + etWeight.getText().toString());
@@ -295,8 +295,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
     }
 
 
-
-
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -333,7 +331,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        startActivity(new Intent(StartWorkoutActivity.this,CustomPlanActivity.class));
+                        startActivity(new Intent(StartWorkoutActivity.this, CustomPlanActivity.class));
                         finish();
                     }
                 })
@@ -346,7 +344,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
         androidx.appcompat.app.AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
 
 //    private void initRecyclerView() {
 //        @SuppressLint("WrongConstant")

@@ -21,6 +21,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.albert.fitness.pumpit.adapter.CommonListAdapter;
+import com.albert.fitness.pumpit.adapter.FoodListAdapter;
+import com.albert.fitness.pumpit.api.RestApi;
+import com.albert.fitness.pumpit.model.Event;
+import com.albert.fitness.pumpit.model.UserRegister;
+import com.albert.fitness.pumpit.model.nutrition.Common;
+import com.albert.fitness.pumpit.model.nutrition.CommonListResponse;
+import com.albert.fitness.pumpit.model.nutrition.FoodListResponse;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.retro_request.FoodRequest;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.utils.Global;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
@@ -32,19 +45,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.CommonListAdapter;
-import com.albert.fitness.pumpit.adapter.FoodListAdapter;
-import com.albert.fitness.pumpit.api.RestApi;
-import com.albert.fitness.pumpit.model.nutrition.Common;
-import com.albert.fitness.pumpit.model.nutrition.CommonListResponse;
-import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
-import com.albert.fitness.pumpit.model.nutrition.FoodListResponse;
-import com.albert.fitness.pumpit.model.nutrition.Foods;
-import com.albert.fitness.pumpit.utils.PrefsUtils;
-import com.albert.fitness.pumpit.model.UserRegister;
-import com.albert.fitness.pumpit.retro_request.FoodRequest;
-import com.albert.fitness.pumpit.utils.Global;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -235,13 +235,11 @@ public class SearchFoodsActivity extends AppCompatActivity {
     }
 
     private void saveAll() {
-        final PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(this, Foods.SHARED_PREFERENCES_FILE);
+        final PrefsUtils prefsUtils = new PrefsUtils(this, Foods.SHARED_PREFERENCES_FILE);
 
         boolean dinner = prefsUtils.getBoolean(Foods.DINNER, false);
         boolean breakfast = prefsUtils.getBoolean(Foods.BREAKFAST, false);
         boolean lunch = prefsUtils.getBoolean(Foods.LUNCH, false);
-        // boolean snack = prefsUtils.getBoolean(Foods.SNACK,false);
 
         String correctNutrition;
 

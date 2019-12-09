@@ -63,6 +63,12 @@ public class Event {
         return df.format(c);
     }
 
+    public static String getCurrentTime() {
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss", Locale.US);
+        return df.format(c);
+    }
+
     public static String getDayName() {
         Calendar cal = Calendar.getInstance();
         @SuppressLint("SimpleDateFormat")

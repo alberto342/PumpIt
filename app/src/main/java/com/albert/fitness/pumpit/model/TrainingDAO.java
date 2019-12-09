@@ -41,6 +41,4 @@ public interface TrainingDAO {
 
     @Query("UPDATE training_table SET index_of_Training=:newPosition WHERE index_of_Training =:position")
     void updateTrainingPosition(int newPosition, int position);
-
-
 }

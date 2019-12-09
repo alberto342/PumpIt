@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.albert.fitness.pumpit.model.FinishTraining;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.Training;
 import com.albert.fitness.pumpit.model.WorkoutObj;
@@ -20,11 +21,13 @@ public class CustomPlanViewModel extends AndroidViewModel {
     private WorkoutRepository repository;
     private LiveData<WorkoutPlanObj> workoutPlanObjLiveData;
     private LiveData<WorkoutObj> workoutObjLiveData;
+    private LiveData<FinishTraining> finishTrainingLiveData;
     private LiveData<List<WorkoutPlanObj>> workoutPlans;
     private LiveData<List<WorkoutObj>> workouts;
     private LiveData<List<Training>> training;
     private LiveData<List<TrackerExercise>> trackerExercise;
-    private LiveData<Integer> lastTrainingId;
+    private LiveData<List<FinishTraining>> finishTraining;
+    private LiveData<Integer> lastId;
 
 
     public CustomPlanViewModel(@NonNull Application application) {
@@ -44,20 +47,20 @@ public class CustomPlanViewModel extends AndroidViewModel {
         return training = repository.getTraining();
     }
 
-    public LiveData<Integer> getLastTrainingId() {
-        return  lastTrainingId = repository.getLastTrainingId();
+    public LiveData<Integer> getLastId() {
+        return lastId = repository.getLastTrainingId();
     }
 
     public LiveData<List<Training>> getAllTrainingByDate(String date) {
-        return  training = repository.getAllTrainingByDate(date);
+        return training = repository.getAllTrainingByDate(date);
     }
 
     public LiveData<List<TrackerExercise>> getAllTracker() {
-        return  trackerExercise = repository.getAllTracker();
+        return trackerExercise = repository.getAllTracker();
     }
 
     public LiveData<WorkoutPlanObj> getPlan(int id) {
-        return  workoutPlanObjLiveData = repository.getPlan(id);
+        return workoutPlanObjLiveData = repository.getPlan(id);
     }
 
     public LiveData<List<WorkoutObj>> getWorkoutNAmeOfASelectedPlan(int id) {
@@ -73,11 +76,27 @@ public class CustomPlanViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Training>> getTrainingByWorkoutId(int id) {
-        return  training = repository.getTrainingByWorkoutId(id);
+        return training = repository.getTrainingByWorkoutId(id);
     }
 
     public LiveData<List<TrackerExercise>> getTrackerExerciseByTraining(int id) {
         return trackerExercise = repository.getTrackerExerciseByTrainingId(id);
+    }
+
+    public LiveData<List<TrackerExercise>> getAllTrackerByFinishTrainingId(int id) {
+        return trackerExercise = repository.getAllTrackerByFinishTrainingId(id);
+    }
+
+    public LiveData<Integer> getLastFinishTrainingById() {
+        return lastId = repository.getLastFinishTrainingById();
+    }
+
+    public LiveData<FinishTraining> getFinishTrainingById(int id) {
+        return finishTrainingLiveData = repository.getFinishTrainingById(id);
+    }
+
+    public LiveData<FinishTraining> getFinishTrainingByDate(String date) {
+        return finishTrainingLiveData = repository.getFinishTrainingByDate(date);
     }
 
     public void addNewWorkout(WorkoutObj workout) {
@@ -100,7 +119,15 @@ public class CustomPlanViewModel extends AndroidViewModel {
         repository.insertTrackerExercise(trackerExercise);
     }
 
-    public void updateWorkoutPlan(WorkoutPlanObj plan){
+    public void addNewFinishTraining(FinishTraining finishTraining) {
+        repository.insertFinishTraining(finishTraining);
+    }
+
+    public void addNewFinishTrainingAndTracker(FinishTraining finishTraining, List<TrackerExercise> trackerExercises) {
+        repository.insertFinishTrainingAndTracker(finishTraining, trackerExercises);
+    }
+
+    public void updateWorkoutPlan(WorkoutPlanObj plan) {
         repository.updatePlan(plan);
     }
 
@@ -120,8 +147,8 @@ public class CustomPlanViewModel extends AndroidViewModel {
         repository.updateTrackerExercise(trackerExercise);
     }
 
-    public void deleteWorkoutPlan(WorkoutPlanObj plan){
-       repository.deletePlan(plan);
+    public void deleteWorkoutPlan(WorkoutPlanObj plan) {
+        repository.deletePlan(plan);
     }
 
     public void deleteWorkout(WorkoutObj workout) {
@@ -130,6 +157,10 @@ public class CustomPlanViewModel extends AndroidViewModel {
 
     public void deleteTraining(Training training) {
         repository.deleteTraining(training);
+    }
+
+    public void deleteTrackerExerciseByTrainingId(int id) {
+        repository.deleteTrackerExerciseByTrainingId(id);
     }
 
 

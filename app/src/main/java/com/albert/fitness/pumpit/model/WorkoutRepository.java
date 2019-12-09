@@ -13,10 +13,12 @@ public class WorkoutRepository {
     private WorkoutPlanDAO workoutPlanDAO;
     private TrainingDAO trainingDAO;
     private TrackerExerciseDAO trackerExerciseDAO;
+    private FinishTrainingDAO finishTrainingDAO;
     private LiveData<List<WorkoutPlanObj>> workoutPlans;
     private LiveData<List<WorkoutObj>> workouts;
     private LiveData<List<Training>> training;
     private LiveData<List<TrackerExercise>> trackerExercise;
+    private LiveData<List<FinishTraining>> finishTraining;
     private Executor executor;
 
     public WorkoutRepository(Application application) {
@@ -26,6 +28,7 @@ public class WorkoutRepository {
         workoutPlanDAO = workoutDatabase.workoutPlanDAO();
         trainingDAO = workoutDatabase.trainingDAO();
         trackerExerciseDAO = workoutDatabase.trackerExerciseDAO();
+        finishTrainingDAO = workoutDatabase.finishTrainingDAO();
     }
 
 
@@ -82,6 +85,22 @@ public class WorkoutRepository {
         return trackerExerciseDAO.getTrackerExercises(trainingId);
     }
 
+    public LiveData<List<TrackerExercise>> getAllTrackerByFinishTrainingId(int id) {
+        return trackerExerciseDAO.getAllTrackerByFinishTrainingId(id);
+    }
+
+    public LiveData<Integer> getLastFinishTrainingById() {
+        return finishTrainingDAO.getLastFinishTrainingById();
+    }
+
+    public LiveData<FinishTraining> getFinishTrainingById(int id) {
+        return finishTrainingDAO.getFinishTrainingById(id);
+    }
+
+    public LiveData<FinishTraining> getFinishTrainingByDate(String date) {
+        return finishTrainingDAO.getFinishTrainingsByDate(date);
+    }
+
     public void insertWorkout(final WorkoutObj workout) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
         myExecutor.execute(new Runnable() {
@@ -112,7 +131,7 @@ public class WorkoutRepository {
         });
     }
 
-    public void insertTrainingAndTracker(final  Training training, final List<TrackerExercise> trackerExercises) {
+    public void insertTrainingAndTracker(final Training training, final List<TrackerExercise> trackerExercises) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
         myExecutor.execute(new Runnable() {
             @Override
@@ -128,6 +147,26 @@ public class WorkoutRepository {
             @Override
             public void run() {
                 trackerExerciseDAO.insert(trackerExercise);
+            }
+        });
+    }
+
+    public void insertFinishTraining(final FinishTraining finishTraining) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                finishTrainingDAO.insert(finishTraining);
+            }
+        });
+    }
+
+    public void insertFinishTrainingAndTracker(final FinishTraining finishTraining, final List<TrackerExercise> trackerExercises) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                finishTrainingDAO.insertFinishTrainingAndTracker(finishTraining, trackerExercises);
             }
         });
     }
@@ -168,6 +207,16 @@ public class WorkoutRepository {
             @Override
             public void run() {
                 trackerExerciseDAO.delete(trackerExercise);
+            }
+        });
+    }
+
+    public void deleteTrackerExerciseByTrainingId(final int trainingId) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                trackerExerciseDAO.deleteTrackerExerciseByTrainingId(trainingId);
             }
         });
     }

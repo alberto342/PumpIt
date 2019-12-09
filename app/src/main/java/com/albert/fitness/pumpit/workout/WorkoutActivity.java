@@ -286,8 +286,6 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 //    }
 
 
-    //todo its not removed after deleted items
-
     private void swipe() {
         new SwipeHelper(this, mRecyclerView) {
             @Override
@@ -300,7 +298,7 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
-                                deleteItem(pos);
+                                customPlanViewModel.deleteWorkout(workoutList.get(pos));
                                 deleteFromPref();
                             }
                         }
@@ -360,19 +358,6 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 //                }
 //        ));
 //    }
-
-
-    private void deleteItem(final int position) {
-        customPlanViewModel.deleteWorkout(workoutList.get(position));
-//        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this);
-//        workoutAdapter.setItems((ArrayList<WorkoutObj>) workoutList);
-//        workoutList.remove(position);
-//        mRecyclerView.removeViewAt(position);
-//        workoutAdapter.notifyItemRemoved(position);
-//        workoutAdapter.notifyItemRangeChanged(position, workoutList.size());
-//        Log.i(TAG, "success delete item");
-    }
-
 
 
     private void deleteFromPref() {

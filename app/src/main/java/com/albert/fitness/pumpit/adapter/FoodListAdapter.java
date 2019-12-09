@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.albert.fitness.pumpit.model.nutrition.Foods;
 import com.albert.fitness.pumpit.nutrition.ShowFoodBeforeAddedActivity;
 import com.squareup.picasso.Picasso;
 
@@ -20,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.albert.fitness.pumpit.model.nutrition.Foods;
 import fitness.albert.com.pumpit.R;
 
 public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -67,7 +67,7 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 .into(holder.ivImage);
 
         holder.tvFoodName.setText(mListItem.get(position).getFoodName());
-        holder.tvCalories.setText(mContext.getString(R.string.calories) + ": " + mListItem.get(position).getNfCalories());
+        holder.tvCalories.setText(mContext.getString(R.string.nfCalories) + ": " + mListItem.get(position).getNfCalories());
         holder.tvServingQuantity.setText(mContext.getString(R.string.servingQty) + ": " + mListItem.get(position).getServingQty());
         holder.tvServingUnit.setText(mContext.getString(R.string.servingUnit) + ": " + mListItem.get(position).getServingUnit());
         holder.itemView.setOnClickListener(new View.OnClickListener() {

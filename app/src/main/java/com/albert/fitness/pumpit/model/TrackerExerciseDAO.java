@@ -21,10 +21,16 @@ public interface TrackerExerciseDAO {
     @Delete
     void delete(TrackerExercise item);
 
+    @Query("DELETE FROM tracker_exercise_table WHERE training_id ==:id")
+    void deleteTrackerExerciseByTrainingId(int id);
+
     @Query("SELECT * FROM tracker_exercise_table")
     LiveData<List<TrackerExercise>> getAllTrackerExercise();
 
 
-    @Query("SELECT * FROM tracker_exercise_table WHERE tracker_id==:id")
+    @Query("SELECT * FROM tracker_exercise_table WHERE training_id==:id")
     LiveData<List<TrackerExercise>> getTrackerExercises(int id);
+
+    @Query("SELECT * FROM tracker_exercise_table WHERE finish_training_id==:id")
+    LiveData<List<TrackerExercise>> getAllTrackerByFinishTrainingId(int id);
 }

@@ -16,6 +16,9 @@ public class TrackerExercise {
     @ColumnInfo(name = "training_id")
     private int trainingId;
 
+    @ColumnInfo(name = "finish_training_id")
+    private int finishTrainingId;
+
     public TrackerExercise() {
     }
 
@@ -25,9 +28,23 @@ public class TrackerExercise {
         this.trainingId = trainingId;
     }
 
+    public TrackerExercise(float weight, int repsNumber, int finishTrainingId) {
+        this.repsNumber = repsNumber;
+        this.weight = weight;
+        this.finishTrainingId = finishTrainingId;
+    }
+
     public TrackerExercise(int repNumber, float weight) {
         this.repsNumber = repNumber;
         this.weight = weight;
+    }
+
+    public int getFinishTrainingId() {
+        return finishTrainingId;
+    }
+
+    public void setFinishTrainingId(int finishTrainingId) {
+        this.finishTrainingId = finishTrainingId;
     }
 
     public int getTrackerId() {

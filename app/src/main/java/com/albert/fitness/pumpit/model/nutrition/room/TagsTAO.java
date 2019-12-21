@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -23,6 +23,9 @@ public interface TagsTAO {
 
     @Query("SELECT * FROM tags_table")
     LiveData<List<Tags>> getAllTags();
+
+    @Query("SELECT * FROM tags_table WHERE food_id==:id")
+    LiveData<Tags> getTagsByFoodId(int id);
 
 
     @Query("SELECT * FROM tags_table WHERE tag_id==:id")

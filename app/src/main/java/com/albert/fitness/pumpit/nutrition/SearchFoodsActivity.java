@@ -1,7 +1,6 @@
 package com.albert.fitness.pumpit.nutrition;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,11 +12,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,22 +27,25 @@ import com.albert.fitness.pumpit.adapter.CommonListAdapter;
 import com.albert.fitness.pumpit.adapter.FoodListAdapter;
 import com.albert.fitness.pumpit.api.RestApi;
 import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.model.nutrition.Common;
 import com.albert.fitness.pumpit.model.nutrition.CommonListResponse;
 import com.albert.fitness.pumpit.model.nutrition.FoodListResponse;
 import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.model.nutrition.room.AltMeasures;
+import com.albert.fitness.pumpit.model.nutrition.room.FoodLog;
+import com.albert.fitness.pumpit.model.nutrition.room.FoodsObj;
+import com.albert.fitness.pumpit.model.nutrition.room.FullNutrition;
+import com.albert.fitness.pumpit.model.nutrition.room.Nutrition;
+import com.albert.fitness.pumpit.model.nutrition.room.Photo;
+import com.albert.fitness.pumpit.model.nutrition.room.Tags;
 import com.albert.fitness.pumpit.retro_request.FoodRequest;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.utils.Global;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.albert.fitness.pumpit.viewmodel.NutritionViewModel;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -61,21 +66,26 @@ public class SearchFoodsActivity extends AppCompatActivity {
     TextView tvEmpty;
     RestApi api;
     private Foods foods = new Foods();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private MaterialSearchBar searchBar;
-    private PrefsUtils prefsUtils = new PrefsUtils();
+    private PrefsUtils prefsUtils;
+    private NutritionViewModel viewModel;
+    private boolean isInFoodId = true;
+    private int foodId;
+    ProgressBar pb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_foods);
+        prefsUtils = new PrefsUtils(this, PrefsUtils.NUTRITION);
+        viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
+        getLastFoodId();
 
         //checkPermission();
         Objects.requireNonNull(getSupportActionBar()).hide();
         api = Global.initRetrofit();
         findViews();
     }
-
 
 
     @SuppressLint("WrongConstant")
@@ -85,6 +95,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
         btnSaveAllFood = findViewById(R.id.btn_save_all_food);
         searchBar = findViewById(R.id.food_search_bar);
         //   searchBar.setCardViewElevation(25);
+        pb = findViewById(R.id.pb_search_food);
         rvList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         searchBarClicked();
@@ -92,7 +103,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
         btnSaveAllFood.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveAll();
+                checkFoodNameExisting();
             }
         });
     }
@@ -104,9 +115,21 @@ public class SearchFoodsActivity extends AppCompatActivity {
         return true;
     }
 
+    private void getLastFoodId() {
+        viewModel.getLastFoodId().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (integer != null) {
+                    foodId = integer + 1;
+                } else {
+                    foodId = 1;
+                }
+            }
+        });
+    }
+
 
     private void searchBarClicked() {
-
         searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
             @Override
             public void onSearchStateChanged(boolean enabled) {
@@ -153,9 +176,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
     }
 
     private void getFoodList() {
-        final ProgressDialog progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
+        pb.setVisibility(View.VISIBLE);
 
         FoodRequest foodRequest = null;
         final String search = searchBar.getText();
@@ -171,7 +192,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
             @SuppressLint("ShowToast")
             @Override
             public void onResponse(@NonNull Call<FoodListResponse> call, @NonNull Response<FoodListResponse> response) {
-                progressdialog.hide();
+                pb.setVisibility(View.GONE);
                 if (response.body() != null) {
                     if (response.body().getFoods().size() > 0) {
                         tvEmpty.setVisibility(View.GONE);
@@ -193,7 +214,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<FoodListResponse> call, @NonNull Throwable t) {
-                progressdialog.hide();
+                pb.setVisibility(View.GONE);
                 t.printStackTrace();
             }
         });
@@ -234,52 +255,105 @@ public class SearchFoodsActivity extends AppCompatActivity {
         });
     }
 
-    private void saveAll() {
-        final PrefsUtils prefsUtils = new PrefsUtils(this, Foods.SHARED_PREFERENCES_FILE);
-
-        boolean dinner = prefsUtils.getBoolean(Foods.DINNER, false);
-        boolean breakfast = prefsUtils.getBoolean(Foods.BREAKFAST, false);
-        boolean lunch = prefsUtils.getBoolean(Foods.LUNCH, false);
-
-        String correctNutrition;
-
-        if (dinner) {
-            correctNutrition = Foods.DINNER;
-        } else if (breakfast) {
-            correctNutrition = Foods.BREAKFAST;
-        } else if (lunch) {
-            correctNutrition = Foods.LUNCH;
-        } else {
-            correctNutrition = Foods.SNACK;
-        }
-        for (int i = 0; i < mListItem.size(); i++) {
-            try {
-                arrayListIntoClass();
-                db.collection(Foods.NUTRITION)
-                        .document(FireBaseInit.getEmailRegister()).collection(correctNutrition)
-                        .document(UserRegister.getTodayDate()).collection(Foods.All_NUTRITION).add(mListItem.get(i))
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+    private void checkFoodNameExisting() {
+        if (!mListItem.isEmpty()) {
+            for (final Foods foods : mListItem) {
+                viewModel.getFoodIdByFoodName(foods.getFoodName())
+                        .observe(this, new Observer<Integer>() {
                             @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Event.saveEvent(SearchFoodsActivity.this);
-                                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error adding document", e);
+                            public void onChanged(Integer id) {
+                                if (id == null) {
+                                    saveNutrition(foods);
+                                } else {
+                                    Log.d(TAG, "Save Food: NOT SAVING FoodNameExisting + id: " + id);
+                                    getAltMeasuresId(id, foods);
+                                    Log.d(TAG, "saveFoodLogs id: " + id + ", EatType: " + getEatType() + ", Date:" + Event.getTodayData());
+                                    finish();
+                                }
                             }
                         });
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
+    }
+
+    private void saveNutrition(Foods foods) {
+        List<FoodsObj> foodsObjList = new ArrayList<>();
+        List<Nutrition> nutritionList = new ArrayList<>();
+        List<FullNutrition> fullNutritionList = new ArrayList<>();
+        List<AltMeasures> altMeasuresList = new ArrayList<>();
+        List<Photo> photoList = new ArrayList<>();
+        List<Tags> tagsList = new ArrayList<>();
+
+        try {
+            foodsObjList.add(new FoodsObj(foods.getFoodName()));
+
+            photoList.add(new Photo(foodId, foods.getPhoto().getHighres(), foods.getPhoto().getThumb()));
+
+            tagsList.add(new Tags(foodId, foods.getTags().getFoodGroup(),
+                    foods.getTags().getItem(), foods.getTags().getMeasure(),
+                    foods.getTags().getQuantity(), foods.getTags().getTagId()));
+
+            nutritionList.add(new Nutrition(foodId, foods.getNfCalories(),
+                    foods.getNfDietaryFiber(), foods.getNfCholesterol(), foods.getNfProtein(),
+                    foods.getNfSaturatedFat(), foods.getNfTotalFat(), foods.getNfSugars(),
+                    foods.getNfTotalCarbohydrate(), 1, foods.getServingUnit(),
+                    (int) foods.getServingWeightGrams(), foods.getSource()));
+
+            for (int j = 0; j < foods.getFullNutrients().size(); j++) {
+                fullNutritionList.add(new FullNutrition(foodId,
+                        foods.getFullNutrients().get(j).getAttrId(),
+                        foods.getFullNutrients().get(j).getValue()));
+            }
+
+            for (int j = 0; j < foods.getAltMeasures().size(); j++) {
+                altMeasuresList.add(new AltMeasures(foodId,
+                        foods.getAltMeasures().get(j).getMeasure(),
+                        foods.getAltMeasures().get(j).getQty(),
+                        Integer.valueOf(foods.getAltMeasures().get(j).getSeq()),
+                        Integer.valueOf(foods.getAltMeasures().get(j).getServingWeight())));
+            }
+
+            arrayListIntoClass();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        viewModel.addNewAllNutrition(foodsObjList, nutritionList, fullNutritionList, altMeasuresList, photoList, tagsList);
+        getAltMeasuresId(foodId, foods);
+        foodId++;
+
         Toast.makeText(SearchFoodsActivity.this, "Save successfully", Toast.LENGTH_SHORT).show();
         finish();
     }
 
+    private void getAltMeasuresId(int id, final Foods foods) {
+        viewModel.getAltMeasuresIdByFoodId(id).observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer measuresId) {
+                if (measuresId != null) {
+                    Log.d(TAG, "getAltMeasuresId: " + measuresId + " foodId: " + foodId + " qty: " + foods.getServingQty());
+                    viewModel.addNewFoodLog(new FoodLog(foodId, measuresId, foods.getServingQty(), getEatType(), Event.getTodayData()));
+                }
+            }
+        });
+    }
 
+
+    private String getEatType() {
+        final PrefsUtils prefsUtils = new PrefsUtils(this, Foods.SHARED_PREFERENCES_FILE);
+        boolean dinner = prefsUtils.getBoolean(Foods.DINNER, false);
+        boolean breakfast = prefsUtils.getBoolean(Foods.BREAKFAST, false);
+        boolean lunch = prefsUtils.getBoolean(Foods.LUNCH, false);
+        if (dinner) {
+            return Foods.DINNER;
+        } else if (breakfast) {
+            return Foods.BREAKFAST;
+        } else if (lunch) {
+            return Foods.LUNCH;
+        } else {
+            return Foods.SNACK;
+        }
+    }
 
 
     private void openVoiceRecognizer() {

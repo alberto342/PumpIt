@@ -19,8 +19,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.adapter.DinnerListAdapter;
+import com.albert.fitness.pumpit.adapter.LunchListAdapter;
+import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
 import com.albert.fitness.pumpit.model.UserRegister;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.utils.SwipeHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,12 +36,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.albert.fitness.pumpit.adapter.DinnerListAdapter;
-import com.albert.fitness.pumpit.adapter.LunchListAdapter;
-import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
-import com.albert.fitness.pumpit.model.nutrition.Foods;
-import com.albert.fitness.pumpit.utils.SwipeHelper;
 
 import fitness.albert.com.pumpit.R;
 
@@ -187,8 +186,8 @@ public class LogNutritionFragment extends Fragment {
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvBreakfast.setLayoutManager(layoutManager);
-        breakfastListAdapter = new BreakfastListAdapter(getActivity(), breakfastList);
-        rvBreakfast.setAdapter(breakfastListAdapter);
+      //  breakfastListAdapter = new BreakfastListAdapter(getActivity(), breakfastList);
+       // rvBreakfast.setAdapter(breakfastListAdapter);
     }
 
     private void initLunchRecyclerView() {
@@ -197,8 +196,8 @@ public class LogNutritionFragment extends Fragment {
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvLunch.setLayoutManager(layoutManager);
-        lunchListAdapter = new LunchListAdapter(getActivity(), lunchList);
-        rvLunch.setAdapter(lunchListAdapter);
+//        lunchListAdapter = new LunchListAdapter(getActivity(), lunchList);
+//        rvLunch.setAdapter(lunchListAdapter);
     }
 
 
@@ -208,8 +207,8 @@ public class LogNutritionFragment extends Fragment {
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvDinner.setLayoutManager(layoutManager);
-        dinnerListAdapter = new DinnerListAdapter(getActivity(), dinnerList);
-        rvDinner.setAdapter(dinnerListAdapter);
+//        dinnerListAdapter = new DinnerListAdapter(getActivity(), dinnerList);
+//        rvDinner.setAdapter(dinnerListAdapter);
     }
 
     private void initSnacksRecyclerView() {
@@ -218,8 +217,8 @@ public class LogNutritionFragment extends Fragment {
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvSnacks.setLayoutManager(layoutManager);
-        snacksListAdapter = new SnacksListAdapter(getActivity(), snacksList);
-        rvSnacks.setAdapter(snacksListAdapter);
+//        snacksListAdapter = new SnacksListAdapter(getActivity(), snacksList);
+//        rvSnacks.setAdapter(snacksListAdapter);
     }
 
 

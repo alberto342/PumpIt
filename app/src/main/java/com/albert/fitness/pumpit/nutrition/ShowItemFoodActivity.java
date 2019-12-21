@@ -21,7 +21,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.albert.fitness.pumpit.adapter.FirestoreFoodListAdapter;
+import com.albert.fitness.pumpit.adapter.FoodListAdapter;
 import com.albert.fitness.pumpit.model.UserRegister;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -40,11 +44,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.FirestoreFoodListAdapter;
-import com.albert.fitness.pumpit.adapter.FoodListAdapter;
-import com.albert.fitness.pumpit.model.nutrition.Foods;
-import com.albert.fitness.pumpit.utils.PrefsUtils;
-
 import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowItemFoodActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
@@ -183,7 +182,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 //
 //                                    for (int r = 0; r < foodList.get(i).getAltMeasures().size(); r++) {
 //                                        spinnerList.add(foodList.get(i).getAltMeasures().get(r).getMeasure());
-//                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServing_weight()));
+//                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServingWeight()));
 //                                    }
 //                            }
 //                            tvEnergy.setText(String.format("%.0f", kcal));
@@ -211,7 +210,9 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                                 Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
                                 foodList.add(foods);
 
-                                if (FirestoreFoodListAdapter.foodName.equals(foodList.get(i).getFoodName()) && FirestoreFoodListAdapter.qty == foodList.get(i).getServingQty() && FirestoreFoodListAdapter.unit.equals(foodList.get(i).getServingUnit())) {
+                                if (FirestoreFoodListAdapter.foodName.equals(foodList.get(i).getFoodName())
+                                        && FirestoreFoodListAdapter.qty == foodList.get(i).getServingQty()
+                                        && FirestoreFoodListAdapter.unit.equals(foodList.get(i).getServingUnit())) {
                                     Picasso.get()
                                             .load(foodList.get(i).getPhoto().getHighres())
                                             .placeholder(R.mipmap.ic_launcher)
@@ -238,14 +239,14 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                                     //add value into list
                                     for (int r = 0; r < foodList.get(i).getAltMeasures().size(); r++) {
                                         spinnerList.add(foodList.get(i).getAltMeasures().get(r).getMeasure()); // Measure name
-                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServing_weight())); // Measure value
+                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServingWeight())); // Measure value
 
 
                                         //add spinner to the map
                                         if (servingWeightList.isEmpty()) {
                                             allServingWeight.put("package", servingWeightGrams);
                                         } else {
-                                            allServingWeight.put(foodList.get(i).getAltMeasures().get(r).getMeasure(), Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServing_weight()));
+                                            allServingWeight.put(foodList.get(i).getAltMeasures().get(r).getMeasure(), Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServingWeight()));
                                         }
                                     }
                                 }
@@ -337,7 +338,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
                     testOnce = true;
 
                     quantityViewCustom.setQuantity(1);
-                   // updateNutrition(Foods.BREAKFAST, AltMeasures);
+                    // updateNutrition(Foods.BREAKFAST, AltMeasures);
                 }
             }
 

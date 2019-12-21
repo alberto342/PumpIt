@@ -17,7 +17,6 @@ import java.util.List;
 
 public class CustomPlanViewModel extends AndroidViewModel {
 
-
     private WorkoutRepository repository;
     private LiveData<WorkoutPlanObj> workoutPlanObjLiveData;
     private LiveData<WorkoutObj> workoutObjLiveData;

@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

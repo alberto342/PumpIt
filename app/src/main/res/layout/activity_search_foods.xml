@@ -37,9 +37,16 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
-
-
+    <ProgressBar
+        android:id="@+id/pb_search_food"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="25dp"
+        android:minWidth="50dp"
+        android:minHeight="50dp"
+        android:visibility="invisible" />
 
 
     <TextView

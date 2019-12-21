@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -23,6 +23,15 @@ public class FullNutrition {
     private int atterId;
 
     private float value;
+
+    public FullNutrition() {
+    }
+
+    public FullNutrition(int foodId, int atterId, float value) {
+        this.foodId = foodId;
+        this.atterId = atterId;
+        this.value = value;
+    }
 
     public int getFullNutritionId() {
         return fullNutritionId;

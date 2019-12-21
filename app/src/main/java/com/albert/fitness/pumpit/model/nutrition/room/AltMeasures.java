@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -22,8 +22,29 @@ public class AltMeasures {
 
     private int qty;
 
+    private int seq;
+
     @ColumnInfo(name = "serving_weight")
     private int servingWeight;
+
+    public AltMeasures() {
+    }
+
+    public AltMeasures(int foodId, String measure, int qty, int seq, int servingWeight) {
+        this.foodId = foodId;
+        this.measure = measure;
+        this.qty = qty;
+        this.seq = seq;
+        this.servingWeight = servingWeight;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
+    }
 
     public int getAltMeasuresId() {
         return altMeasuresId;

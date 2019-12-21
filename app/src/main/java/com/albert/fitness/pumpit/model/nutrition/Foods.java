@@ -264,6 +264,4 @@ public class Foods {
     public String toString() {
         return "ClassPojo [servingUnit = " + servingUnit + ", nfTotalCarbohydrate = " + nfTotalCarbohydrate + ", nfSodium = " + nfSodium + ", nfP = " + nfP + ", AltMeasures = " + altMeasures + ", nfSugars = " + nfSugars + ", nfCalories = " + nfCalories + ", brandName = " + brandName + ", lat = " + lat + ", metadata = " + metadata + ", tags = " + tags + ", subRecipe = " + subRecipe + ", ndbNo = " + ndbNo + ", foodName = " + foodName + ", mealType = " + mealType + ", nfSaturatedFat = " + nfSaturatedFat + ", nfTotalFat = " + nfTotalFat + ", consumedAt = " + consumedAt + ", nfDietaryFiber = " + nfDietaryFiber + ", nfCholesterol = " + nfCholesterol + ", photo = " + photo + ", upc = " + upc + ", nfPotassium = " + nfPotassium + ", nixBrandName = " + nixBrandName + ", FullNutrients = " + fullNutrients + ", nixItemId = " + nixItemId + ", source = " + source + ", nixItemName = " + nixItemName + ", servingWeightGrams = " + servingWeightGrams + ", nixBrandId = " + nixBrandId + ", servingQty = " + servingQty + "]";
     }
-
-
 }

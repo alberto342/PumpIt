@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -29,6 +29,18 @@ public class Tags {
 
     @ColumnInfo(name = "api_tag_id")
     private int tagIdApi;
+
+    public Tags() {
+    }
+
+    public Tags(int foodId, int foodGroup, String item, String measure, int quantity, int tagIdApi) {
+        this.foodId = foodId;
+        this.foodGroup = foodGroup;
+        this.item = item;
+        this.measure = measure;
+        this.quantity = quantity;
+        this.tagIdApi = tagIdApi;
+    }
 
     public int getTagId() {
         return tagId;

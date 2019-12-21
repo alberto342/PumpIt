@@ -1,6 +1,7 @@
 package com.albert.fitness.pumpit.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -13,7 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.model.nutrition.room.QueryNutritionItem;
 import com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity;
 import com.albert.fitness.pumpit.nutrition.ShowBreakfastActivity;
 import com.squareup.picasso.Picasso;
@@ -27,15 +28,13 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private final String TAG = "BreakfastListAdapter";
     private Context mContext;
-    private List<Foods> foodsList;
+    private List<QueryNutritionItem> nutritionItems;
     public static String foodName;
 
-
-    public BreakfastListAdapter(Context mContext, List<Foods> foodsList) {
+    public BreakfastListAdapter(Context mContext, List<QueryNutritionItem> nutritionItems) {
         this.mContext = mContext;
-        this.foodsList = foodsList;
+        this.nutritionItems = nutritionItems;
     }
-
 
     @NonNull
     @Override
@@ -58,20 +57,35 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
     @SuppressLint({"LongLogTag", "SetTextI18n"})
     private void bindViews(final ViewHolder holder, final int position) {
 
+        Log.d(TAG, "bindViews: " + nutritionItems.get(position).getThumb());
+
         Picasso.get()
-                .load(foodsList.get(position).getPhoto().getThumb())
+                .load(nutritionItems.get(position).getThumb())
                 .placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
-        holder.tvFoodName.setText(foodsList.get(position).getFoodName());
-        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", foodsList.get(position).getNfCalories(), foodsList.get(position).getNfTotalCarbohydrate()));
-        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", foodsList.get(position).getNfProtein()));
-        holder.tvServiceQty.setText("Qty: " + foodsList.get(position).getServingQty());
+        holder.tvFoodName.setText(nutritionItems.get(position).getFoodName());
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", nutritionItems.get(position).getCalories(), nutritionItems.get(position).getTotalCarbohydrate()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", nutritionItems.get(position).getProtein()));
+        holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
+            }
+        });
+
+
+        holder.tvFoodName.setText(nutritionItems.get(position).getFoodName());
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", nutritionItems.get(position).getCalories(),
+                nutritionItems.get(position).getTotalCarbohydrate()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", nutritionItems.get(position).getProtein()));
+        holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
                 foodName = holder.tvFoodName.getText().toString();
@@ -86,33 +100,12 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 }
 
                 Intent i = new Intent(mContext, ShowBreakfastActivity.class);
-                i.putExtra("foodPhoto", foodsList.get(position).getPhoto().getHighres());
-                i.putExtra("kcal", foodsList.get(position).getNfCalories());
-                i.putExtra("fat", foodsList.get(position).getNfTotalFat());
-                i.putExtra("protein", foodsList.get(position).getNfProtein());
-                i.putExtra("carbohydrate", foodsList.get(position).getNfTotalCarbohydrate());
-                i.putExtra("servingWeightGrams", foodsList.get(position).getServingWeightGrams());
-                i.putExtra("qty", foodsList.get(position).getServingQty());
-                i.putExtra("servingUnit", foodsList.get(position).getServingUnit());
-                i.putExtra("altMeasuresSize", foodsList.get(position).getAltMeasures().size());
-                i.putExtra("fullNutrientsSize", foodsList.get(position).getFullNutrients().size());
-                i.putExtra("foodGroup", foodsList.get(position).getTags().getFoodGroup());
-
-
-                for (int r = 0; r < foodsList.get(position).getAltMeasures().size(); r++) {
-                    i.putExtra("measure" + r, foodsList.get(position).getAltMeasures().get(r).getMeasure());
-                    i.putExtra("measureServingWeight" + r, foodsList.get(position).getAltMeasures().get(r).getServing_weight());
-                }
-
-                for (int r = 0; r < foodsList.get(position).getFullNutrients().size(); r++) {
-                    i.putExtra("attrId" + r, foodsList.get(position).getFullNutrients().get(r).getAttrId());
-                    i.putExtra("values" + r, foodsList.get(position).getFullNutrients().get(r).getValue());
-                }
-
+                i.putExtra("logId", nutritionItems.get(position).getLogId());
+                i.putExtra("foodName", nutritionItems.get(position).getFoodName());
                 mContext.startActivity(i);
 
 
-                //   ((Activity) mContext).recreate();
+                ((Activity) mContext).recreate();
 
 //                mContext.startActivity(new Intent(mContext, ShowBreakfastActivity.class));
 //                foodsList.clear();
@@ -124,24 +117,24 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemCount() {
-        return foodsList.size();
+        return nutritionItems.size();
     }
 
 
-//    public void removeItem(int position) {
-//        foodsList.remove(position);
-//        notifyItemRemoved(position);
-//    }
-//
-//
-//    public void restoreItem(Foods item, int position) {
-//        foodsList.add(position, item);
-//        notifyItemInserted(position);
-//    }
+    public void removeItem(int position) {
+        nutritionItems.remove(position);
+        notifyItemRemoved(position);
+    }
 
 
-    public List<Foods> getData() {
-        return foodsList;
+    public void restoreItem(QueryNutritionItem item, int position) {
+        nutritionItems.add(position, item);
+        notifyItemInserted(position);
+    }
+
+
+    public List<QueryNutritionItem> getData() {
+        return nutritionItems;
     }
 
 

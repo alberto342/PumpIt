@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -10,24 +10,32 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 @Database(entities = {FoodsObj.class, AltMeasures.class, FullNutrition.class, Nutrition.class,
-        Photo.class, Tags.class}, version = 1)
+        Photo.class, Tags.class, FoodLog.class, WaterTracker.class}, version = 1)
 public abstract class
 NutritionDatabase extends RoomDatabase {
 
     public abstract FoodsDAO foodsDAO();
+
     public abstract AltMeasuresDAO altMeasuresDAO();
+
     public abstract FullNutritionDAO fullNutritionDAO();
+
     public abstract NutritionDAO nutritionDAO();
+
     public abstract PhotoDAO photoDAO();
+
     public abstract TagsTAO tagsTAO();
 
+    public abstract FoodLogDAO foodLogDAO();
+
+    public abstract WaterTrackerDAO waterTrackerDAO();
 
     private static NutritionDatabase instance;
 
     public static synchronized NutritionDatabase getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(context.getApplicationContext(),
-                    NutritionDatabase.class, "FoodsDb")
+                    NutritionDatabase.class, "nutrition_database")
                     .fallbackToDestructiveMigration()
                     .addCallback(callback)
                     .build();
@@ -51,6 +59,8 @@ NutritionDatabase extends RoomDatabase {
         private NutritionDAO nutritionDAO;
         private PhotoDAO photoDAO;
         private TagsTAO tagsTAO;
+        private FoodLogDAO foodLogDAO;
+        private WaterTrackerDAO waterTrackerDAO;
 
         public InitialDataAsyncTask(NutritionDatabase nutritionDatabase) {
             foodsDAO = nutritionDatabase.foodsDAO();
@@ -59,12 +69,12 @@ NutritionDatabase extends RoomDatabase {
             nutritionDAO = nutritionDatabase.nutritionDAO();
             photoDAO = nutritionDatabase.photoDAO();
             tagsTAO = nutritionDatabase.tagsTAO();
+            foodLogDAO = nutritionDatabase.foodLogDAO();
+            waterTrackerDAO = nutritionDatabase.waterTrackerDAO();
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-
-
             return null;
         }
     }

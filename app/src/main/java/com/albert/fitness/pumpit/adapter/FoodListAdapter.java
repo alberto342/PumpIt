@@ -137,7 +137,7 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         //remove existed
         if(!mListItem.get(position).getAltMeasures().isEmpty()) {
-            if(!String.valueOf(mListItem.get(position).getServingWeightGrams()).equals(mListItem.get(position).getAltMeasures().get(position).getServing_weight())) {
+            if(!String.valueOf(mListItem.get(position).getServingWeightGrams()).equals(mListItem.get(position).getAltMeasures().get(position).getServingWeight())) {
                 String itemOne = measure.get(0);
                 measure.remove(0);
                 measure.add(itemOne);
@@ -152,13 +152,12 @@ public class FoodListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         for (int i = 0; i < mListItem.get(position).getAltMeasures().size(); i++) {
-            measureMap.put(mListItem.get(position).getAltMeasures().get(i).getMeasure(), Float.valueOf(mListItem.get(position).getAltMeasures().get(i).getServing_weight()));
+            measureMap.put(mListItem.get(position).getAltMeasures().get(i).getMeasure(), Float.valueOf(mListItem.get(position).getAltMeasures().get(i).getServingWeight()));
         }
     }
 
     @Override
     public long getItemId(int position) {
-        //Auto-generated method stub
         return position;
     }
 

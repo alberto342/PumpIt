@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -19,13 +19,19 @@ public class FoodsObj {
     public static final String All_NUTRITION = "all_nutrition";
     public static final String WATER_TRACKER = "water_tracker";
 
-
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "food_id")
     private int foodId;
 
     @ColumnInfo(name = "food_name")
     private String foodName;
+
+    public FoodsObj() {
+    }
+
+    public FoodsObj(String foodName) {
+        this.foodName = foodName;
+    }
 
     public int getFoodId() {
         return foodId;

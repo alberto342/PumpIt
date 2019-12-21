@@ -19,35 +19,29 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.albert.fitness.pumpit.model.Event;
+import com.albert.fitness.pumpit.model.UserRegister;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.model.nutrition.room.SumNutritionPojo;
+import com.albert.fitness.pumpit.model.nutrition.room.WaterTracker;
 import com.albert.fitness.pumpit.nutrition.SearchFoodsActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.viewmodel.NutritionViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.model.FinishTraining;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
-import com.albert.fitness.pumpit.model.nutrition.Foods;
-import com.albert.fitness.pumpit.utils.PrefsUtils;
-import com.albert.fitness.pumpit.model.UserRegister;
-import com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity;
 
 
 public class NutritionFragment extends Fragment {
@@ -55,13 +49,13 @@ public class NutritionFragment extends Fragment {
     private final String TAG = "NutritionFragment";
     private TextView tvGoal, tvFood, tvExercise, tvRemaining, tvFat, tvProtien, tvCarbs;
     private List<Foods> foodList = new ArrayList<>();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private PrefsUtils prefsUtils = new PrefsUtils();
     private UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs, waterMl;
     private int calculationGoal;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
     private int ly1ElementCount = 0, ly2ElementCount = 0, ly3ElementCount = 0, ly4ElementCount = 0;
+    private NutritionViewModel viewModel;
 
 
     public NutritionFragment() {
@@ -83,9 +77,11 @@ public class NutritionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
         init(view);
         getCaloriesBurned();
-        mealFromFs();
+
+        getMeal(Event.getTodayData());
         getUserDataAndSetGoal();
         emailIsOnNutrition();
         datePicker(view);
@@ -103,7 +99,6 @@ public class NutritionFragment extends Fragment {
         super.onStop();
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
-
 
 
     private void init(View view) {
@@ -134,21 +129,6 @@ public class NutritionFragment extends Fragment {
         tvDetails.setOnClickListener(onClickListener);
     }
 
-
-    private void mealFromFs() {
-        //   if (isOnNutrition) {
-        ProgressDialog progressdialog = new ProgressDialog(getActivity());
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        getMealFromFs(Foods.BREAKFAST, UserRegister.getTodayDate());
-        getMealFromFs(Foods.SNACK, UserRegister.getTodayDate());
-        getMealFromFs(Foods.LUNCH, UserRegister.getTodayDate());
-        getMealFromFs(Foods.DINNER, UserRegister.getTodayDate());
-        progressdialog.hide();
-        //   }
-    }
-
     private void datePicker(View view) {
         /* starts before 1 month from now */
         Calendar startDate = Calendar.getInstance();
@@ -167,7 +147,6 @@ public class NutritionFragment extends Fragment {
             @SuppressLint("WrongConstant")
             @Override
             public void onDateSelected(Calendar date, int position) {
-
                 ProgressDialog progressdialog = new ProgressDialog(getActivity());
                 progressdialog.setMessage("Please Wait....");
                 progressdialog.show();
@@ -185,10 +164,7 @@ public class NutritionFragment extends Fragment {
                 }
                 Log.d(TAG, "Date Selected: " + newDate);
 
-                getMealFromFs(Foods.BREAKFAST, newDate);
-                getMealFromFs(Foods.SNACK, newDate);
-                getMealFromFs(Foods.LUNCH, newDate);
-                getMealFromFs(Foods.DINNER, newDate);
+                getMeal(newDate);
                 progressdialog.hide();
             }
         });
@@ -235,25 +211,25 @@ public class NutritionFragment extends Fragment {
 
     //The first time the email not exist, only after add food is exists
     private void emailIsOnNutrition() {
-        DocumentReference docRef = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister());
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    assert document != null;
-                    if ((document.exists())) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        //   isOnNutrition = true;
-                    } else {
-                        Log.d(TAG, "No such document");
-                        // isOnNutrition = false;
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
+//        DocumentReference docRef = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister());
+//        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    DocumentSnapshot document = task.getResult();
+//                    assert document != null;
+//                    if ((document.exists())) {
+//                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+//                        //   isOnNutrition = true;
+//                    } else {
+//                        Log.d(TAG, "No such document");
+//                        // isOnNutrition = false;
+//                    }
+//                } else {
+//                    Log.d(TAG, "get failed with ", task.getException());
+//                }
+//            }
+//        });
     }
 
     private void saveMealToSP(boolean dinner, boolean breakfast, boolean lunch, boolean snack) {
@@ -268,117 +244,96 @@ public class NutritionFragment extends Fragment {
 
     private void getCaloriesBurned() {
         final int[] caloriesBurned = {0};
-        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-                .collection(UserRegister.getTodayDate()).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful() && task.getResult() != null) {
+//        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
+//                .collection(UserRegister.getTodayDate()).get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if(task.isSuccessful() && task.getResult() != null) {
+//
+//                            for(int i=0; i<task.getResult().size(); i++) {
+//                                FinishTraining finishTraining = task.getResult().getDocuments().get(i).toObject(FinishTraining.class);
+//                                caloriesBurned[0] += finishTraining.getCaloriesBurned();
+//                            }
+//                            tvExercise.setText(String.valueOf(caloriesBurned[0]));
+//                            Log.d(TAG, "Calories Burned: " + caloriesBurned[0]);
+//                        }
+//
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.w(TAG, "onFailure: " + e);
+//            }
+//        });
+    }
 
-                            for(int i=0; i<task.getResult().size(); i++) {
-                                FinishTraining finishTraining = task.getResult().getDocuments().get(i).toObject(FinishTraining.class);
-                                caloriesBurned[0] += finishTraining.getCaloriesBurned();
-                            }
-                            tvExercise.setText(String.valueOf(caloriesBurned[0]));
-                            Log.d(TAG, "Calories Burned: " + caloriesBurned[0]);
-                        }
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
+    private void getMeal(String date) {
+        viewModel.getSumOfNutritionByDate(date).observe(this, new Observer<SumNutritionPojo>() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "onFailure: " + e);
+            public void onChanged(SumNutritionPojo nutrition) {
+                PrefsUtils prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
+                String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
+                calculationGoal = user.thermicEffect(activityLevel);
+
+                Log.d(TAG, "calculationGoal: " + calculationGoal);
+
+                tvFood.setText(String.format(Locale.getDefault(), "%.0f", nutrition.getCalories()));
+                tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg", nutrition.getCarb()));
+                tvProtien.setText(String.format(Locale.getDefault(), "%.0fg", nutrition.getProtein()));
+                tvFat.setText(String.format(Locale.getDefault(), "%.0fg", nutrition.getFat()));
+
+                tvFood.setText(String.format(Locale.getDefault(), "%.0f", nutrition.getCalories()));
+                tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getCarb(), calculationGoal / 2));
+                tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getProtein(), calculationGoal * 20 / 100));
+                tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getFat(), calculationGoal * 30 / 100));
+                tvRemaining.setText(String.format(Locale.getDefault(), "%.0f", calculationGoal - kcal + Integer.parseInt(tvExercise.getText().toString())));
+
+                updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
             }
         });
     }
 
 
-    private void getMealFromFs(String keyValue, String date) {
-        //get NUTRITION from firestone
-        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(date)
-                .collection(Foods.All_NUTRITION).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
-                                Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-                                foodList.add(foods);
-
-                                Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
-
-                                //Set NUTRITION to float
-                                kcal += foodList.get(i).getNfCalories();
-                                carbs += foodList.get(i).getNfTotalCarbohydrate();
-                                fat += foodList.get(i).getNfTotalFat();
-                                protein += foodList.get(i).getNfProtein();
-
-                                Log.d(TAG, "Kcal: " + kcal);
-
-                                tvFood.setText(String.format(Locale.getDefault(), "%.0f", kcal));
-                                tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
-                                tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
-                                tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
-                                tvRemaining.setText(String.format(Locale.getDefault(), "%.0f", calculationGoal - kcal +  Integer.parseInt(tvExercise.getText().toString())));
-
-                                updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-                                updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-                                updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
-                            }
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-    }
-
-
     private void getUserDataAndSetGoal() {
-        final ProgressDialog progressdialog = new ProgressDialog(getActivity());
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        db.collection(UserRegister.FIRE_BASE_USERS).document(FireBaseInit.getEmailRegister()).get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        user = documentSnapshot.toObject(UserRegister.class);
-
-                        assert user != null;
-                        calculationGoal = user.thermicEffect(user.getActivityLevel());
-
-                        tvGoal.setText(String.valueOf(calculationGoal));
-                        tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
-                        tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
-                        tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
-
-                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
-
-                        progressdialog.hide();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+//        final ProgressDialog progressdialog = new ProgressDialog(getActivity());
+//        progressdialog.setMessage("Please Wait....");
+//        progressdialog.show();
+//
+//        db.collection(UserRegister.FIRE_BASE_USERS).document(FireBaseInit.getEmailRegister()).get()
+//                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                        user = documentSnapshot.toObject(UserRegister.class);
+//
+//                        assert user != null;
+//                        calculationGoal = user.thermicEffect(user.getActivityLevel());
+//
+//                        tvGoal.setText(String.valueOf(calculationGoal));
+//                        tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
+//                        tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
+//                        tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
+//
+//                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+//                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+//                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
+//
+//                        progressdialog.hide();
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                });
     }
 
     private void updateProgressColor(RoundCornerProgressBar roundCornerProgressBar, float nutrition, int calculationGoal) {
-
         float fractionToPercent = nutrition / calculationGoal * 100;
-
         try {
             roundCornerProgressBar.setProgress(fractionToPercent);
             float progress = roundCornerProgressBar.getProgress();
@@ -418,16 +373,13 @@ public class NutritionFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
                 waterTrackerSaved(tvWaterMl.getText().toString());
             }
         });
 
-
         final boolean[] isRemovable1 = {true};
         final boolean[] isRemovable2 = {true};
         final boolean[] isRemovable3 = {true};
-
 
         addWater.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
@@ -450,12 +402,10 @@ public class NutritionFragment extends Fragment {
                     isRemovable1[0] = false;
                 }
 
-
                 ivFullWater.setOnClickListener(new View.OnClickListener() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onClick(View view) {
-
                         Log.d(TAG, "onClick: remove water " + ly1ElementCount);
 
                         if (ly1ElementCount >= 1 && ly1ElementCount <= 6 && isRemovable1[0]) {
@@ -463,11 +413,9 @@ public class NutritionFragment extends Fragment {
                             ly1ElementCount--;
                             waterMl -= 0.25f;
                         }
-
                         tvWaterMl.setText(waterMl + " L");
                     }
                 });
-
                 tvWaterMl.setText(waterMl + " L");
             }
         });
@@ -475,7 +423,6 @@ public class NutritionFragment extends Fragment {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
-
                 Log.d(TAG, "onClick: add water 2: " + ly2ElementCount);
 
                 ImageView ivFullWater = new ImageView(getActivity());
@@ -505,20 +452,16 @@ public class NutritionFragment extends Fragment {
                             ly2ElementCount--;
                             waterMl -= 0.25f;
                         }
-
                         if (ly2ElementCount == 0) {
                             isRemovable1[0] = true;
                             addWater.setVisibility(View.VISIBLE);
                             addWater.setImageResource(R.mipmap.add_water_icon);
                             addWater2.setVisibility(View.GONE);
                         }
-
                         tvWaterMl.setText(waterMl + " L");
                     }
                 });
-
                 tvWaterMl.setText(waterMl + " L");
-
             }
         });
         addWater3.setOnClickListener(new View.OnClickListener() {
@@ -543,7 +486,6 @@ public class NutritionFragment extends Fragment {
                     addWater4.setVisibility(View.VISIBLE);
                     isRemovable3[0] = false;
                 }
-
                 ivFullWater.setOnClickListener(new View.OnClickListener() {
                     @SuppressLint("SetTextI18n")
                     @Override
@@ -554,18 +496,15 @@ public class NutritionFragment extends Fragment {
                             ly3ElementCount--;
                             waterMl -= 0.25f;
                         }
-
                         if (ly3ElementCount == 0) {
                             isRemovable2[0] = true;
                             addWater2.setVisibility(View.VISIBLE);
                             addWater2.setImageResource(R.mipmap.add_water_icon);
                             addWater3.setVisibility(View.GONE);
                         }
-
                         tvWaterMl.setText(waterMl + " L");
                     }
                 });
-
                 tvWaterMl.setText(waterMl + " L");
             }
         });
@@ -584,7 +523,6 @@ public class NutritionFragment extends Fragment {
                     isRemovable3[0] = false;
                     waterMl += 0.25f;
                 }
-
                 ivFullWater.setOnClickListener(new View.OnClickListener() {
                     @SuppressLint("SetTextI18n")
                     @Override
@@ -595,42 +533,22 @@ public class NutritionFragment extends Fragment {
                             ly4ElementCount--;
                             waterMl -= 0.25f;
                         }
-
                         if (ly4ElementCount == 0) {
                             isRemovable3[0] = true;
                             addWater3.setVisibility(View.VISIBLE);
                             addWater3.setImageResource(R.mipmap.add_water_icon);
                             addWater4.setVisibility(View.GONE);
                         }
-
                         tvWaterMl.setText(waterMl + " L");
                     }
                 });
-
                 tvWaterMl.setText(waterMl + " L");
             }
         });
     }
 
     private void waterTrackerSaved(String waterTracker) {
-
-        Map<String, String> waterTrk = new HashMap<>();
-        waterTrk.put("waterTracker", waterTracker);
-
-        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(Foods.WATER_TRACKER)
-                .document(UserRegister.getTodayDate())
-                .set(waterTrk).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Success saved waterTracker ");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i(TAG, "onFailure: " + e.getMessage());
-            }
-        });
-
+        viewModel.addNewWaterTracker(new WaterTracker(Event.getTodayData(), waterTracker));
     }
 
     private String monthAdded(int month) {

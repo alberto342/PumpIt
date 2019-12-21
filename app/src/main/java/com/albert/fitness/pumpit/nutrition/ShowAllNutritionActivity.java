@@ -2,7 +2,6 @@ package com.albert.fitness.pumpit.nutrition;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,23 +10,26 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.adapter.DinnerListAdapter;
+import com.albert.fitness.pumpit.adapter.LunchListAdapter;
+import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
+import com.albert.fitness.pumpit.model.Event;
 import com.albert.fitness.pumpit.model.UserRegister;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.model.nutrition.room.FoodLog;
+import com.albert.fitness.pumpit.model.nutrition.room.QueryAltMeasures;
+import com.albert.fitness.pumpit.model.nutrition.room.QueryNutritionItem;
+import com.albert.fitness.pumpit.model.nutrition.room.SumNutritionPojo;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.viewmodel.NutritionViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,13 +40,6 @@ import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import fitness.albert.com.pumpit.R;
 
-import com.albert.fitness.pumpit.adapter.DinnerListAdapter;
-import com.albert.fitness.pumpit.adapter.FirestoreFoodListAdapter;
-import com.albert.fitness.pumpit.adapter.LunchListAdapter;
-import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
-import com.albert.fitness.pumpit.model.nutrition.Foods;
-import com.albert.fitness.pumpit.utils.SwipeToDeleteCallback;
-
 public class ShowAllNutritionActivity extends AppCompatActivity {
 
     private final String TAG = "ShowAllNutritionActivity";
@@ -54,36 +49,33 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     private List<Foods> foodListDinner = new ArrayList<>();
     private List<Foods> foodListSnacks = new ArrayList<>();
     private TextView tvTotalBreakfast, tvTotalLunch, tvTotalDinner, tvTotalSnacks;
-    private float kcal, fat, protein, carbs;
-    private FirestoreFoodListAdapter mAdapter;
-    private ConstraintLayout constraintLayout;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    //    private float kcal, fat, protein, carbs;
+//    private FirestoreFoodListAdapter mAdapter;
+//    private ConstraintLayout constraintLayout;
     private LinearLayout breakfastContainer, lunchContainer, dinnerContainer, snacksContainer;
     public static String nutritionName;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
     private UserRegister user = new UserRegister();
     private TextView tvCarbs, tvProtien, tvFat;
     private int calculationGoal;
+    private NutritionViewModel viewModel;
 
+    @SuppressLint("LongLogTag")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_all_nutrition);
         setTitle("Nutrition");
+        viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
 
         init();
         datePicker();
-        getUserDataAndSetGoal();
 
-        getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast, UserRegister.getTodayDate());
-        getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch, UserRegister.getTodayDate());
-        getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner, UserRegister.getTodayDate());
-        getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks, UserRegister.getTodayDate());
-
-        enableSwipeToDeleteAndUndo(rvListBreakfast, foodListBreakfast, Foods.BREAKFAST);
-        enableSwipeToDeleteAndUndo(rvListDinner, foodListDinner, Foods.DINNER);
-        enableSwipeToDeleteAndUndo(rvListLunch, foodListLunch, Foods.LUNCH);
-        enableSwipeToDeleteAndUndo(rvListSnacks, foodListSnacks, Foods.SNACK);
+        calAltMeasures(Event.getTodayData(), Foods.BREAKFAST, rvListBreakfast);
+        calAltMeasures(Event.getTodayData(), Foods.DINNER, rvListDinner);
+        calAltMeasures(Event.getTodayData(), Foods.LUNCH, rvListLunch);
+        calAltMeasures(Event.getTodayData(), Foods.SNACK, rvListSnacks);
+        getMeal(Event.getTodayData());
     }
 
     private void init() {
@@ -95,7 +87,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         tvTotalLunch = findViewById(R.id.tv_total_lunch);
         tvTotalDinner = findViewById(R.id.tv_total_dinner);
         tvTotalSnacks = findViewById(R.id.tv_total_snacks);
-        constraintLayout = findViewById(R.id.coordinator_layout);
+        //constraintLayout = findViewById(R.id.coordinator_layout);
         tvCarbs = findViewById(R.id.tv_carbs_all_nutrition);
         tvProtien = findViewById(R.id.tv_protein_all_nutrition);
         tvFat = findViewById(R.id.tv_fat_all_nutrition);
@@ -127,7 +119,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
             @SuppressLint({"LongLogTag", "WrongConstant"})
             @Override
             public void onDateSelected(Calendar date, int position) {
-
                 restData();
 
                 ProgressDialog progressdialog = new ProgressDialog(ShowAllNutritionActivity.this);
@@ -145,23 +136,23 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                 }
                 Log.d(TAG, "Date Selected: " + newDate);
 
+                getMeal(newDate);
 
-                getMealFromFs(Foods.BREAKFAST, rvListBreakfast, foodListBreakfast, tvTotalBreakfast, newDate);
-                getMealFromFs(Foods.LUNCH, rvListLunch, foodListLunch, tvTotalLunch, newDate);
-                getMealFromFs(Foods.DINNER, rvListDinner, foodListDinner, tvTotalDinner, newDate);
-                getMealFromFs(Foods.SNACK, rvListSnacks, foodListSnacks, tvTotalSnacks, newDate);
-
+                calAltMeasures(newDate, Foods.BREAKFAST, rvListBreakfast);
+                calAltMeasures(newDate, Foods.LUNCH, rvListLunch);
+                calAltMeasures(newDate, Foods.DINNER, rvListDinner);
+                calAltMeasures(newDate, Foods.SNACK, rvListSnacks);
                 progressdialog.hide();
             }
         });
     }
 
     private void restData() {
-        kcal = fat = protein = carbs = 0;
+        //kcal = fat = protein = carbs = 0;
         progressCarbs.setProgress(0);
         progressFat.setProgress(0);
         progressProtien.setProgress(0);
-        getUserDataAndSetGoal();
+
         foodListBreakfast.clear();
         foodListDinner.clear();
         foodListLunch.clear();
@@ -172,69 +163,119 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         snacksContainer.setVisibility(View.GONE);
     }
 
+    private void calAltMeasures(final String date, final String type, final RecyclerView recycler) {
+        viewModel.getAltMeasuresQtyAndWeight(date, type).observe(this, new Observer<List<QueryAltMeasures>>() {
+            @SuppressLint("LongLogTag")
+            @Override
+            public void onChanged(List<QueryAltMeasures> queryAltMeasures) {
+                if (!queryAltMeasures.isEmpty()) {
+                    for (QueryAltMeasures measures : queryAltMeasures) {
+                        float calAltMeasure = 1;
+                        if (measures.getMeasure().equals("g")) {
+                            try {
+                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() / 100 * measures.getQty();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try {
+                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() * measures.getQty();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Log.d(TAG, "calAltMeasure: " + calAltMeasure);
+                        getNutrition(date, type, recycler, calAltMeasure);
+                    }
+                }
+            }
+        });
+    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
     }
 
-    private void getMealFromFs(final String keyValue, final RecyclerView recyclerView,
-                               final List<Foods> foodList, final TextView totalMeal, String date) {
+    private void getMeal(String date) {
+        viewModel.getSumOfNutritionByDate(date).observe(this, new Observer<SumNutritionPojo>() {
+            @Override
+            public void onChanged(SumNutritionPojo nutrition) {
+                if (nutrition != null) {
+                    PrefsUtils prefsUtils = new PrefsUtils(ShowAllNutritionActivity.this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
+                    String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
+                    calculationGoal = user.thermicEffect(activityLevel);
 
-        final ProgressDialog progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
+                    tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getCarb(), calculationGoal / 2));
+                    tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getProtein(), calculationGoal * 20 / 100));
+                    tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getFat(), calculationGoal * 30 / 100));
 
-        //get NUTRITION from firestone
-        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(date)
-                .collection(Foods.All_NUTRITION).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("LongLogTag")
+                    updateProgressColor(progressCarbs, nutrition.getCarb(), calculationGoal / 2);
+                    updateProgressColor(progressProtien, nutrition.getProtein(), calculationGoal * 20 / 100);
+                    updateProgressColor(progressFat, nutrition.getFat(), calculationGoal * 30 / 100);
+                }
+            }
+        });
+    }
+
+    private void getMealByType(String date, final String type, final TextView totalMeal) {
+        viewModel.getSumOfNutritionByDateAndMealType(date, type).observe(this, new Observer<SumNutritionPojo>() {
+            @Override
+            public void onChanged(SumNutritionPojo nutrition) {
+                if (nutrition != null) {
+                    nutritionName = type;
+
+                    totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" +
+                                    " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ",
+                            nutrition.getCalories(), nutrition.getCarb(), nutrition.getProtein(), nutrition.getFat()));
+
+                    updateProgressColor(progressCarbs, nutrition.getCarb(), calculationGoal / 2);
+                    updateProgressColor(progressProtien, nutrition.getProtein(), calculationGoal * 20 / 100);
+                    updateProgressColor(progressFat, nutrition.getFat(), calculationGoal * 30 / 100);
+                }
+            }
+        });
+    }
+
+    @SuppressLint("LongLogTag")
+    private void getNutrition(final String date, final String type, final RecyclerView recyclerView, final float calAltMeasure) {
+        final float newCalAltMeasure = calAltMeasure == 0.0 ? 1 : calAltMeasure;
+        viewModel.getNutritionItem(date, type)
+                .observe(this, new Observer<List<QueryNutritionItem>>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onChanged(List<QueryNutritionItem> queryNutritionItems) {
+                        if (!queryNutritionItems.isEmpty()) {
+                            visibleNutrition(type);
 
-                        //hide ProgressDialog
-                        progressdialog.hide();
+                            for (int i = 0; i < queryNutritionItems.size(); i++) {
+                                float calories = queryNutritionItems.get(i).getCalories();
+                                float protein = queryNutritionItems.get(i).getProtein();
+                                float carbohydrate = queryNutritionItems.get(i).getTotalCarbohydrate();
 
-                        if (task.isSuccessful() && task.getResult() != null) {
-
-                            nutritionName = keyValue;
-
-                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
-                                Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-                                foodList.add(foods);
-
-                                visibleNutrition(keyValue);
-
-                                initRecyclerView(recyclerView, foodList, keyValue);
-                                //Disable RecyclerView scrolling
-                                recyclerView.setNestedScrollingEnabled(false);
-
-                                Log.d(TAG, "DocumentSnapshot data: " + task.getResult().getDocuments());
-
-                                //set NUTRITION to float
-                                kcal += foodList.get(i).getNfCalories();
-                                carbs += foodList.get(i).getNfTotalCarbohydrate();
-                                fat += foodList.get(i).getNfTotalFat();
-                                protein += foodList.get(i).getNfProtein();
+                                queryNutritionItems.get(i).setCalories(calories * newCalAltMeasure);
+                                queryNutritionItems.get(i).setProtein(protein * newCalAltMeasure);
+                                queryNutritionItems.get(i).setTotalCarbohydrate(carbohydrate * newCalAltMeasure);
                             }
-                            totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" + " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ", kcal, carbs, protein, fat));
+                            initRecyclerView(type, recyclerView, queryNutritionItems);
 
-                            kcal = carbs = fat = protein = 0;
-
-                            updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-                            updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-                            updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
+                            switch (type) {
+                                case Foods.BREAKFAST:
+                                    getMealByType(date, type, tvTotalBreakfast);
+                                    break;
+                                case Foods.DINNER:
+                                    getMealByType(date, type, tvTotalDinner);
+                                    break;
+                                case Foods.LUNCH:
+                                    getMealByType(date, type, tvTotalLunch);
+                                    break;
+                                case Foods.SNACK:
+                                    getMealByType(date, type, tvTotalSnacks);
+                            }
+                            for (QueryNutritionItem i : queryNutritionItems) {
+                                Log.d(TAG, "get Nutrition name for adapter: " + i.getFoodName());
+                            }
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
                     }
                 });
     }
@@ -256,154 +297,60 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         }
     }
 
-
-    private void deleteFromFirebase(final String keyValue, final String foodName, final int qty) {
-        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(keyValue).document(UserRegister.getTodayDate())
-                .collection(Foods.All_NUTRITION).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("LongLogTag")
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                        if (task.isSuccessful() && task.getResult() != null) {
-
-                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
-                                Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-
-                                assert foods != null;
-                                if (foodName.equals(foods.getFoodName()) && qty == foods.getServingQty()) {
-
-                                    String id = task.getResult().getDocuments().get(i).getId();
-
-                                    //delete from firebase
-                                    db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                            .collection(keyValue).document(UserRegister.getTodayDate())
-                                            .collection(Foods.All_NUTRITION).document(id).delete();
-
-                                    Log.d(TAG, "DocumentSnapshot " + task.getResult().getDocuments().get(i).getId() + " successfully deleted!");
-                                    return;
-                                }
-                            }
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-    }
-
-
-    @SuppressLint("LongLogTag")
-    private void initRecyclerView(RecyclerView recyclerView, final List<Foods> foodList, String nutrition) {
-
-        Log.d(TAG, "initRecyclerView: init food recyclerView" + recyclerView);
-
+    private void initRecyclerView(final String nutritionType, RecyclerView recyclerView, final List<QueryNutritionItem> nutritionItems) {
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
-
-        switch (nutrition) {
+        switch (nutritionType) {
             case Foods.BREAKFAST:
-                BreakfastListAdapter breakfastAdapter = new BreakfastListAdapter(this, foodList);
+                BreakfastListAdapter breakfastAdapter = new BreakfastListAdapter(this, nutritionItems);
                 recyclerView.setAdapter(breakfastAdapter);
                 breakfastAdapter.notifyDataSetChanged();
                 break;
             case Foods.LUNCH:
-                LunchListAdapter lunchAdapter = new LunchListAdapter(this, foodList);
+                LunchListAdapter lunchAdapter = new LunchListAdapter(this, nutritionItems);
                 recyclerView.setAdapter(lunchAdapter);
                 lunchAdapter.notifyDataSetChanged();
                 break;
             case Foods.DINNER:
-                DinnerListAdapter dinnerAdapter = new DinnerListAdapter(this, foodList);
+                DinnerListAdapter dinnerAdapter = new DinnerListAdapter(this, nutritionItems);
                 recyclerView.setAdapter(dinnerAdapter);
                 dinnerAdapter.notifyDataSetChanged();
                 break;
             case Foods.SNACK:
-                SnacksListAdapter snacksAdapter = new SnacksListAdapter(this, foodList);
+                SnacksListAdapter snacksAdapter = new SnacksListAdapter(this, nutritionItems);
                 recyclerView.setAdapter(snacksAdapter);
                 snacksAdapter.notifyDataSetChanged();
-
         }
-    }
-
-    // Swipe to delete item
-    private void enableSwipeToDeleteAndUndo(final RecyclerView recyclerView, final List<Foods> foodList, final String keyValue) {
-        final SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
-            public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int i) {
-
-                mAdapter = new FirestoreFoodListAdapter(ShowAllNutritionActivity.this, foodList);
-
-                final int position = viewHolder.getAdapterPosition();
-                final Foods item = mAdapter.getData().get(position);
-
-                deleteFromFirebase(keyValue, item.getFoodName(), item.getServingQty());
-
-                foodList.remove(position);
-                recyclerView.removeViewAt(position);
-                mAdapter.notifyItemRemoved(position);
-                mAdapter.notifyItemRangeChanged(position, foodList.size());
-
-                final Snackbar snackbar = Snackbar
-                        .make(constraintLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
-//                snackbar.setAction("UNDO", new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        mAdapter.restoreItem(item, position);
-//                        recyclerView.scrollToPosition(position);
-//                    }
-//                });
-                snackbar.setActionTextColor(Color.YELLOW);
-                snackbar.show();
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
             }
-        };
-        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
-        itemTouchhelper.attachToRecyclerView(recyclerView);
-    }
 
+            @SuppressLint("LongLogTag")
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                final int position = viewHolder.getAdapterPosition();
+                final int logId = nutritionItems.get(position).getLogId();
+                Log.d(TAG, "onSwiped: " + logId);
 
-    private void getUserDataAndSetGoal() {
-        final ProgressDialog progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        db.collection(UserRegister.FIRE_BASE_USERS).document(FireBaseInit.getEmailRegister()).get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        user = documentSnapshot.toObject(UserRegister.class);
-
-                        assert user != null;
-                        calculationGoal = user.thermicEffect(user.getActivityLevel());
-
-                        tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
-                        tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
-                        tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
-
-                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
-
-                        progressdialog.hide();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+                viewModel.getFoodLogByLogId(logId)
+                        .observe(ShowAllNutritionActivity.this, new Observer<FoodLog>() {
+                            @Override
+                            public void onChanged(FoodLog foodLog) {
+                                if (foodLog != null) {
+                                    viewModel.deleteFoodLog(foodLog);
+                                    Log.d(TAG, "onSwiped: Deleted successfully lodId" + logId);
+                                }
+                            }
+                        });
+            }
+        }).attachToRecyclerView(recyclerView);
     }
 
     private void updateProgressColor(RoundCornerProgressBar roundCornerProgressBar, float nutrition, int calculationGoal) {
-
         float fractionToPercent = nutrition / calculationGoal * 100;
         roundCornerProgressBar.setProgress(fractionToPercent);
         float progress = roundCornerProgressBar.getProgress();
@@ -441,5 +388,4 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         this.foodListLunch.clear();
         this.foodListSnacks.clear();
     }
-
 }

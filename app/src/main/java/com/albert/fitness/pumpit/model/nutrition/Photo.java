@@ -9,7 +9,7 @@ public class Photo {
     private String thumb;
 
     @SerializedName("is_user_uploaded")
-    private String isUserUploaded;
+    private boolean isUserUploaded;
 
     public String getHighres ()
     {
@@ -31,12 +31,12 @@ public class Photo {
         this.thumb = thumb;
     }
 
-    public String getIsUserUploaded()
+    public boolean getIsUserUploaded()
     {
         return isUserUploaded;
     }
 
-    public void setIsUserUploaded(String isUserUploaded) {
+    public void setIsUserUploaded(boolean isUserUploaded) {
         this.isUserUploaded = isUserUploaded;
     }
 

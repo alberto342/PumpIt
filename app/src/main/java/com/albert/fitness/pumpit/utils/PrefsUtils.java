@@ -12,6 +12,8 @@ public class PrefsUtils {
     public static final String PLAN_NAME = "planName";
     public static final String START_WORKOUT = "start_workout";
     public static final String SETTINGS_PREFERENCES_FILE = "fitness.albert.com.pumpit_preferences";
+    public static final String NUTRITION = "nutrition";
+    public static final String ACTIVITY_LEVEL = "ACTIVITY_LEVEL";
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor editor;
 

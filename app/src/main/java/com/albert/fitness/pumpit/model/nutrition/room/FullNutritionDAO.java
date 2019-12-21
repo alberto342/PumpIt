@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -15,6 +15,9 @@ public interface FullNutritionDAO {
     @Insert
     void insert(FullNutrition item);
 
+    @Insert
+    void insert(List<FullNutrition> item);
+
     @Update
     void update(FullNutrition item);
 
@@ -24,8 +27,11 @@ public interface FullNutritionDAO {
     @Query("SELECT * FROM full_nutrition_table")
     LiveData<List<FullNutrition>> getAllFullNutrition();
 
+    @Query("SELECT * FROM full_nutrition_table WHERE food_id==:id")
+    LiveData<List<FullNutrition>> getFullNutritiionByFoodId(int id);
+
 
     @Query("SELECT * FROM full_nutrition_table WHERE fn_id==:id")
-    LiveData<List<FullNutrition>> getFullNutritions(int id);
+    LiveData<List<FullNutrition>> getFullNutrition(int id);
 
 }

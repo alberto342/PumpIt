@@ -51,7 +51,7 @@ dependencies {
     implementation 'android.arch.lifecycle:extensions:1.1.1'
 
     //recylerview
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     //custom recylerview - swipe
     implementation 'it.shadowsheep.recyclerviewswipehelper:recyclerviewswipehelper:1.1.0-rc2'

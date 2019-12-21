@@ -1,13 +1,17 @@
 package com.albert.fitness.pumpit.model.nutrition;
 
+import com.google.gson.annotations.SerializedName;
+
 public class AltMeasures {
+
     private String measure;
 
-    private String serving_weight;
+    @SerializedName("serving_weight")
+    private String servingWeight;
 
     private String seq;
 
-    private String qty;
+    private int qty;
 
     public String getMeasure ()
     {
@@ -19,14 +23,14 @@ public class AltMeasures {
         this.measure = measure;
     }
 
-    public String getServing_weight ()
+    public String getServingWeight()
     {
-        return serving_weight;
+        return servingWeight;
     }
 
-    public void setServing_weight (String serving_weight)
+    public void setServing_weight (String servingWeight)
     {
-        this.serving_weight = serving_weight;
+        this.servingWeight = servingWeight;
     }
 
     public String getSeq ()
@@ -39,18 +43,18 @@ public class AltMeasures {
         this.seq = seq;
     }
 
-    public String getQty ()
+    public int getQty ()
     {
         return qty;
     }
 
-    public void setQty (String qty)
+    public void setQty (int qty)
     {
         this.qty = qty;
     }
 
     @Override
     public String toString() {
-        return "ClassPojo [measure = "+measure+", serving_weight = "+serving_weight+", seq = "+seq+", qty = "+qty+"]";
+        return "ClassPojo [measure = "+measure+", serving_weight = "+servingWeight+", seq = "+seq+", qty = "+qty+"]";
     }
 }

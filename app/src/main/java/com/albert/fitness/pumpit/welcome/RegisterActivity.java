@@ -290,6 +290,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         prefsUtils.saveData("is_male", isMale);
         prefsUtils.saveData("name", inputName.getText().toString());
         prefsUtils.saveData("email", inputEmail.getText().toString());
+        prefsUtils.saveData(PrefsUtils.ACTIVITY_LEVEL, "activeLightweight");
     }
 
     private void nextActivity() {

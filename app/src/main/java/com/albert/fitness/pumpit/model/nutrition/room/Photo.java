@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -20,10 +20,16 @@ public class Photo {
 
     private String highres;
 
-    @ColumnInfo(name = "is_user_uploaded")
-    private boolean isUserUploaded;
-
     private String thumb;
+
+    public Photo() {
+    }
+
+    public Photo(int foodId, String highres, String thumb) {
+        this.foodId = foodId;
+        this.highres = highres;
+        this.thumb = thumb;
+    }
 
     public int getPhotoId() {
         return photoId;
@@ -47,14 +53,6 @@ public class Photo {
 
     public void setHighres(String highres) {
         this.highres = highres;
-    }
-
-    public boolean isUserUploaded() {
-        return isUserUploaded;
-    }
-
-    public void setUserUploaded(boolean userUploaded) {
-        isUserUploaded = userUploaded;
     }
 
     public String getThumb() {

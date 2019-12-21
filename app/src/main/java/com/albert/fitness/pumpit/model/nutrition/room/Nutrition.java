@@ -1,4 +1,4 @@
-package com.albert.fitness.pumpit.model.nutrition.sql;
+package com.albert.fitness.pumpit.model.nutrition.room;
 
 
 import androidx.room.ColumnInfo;
@@ -31,16 +31,16 @@ public class Nutrition {
     @ColumnInfo(name = "cholesterol")
     private float nfCholesterol;
 
-    @ColumnInfo(name = "Protein")
+    @ColumnInfo(name = "protein")
     private float nfProtein;
 
-    @ColumnInfo(name = "Saturated_fat")
+    @ColumnInfo(name = "saturated_fat")
     private float nfSaturatedFat;
 
     @ColumnInfo(name = "total_fat")
     private float nfTotalFat;
 
-    @ColumnInfo(name = "Sugars")
+    @ColumnInfo(name = "sugars")
     private float nfSugars;
 
     @ColumnInfo(name = "total_carbohydrate")
@@ -49,13 +49,36 @@ public class Nutrition {
     @ColumnInfo(name = "serving_qty")
     private int servingQty;
 
-    @ColumnInfo(name = " serving_unit")
+    @ColumnInfo(name = "serving_unit")
     private String servingUnit;
 
     @ColumnInfo(name = "serving_weight_grams")
-    private int servingWeightGrams;
+    private float servingWeightGrams;
 
     private String source;
+
+    public Nutrition() {
+    }
+
+    public Nutrition(int foodId, float nfCalories, float dietary_fiber,
+                     float nfCholesterol, float nfProtein, float nfSaturatedFat, float nfTotalFat,
+                     float nfSugars, float nfTotalCarbohydrate, int servingQty, String servingUnit,
+                     int servingWeightGrams, String source) {
+        this.foodId = foodId;
+        this.mealType = mealType;
+        this.nfCalories = nfCalories;
+        this.dietary_fiber = dietary_fiber;
+        this.nfCholesterol = nfCholesterol;
+        this.nfProtein = nfProtein;
+        this.nfSaturatedFat = nfSaturatedFat;
+        this.nfTotalFat = nfTotalFat;
+        this.nfSugars = nfSugars;
+        this.nfTotalCarbohydrate = nfTotalCarbohydrate;
+        this.servingQty = servingQty;
+        this.servingUnit = servingUnit;
+        this.servingWeightGrams = servingWeightGrams;
+        this.source = source;
+    }
 
     public int getNutritionId() {
         return nutritionId;
@@ -177,11 +200,11 @@ public class Nutrition {
         this.servingUnit = servingUnit;
     }
 
-    public int getServingWeightGrams() {
+    public float getServingWeightGrams() {
         return servingWeightGrams;
     }
 
-    public void setServingWeightGrams(int servingWeightGrams) {
+    public void setServingWeightGrams(float servingWeightGrams) {
         this.servingWeightGrams = servingWeightGrams;
     }
 }

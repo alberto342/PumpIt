@@ -17,7 +17,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
+import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
+import com.albert.fitness.pumpit.adapter.FoodListAdapter;
+import com.albert.fitness.pumpit.model.UserRegister;
+import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.model.nutrition.FullNutrients;
+import com.albert.fitness.pumpit.model.nutrition.Tags;
+import com.albert.fitness.pumpit.model.nutrition.room.AltMeasures;
+import com.albert.fitness.pumpit.model.nutrition.room.FoodLog;
+import com.albert.fitness.pumpit.model.nutrition.room.FullNutrition;
+import com.albert.fitness.pumpit.model.nutrition.room.Nutrition;
+import com.albert.fitness.pumpit.model.nutrition.room.Photo;
+import com.albert.fitness.pumpit.utils.FireBaseInit;
+import com.albert.fitness.pumpit.viewmodel.NutritionViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,16 +50,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
-import com.albert.fitness.pumpit.adapter.FoodListAdapter;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
-import com.albert.fitness.pumpit.model.nutrition.Foods;
-import com.albert.fitness.pumpit.model.nutrition.FullNutrients;
-import com.albert.fitness.pumpit.model.nutrition.Tags;
-import com.albert.fitness.pumpit.model.UserRegister;
 import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowBreakfastActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
@@ -66,6 +73,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     private ProgressDialog progressdialog;
     private int firstQty;
     private ProgressBar progressBar;
+    private NutritionViewModel viewModel;
 
 
     // TODO: 2019-07-09 save full nutrients not working, check fb saving
@@ -74,6 +82,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_breakfast);
+        viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
 
         init();
         Toolbar toolbar = findViewById(R.id.food_toolbar);
@@ -140,26 +149,95 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     private void getData() {
         Intent iin = getIntent();
         Bundle bundle = iin.getExtras();
-        List<String> allFoods = new ArrayList<>();
+        final List<String> allFoods = new ArrayList<>();
 
         if (bundle != null) {
+            int logId = bundle.getInt("logId");
+            String foodName = bundle.getString("foodName");
 
-            Picasso.get()
-                    .load(bundle.getString("foodPhoto"))
-                    .placeholder(R.mipmap.ic_launcher)
-                    .error(R.mipmap.ic_launcher)
-                    .into(foodItem);
+            viewModel.getFoodLogByLogId(logId).observe(this, new Observer<FoodLog>() {
+                @Override
+                public void onChanged(FoodLog foodLog) {
+                    viewModel.getNutritionByFoodId(foodLog.getFoodId())
+                            .observe(ShowBreakfastActivity.this, new Observer<Nutrition>() {
+                                @Override
+                                public void onChanged(Nutrition nutrition) {
+                                    kcal = nutrition.getNfCalories();
+                                    fat = nutrition.getNfTotalFat();
+                                    protein = nutrition.getNfProtein();
+                                    carbs = nutrition.getNfTotalCarbohydrate();
+                                    servingWeightGrams = nutrition.getServingWeightGrams();
+                                    int qty = nutrition.getServingQty();
+                                    firstQty = nutrition.getServingQty();
+                                    oldServingUnit = nutrition.getServingUnit();
 
-            kcal = bundle.getFloat("kcal");
-            fat = bundle.getFloat("fat");
-            protein = bundle.getFloat("protein");
-            carbs = bundle.getFloat("carbohydrate");
-            servingWeightGrams = bundle.getFloat("servingWeightGrams");
-            int qty = bundle.getInt("qty");
-            firstQty = bundle.getInt("qty");
-            oldServingUnit = bundle.getString("servingUnit");
-            int foodGroup = bundle.getInt("foodGroup");
-            tvGroupTag.setText(Tags.foodGroup(foodGroup));
+                                    //DELEDED IF NOT NEED
+                                    changeDataView(1);
+                                    quantityViewCustom.setQuantity(qty);
+                                }
+                            });
+
+                    viewModel.getFullNutritiionByFoodId(foodLog.getFoodId())
+                            .observe(ShowBreakfastActivity.this, new Observer<List<FullNutrition>>() {
+                                @Override
+                                public void onChanged(List<FullNutrition> nutrition) {
+                                    for(FullNutrition n : nutrition) {
+                                        atterId.add(n.getAtterId());
+                                        values.add(n.getValue());
+
+                                        FullNutrients fullNutrients = new FullNutrients(n.getAtterId(), n.getValue());
+                                        allFoods.add(fullNutrients.getNutrients(n.getAtterId()));
+                                    }
+                                }
+                            });
+
+                    viewModel.getAltMeasuresByFoodId(foodLog.getFoodId())
+                            .observe(ShowBreakfastActivity.this, new Observer<List<AltMeasures>>() {
+                                @Override
+                                public void onChanged(List<AltMeasures> altMeasures) {
+                                    if (!altMeasures.isEmpty()) {
+                                        for (AltMeasures measures : altMeasures) {
+
+                                            if(measures.getMeasure().isEmpty()) {
+                                                spinnerList.add("Packet");
+                                            }
+
+                                            spinnerList.add(measures.getMeasure());
+                                            servingWeightList.add((float) measures.getServingWeight());
+
+                                            //add spinner to the map
+                                            allServingWeight.put(measures.getMeasure(), (float) measures.getServingWeight());
+//                                            if (servingWeightList.isEmpty()) {
+//                                                allServingWeight.put("package", servingWeightGrams);
+//                                            } else {
+//
+//                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                    viewModel.getPhotoByFoodId(foodLog.getFoodId())
+                            .observe(ShowBreakfastActivity.this, new Observer<Photo>() {
+                                @Override
+                                public void onChanged(Photo photo) {
+                                    Picasso.get()
+                                            .load(photo.getHighres())
+                                            .placeholder(R.mipmap.ic_launcher)
+                                            .error(R.mipmap.ic_launcher)
+                                            .into(foodItem);
+                                }
+                            });
+                    viewModel.getTagsByFoodId(foodLog.getFoodId())
+                            .observe(ShowBreakfastActivity.this, new Observer<com.albert.fitness.pumpit.model.nutrition.room.Tags>() {
+                                @Override
+                                public void onChanged(com.albert.fitness.pumpit.model.nutrition.room.Tags tags) {
+                                    int foodGroup = tags.getFoodGroup();
+                                    tvGroupTag.setText(Tags.foodGroup(foodGroup));
+                                }
+                            });
+                }
+            });
 
             //Get Serving Unit
             if (oldServingUnit == null) {
@@ -167,31 +245,6 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
             } else {
                 spinnerList.add(oldServingUnit);
             }
-
-            //add value into list
-            for (int r = 0; r < bundle.getInt("altMeasuresSize"); r++) {
-                spinnerList.add(bundle.getString("measure" + r));
-                servingWeightList.add(Float.valueOf(Objects.requireNonNull(bundle.getString("measureServingWeight" + r))));
-
-                //add spinner to the map
-                if (servingWeightList.isEmpty()) {
-                    allServingWeight.put("package", servingWeightGrams);
-                } else {
-                    allServingWeight.put(Objects.requireNonNull(bundle.getString("measure" + r)),
-                            Float.valueOf(Objects.requireNonNull(bundle.getString("measureServingWeight" + r))));
-                }
-            }
-
-            for (int r = 0; r < bundle.getInt("fullNutrientsSize"); r++) {
-                atterId.add(bundle.getInt("attrId" + r));
-                values.add(bundle.getFloat("values" + r));
-                FullNutrients fullNutrients = new FullNutrients(bundle.getInt("attrId" + r), bundle.getFloat("values" + r));
-                allFoods.add(fullNutrients.getNutrients(bundle.getInt("attrId" + r)));
-            }
-
-            //DELEDED IF NOT NEED
-            changeDataView(1);
-            quantityViewCustom.setQuantity(qty);
         }
 
         StringBuilder all = new StringBuilder();

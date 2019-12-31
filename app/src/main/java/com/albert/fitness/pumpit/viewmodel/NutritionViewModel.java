@@ -101,6 +101,10 @@ public class NutritionViewModel extends AndroidViewModel {
         return repository.getSumOfNutritionByDateAndMealType(date, type);
     }
 
+    public LiveData<SumNutritionPojo> getSumOfNutritionByDateAndMealTypeWithGrams(String date, String type) {
+        return repository.getSumOfNutritionByDateAndMealTypeWithGrams(date, type);
+    }
+
     public LiveData<Photo> getPhotoByFoodId(int foodId) {
         return repository.getPhotoByFoodId(foodId);
     }

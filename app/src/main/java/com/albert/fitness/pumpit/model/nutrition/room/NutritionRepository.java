@@ -93,7 +93,7 @@ public class NutritionRepository {
     }
 
     public LiveData<List<FullNutrition>> getFullNutritiionByFoodId(int id) {
-        return fullNutritionDAO.getFullNutritiionByFoodId(id);
+        return fullNutritionDAO.getFullNutritionByFoodId(id);
     }
 
     public LiveData<List<Nutrition>> getNutritionById(int id) {
@@ -146,6 +146,10 @@ public class NutritionRepository {
 
     public LiveData<SumNutritionPojo> getSumOfNutritionByDateAndMealType(String date, String type) {
         return foodLogDAO.getSumOfNutritionByDateAndMealType(date, type);
+    }
+
+    public LiveData<SumNutritionPojo> getSumOfNutritionByDateAndMealTypeWithGrams(String date, String type) {
+        return foodLogDAO.getSumOfNutritionByDateAndMealTypeWithGrams(date, type);
     }
 
     public LiveData<List<QueryNutritionItem>> getNutritionItem(String date, String type) {

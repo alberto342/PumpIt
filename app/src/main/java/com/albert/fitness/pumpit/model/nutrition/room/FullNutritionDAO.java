@@ -28,7 +28,7 @@ public interface FullNutritionDAO {
     LiveData<List<FullNutrition>> getAllFullNutrition();
 
     @Query("SELECT * FROM full_nutrition_table WHERE food_id==:id")
-    LiveData<List<FullNutrition>> getFullNutritiionByFoodId(int id);
+    LiveData<List<FullNutrition>> getFullNutritionByFoodId(int id);
 
 
     @Query("SELECT * FROM full_nutrition_table WHERE fn_id==:id")

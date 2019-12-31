@@ -49,9 +49,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     private List<Foods> foodListDinner = new ArrayList<>();
     private List<Foods> foodListSnacks = new ArrayList<>();
     private TextView tvTotalBreakfast, tvTotalLunch, tvTotalDinner, tvTotalSnacks;
-    //    private float kcal, fat, protein, carbs;
-//    private FirestoreFoodListAdapter mAdapter;
-//    private ConstraintLayout constraintLayout;
+    //    private ConstraintLayout constraintLayout;
     private LinearLayout breakfastContainer, lunchContainer, dinnerContainer, snacksContainer;
     public static String nutritionName;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
@@ -173,13 +171,14 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                         float calAltMeasure = 1;
                         if (measures.getMeasure().equals("g")) {
                             try {
-                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() / 100 * measures.getQty();
+                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() / 100;
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         } else {
                             try {
-                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() * measures.getQty();
+                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() ;
+                              //  calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() * measures.getQty();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -192,55 +191,53 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         });
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
     private void getMeal(String date) {
-        viewModel.getSumOfNutritionByDate(date).observe(this, new Observer<SumNutritionPojo>() {
-            @Override
-            public void onChanged(SumNutritionPojo nutrition) {
-                if (nutrition != null) {
-                    PrefsUtils prefsUtils = new PrefsUtils(ShowAllNutritionActivity.this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
-                    String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
-                    calculationGoal = user.thermicEffect(activityLevel);
+        viewModel.getSumOfNutritionByDate(date)
+                .observe(this, new Observer<SumNutritionPojo>() {
+                    @Override
+                    public void onChanged(SumNutritionPojo nutrition) {
+                        if (nutrition != null) {
+                            PrefsUtils prefsUtils = new PrefsUtils(ShowAllNutritionActivity.this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
+                            String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
+                            calculationGoal = user.thermicEffect(activityLevel);
 
-                    tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getCarb(), calculationGoal / 2));
-                    tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getProtein(), calculationGoal * 20 / 100));
-                    tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getFat(), calculationGoal * 30 / 100));
+                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", nutrition.getCarb(), calculationGoal / 2));
+                            tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", nutrition.getProtein(), calculationGoal * 20 / 100));
+                            tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", nutrition.getFat(), calculationGoal * 30 / 100));
 
-                    updateProgressColor(progressCarbs, nutrition.getCarb(), calculationGoal / 2);
-                    updateProgressColor(progressProtien, nutrition.getProtein(), calculationGoal * 20 / 100);
-                    updateProgressColor(progressFat, nutrition.getFat(), calculationGoal * 30 / 100);
-                }
-            }
-        });
+                            updateProgressColor(progressCarbs, nutrition.getCarb(), calculationGoal / 2);
+                            updateProgressColor(progressProtien, nutrition.getProtein(), calculationGoal * 20 / 100);
+                            updateProgressColor(progressFat, nutrition.getFat(), calculationGoal * 30 / 100);
+                        }
+                    }
+                });
     }
 
     private void getMealByType(String date, final String type, final TextView totalMeal) {
-        viewModel.getSumOfNutritionByDateAndMealType(date, type).observe(this, new Observer<SumNutritionPojo>() {
-            @Override
-            public void onChanged(SumNutritionPojo nutrition) {
-                if (nutrition != null) {
-                    nutritionName = type;
+        viewModel.getSumOfNutritionByDateAndMealType(date, type)
+                .observe(this, new Observer<SumNutritionPojo>() {
+                    @Override
+                    public void onChanged(SumNutritionPojo nutrition) {
+                        if (nutrition != null) {
+                            nutritionName = type;
 
-                    totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" +
-                                    " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ",
-                            nutrition.getCalories(), nutrition.getCarb(), nutrition.getProtein(), nutrition.getFat()));
+                            totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" +
+                                            " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ",
+                                    nutrition.getCalories(), nutrition.getCarb(), nutrition.getProtein(), nutrition.getFat()));
 
-                    updateProgressColor(progressCarbs, nutrition.getCarb(), calculationGoal / 2);
-                    updateProgressColor(progressProtien, nutrition.getProtein(), calculationGoal * 20 / 100);
-                    updateProgressColor(progressFat, nutrition.getFat(), calculationGoal * 30 / 100);
-                }
-            }
-        });
+                            updateProgressColor(progressCarbs, nutrition.getCarb(), calculationGoal / 2);
+                            updateProgressColor(progressProtien, nutrition.getProtein(), calculationGoal * 20 / 100);
+                            updateProgressColor(progressFat, nutrition.getFat(), calculationGoal * 30 / 100);
+                        }
+                    }
+                });
     }
 
     @SuppressLint("LongLogTag")
     private void getNutrition(final String date, final String type, final RecyclerView recyclerView, final float calAltMeasure) {
         final float newCalAltMeasure = calAltMeasure == 0.0 ? 1 : calAltMeasure;
+        Log.d(TAG, "getNutrition: " + newCalAltMeasure);
+
         viewModel.getNutritionItem(date, type)
                 .observe(this, new Observer<List<QueryNutritionItem>>() {
                     @Override

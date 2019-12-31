@@ -1,7 +1,10 @@
 package com.albert.fitness.pumpit.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.model.nutrition.room.QueryNutritionItem;
+import com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity;
+import com.albert.fitness.pumpit.nutrition.ShowLunchActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -60,61 +65,37 @@ public class LunchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 .into(holder.ivImage);
 
         holder.tvFoodName.setText(nutritionItems.get(position).getFoodName());
-        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", nutritionItems.get(position).getCalories(), nutritionItems.get(position).getTotalCarbohydrate()));
-        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", nutritionItems.get(position).getProtein()));
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.2f Kcal,  %.2f Carbs", nutritionItems.get(position).getCalories(), nutritionItems.get(position).getTotalCarbohydrate()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.2f Protein", nutritionItems.get(position).getProtein()));
         holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
-//                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
-//
-//                foodName = foodsList.get(position).getFoodName();
-//
-//                String cotxt = mContext.toString();
-//                String[] parts = cotxt.split("@");
-//                String part1 = parts[0];
-//
-//                //refresh page
-//                if (!part1.equals("LogTabActivity")) {
-//                    mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
-//                    ((ShowAllNutritionActivity) mContext).finish();
-//                }
-//
-//
-//                Intent i = new Intent(mContext, ShowLunchActivity.class);
-//                i.putExtra("foodPhoto", foodsList.get(position).getPhoto().getHighres());
-//                i.putExtra("kcal", foodsList.get(position).getNfCalories());
-//                i.putExtra("fat", foodsList.get(position).getNfTotalFat());
-//                i.putExtra("protein", foodsList.get(position).getNfProtein());
-//                i.putExtra("carbohydrate", foodsList.get(position).getNfTotalCarbohydrate());
-//                i.putExtra("servingWeightGrams", foodsList.get(position).getServingWeightGrams());
-//                i.putExtra("qty", foodsList.get(position).getServingQty());
-//                i.putExtra("servingUnit", foodsList.get(position).getServingUnit());
-//                i.putExtra("altMeasuresSize", foodsList.get(position).getAltMeasures().size());
-//                i.putExtra("fullNutrientsSize", foodsList.get(position).getFullNutrients().size());
-//                i.putExtra("foodGroup", foodsList.get(position).getTags().getFoodGroup());
-//
-//
-//                for (int r = 0; r < foodsList.get(position).getAltMeasures().size(); r++) {
-//                    i.putExtra("measure" + r, foodsList.get(position).getAltMeasures().get(r).getMeasure());
-//                    i.putExtra("measureServingWeight" + r, foodsList.get(position).getAltMeasures().get(r).getServingWeight());
-//                }
-//
-//                for(int r=0; r< foodsList.get(position).getFullNutrients().size(); r++) {
-//                    i.putExtra("AttrId" + r, foodsList.get(position).getFullNutrients().get(r).getAttrId());
-//                    i.putExtra("values" + r,foodsList.get(position).getFullNutrients().get(r).getValue());
-//                }
-//                mContext.startActivity(i);
+                foodName = nutritionItems.get(position).getFoodName();
 
+                String cotxt = mContext.toString();
+                String[] parts = cotxt.split("@");
+                String part1 = parts[0];
 
-                //foodsList.clear();
-                //  ((Activity) mContext).finish();
+                //refresh page
+                if (!part1.equals("LogTabActivity")) {
+                    mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
+                    ((ShowAllNutritionActivity) mContext).finish();
+                }
+
+                Intent i = new Intent(mContext, ShowLunchActivity.class);
+                i.putExtra("logId", nutritionItems.get(position).getLogId());
+                i.putExtra("foodName", nutritionItems.get(position).getFoodName());
+                mContext.startActivity(i);
+                ((Activity) mContext).recreate();
+
+                // ((Activity) mContext).finish();
             }
         });
     }
-
 
 
     @Override

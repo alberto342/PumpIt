@@ -1,5 +1,6 @@
 package com.albert.fitness.pumpit.model.nutrition.room;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -25,12 +26,12 @@ public class AltMeasures {
     private int seq;
 
     @ColumnInfo(name = "serving_weight")
-    private int servingWeight;
+    private float servingWeight;
 
     public AltMeasures() {
     }
 
-    public AltMeasures(int foodId, String measure, int qty, int seq, int servingWeight) {
+    public AltMeasures(int foodId, String measure, int qty, int seq, float servingWeight) {
         this.foodId = foodId;
         this.measure = measure;
         this.qty = qty;
@@ -78,11 +79,24 @@ public class AltMeasures {
         this.qty = qty;
     }
 
-    public int getServingWeight() {
+    public float getServingWeight() {
         return servingWeight;
     }
 
-    public void setServingWeight(int servingWeight) {
+    public void setServingWeight(float servingWeight) {
         this.servingWeight = servingWeight;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "AltMeasures{" +
+                "altMeasuresId=" + altMeasuresId +
+                ", foodId=" + foodId +
+                ", measure='" + measure + '\'' +
+                ", qty=" + qty +
+                ", seq=" + seq +
+                ", servingWeight=" + servingWeight +
+                '}';
     }
 }

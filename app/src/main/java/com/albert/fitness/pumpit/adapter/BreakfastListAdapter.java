@@ -65,23 +65,23 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
+//        holder.tvFoodName.setText(nutritionItems.get(position).getFoodName());
+//        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.2f Kcal,  %.2f Carbs", nutritionItems.get(position).getCalories(), nutritionItems.get(position).getTotalCarbohydrate()));
+//        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.2f Protein", nutritionItems.get(position).getProtein()));
+//        holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
+//
+//            }
+//        });
+
+
         holder.tvFoodName.setText(nutritionItems.get(position).getFoodName());
-        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", nutritionItems.get(position).getCalories(), nutritionItems.get(position).getTotalCarbohydrate()));
-        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", nutritionItems.get(position).getProtein()));
-        holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
-
-            }
-        });
-
-
-        holder.tvFoodName.setText(nutritionItems.get(position).getFoodName());
-        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.0f Kcal,  %.0f Carbs", nutritionItems.get(position).getCalories(),
+        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.2f Kcal,  %.2f Carbs", nutritionItems.get(position).getCalories(),
                 nutritionItems.get(position).getTotalCarbohydrate()));
-        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.0f Protein", nutritionItems.get(position).getProtein()));
+        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.2f Protein", nutritionItems.get(position).getProtein()));
         holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

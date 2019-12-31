@@ -1,7 +1,6 @@
 package com.albert.fitness.pumpit.nutrition;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,8 +21,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
 import com.albert.fitness.pumpit.adapter.FoodListAdapter;
-import com.albert.fitness.pumpit.model.UserRegister;
-import com.albert.fitness.pumpit.model.nutrition.Foods;
 import com.albert.fitness.pumpit.model.nutrition.FullNutrients;
 import com.albert.fitness.pumpit.model.nutrition.Tags;
 import com.albert.fitness.pumpit.model.nutrition.room.AltMeasures;
@@ -31,18 +28,9 @@ import com.albert.fitness.pumpit.model.nutrition.room.FoodLog;
 import com.albert.fitness.pumpit.model.nutrition.room.FullNutrition;
 import com.albert.fitness.pumpit.model.nutrition.room.Nutrition;
 import com.albert.fitness.pumpit.model.nutrition.room.Photo;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.viewmodel.NutritionViewModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -57,9 +45,8 @@ import me.himanshusoni.quantityview.QuantityView;
 public class ShowBreakfastActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
     private final String TAG = "ShowBreakfastActivity";
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Spinner spinnerServingUnit;
-    private String spinnerSelectedItem, docId, oldServingUnit;
+    private String spinnerSelectedItem, oldServingUnit;
     private QuantityView quantityViewCustom;
     private TextView tvEnergy, tvCarbs, tvProtein, tvFat, tvAllNutrition, tvFoodName, tvGroupTag;
     private ImageView foodItem;
@@ -70,13 +57,10 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     private List<Float> values = new ArrayList<>();
     private float kcal, fat, protein, carbs, servingWeightGrams, altMeasures;
     private boolean testOnce = false;
-    private ProgressDialog progressdialog;
     private int firstQty;
     private ProgressBar progressBar;
     private NutritionViewModel viewModel;
-
-
-    // TODO: 2019-07-09 save full nutrients not working, check fb saving
+    private FoodLog foodLogs = new FoodLog();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +97,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     // Initializing collapsing toolbar
     // Will show and hide the toolbar title on scroll
     private void initCollapsingToolbar() {
-
         final String foodName = BreakfastListAdapter.foodName;
-
         tvFoodName.setText(foodName);
 
         final CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.nutrition_collapsing_toolbar);
@@ -153,98 +135,96 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
         if (bundle != null) {
             int logId = bundle.getInt("logId");
-            String foodName = bundle.getString("foodName");
 
-            viewModel.getFoodLogByLogId(logId).observe(this, new Observer<FoodLog>() {
-                @Override
-                public void onChanged(FoodLog foodLog) {
-                    viewModel.getNutritionByFoodId(foodLog.getFoodId())
-                            .observe(ShowBreakfastActivity.this, new Observer<Nutrition>() {
+            viewModel.getFoodLogByLogId(logId)
+                    .observe(this, new Observer<FoodLog>() {
+                        @Override
+                        public void onChanged(final FoodLog foodLog) {
+                            foodLogs = foodLog;
+                            int altMeasureId = foodLog.getAltMeasuresId();
+
+                            viewModel.getAltMeasuresById(altMeasureId)
+                                    .observe(ShowBreakfastActivity.this, new Observer<AltMeasures>() {
                                 @Override
-                                public void onChanged(Nutrition nutrition) {
-                                    kcal = nutrition.getNfCalories();
-                                    fat = nutrition.getNfTotalFat();
-                                    protein = nutrition.getNfProtein();
-                                    carbs = nutrition.getNfTotalCarbohydrate();
-                                    servingWeightGrams = nutrition.getServingWeightGrams();
-                                    int qty = nutrition.getServingQty();
-                                    firstQty = nutrition.getServingQty();
-                                    oldServingUnit = nutrition.getServingUnit();
+                                public void onChanged(AltMeasures altMeasures) {
+                                    oldServingUnit = altMeasures.getMeasure();
+                                    spinnerList.add(oldServingUnit == null ? "packet" : oldServingUnit);
 
-                                    //DELEDED IF NOT NEED
                                     changeDataView(1);
-                                    quantityViewCustom.setQuantity(qty);
+                                    quantityViewCustom.setQuantity(foodLog.getQty());
+                                    firstQty = foodLog.getQty();
+                                    addItemsOnSpinner();
                                 }
                             });
 
-                    viewModel.getFullNutritiionByFoodId(foodLog.getFoodId())
-                            .observe(ShowBreakfastActivity.this, new Observer<List<FullNutrition>>() {
-                                @Override
-                                public void onChanged(List<FullNutrition> nutrition) {
-                                    for(FullNutrition n : nutrition) {
-                                        atterId.add(n.getAtterId());
-                                        values.add(n.getValue());
+                            viewModel.getNutritionByFoodId(foodLog.getFoodId())
+                                    .observe(ShowBreakfastActivity.this, new Observer<Nutrition>() {
+                                        @Override
+                                        public void onChanged(Nutrition nutrition) {
+                                            kcal = nutrition.getNfCalories();
+                                            fat = nutrition.getNfTotalFat();
+                                            protein = nutrition.getNfProtein();
+                                            carbs = nutrition.getNfTotalCarbohydrate();
+                                            servingWeightGrams = nutrition.getServingWeightGrams();
+                                          //  oldServingUnit = nutrition.getServingUnit();
 
-                                        FullNutrients fullNutrients = new FullNutrients(n.getAtterId(), n.getValue());
-                                        allFoods.add(fullNutrients.getNutrients(n.getAtterId()));
-                                    }
-                                }
-                            });
-
-                    viewModel.getAltMeasuresByFoodId(foodLog.getFoodId())
-                            .observe(ShowBreakfastActivity.this, new Observer<List<AltMeasures>>() {
-                                @Override
-                                public void onChanged(List<AltMeasures> altMeasures) {
-                                    if (!altMeasures.isEmpty()) {
-                                        for (AltMeasures measures : altMeasures) {
-
-                                            if(measures.getMeasure().isEmpty()) {
-                                                spinnerList.add("Packet");
-                                            }
-
-                                            spinnerList.add(measures.getMeasure());
-                                            servingWeightList.add((float) measures.getServingWeight());
-
-                                            //add spinner to the map
-                                            allServingWeight.put(measures.getMeasure(), (float) measures.getServingWeight());
-//                                            if (servingWeightList.isEmpty()) {
-//                                                allServingWeight.put("package", servingWeightGrams);
-//                                            } else {
-//
-//                                            }
                                         }
-                                    }
-                                }
-                            });
+                                    });
 
-                    viewModel.getPhotoByFoodId(foodLog.getFoodId())
-                            .observe(ShowBreakfastActivity.this, new Observer<Photo>() {
-                                @Override
-                                public void onChanged(Photo photo) {
-                                    Picasso.get()
-                                            .load(photo.getHighres())
-                                            .placeholder(R.mipmap.ic_launcher)
-                                            .error(R.mipmap.ic_launcher)
-                                            .into(foodItem);
-                                }
-                            });
-                    viewModel.getTagsByFoodId(foodLog.getFoodId())
-                            .observe(ShowBreakfastActivity.this, new Observer<com.albert.fitness.pumpit.model.nutrition.room.Tags>() {
-                                @Override
-                                public void onChanged(com.albert.fitness.pumpit.model.nutrition.room.Tags tags) {
-                                    int foodGroup = tags.getFoodGroup();
-                                    tvGroupTag.setText(Tags.foodGroup(foodGroup));
-                                }
-                            });
-                }
-            });
+                            viewModel.getFullNutritiionByFoodId(foodLog.getFoodId())
+                                    .observe(ShowBreakfastActivity.this, new Observer<List<FullNutrition>>() {
+                                        @Override
+                                        public void onChanged(List<FullNutrition> nutrition) {
+                                            for (FullNutrition n : nutrition) {
+                                                atterId.add(n.getAtterId());
+                                                values.add(n.getValue());
 
-            //Get Serving Unit
-            if (oldServingUnit == null) {
-                spinnerList.add("Packet");
-            } else {
-                spinnerList.add(oldServingUnit);
-            }
+                                                FullNutrients fullNutrients = new FullNutrients(n.getAtterId(), n.getValue());
+                                                allFoods.add(fullNutrients.getNutrients(n.getAtterId()));
+                                            }
+                                        }
+                                    });
+
+                            viewModel.getAltMeasuresByFoodId(foodLog.getFoodId())
+                                    .observe(ShowBreakfastActivity.this, new Observer<List<AltMeasures>>() {
+                                        @Override
+                                        public void onChanged(List<AltMeasures> altMeasures) {
+                                            if (!altMeasures.isEmpty()) {
+                                                for (AltMeasures measures : altMeasures) {
+                                                    if (measures.getMeasure().isEmpty()) {
+                                                        spinnerList.add("Packet");
+                                                    }
+                                                    spinnerList.add(measures.getMeasure());
+                                                    servingWeightList.add((float) measures.getServingWeight());
+
+                                                    //add spinner to the map
+                                                    allServingWeight.put(measures.getMeasure(), (float) measures.getServingWeight());
+                                                }
+                                            }
+                                        }
+                                    });
+
+                            viewModel.getPhotoByFoodId(foodLog.getFoodId())
+                                    .observe(ShowBreakfastActivity.this, new Observer<Photo>() {
+                                        @Override
+                                        public void onChanged(Photo photo) {
+                                            Picasso.get()
+                                                    .load(photo.getHighres())
+                                                    .placeholder(R.mipmap.ic_launcher)
+                                                    .error(R.mipmap.ic_launcher)
+                                                    .into(foodItem);
+                                        }
+                                    });
+                            viewModel.getTagsByFoodId(foodLog.getFoodId())
+                                    .observe(ShowBreakfastActivity.this, new Observer<com.albert.fitness.pumpit.model.nutrition.room.Tags>() {
+                                        @Override
+                                        public void onChanged(com.albert.fitness.pumpit.model.nutrition.room.Tags tags) {
+                                            int foodGroup = tags.getFoodGroup();
+                                            tvGroupTag.setText(Tags.foodGroup(foodGroup));
+                                        }
+                                    });
+                        }
+                    });
         }
 
         StringBuilder all = new StringBuilder();
@@ -254,7 +234,6 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
         tvAllNutrition.setText(all.toString());
 
         progressBar.setVisibility(View.INVISIBLE);
-        addItemsOnSpinner();
     }
 
 
@@ -307,7 +286,6 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
         spinnerServingUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                 spinnerSelectedItem = String.valueOf(spinnerServingUnit.getItemAtPosition(position));
                 Log.d(TAG, "Spinner Item Position: " + spinnerSelectedItem);
 
@@ -363,80 +341,14 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
     //Update fb on backPressed
     private void updateNutrition() {
-
-        progressdialog = new ProgressDialog(this);
-        progressdialog.setMessage("Please Wait....");
-        progressdialog.show();
-
-        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(Foods.BREAKFAST).document(UserRegister.getTodayDate())
-                .collection(Foods.All_NUTRITION)
-                .whereEqualTo("foodName", BreakfastListAdapter.foodName)
-                .whereEqualTo("servingUnit", oldServingUnit)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        viewModel.getAltMeasuresIdByFoodIdAndMeasureType(foodLogs.getFoodId(), spinnerSelectedItem)
+                .observe(this, new Observer<Integer>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, "document.getId " + document.getId() + " => " + document.getData());
-                                docId = document.getId();
-                            }
-                            DocumentReference doc = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                    .collection(Foods.BREAKFAST).document(UserRegister.getTodayDate())
-                                    .collection(Foods.All_NUTRITION).document(docId);
-
-                            int qty = quantityViewCustom.getQuantity();
-
-                            //   int notGrams = spinnerSelectedItem.equals("g") ? 1 : 100;
-//                            doc.update("servingQty", qty);
-//                            doc.update("servingUnit", spinnerSelectedItem);
-//                            doc.update("nfCalories", kcal * altMeasures * qty * notGrams);
-//                            doc.update("nfTotalFat", fat * altMeasures * qty * notGrams);
-//                            doc.update("nfProtein", protein * altMeasures * qty * notGrams);
-//                            doc.update("nfTotalCarbohydrate", carbs * altMeasures * qty * notGrams);
-//                            doc.update("servingWeightGrams", allServingWeight.get(spinnerSelectedItem))
-
-                            Log.d(TAG, "onComplete: " + tvAllNutrition.getText().toString());
-
-
-                            for (int i = 0; i < values.size(); i++) {
-                                @SuppressLint("UseSparseArrays")
-                                Map<Integer, Float> fullNutrients = new HashMap<>();
-
-                                fullNutrients.put(atterId.get(i), values.get(i));
-                                //   FullNutrients fullNutrient = new FullNutrients(atterId.get(i),values.get(i));
-
-                                // doc.update("fullNutrients", fullNutrients);
-                            }
-
-
-                            doc.update("servingQty", qty);
-                            doc.update("servingUnit", spinnerSelectedItem);
-                            doc.update("nfCalories", Float.valueOf(tvEnergy.getText().toString()));
-                            doc.update("nfTotalFat", Float.valueOf(tvFat.getText().toString()));
-                            doc.update("nfProtein", Float.valueOf(tvProtein.getText().toString()));
-                            doc.update("nfTotalCarbohydrate", Float.valueOf(tvCarbs.getText().toString()));
-                            doc.update("servingWeightGrams", allServingWeight.get(spinnerSelectedItem))
-
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            progressdialog.hide();
-                                            Log.d(TAG, "DocumentSnapshot successfully updated!");
-
-                                            //oldServingUnit = spinnerSelectedItem;
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            progressdialog.hide();
-                                            Log.w(TAG, "Error updating document", e);
-                                        }
-                                    });
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                    public void onChanged(Integer id) {
+                        if (id != null) {
+                            foodLogs.setAltMeasuresId(id);
+                            foodLogs.setQty(quantityViewCustom.getQuantity());
+                            viewModel.updateFoodLog(foodLogs);
                         }
                     }
                 });

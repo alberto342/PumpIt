@@ -8,6 +8,8 @@ public class SumNutritionPojo {
     private float fat;
     private float protein;
 
+
+
     public SumNutritionPojo() {
     }
 

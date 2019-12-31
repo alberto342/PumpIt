@@ -49,7 +49,7 @@ import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
-    //Todo check if spinner is empty
+
     // TODO: 2019-07-09 on change quantity manuel its not show up
 
     private final String TAG = "ShowFoodBeforeAddedActivity";
@@ -319,6 +319,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                         @SuppressLint("LongLogTag")
                         @Override
                         public void onChanged(Integer id) {
+                            Log.d(TAG, "checkFoodNameExisting: " + id);
                             if (id == null) {
                                 saveNutrition(foods);
                             } else {
@@ -337,8 +338,8 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
                     @SuppressLint("LongLogTag")
                     @Override
                     public void onChanged(Integer measureId) {
+                        Log.d(TAG, "getAltMeasuresId: " + measureId);
                         if (measureId != null) {
-                            Log.d(TAG, "getAltMeasuresId: " + measureId);
                             viewModel.addNewFoodLog(new FoodLog(id, measureId, quantityViewCustom.getQuantity(), getMeal(), Event.getTodayData()));
                             Log.d(TAG, "Log is saved:  " + id + " getEatType: " + getMeal() + " Date: " + Event.getTodayData());
                         }
@@ -378,11 +379,17 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
             }
 
             for (int j = 0; j < foods.getAltMeasures().size(); j++) {
+                Log.d(TAG, "saveNutrition qty: " + foods.getAltMeasures().get(j).getQty() + "\t ServingWeight: " + foods.getAltMeasures().get(j).getServingWeight() + "\t Measure: " + foods.getAltMeasures().get(j).getMeasure());
+
+                if (foods.getAltMeasures().get(j).getSeq() == null) {
+                    foods.getAltMeasures().get(j).setSeq("1");
+                }
+
                 altMeasuresList.add(new AltMeasures(foodId,
                         foods.getAltMeasures().get(j).getMeasure(),
                         foods.getAltMeasures().get(j).getQty(),
                         Integer.valueOf(foods.getAltMeasures().get(j).getSeq()),
-                        Integer.valueOf(foods.getAltMeasures().get(j).getServingWeight())));
+                        Float.valueOf(foods.getAltMeasures().get(j).getServingWeight())));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -401,7 +408,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
     //get Meal from SharedPreferences file
     public String getMeal() {
         SharedPreferences pref = getSharedPreferences(Foods.SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
-
         boolean breakfast = pref.getBoolean("dinner", false);
         boolean dinner = pref.getBoolean("breakfast", false);
         boolean lunch = pref.getBoolean("lunch", false);

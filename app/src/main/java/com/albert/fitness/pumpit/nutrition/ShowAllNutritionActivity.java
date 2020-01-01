@@ -177,7 +177,9 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                             }
                         } else {
                             try {
-                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() ;
+                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams();
+                                //cal =
+
                               //  calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() * measures.getQty();
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -249,6 +251,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                                 float calories = queryNutritionItems.get(i).getCalories();
                                 float protein = queryNutritionItems.get(i).getProtein();
                                 float carbohydrate = queryNutritionItems.get(i).getTotalCarbohydrate();
+
+                                Log.d(TAG, "onChanged: cal " + calories + " pro " + protein);
 
                                 queryNutritionItems.get(i).setCalories(calories * newCalAltMeasure);
                                 queryNutritionItems.get(i).setProtein(protein * newCalAltMeasure);

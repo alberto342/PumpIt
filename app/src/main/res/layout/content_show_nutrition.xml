@@ -43,6 +43,18 @@
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/tv_carbs_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_weight="1"
+                        android:hint="55"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/gray"
+                        android:textSize="16sp" />
+
+                    <TextView
                         android:id="@+id/tv_protein_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -56,18 +68,6 @@
 
                     <TextView
                         android:id="@+id/tv_fat_item"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="1"
-                        android:hint="55"
-                        android:textAlignment="center"
-                        android:textColor="@color/white"
-                        android:textColorHint="@color/gray"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/tv_carbs_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"

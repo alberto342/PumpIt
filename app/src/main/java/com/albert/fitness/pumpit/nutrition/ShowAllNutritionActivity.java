@@ -178,8 +178,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                         } else {
                             try {
                                 calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams();
-                                //cal =
-
                               //  calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() * measures.getQty();
                             } catch (Exception e) {
                                 e.printStackTrace();

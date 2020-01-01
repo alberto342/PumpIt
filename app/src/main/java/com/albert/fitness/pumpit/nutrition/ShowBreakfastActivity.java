@@ -55,7 +55,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     private List<Float> servingWeightList = new ArrayList<>();
     private List<Integer> atterId = new ArrayList<>();
     private List<Float> values = new ArrayList<>();
-    private float kcal, fat, protein, carbs, servingWeightGrams, altMeasures;
+    private float kcal, fat, protein, carbs, servingWeightGrams, altMeasures, servingWeight;
     private boolean testOnce = false;
     private int firstQty;
     private ProgressBar progressBar;
@@ -145,17 +145,18 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
                             viewModel.getAltMeasuresById(altMeasureId)
                                     .observe(ShowBreakfastActivity.this, new Observer<AltMeasures>() {
-                                @Override
-                                public void onChanged(AltMeasures altMeasures) {
-                                    oldServingUnit = altMeasures.getMeasure();
-                                    spinnerList.add(oldServingUnit == null ? "packet" : oldServingUnit);
+                                        @Override
+                                        public void onChanged(AltMeasures altMeasures) {
+                                            oldServingUnit = altMeasures.getMeasure();
+                                            servingWeight = altMeasures.getServingWeight();
 
-                                    changeDataView(1);
-                                    quantityViewCustom.setQuantity(foodLog.getQty());
-                                    firstQty = foodLog.getQty();
-                                    addItemsOnSpinner();
-                                }
-                            });
+                                            spinnerList.add(oldServingUnit == null ? "packet" : oldServingUnit);
+                                            changeDataView(foodLog.getQty());
+                                            quantityViewCustom.setQuantity(foodLog.getQty());
+                                            firstQty = foodLog.getQty();
+                                            addItemsOnSpinner();
+                                        }
+                                    });
 
                             viewModel.getNutritionByFoodId(foodLog.getFoodId())
                                     .observe(ShowBreakfastActivity.this, new Observer<Nutrition>() {
@@ -166,7 +167,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
                                             protein = nutrition.getNfProtein();
                                             carbs = nutrition.getNfTotalCarbohydrate();
                                             servingWeightGrams = nutrition.getServingWeightGrams();
-                                          //  oldServingUnit = nutrition.getServingUnit();
+                                            //  oldServingUnit = nutrition.getServingUnit();
 
                                         }
                                     });
@@ -195,10 +196,10 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
                                                         spinnerList.add("Packet");
                                                     }
                                                     spinnerList.add(measures.getMeasure());
-                                                    servingWeightList.add((float) measures.getServingWeight());
+                                                    servingWeightList.add(measures.getServingWeight());
 
                                                     //add spinner to the map
-                                                    allServingWeight.put(measures.getMeasure(), (float) measures.getServingWeight());
+                                                    allServingWeight.put(measures.getMeasure(), measures.getServingWeight());
                                                 }
                                             }
                                         }
@@ -244,9 +245,9 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
             quantityViewCustom.setQuantity(newQuantity);
         }
         if (spinnerSelectedItem.equals("g")) {
-            altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams / 100 / firstQty;
+            altMeasures = allServingWeight.get(spinnerSelectedItem) * newQuantity / servingWeightGrams / 100;
         } else {
-            altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams / firstQty;
+            altMeasures = allServingWeight.get(spinnerSelectedItem) * newQuantity/ servingWeightGrams;
         }
         changeDataView(newQuantity);
     }
@@ -289,21 +290,19 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
                 spinnerSelectedItem = String.valueOf(spinnerServingUnit.getItemAtPosition(position));
                 Log.d(TAG, "Spinner Item Position: " + spinnerSelectedItem);
 
-                if (allServingWeight.get(spinnerSelectedItem) == null) {
-                    FoodListAdapter.measureMap.put(spinnerSelectedItem, servingWeightGrams);
-                    allServingWeight.put(spinnerSelectedItem, servingWeightGrams);
-                }
-
-                if (spinnerSelectedItem.equals("g")) {
-                    altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams / 100 / firstQty;
-                } else {
-                    altMeasures = allServingWeight.get(spinnerSelectedItem) / servingWeightGrams / firstQty;
-                }
                 //Check if the position is change
                 if (position > 0 || testOnce) {
                     testOnce = true;
                     quantityViewCustom.setQuantity(1);
                 }
+
+                if (allServingWeight.get(spinnerSelectedItem) == null) {
+                    FoodListAdapter.measureMap.put(spinnerSelectedItem, servingWeightGrams);
+                    allServingWeight.put(spinnerSelectedItem, servingWeightGrams);
+                }
+
+                altMeasures = allServingWeight.get(spinnerSelectedItem) * quantityViewCustom.getQuantity() / servingWeightGrams;
+
                 if (spinnerSelectedItem.equals("g") && testOnce) {
                     quantityViewCustom.setQuantity(100);
                 }
@@ -321,16 +320,19 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     private void changeDataView(int qty) {
         List<String> sAllFoods = new ArrayList<>();
         int gramSelected = oldServingUnit.equals("g") ? 100 : 1;
+        float newAltMeasures = altMeasures == 0.0 ? 1 : altMeasures;
 
         for (int i = 0; i < atterId.size(); i++) {
-            FullNutrients fullNutrients = new FullNutrients(atterId.get(i), values.get(i) * altMeasures * qty * gramSelected);
+            FullNutrients fullNutrients = new FullNutrients(atterId.get(i), values.get(i) * newAltMeasures * gramSelected);
             sAllFoods.add(fullNutrients.getNutrients(atterId.get(i)));
         }
 
-        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal * altMeasures * qty * gramSelected));
-        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat * altMeasures * qty * gramSelected));
-        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein * altMeasures * qty * gramSelected));
-        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs * altMeasures * qty * gramSelected));
+        Log.d(TAG, "changeDataView: " + qty + " newAlt" + newAltMeasures + " bool: " + testOnce);
+
+        tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal * newAltMeasures * gramSelected));
+        tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat * newAltMeasures * gramSelected));
+        tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein * newAltMeasures * gramSelected));
+        tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs * newAltMeasures * gramSelected));
 
         StringBuilder all = new StringBuilder();
         for (String nutrients : sAllFoods) {

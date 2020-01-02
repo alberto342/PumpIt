@@ -166,9 +166,9 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
             @SuppressLint("LongLogTag")
             @Override
             public void onChanged(List<QueryAltMeasures> queryAltMeasures) {
+                float calAltMeasure = 1f;
                 if (!queryAltMeasures.isEmpty()) {
                     for (QueryAltMeasures measures : queryAltMeasures) {
-                        float calAltMeasure = 1;
                         if (measures.getMeasure().equals("g")) {
                             try {
                                 calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() / 100;
@@ -177,8 +177,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                             }
                         } else {
                             try {
-                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams();
-                              //  calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() * measures.getQty();
+                                float weight = measures.getServingWeight() * measures.getQty();
+                                calAltMeasure = weight / measures.getServingWeightGrams();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

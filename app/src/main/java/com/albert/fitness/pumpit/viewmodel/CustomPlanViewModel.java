@@ -7,6 +7,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.albert.fitness.pumpit.model.FinishTraining;
+import com.albert.fitness.pumpit.model.QueryFinishWorkout;
+import com.albert.fitness.pumpit.model.QueryLogWorkout;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.Training;
 import com.albert.fitness.pumpit.model.WorkoutObj;
@@ -96,6 +98,30 @@ public class CustomPlanViewModel extends AndroidViewModel {
 
     public LiveData<FinishTraining> getFinishTrainingByDate(String date) {
         return finishTrainingLiveData = repository.getFinishTrainingByDate(date);
+    }
+
+    public LiveData<List<QueryFinishWorkout>> getFinishWorkout(String date) {
+        return repository.getFinishWorkout(date);
+    }
+
+    public LiveData<List<QueryFinishWorkout>> getFinishWorkoutByDateAndExerciseId(String date, int id) {
+        return repository.getFinishWorkoutByDateAndExerciseId(date, id);
+    }
+
+    public LiveData<Integer> getMaxIdFromFinishTraining() {
+        return repository.getMaxIdFromFinishTraining();
+    }
+
+    public LiveData<List<Integer>> getExerciseIdByDate(String date) {
+        return repository.getExerciseIdByDate(date);
+    }
+
+    public LiveData<List<QueryLogWorkout>> getLogWorkout(String date) {
+        return repository.getLogWorkout(date);
+    }
+
+    public LiveData<List<TrackerExercise>> getAllTrackerWhereFinishIdZero() {
+        return repository.getAllTrackerWhereFinishIdZero();
     }
 
     public void addNewWorkout(WorkoutObj workout) {

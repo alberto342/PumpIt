@@ -339,7 +339,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
-                    android:text="9"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 
@@ -382,7 +381,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
-                    android:text="7345 kg"
+                    android:text="0 kg"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
 

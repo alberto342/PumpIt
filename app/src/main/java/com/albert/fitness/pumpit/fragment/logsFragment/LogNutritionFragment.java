@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,20 +21,11 @@ import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
 import com.albert.fitness.pumpit.adapter.DinnerListAdapter;
 import com.albert.fitness.pumpit.adapter.LunchListAdapter;
 import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
-import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.model.nutrition.Foods;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
 import com.albert.fitness.pumpit.utils.SwipeHelper;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import fitness.albert.com.pumpit.R;
 
@@ -46,18 +36,15 @@ public class LogNutritionFragment extends Fragment {
 
     private final String TAG = "LogNutritionFragment";
     private RecyclerView rvBreakfast, rvLunch, rvDinner, rvSnacks;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ArrayList<Foods> breakfastList = new ArrayList<>();
     private ArrayList<Foods> lunchList = new ArrayList<>();
     private ArrayList<Foods> dinnerList = new ArrayList<>();
     private ArrayList<Foods> snacksList = new ArrayList<>();
     private TextView tvBreakfast, tvLunch, tvDinner, tvSnacks;
     private LinearLayout llBreakfast, llLunch, llDinner, llSnacks;
-    private ProgressBar progressBar;
 
 
     public LogNutritionFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -85,17 +72,16 @@ public class LogNutritionFragment extends Fragment {
         llLunch = view.findViewById(R.id.lunch_container);
         llSnacks = view.findViewById(R.id.snacks_container);
 
-        progressBar = view.findViewById(R.id.pb_log_nutrition);
 
         rvBreakfast.setNestedScrollingEnabled(false);
         rvLunch.setNestedScrollingEnabled(false);
         rvDinner.setNestedScrollingEnabled(false);
         rvSnacks.setNestedScrollingEnabled(false);
 
-        getNutritionFromFb(LogFragment.date, Foods.BREAKFAST);
-        getNutritionFromFb(LogFragment.date, Foods.LUNCH);
-        getNutritionFromFb(LogFragment.date, Foods.DINNER);
-        getNutritionFromFb(LogFragment.date, Foods.SNACK);
+        getNutrition(LogFragment.date, Foods.BREAKFAST);
+        getNutrition(LogFragment.date, Foods.LUNCH);
+        getNutrition(LogFragment.date, Foods.DINNER);
+        getNutrition(LogFragment.date, Foods.SNACK);
 
         swipe(rvBreakfast);
         swipe(rvDinner);
@@ -109,34 +95,34 @@ public class LogNutritionFragment extends Fragment {
     }
 
 
-    private void getNutritionFromFb(final String date, final String nutritionType) {
+    private void getNutrition(final String date, final String nutritionType) {
 
-        progressBar.setVisibility(View.VISIBLE);
 
-        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(nutritionType)
-                .document(date).collection(Foods.All_NUTRITION).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                progressBar.setVisibility(View.GONE);
 
-                if(task.getResult().isEmpty()) {
-                    Foods foods = null;
-                    getNutrition(nutritionType, false, foods);
-                }
-                if (task.isSuccessful() && task.getResult() != null) {
-                    for (int i = 0; i < task.getResult().size(); i++) {
-                        Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-                        getNutrition(nutritionType, true, foods);
-                    }
-                }
-                Log.d(TAG, "Successfully receive data from fb");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i(TAG, "Filed receive data " + e);
-            }
-        });
+//        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(nutritionType)
+//                .document(date).collection(Foods.All_NUTRITION).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                progressBar.setVisibility(View.GONE);
+//
+//                if(task.getResult().isEmpty()) {
+//                    Foods foods = null;
+//                    getNutrition(nutritionType, false, foods);
+//                }
+//                if (task.isSuccessful() && task.getResult() != null) {
+//                    for (int i = 0; i < task.getResult().size(); i++) {
+//                        Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
+//                        getNutrition(nutritionType, true, foods);
+//                    }
+//                }
+//                Log.d(TAG, "Successfully receive data from fb");
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.i(TAG, "Filed receive data " + e);
+//            }
+//        });
     }
 
 
@@ -236,7 +222,7 @@ public class LogNutritionFragment extends Fragment {
                             public void onClick(int pos) {
                                 //    deleteItem(pos);
                                 //  deleteFromFb(pos);
-                                delNutrition(Foods.BREAKFAST, breakfastList, pos);
+                               // delNutrition(Foods.BREAKFAST, breakfastList, pos);
 
                             }
                         }
@@ -256,36 +242,36 @@ public class LogNutritionFragment extends Fragment {
         };
     }
 
-    private void delNutrition(final String nutrition, ArrayList<Foods> foodsArrayList, int pos) {
-        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                .collection(nutrition).document(UserRegister.getTodayDate()).collection(Foods.All_NUTRITION)
-                .whereEqualTo("food_name", foodsArrayList.get(pos).getFoodName())
-                .whereEqualTo("serving_qty", foodsArrayList.get(pos).getServingQty()).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (int i = 0; i < Objects.requireNonNull(task.getResult()).size(); i++) {
-                                String docId = task.getResult().getDocuments().get(i).getId();
-                                Log.d(TAG, "id: " + docId);
-                                db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-                                        .collection(nutrition).document(UserRegister.getTodayDate())
-                                        .collection(Foods.All_NUTRITION).document(docId)
-                                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.i(TAG, "Success delete doc");
-                                    }
-                                });
-                            }
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.i(TAG, "failed " + e.getMessage());
-                    }
-                });
-    }
+//    private void delNutrition(final String nutrition, ArrayList<Foods> foodsArrayList, int pos) {
+//        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+//                .collection(nutrition).document(UserRegister.getTodayDate()).collection(Foods.All_NUTRITION)
+//                .whereEqualTo("food_name", foodsArrayList.get(pos).getFoodName())
+//                .whereEqualTo("serving_qty", foodsArrayList.get(pos).getServingQty()).get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            for (int i = 0; i < Objects.requireNonNull(task.getResult()).size(); i++) {
+//                                String docId = task.getResult().getDocuments().get(i).getId();
+//                                Log.d(TAG, "id: " + docId);
+//                                db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
+//                                        .collection(nutrition).document(UserRegister.getTodayDate())
+//                                        .collection(Foods.All_NUTRITION).document(docId)
+//                                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                    @Override
+//                                    public void onSuccess(Void aVoid) {
+//                                        Log.i(TAG, "Success delete doc");
+//                                    }
+//                                });
+//                            }
+//                        }
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.i(TAG, "failed " + e.getMessage());
+//                    }
+//                });
+//    }
 }

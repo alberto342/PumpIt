@@ -208,9 +208,6 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
         float kcal, crabs, protein, fat;
         List<String> fullNutrient = new ArrayList<>();
 
-        // TODO: 2019-12-13 need to fix calAltMeasures
-
-
         float calAltMeasures;
         try {
             if (spinnerSelectedItem.equals("g")) {
@@ -397,6 +394,7 @@ public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements Qu
 
         try {
             viewModel.addNewAllNutrition(foodsObjList, nutritionList, fullNutritionList, altMeasuresList, photoList, tagsList);
+            Event.saveEvent(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

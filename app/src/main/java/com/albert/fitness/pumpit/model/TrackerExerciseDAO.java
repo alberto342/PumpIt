@@ -33,4 +33,7 @@ public interface TrackerExerciseDAO {
 
     @Query("SELECT * FROM tracker_exercise_table WHERE finish_training_id==:id")
     LiveData<List<TrackerExercise>> getAllTrackerByFinishTrainingId(int id);
+
+    @Query("SELECT * FROM tracker_exercise_table WHERE finish_training_id = 0")
+    LiveData<List<TrackerExercise>> getAllTrackerWhereFinishIdZero();
 }

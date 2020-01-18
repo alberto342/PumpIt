@@ -17,6 +17,9 @@ public class QueryNutritionItem {
     private String servingUnit;
     @ColumnInfo(name = "total_carbohydrate")
     private float totalCarbohydrate;
+    private String measure;
+    @ColumnInfo(name = "serving_weight")
+    private int servingWeight;
 
     public QueryNutritionItem() {
     }
@@ -93,5 +96,21 @@ public class QueryNutritionItem {
 
     public void setLogId(int logId) {
         this.logId = logId;
+    }
+
+    public String getMeasure() {
+        return measure;
+    }
+
+    public void setMeasure(String measure) {
+        this.measure = measure;
+    }
+
+    public int getServingWeight() {
+        return servingWeight;
+    }
+
+    public void setServingWeight(int servingWeight) {
+        this.servingWeight = servingWeight;
     }
 }

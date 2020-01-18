@@ -43,10 +43,12 @@ public interface FoodsDAO {
     LiveData<Integer> getFoodIdByName(String name);
 
 
-    @Query("SELECT log_id, food_name, qty, thumb, calories, protein, serving_unit, total_carbohydrate " +
+    @Query("SELECT log_id, food_name, food_log_table.qty, thumb, calories, protein, serving_unit, total_carbohydrate, " +
+            "alt_measures_table.measure, serving_weight " +
             "FROM food_log_table, foods_table " +
             "INNER JOIN photo_table ON food_log_table.food_id = photo_table.food_id " +
             "INNER JOIN nutrition_table ON food_log_table.food_id = nutrition_table.food_id " +
+            "INNER JOIN alt_measures_table ON food_log_table.alt_measures_id = alt_measures_table.alt_measures_id " +
             "WHERE food_log_table.date ==:date AND food_log_table.eat_type==:type " +
             "AND foods_table.food_id = nutrition_table.food_id")
     LiveData<List<QueryNutritionItem>> getNutritionItem(String date, String type);

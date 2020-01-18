@@ -51,8 +51,7 @@ public class NutritionFragment extends Fragment {
     private List<Foods> foodList = new ArrayList<>();
     private PrefsUtils prefsUtils = new PrefsUtils();
     private UserRegister user = new UserRegister();
-    private float kcal, fat, protein, carbs, waterMl;
-    private int calculationGoal;
+    private float kcal, fat, protein, carbs, waterMl, caloriesBurned = 0;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
     private int ly1ElementCount = 0, ly2ElementCount = 0, ly3ElementCount = 0, ly4ElementCount = 0;
     private NutritionViewModel viewModel;
@@ -82,8 +81,6 @@ public class NutritionFragment extends Fragment {
         getCaloriesBurned();
 
         getMeal(Event.getTodayData());
-        getUserDataAndSetGoal();
-        emailIsOnNutrition();
         datePicker(view);
         setViewDrink(view);
     }
@@ -177,10 +174,6 @@ public class NutritionFragment extends Fragment {
         tvCarbs.setText("0");
         tvProtien.setText("0");
         tvFat.setText("0");
-        getUserDataAndSetGoal();
-        //  progressCarbs.setProgress(0);
-        //progressFat.setProgress(0);
-        //progressProtien.setProgress(0);
     }
 
 
@@ -208,29 +201,6 @@ public class NutritionFragment extends Fragment {
             }
         }
     };
-
-    //The first time the email not exist, only after add food is exists
-    private void emailIsOnNutrition() {
-//        DocumentReference docRef = db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister());
-//        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    DocumentSnapshot document = task.getResult();
-//                    assert document != null;
-//                    if ((document.exists())) {
-//                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-//                        //   isOnNutrition = true;
-//                    } else {
-//                        Log.d(TAG, "No such document");
-//                        // isOnNutrition = false;
-//                    }
-//                } else {
-//                    Log.d(TAG, "get failed with ", task.getException());
-//                }
-//            }
-//        });
-    }
 
     private void saveMealToSP(boolean dinner, boolean breakfast, boolean lunch, boolean snack) {
         prefsUtils.saveData("dinner", dinner);
@@ -270,82 +240,86 @@ public class NutritionFragment extends Fragment {
 
 
     private void getMeal(String date) {
-        viewModel.getSumOfNutritionByDate(date).observe(this, new Observer<SumNutritionPojo>() {
-            @Override
-            public void onChanged(SumNutritionPojo nutrition) {
-                PrefsUtils prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
-                String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
-                calculationGoal = user.thermicEffect(activityLevel);
+        PrefsUtils prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
+        String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
+        final int calculationGoal = user.thermicEffect(activityLevel);
 
-                Log.d(TAG, "calculationGoal: " + calculationGoal);
+        viewModel.getSumOfNutritionByDate(date)
+                .observe(this, new Observer<List<SumNutritionPojo>>() {
+                    @Override
+                    public void onChanged(List<SumNutritionPojo> nutrition) {
+                        if(!nutrition.isEmpty()) {
+                            for(SumNutritionPojo nutritionPojo : nutrition) {
+                                if(nutritionPojo.getMeasure().equals("g")) {
+                                     kcal += nutritionPojo.getCalories() / 100;
+                                     carbs += nutritionPojo.getCarb() / 100;
+                                     protein += nutritionPojo.getProtein() / 100;
+                                     fat += nutritionPojo.getFat() / 100;
+                                } else {
+                                    kcal += nutritionPojo.getCalories();
+                                    carbs += nutritionPojo.getCarb();
+                                    protein += nutritionPojo.getProtein();
+                                    fat += nutritionPojo.getFat();
+                                }
+                            }
+                            tvGoal.setText(String.valueOf(calculationGoal));
+                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
+                            tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
+                            tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
+                            tvFood.setText(String.format(Locale.getDefault(), "%.1f", kcal));
 
-                tvFood.setText(String.format(Locale.getDefault(), "%.0f", nutrition.getCalories()));
-                tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg", nutrition.getCarb()));
-                tvProtien.setText(String.format(Locale.getDefault(), "%.0fg", nutrition.getProtein()));
-                tvFat.setText(String.format(Locale.getDefault(), "%.0fg", nutrition.getFat()));
+                            float remaining = calculationGoal - kcal + caloriesBurned;
+                            tvRemaining.setText(String.format(Locale.getDefault(), "%.1f", remaining));
 
-                tvFood.setText(String.format(Locale.getDefault(), "%.0f", nutrition.getCalories()));
-                tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getCarb(), calculationGoal / 2));
-                tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getProtein(), calculationGoal * 20 / 100));
-                tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", nutrition.getFat(), calculationGoal * 30 / 100));
-                tvRemaining.setText(String.format(Locale.getDefault(), "%.0f", calculationGoal - kcal + Integer.parseInt(tvExercise.getText().toString())));
-
-                updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-                updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-                updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
-            }
-        });
-    }
+                            updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                            updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                            updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
+                        }
+                    }
+                });
 
 
-    private void getUserDataAndSetGoal() {
-//        final ProgressDialog progressdialog = new ProgressDialog(getActivity());
-//        progressdialog.setMessage("Please Wait....");
-//        progressdialog.show();
+//        viewModel.getSumOfNutritionByDate(date)
+//                .observe(this, new Observer<SumNutritionPojo>() {
+//            @SuppressLint("SetTextI18n")
+//            @Override
+//            public void onChanged(SumNutritionPojo nutrition) {
+//                if(nutrition != null) {
 //
-//        db.collection(UserRegister.FIRE_BASE_USERS).document(FireBaseInit.getEmailRegister()).get()
-//                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                        user = documentSnapshot.toObject(UserRegister.class);
-//
-//                        assert user != null;
-//                        calculationGoal = user.thermicEffect(user.getActivityLevel());
-//
-//                        tvGoal.setText(String.valueOf(calculationGoal));
-//                        tvCarbs.setText(String.format(Locale.getDefault(), "%.0fg of %dg", carbs, calculationGoal / 2));
-//                        tvProtien.setText(String.format(Locale.getDefault(), "%.0fg of %dg", protein, calculationGoal * 20 / 100));
-//                        tvFat.setText(String.format(Locale.getDefault(), "%.0fg of %dg", fat, calculationGoal * 30 / 100));
-//
-//                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-//                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-//                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
-//
-//                        progressdialog.hide();
+//                    if(nutrition.getCalories() > 10000) {
+//                        kcal[0] = nutrition.getCalories() / 100;
+//                        carbs = nutrition.getCarb() / 100;
+//                        protein = nutrition.getProtein() / 100;
+//                        fat = nutrition.getFat() / 100;
 //                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                });
+//
+//                    tvGoal.setText(String.valueOf(calculationGoal));
+//                    tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
+//                    tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
+//                    tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
+//                    tvFood.setText(String.format(Locale.getDefault(), "%.1f", kcal[0]));
+//
+//                    float remaining = calculationGoal - kcal[0] + caloriesBurned;
+//                    tvRemaining.setText(String.format(Locale.getDefault(), "%.1f", remaining));
+//
+//                    updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+//                    updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+//                    updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
+//                }
+//            }
+//        });
     }
 
     private void updateProgressColor(RoundCornerProgressBar roundCornerProgressBar, float nutrition, int calculationGoal) {
         float fractionToPercent = nutrition / calculationGoal * 100;
-        try {
-            roundCornerProgressBar.setProgress(fractionToPercent);
-            float progress = roundCornerProgressBar.getProgress();
-            if (progress <= 50) {
-                roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.yellow_dolly));
-            } else if (progress > 75 && progress <= 100) {
-                roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_green_600));
-            } else if (progress > 100) {
-                roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_red_500));
-            }
-        } catch (Exception e) {
-            Log.i(TAG, "updateProgressColor: " + e.getMessage());
+        roundCornerProgressBar.setProgress(fractionToPercent);
+        float progress = roundCornerProgressBar.getProgress();
+        if (progress <= 49.99) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.yellow_dolly));
+        } else if (progress >= 50 && progress <= 99.9) {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_green_600));
+        } else {
+            roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_red_500));
         }
     }
 
@@ -547,8 +521,18 @@ public class NutritionFragment extends Fragment {
         });
     }
 
-    private void waterTrackerSaved(String waterTracker) {
-        viewModel.addNewWaterTracker(new WaterTracker(Event.getTodayData(), waterTracker));
+    private void waterTrackerSaved(final String waterQty) {
+        viewModel.getWaterTracker(Event.getTodayData()).observe(this, new Observer<WaterTracker>() {
+            @Override
+            public void onChanged(WaterTracker waterTracker) {
+                if(waterTracker != null) {
+                    waterTracker.setWaterQty(waterQty);
+                    viewModel.updateWaterTracker(waterTracker);
+                } else {
+                    viewModel.addNewWaterTracker(new WaterTracker(Event.getTodayData(), waterQty));
+                }
+            }
+        });
     }
 
     private String monthAdded(int month) {

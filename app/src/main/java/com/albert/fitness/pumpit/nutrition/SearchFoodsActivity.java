@@ -23,12 +23,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.adapter.CommonListAdapter;
 import com.albert.fitness.pumpit.adapter.FoodListAdapter;
 import com.albert.fitness.pumpit.api.RestApi;
 import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.model.nutrition.Common;
-import com.albert.fitness.pumpit.model.nutrition.CommonListResponse;
 import com.albert.fitness.pumpit.model.nutrition.FoodListResponse;
 import com.albert.fitness.pumpit.model.nutrition.Foods;
 import com.albert.fitness.pumpit.model.nutrition.room.AltMeasures;
@@ -58,18 +55,16 @@ public class SearchFoodsActivity extends AppCompatActivity {
 
     private String TAG = "SearchFoodsActivity";
     public static ArrayList<Foods> mListItem = new ArrayList<>();
-    private ArrayList<Common> commonArrayList = new ArrayList<>();
+//    private ArrayList<Common> commonArrayList = new ArrayList<>();
+//    CommonListAdapter commonListAdapter;
     FoodListAdapter foodListAdapter;
-    CommonListAdapter commonListAdapter;
     RecyclerView rvList;
     Button btnSaveAllFood;
     TextView tvEmpty;
     RestApi api;
     private Foods foods = new Foods();
     private MaterialSearchBar searchBar;
-    private PrefsUtils prefsUtils;
     private NutritionViewModel viewModel;
-    private boolean isInFoodId = true;
     private int foodId;
     ProgressBar pb;
 
@@ -77,7 +72,6 @@ public class SearchFoodsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_foods);
-        prefsUtils = new PrefsUtils(this, PrefsUtils.NUTRITION);
         viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
         getLastFoodId();
 
@@ -221,39 +215,39 @@ public class SearchFoodsActivity extends AppCompatActivity {
     }
 
 
-    private void getCommonList() {
-        FoodRequest foodRequest = null;
-        final String search = searchBar.getText();
-
-        if (search.length() == 0) {
-            Toast.makeText(this, "Please Enter food name", Toast.LENGTH_SHORT).show();
-        } else {
-            foodRequest = new FoodRequest(search);
-        }
-
-        Call<CommonListResponse> call = api.foodListInstant(Global.x_app_id, Global.x_app_key, foodRequest);
-
-        call.enqueue(new Callback<CommonListResponse>() {
-            @SuppressLint("ShowToast")
-            @Override
-            public void onResponse(@NonNull Call<CommonListResponse> call, @NonNull Response<CommonListResponse> response) {
-                if (response.body() != null) {
-                    commonArrayList = response.body().getFoods();
-                    Log.d(TAG, "LOLO:" + commonArrayList.get(0).getFoodName());
-
-                    commonListAdapter = new CommonListAdapter(SearchFoodsActivity.this, commonArrayList);
-                    rvList.setAdapter(commonListAdapter);
-                } else {
-                    Toast.makeText(SearchFoodsActivity.this, R.string.no_data_found, Toast.LENGTH_SHORT);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<CommonListResponse> call, @NonNull Throwable t) {
-                t.printStackTrace();
-            }
-        });
-    }
+//    private void getCommonList() {
+//        FoodRequest foodRequest = null;
+//        final String search = searchBar.getText();
+//
+//        if (search.length() == 0) {
+//            Toast.makeText(this, "Please Enter food name", Toast.LENGTH_SHORT).show();
+//        } else {
+//            foodRequest = new FoodRequest(search);
+//        }
+//
+//        Call<CommonListResponse> call = api.foodListInstant(Global.x_app_id, Global.x_app_key, foodRequest);
+//
+//        call.enqueue(new Callback<CommonListResponse>() {
+//            @SuppressLint("ShowToast")
+//            @Override
+//            public void onResponse(@NonNull Call<CommonListResponse> call, @NonNull Response<CommonListResponse> response) {
+//                if (response.body() != null) {
+//                    commonArrayList = response.body().getFoods();
+//                    Log.d(TAG, "LOLO:" + commonArrayList.get(0).getFoodName());
+//
+//                    commonListAdapter = new CommonListAdapter(SearchFoodsActivity.this, commonArrayList);
+//                    rvList.setAdapter(commonListAdapter);
+//                } else {
+//                    Toast.makeText(SearchFoodsActivity.this, R.string.no_data_found, Toast.LENGTH_SHORT);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<CommonListResponse> call, @NonNull Throwable t) {
+//                t.printStackTrace();
+//            }
+//        });
+//    }
 
     private void checkFoodNameExisting() {
         if (!mListItem.isEmpty()) {
@@ -263,7 +257,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
                             @Override
                             public void onChanged(Integer id) {
                                 if (id == null) {
-                                    saveNutrition(foods);
+                                   saveNutrition(foods);
                                 } else {
                                     Log.d(TAG, "Save Food: NOT SAVING FoodNameExisting + id: " + id);
                                     getAltMeasuresId(id, foods);
@@ -319,20 +313,24 @@ public class SearchFoodsActivity extends AppCompatActivity {
         }
 
         viewModel.addNewAllNutrition(foodsObjList, nutritionList, fullNutritionList, altMeasuresList, photoList, tagsList);
-        getAltMeasuresId(foodId, foods);
+       // getAltMeasuresId(foodId, foods);
         foodId++;
+
+        Event.saveEvent(this);
 
         Toast.makeText(SearchFoodsActivity.this, "Save successfully", Toast.LENGTH_SHORT).show();
         finish();
     }
 
-    private void getAltMeasuresId(int id, final Foods foods) {
+
+    private void getAltMeasuresId(final int id, final Foods foods) {
         viewModel.getAltMeasuresIdByFoodId(id).observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer measuresId) {
                 if (measuresId != null) {
-                    Log.d(TAG, "getAltMeasuresId: " + measuresId + " foodId: " + foodId + " qty: " + foods.getServingQty());
-                    viewModel.addNewFoodLog(new FoodLog(foodId, measuresId, foods.getServingQty(), getEatType(), Event.getTodayData()));
+                    Log.d(TAG, "getAltMeasuresId: " + measuresId + " foodId: " + id + " qty: " + foods.getServingQty());
+                    viewModel.addNewFoodLog(new FoodLog(id, measuresId, foods.getServingQty(), getEatType(), Event.getTodayData()));
+                    Event.saveEvent(SearchFoodsActivity.this);
                 }
             }
         });

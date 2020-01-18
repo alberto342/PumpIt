@@ -55,8 +55,8 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
     private UserRegister user = new UserRegister();
     private TextView tvCarbs, tvProtien, tvFat;
-    private int calculationGoal;
     private NutritionViewModel viewModel;
+    private float kcal=0, protein=0, fat=0, carbs=0;
 
     @SuppressLint("LongLogTag")
     @Override
@@ -192,22 +192,38 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     }
 
     private void getMeal(String date) {
+        PrefsUtils prefsUtils = new PrefsUtils(ShowAllNutritionActivity.this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
+        String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
+        final int calculationGoal = user.thermicEffect(activityLevel);
+
         viewModel.getSumOfNutritionByDate(date)
-                .observe(this, new Observer<SumNutritionPojo>() {
+                .observe(this, new Observer<List<SumNutritionPojo>>() {
                     @Override
-                    public void onChanged(SumNutritionPojo nutrition) {
-                        if (nutrition != null) {
-                            PrefsUtils prefsUtils = new PrefsUtils(ShowAllNutritionActivity.this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
-                            String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
-                            calculationGoal = user.thermicEffect(activityLevel);
+                    public void onChanged(List<SumNutritionPojo> nutrition) {
+                        if(!nutrition.isEmpty()) {
+                            for(SumNutritionPojo pojo : nutrition) {
+                                if(pojo.getMeasure().equals("g")) {
+                                    float result = 100/ pojo.getServingWeightGrams();
 
-                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", nutrition.getCarb(), calculationGoal / 2));
-                            tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", nutrition.getProtein(), calculationGoal * 20 / 100));
-                            tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", nutrition.getFat(), calculationGoal * 30 / 100));
+                                    carbs += pojo.getCarb() / 100 * pojo.getQty();
+                                    protein += pojo.getProtein() / 100 * pojo.getQty();
+                                    fat += pojo.getFat() / 100 * pojo.getQty();
 
-                            updateProgressColor(progressCarbs, nutrition.getCarb(), calculationGoal / 2);
-                            updateProgressColor(progressProtien, nutrition.getProtein(), calculationGoal * 20 / 100);
-                            updateProgressColor(progressFat, nutrition.getFat(), calculationGoal * 30 / 100);
+                                } else {
+                                    carbs += pojo.getCarb() * pojo.getQty();
+                                    protein += pojo.getProtein() * pojo.getQty();
+                                    fat += pojo.getFat() * pojo.getQty();
+                                }
+                            }
+
+
+                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
+                            tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
+                            tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
+
+                            updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                            updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                            updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
                         }
                     }
                 });
@@ -224,10 +240,6 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                             totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" +
                                             " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ",
                                     nutrition.getCalories(), nutrition.getCarb(), nutrition.getProtein(), nutrition.getFat()));
-
-                            updateProgressColor(progressCarbs, nutrition.getCarb(), calculationGoal / 2);
-                            updateProgressColor(progressProtien, nutrition.getProtein(), calculationGoal * 20 / 100);
-                            updateProgressColor(progressFat, nutrition.getFat(), calculationGoal * 30 / 100);
                         }
                     }
                 });
@@ -244,17 +256,18 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                     public void onChanged(List<QueryNutritionItem> queryNutritionItems) {
                         if (!queryNutritionItems.isEmpty()) {
                             visibleNutrition(type);
-
                             for (int i = 0; i < queryNutritionItems.size(); i++) {
-                                float calories = queryNutritionItems.get(i).getCalories();
-                                float protein = queryNutritionItems.get(i).getProtein();
-                                float carbohydrate = queryNutritionItems.get(i).getTotalCarbohydrate();
 
-                                Log.d(TAG, "onChanged: cal " + calories + " pro " + protein);
+                                    float calories = queryNutritionItems.get(i).getCalories();
+                                    float protein = queryNutritionItems.get(i).getProtein();
+                                    float carbohydrate = queryNutritionItems.get(i).getTotalCarbohydrate();
 
-                                queryNutritionItems.get(i).setCalories(calories * newCalAltMeasure);
-                                queryNutritionItems.get(i).setProtein(protein * newCalAltMeasure);
-                                queryNutritionItems.get(i).setTotalCarbohydrate(carbohydrate * newCalAltMeasure);
+                                    Log.d(TAG, "onChanged: cal " + calories + " pro " + protein);
+
+                                    queryNutritionItems.get(i).setCalories(calories * newCalAltMeasure);
+                                    queryNutritionItems.get(i).setProtein(protein * newCalAltMeasure);
+                                    queryNutritionItems.get(i).setTotalCarbohydrate(carbohydrate * newCalAltMeasure);
+
                             }
                             initRecyclerView(type, recyclerView, queryNutritionItems);
 
@@ -353,11 +366,12 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         float fractionToPercent = nutrition / calculationGoal * 100;
         roundCornerProgressBar.setProgress(fractionToPercent);
         float progress = roundCornerProgressBar.getProgress();
-        if (progress <= 50) {
+
+        if (progress <= 49.99) {
             roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.yellow_dolly));
-        } else if (progress > 75 && progress <= 100) {
+        } else if (progress >= 50 && progress <= 99.9) {
             roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_green_600));
-        } else if (progress > 100) {
+        } else {
             roundCornerProgressBar.setProgressColor(getResources().getColor(R.color.md_red_500));
         }
     }

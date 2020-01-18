@@ -140,7 +140,7 @@ public class NutritionRepository {
         return mFoodsDAO.getFoodIdByName(foodName);
     }
 
-    public LiveData<SumNutritionPojo> getSumOfNutritionByDate(String date) {
+    public LiveData<List<SumNutritionPojo>> getSumOfNutritionByDate(String date) {
         return foodLogDAO.getSumOfNutritionByDate(date);
     }
 
@@ -151,6 +151,9 @@ public class NutritionRepository {
     public LiveData<SumNutritionPojo> getSumOfNutritionByDateAndMealTypeWithGrams(String date, String type) {
         return foodLogDAO.getSumOfNutritionByDateAndMealTypeWithGrams(date, type);
     }
+
+
+
 
     public LiveData<List<QueryNutritionItem>> getNutritionItem(String date, String type) {
         return mFoodsDAO.getNutritionItem(date, type);
@@ -175,6 +178,10 @@ public class NutritionRepository {
 
     public LiveData<List<WaterTracker>> getAllWaterTracker() {
         return waterTrackerDAO.getAllWaterTracker();
+    }
+
+    public LiveData<WaterTracker> getWaterTracker(String date) {
+        return waterTrackerDAO.getWaterTracker(date);
     }
 
     public void insertFoodName(final FoodsObj foodsObj) {

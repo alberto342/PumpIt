@@ -65,7 +65,7 @@ public class NutritionViewModel extends AndroidViewModel {
         return repository.getFullNutritiionByFoodId(id);
     }
 
-    public LiveData<SumNutritionPojo> getSumOfNutritionByDate(String date) {
+    public LiveData<List<SumNutritionPojo>> getSumOfNutritionByDate(String date) {
         return repository.getSumOfNutritionByDate(date);
     }
 
@@ -119,6 +119,10 @@ public class NutritionViewModel extends AndroidViewModel {
 
     public LiveData<List<QueryNutritionItem>> getNutritionItem(String date, String type) {
         return repository.getNutritionItem(date, type);
+    }
+
+    public LiveData<WaterTracker> getWaterTracker(String date) {
+        return repository.getWaterTracker(date);
     }
 
     public void addNewFoodName(FoodsObj foodsObj) {
@@ -212,5 +216,9 @@ public class NutritionViewModel extends AndroidViewModel {
 
     public void updateFoodLog(final FoodLog foodLog) {
         repository.updateFoodLog(foodLog);
+    }
+
+    public void updateWaterTracker(WaterTracker waterTracker) {
+        repository.updateWaterTracker(waterTracker);
     }
 }

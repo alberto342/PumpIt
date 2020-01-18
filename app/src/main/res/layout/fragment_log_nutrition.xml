@@ -6,14 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.albert.fitness.pumpit.fragment.logsFragment.LogNutritionFragment">
 
-    <ProgressBar
-        android:id="@+id/pb_log_nutrition"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:foregroundGravity="center"
-        android:visibility="invisible" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">

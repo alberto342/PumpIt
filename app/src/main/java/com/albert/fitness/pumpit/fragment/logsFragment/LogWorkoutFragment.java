@@ -3,40 +3,44 @@ package com.albert.fitness.pumpit.fragment.logsFragment;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.albert.fitness.pumpit.adapter.FinishWorkoutAdapter;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.albert.fitness.pumpit.model.Exercise;
+import com.albert.fitness.pumpit.model.QueryFinishWorkout;
+import com.albert.fitness.pumpit.utils.SwipeHelper;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
+import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.albert.fitness.pumpit.model.FinishTraining;
-import com.albert.fitness.pumpit.utils.SwipeHelper;
 import fitness.albert.com.pumpit.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class LogWorkoutFragment extends Fragment {
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "LogWorkoutFragment";
-    private List<FinishTraining> finishTrainingList = new ArrayList<>();
     private RecyclerView rvWorkout;
+    private CustomPlanViewModel customPlanViewModel;
+    private WelcomeActivityViewModel welcomeActivityViewModel;
+    private List<Exercise> exerciseList = new ArrayList<>();
+    private Map<String, Object> mapFinishWorkouts = new HashMap<>();
 
     public LogWorkoutFragment() {
     }
@@ -49,11 +53,14 @@ public class LogWorkoutFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_log_workout, container, false);
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        customPlanViewModel = ViewModelProviders.of(getActivity()).get(CustomPlanViewModel.class);
+        welcomeActivityViewModel = ViewModelProviders.of(getActivity()).get(WelcomeActivityViewModel.class);
         init(view);
-        getWorkoutFromFb(LogFragment.date);
+        getWorkout();
         swipe();
         Log.d(TAG, "date of exercise: " + LogFragment.date);
     }
@@ -63,37 +70,48 @@ public class LogWorkoutFragment extends Fragment {
     }
 
 
-    private void getWorkoutFromFb(String date) {
-        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-                .collection(date).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+    private void getWorkout() {
+        Set<Integer> newExerciseId = new HashSet<>();
+        String date = LogFragment.date;
 
-                if (task.isSuccessful() && task.getResult() != null) {
-                    for (int i = 0; i < task.getResult().size(); i++) {
-                        FinishTraining finishTraining = task.getResult().getDocuments().get(i).toObject(FinishTraining.class);
-                        finishTrainingList.add(finishTraining);
-                        initRecyclerView();
-
+        customPlanViewModel.getFinishWorkout(date)
+                .observe(this, queryFinishWorkouts -> {
+                    for (QueryFinishWorkout finishWorkout : queryFinishWorkouts) {
+                        newExerciseId.add(finishWorkout.getExerciseId());
                     }
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i(TAG, "field get data " + e);
-            }
-        });
+
+
+                    for (int exerciseId : newExerciseId) {
+                        welcomeActivityViewModel.getExerciseById(exerciseId)
+                                .observe(this, exercise -> {
+                                    if (exercise != null) {
+                                        exerciseList.add(exercise);
+
+                                        customPlanViewModel.getFinishWorkoutByDateAndExerciseId(date, exerciseId)
+                                                .observe(this, queryFinishWorkoutList -> {
+                                                    if (!queryFinishWorkoutList.isEmpty()) {
+                                                        for (int i = 0; i < queryFinishWorkoutList.size(); i++) {
+                                                            if (exercise.getExerciseName() != null) {
+                                                                mapFinishWorkouts.put(exercise.getExerciseName() + i, queryFinishWorkoutList.get(i).getWeight());
+                                                                mapFinishWorkouts.put(exercise.getExerciseName() + " rept " + i, queryFinishWorkoutList.get(i).getRepsNumber());
+                                                            }
+                                                        }
+                                                        mapFinishWorkouts.values().removeAll(Collections.singleton(null));
+                                                        initRecyclerView();
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                });
     }
 
     private void initRecyclerView() {
         FinishWorkoutAdapter finishWorkoutAdapter;
-
         Log.d(TAG, "initRecyclerView: init FinishWorkout recyclerView" + rvWorkout);
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvWorkout.setLayoutManager(layoutManager);
-        finishWorkoutAdapter = new FinishWorkoutAdapter(getActivity(), finishTrainingList);
+        finishWorkoutAdapter = new FinishWorkoutAdapter(getActivity(), exerciseList, mapFinishWorkouts);
         rvWorkout.setAdapter(finishWorkoutAdapter);
     }
 
@@ -107,12 +125,9 @@ public class LogWorkoutFragment extends Fragment {
                         0,
                         // R.color.colorAccent,
                         Color.parseColor("#d50000"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
+                        pos -> {
                             //    deleteItem(pos);
-                              //  deleteFromFb(pos);
-                            }
+                            //  deleteFromFb(pos);
                         }
                 ));
                 underlayButtons.add(new SwipeHelper.UnderlayButton(
@@ -120,11 +135,8 @@ public class LogWorkoutFragment extends Fragment {
                         0,
                         //R.color.md_green_500,
                         Color.parseColor("#4caf50"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
+                        pos -> {
 
-                            }
                         }
                 ));
             }

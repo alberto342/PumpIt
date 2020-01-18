@@ -4,24 +4,20 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.albert.fitness.pumpit.fragment.FragmentNavigationActivity;
 import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.model.FinishTraining;
+import com.albert.fitness.pumpit.model.QueryFinishWorkout;
 import com.albert.fitness.pumpit.model.TDEECalculator;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
-
-import java.util.List;
 
 import fitness.albert.com.pumpit.R;
 
@@ -29,17 +25,14 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
 
     private static final String TAG = "FinisherWorkoutActivity";
     private TDEECalculator tdeeCalculator = new TDEECalculator();
-    private TextView tvNewRecord;
+    //private TextView tvNewRecord;
     private TextView tvTrainingRecord;
     private TextView tvActualRecord;
     private TextView tvRest;
     private TextView tvWaste;
     private TextView tvCompleteExercise;
     private TextView tvTotalWeightCmp;
-    private int trackerExercises = 0;
-    private PrefsUtils prefsUtils;
     private CustomPlanViewModel planViewModel;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,55 +40,14 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_finisher_workout);
         setTitle("Finished Workout");
         planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
-        prefsUtils = new PrefsUtils(FinisherWorkoutActivity.this, PrefsUtils.EXERCISE);
         initView();
+        updateTrackerExercise();
         getRecord();
-    }
-
-
-    private void getRecord() {
-        planViewModel.getLastFinishTrainingById().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                planViewModel.getFinishTrainingById(integer).observe(FinisherWorkoutActivity.this, new Observer<FinishTraining>() {
-                    @Override
-                    public void onChanged(FinishTraining finishTraining) {
-                        if (finishTraining != null) {
-                            getTrackerExercise(finishTraining.getFinishId());
-                            tvTrainingRecord.setText(finishTraining.getChrTotalTraining());
-                            prefsUtils.saveData("today_date", Event.getTodayData());
-                            totalTimeRest();
-                            totalTimeWaste();
-                            totalActual();
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    private void getTrackerExercise(int id) {
-        final float[] totalWeight = {0};
-        planViewModel.getAllTrackerByFinishTrainingId(id).observe(this, new Observer<List<TrackerExercise>>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onChanged(List<TrackerExercise> trackerExercises) {
-                if (!trackerExercises.isEmpty()) {
-                    tvCompleteExercise.setText(String.valueOf(trackerExercises.size()));
-                    prefsUtils.saveData("exercise_complete", trackerExercises.size());
-
-                    for (TrackerExercise t : trackerExercises) {
-                        totalWeight[0] += t.getWeight();
-                    }
-                    tvTotalWeightCmp.setText(totalWeight[0] + " kg");
-                }
-            }
-        });
     }
 
     @SuppressLint("SetTextI18n")
     private void initView() {
-        tvNewRecord = findViewById(R.id.tv_new_record);
+        //tvNewRecord = findViewById(R.id.tv_new_record);
         tvTrainingRecord = findViewById(R.id.tv_training_record);
         tvActualRecord = findViewById(R.id.tv_actual_record);
         tvRest = findViewById(R.id.tv_rest);
@@ -105,28 +57,60 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         TextView tvDate = findViewById(R.id.tv_date_of_day);
         tvDate.setText("○ " + UserRegister.getTodayDate() + " ○");
         Button finish = findViewById(R.id.btn_finished_workout);
-        finish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(FinisherWorkoutActivity.this, FragmentNavigationActivity.class));
-                finish();
-            }
+        finish.setOnClickListener(view -> {
+            startActivity(new Intent(FinisherWorkoutActivity.this, FragmentNavigationActivity.class));
+            finish();
         });
     }
 
+    private void updateTrackerExercise() {
+        planViewModel.getAllTrackerWhereFinishIdZero()
+                .observe(this, trackerExercises -> {
+                    if (!trackerExercises.isEmpty()) {
+                        for (final TrackerExercise exercise : trackerExercises) {
+
+                            planViewModel.getMaxIdFromFinishTraining()
+                                    .observe(FinisherWorkoutActivity.this, id -> {
+                                        if (id != null) {
+                                            exercise.setFinishTrainingId(id);
+                                            //  trackerExercise.setFinishTrainingId(id);
+                                            Log.d(TAG, "getMaxIdFromFinishTraining: " + id);
+                                        } else {
+                                            exercise.setFinishTrainingId(1);
+                                            Log.d(TAG, "getMaxIdFromFinishTraining: " + id);
+                                        }
+                                    });
+                            planViewModel.updateTracker(exercise);
+                        }
+                    }
+                });
+    }
 
     @SuppressLint("SetTextI18n")
-    private void totalTimeRest() {
-        int totalRestAfterExercise = 0;
-        int totalRestBetweenSet = 0;
+    private void getRecord() {
+        PrefsUtils prefsUtils = new PrefsUtils(FinisherWorkoutActivity.this, PrefsUtils.EXERCISE);
+        final float[] totalWeight = {0};
+        final int[] totalRestBetweenSet = {0};
+        planViewModel.getFinishWorkout(Event.getTodayData())
+                .observe(this, queryFinishWorkouts -> {
+                    if (!queryFinishWorkouts.isEmpty()) {
+                        prefsUtils.saveData("today_date", Event.getTodayData());
 
-//        for (int i = 0; i < finishTrainingList.size(); i++) {
-//            totalRestBetweenSet += finishTrainingList.get(i).getRestBetweenSet() * finishTrainingList.get(i).getTrackerExercises().size();
-//            totalRestAfterExercise += finishTrainingList.get(i).getRestAfterExercise();
-//        }
-        totalRestBetweenSet = totalRestBetweenSet + totalRestAfterExercise;
+                        tvCompleteExercise.setText(String.valueOf(queryFinishWorkouts.size()));
+                        tvTrainingRecord.setText(queryFinishWorkouts.get(queryFinishWorkouts.size() - 1).getChronometer());
 
-        tvRest.setText(intIntoChronometer(totalRestBetweenSet * 1000));
+                        for (QueryFinishWorkout workout : queryFinishWorkouts) {
+                            totalWeight[0] += workout.getWeight();
+                            totalRestBetweenSet[0] += workout.getRestBetweenSet();
+                        }
+
+                        tvTotalWeightCmp.setText(totalWeight[0] + " kg");
+                        tvRest.setText(intIntoChronometer(totalRestBetweenSet[0] * 1000));
+
+                        totalTimeWaste();
+                        totalActual();
+                    }
+                });
     }
 
 
@@ -134,14 +118,8 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         int totalTrainingRecord = tdeeCalculator.splitChronometer(TAG, tvTrainingRecord.getText().toString());
         int totalTimeRest = tdeeCalculator.splitChronometer(TAG, tvRest.getText().toString());
         int totalTimeWaste;
-
-
-//        for (int i = 0; i < finishTrainingList.size(); i++) {
-//            trackerExercises += finishTrainingList.get(i).getTrackerExercises().size() * 45;
-//        }
-
+        int trackerExercises = 0;
         totalTimeWaste = totalTrainingRecord - totalTimeRest - trackerExercises;
-
         tvWaste.setText(intIntoChronometer(totalTimeWaste));
     }
 
@@ -167,6 +145,4 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         Log.d(TAG, "totalTimeRest: " + hh + ":" + mm + ":" + ss);
         return hh + ":" + mm + ":" + ss;
     }
-
-
 }

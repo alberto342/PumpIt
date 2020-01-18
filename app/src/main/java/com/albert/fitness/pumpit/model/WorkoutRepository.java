@@ -101,14 +101,33 @@ public class WorkoutRepository {
         return finishTrainingDAO.getFinishTrainingsByDate(date);
     }
 
+    public LiveData<List<QueryFinishWorkout>> getFinishWorkout(String date) {
+        return finishTrainingDAO.getFinishWorkout(date);
+    }
+
+    public LiveData<List<QueryFinishWorkout>> getFinishWorkoutByDateAndExerciseId(String date, int id) {
+        return finishTrainingDAO.getFinishWorkoutByDateAndExerciseId(date, id);
+    }
+
+    public LiveData<List<Integer>> getExerciseIdByDate(String date) {
+        return finishTrainingDAO.getExerciseIdByDate(date);
+    }
+
+    public LiveData<Integer> getMaxIdFromFinishTraining() {
+        return finishTrainingDAO.getMaxIdFromFinishTraining();
+    }
+
+    public LiveData<List<QueryLogWorkout>> getLogWorkout(String date) {
+        return finishTrainingDAO.getLogWorkout(date);
+    }
+
+    public LiveData<List<TrackerExercise>> getAllTrackerWhereFinishIdZero() {
+        return trackerExerciseDAO.getAllTrackerWhereFinishIdZero();
+    }
+
     public void insertWorkout(final WorkoutObj workout) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                workoutDAO.insert(workout);
-            }
-        });
+        myExecutor.execute(() -> workoutDAO.insert(workout));
     }
 
     public void insertPlan(final WorkoutPlanObj plan) {

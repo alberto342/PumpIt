@@ -1,5 +1,7 @@
 package com.albert.fitness.pumpit.model.nutrition.room;
 
+import androidx.room.ColumnInfo;
+
 public class SumNutritionPojo {
 
     private float calories;
@@ -7,8 +9,11 @@ public class SumNutritionPojo {
     private float cholesterol;
     private float fat;
     private float protein;
+    private String measure;
+    private int qty;
 
-
+    @ColumnInfo(name = "serving_weight_grams")
+    private int servingWeightGrams;
 
     public SumNutritionPojo() {
     }
@@ -19,6 +24,30 @@ public class SumNutritionPojo {
         this.cholesterol = cholesterol;
         this.fat = fat;
         this.protein = protein;
+    }
+
+    public String getMeasure() {
+        return measure;
+    }
+
+    public void setMeasure(String measure) {
+        this.measure = measure;
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
+    }
+
+    public int getServingWeightGrams() {
+        return servingWeightGrams;
+    }
+
+    public void setServingWeightGrams(int servingWeightGrams) {
+        this.servingWeightGrams = servingWeightGrams;
     }
 
     public float getProtein() {

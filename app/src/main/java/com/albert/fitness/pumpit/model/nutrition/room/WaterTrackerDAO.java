@@ -28,4 +28,7 @@ public interface WaterTrackerDAO {
     @Query("SELECT * FROM water_tracker_table WHERE tracker_id==:id")
     LiveData<List<WaterTracker>> getWaterTrackers(int id);
 
+    @Query("SELECT * from water_tracker_table WHERE date==:date ")
+    LiveData<WaterTracker> getWaterTracker(String date);
+
 }

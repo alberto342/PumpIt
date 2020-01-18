@@ -362,6 +362,9 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
                     @Override
                     public void onChanged(Integer id) {
                         if (id != null) {
+
+                            Log.d(TAG, "updateNutrition qty: " + quantityViewCustom.getQuantity() + " altId: " + id + " foodLoodId: " + foodLogs.getFoodId());
+
                             foodLogs.setAltMeasuresId(id);
                             foodLogs.setQty(quantityViewCustom.getQuantity());
                             viewModel.updateFoodLog(foodLogs);

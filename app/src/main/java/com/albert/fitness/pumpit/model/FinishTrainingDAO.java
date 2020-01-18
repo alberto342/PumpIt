@@ -40,4 +40,38 @@ public interface FinishTrainingDAO {
     @Query("SELECT * FROM finish_training_table WHERE training_id==:id")
     LiveData<List<FinishTraining>> getFinishTrainings(int id);
 
+    @Query("SELECT MAX(finish_id) FROM finish_training_table")
+    LiveData<Integer> getMaxIdFromFinishTraining();
+
+    @Query("SELECT exercise_id FROM finish_training_table " +
+            "INNER JOIN training_table ON finish_training_table.training_id = training_table.training_id " +
+            "WHERE finish_training_table.date ==:date")
+    LiveData<List<Integer>> getExerciseIdByDate(String date);
+
+
+    @Query("SELECT time, rest_between_set, rest_after_exercise, size_of_rept, reps_number, weight, exercise_id " +
+            "FROM finish_training_table " +
+            "INNER JOIN training_table ON finish_training_table.training_id = training_table.training_id " +
+            "INNER JOIN tracker_exercise_table ON finish_training_table.finish_id = tracker_exercise_table.finish_training_id " +
+            "WHERE finish_training_table.date ==:date")
+    LiveData<List<QueryLogWorkout>> getLogWorkout(String date);
+
+
+    @Query("SELECT chr_total_training, total_calories_burned, time, exercise_id,rest_after_exercise, " +
+            "rest_between_set, size_of_rept, reps_number, weight " +
+            "FROM finish_training_table " +
+            "INNER JOIN training_table ON finish_training_table.training_id = training_table.training_id " +
+            "INNER JOIN tracker_exercise_table ON training_table.training_id = tracker_exercise_table.training_id " +
+            "WHERE finish_training_table.date ==:date " +
+            "ORDER BY exercise_id")
+    LiveData<List<QueryFinishWorkout>> getFinishWorkout(String date);
+
+    @Query("SELECT chr_total_training, total_calories_burned, time, exercise_id,rest_after_exercise, rest_between_set, size_of_rept, reps_number, weight FROM finish_training_table " +
+            "INNER JOIN training_table ON finish_training_table.training_id = training_table.training_id " +
+            "INNER JOIN tracker_exercise_table ON training_table.training_id = tracker_exercise_table.training_id " +
+            "WHERE finish_training_table.date ==:date " +
+            "AND exercise_id==:id " +
+            "ORDER BY exercise_id")
+    LiveData<List<QueryFinishWorkout>> getFinishWorkoutByDateAndExerciseId(String date, int id);
+
 }

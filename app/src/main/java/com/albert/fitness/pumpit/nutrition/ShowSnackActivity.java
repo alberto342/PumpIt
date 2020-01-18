@@ -371,6 +371,7 @@ public class ShowSnackActivity extends AppCompatActivity implements QuantityView
                 });
         foodLogs.setQty(quantityViewCustom.getQuantity());
         viewModel.updateFoodLog(foodLogs);
+
     }
 
 

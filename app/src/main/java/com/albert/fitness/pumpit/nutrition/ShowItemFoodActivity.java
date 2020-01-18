@@ -17,22 +17,14 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.albert.fitness.pumpit.adapter.FirestoreFoodListAdapter;
 import com.albert.fitness.pumpit.adapter.FoodListAdapter;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.model.nutrition.Foods;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,7 +32,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import fitness.albert.com.pumpit.R;
@@ -62,7 +53,7 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
     private String qty;
     private boolean testOnce = false;
     private PrefsUtils prefsUtils = new PrefsUtils();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    //private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String TAG = "ShowItemFoodActivity";
     private ProgressDialog progressdialog;
     private boolean isGrams = true;
@@ -197,77 +188,77 @@ public class ShowItemFoodActivity extends AppCompatActivity implements QuantityV
 //                })
 
 
-        db.collection(Foods.NUTRITION)
-                .document(getEmailRegister()).collection(Foods.BREAKFAST)
-                .document(user.getTodayDate()).collection(Foods.All_NUTRITION)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        progressdialog.hide();
-                        if (task.isSuccessful()) {
-                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
-                                Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-                                foodList.add(foods);
-
-                                if (FirestoreFoodListAdapter.foodName.equals(foodList.get(i).getFoodName())
-                                        && FirestoreFoodListAdapter.qty == foodList.get(i).getServingQty()
-                                        && FirestoreFoodListAdapter.unit.equals(foodList.get(i).getServingUnit())) {
-                                    Picasso.get()
-                                            .load(foodList.get(i).getPhoto().getHighres())
-                                            .placeholder(R.mipmap.ic_launcher)
-                                            .error(R.mipmap.ic_launcher)
-                                            .into(foodItem);
-
-                                    //Save to float
-                                    kcal = foodList.get(i).getNfCalories();
-                                    fat = foodList.get(i).getNfTotalFat();
-                                    protein = foodList.get(i).getNfProtein();
-                                    carbs = foodList.get(i).getNfTotalCarbohydrate();
-                                    servingWeightGrams = foodList.get(i).getServingWeightGrams();
-                                    qty = String.valueOf(foodList.get(i).getServingQty());
-
-                                    quantityViewCustom.setQuantity(Integer.parseInt(qty));
-
-                                    //Get Serving Unit
-                                    if (foodList.get(i).getServingUnit() == null) {
-                                        spinnerList.add("Packet");
-                                    } else {
-                                        spinnerList.add(foodList.get(i).getServingUnit());
-                                    }
-
-                                    //add value into list
-                                    for (int r = 0; r < foodList.get(i).getAltMeasures().size(); r++) {
-                                        spinnerList.add(foodList.get(i).getAltMeasures().get(r).getMeasure()); // Measure name
-                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServingWeight())); // Measure value
-
-
-                                        //add spinner to the map
-                                        if (servingWeightList.isEmpty()) {
-                                            allServingWeight.put("package", servingWeightGrams);
-                                        } else {
-                                            allServingWeight.put(foodList.get(i).getAltMeasures().get(r).getMeasure(), Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServingWeight()));
-                                        }
-                                    }
-                                }
-                            }
-                            tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal));
-                            tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat));
-                            tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein));
-                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs));
-                            quantityViewCustom.setQuantity(Integer.parseInt(qty));
-
-                            addItemsOnSpinner();
-                        }
-                    }
-                })
-
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+//        db.collection(Foods.NUTRITION)
+//                .document(getEmailRegister()).collection(Foods.BREAKFAST)
+//                .document(user.getTodayDate()).collection(Foods.All_NUTRITION)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        progressdialog.hide();
+//                        if (task.isSuccessful()) {
+//                            for (int i = 0; i < task.getResult().getDocuments().size(); i++) {
+//                                Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
+//                                foodList.add(foods);
+//
+//                                if (FirestoreFoodListAdapter.foodName.equals(foodList.get(i).getFoodName())
+//                                        && FirestoreFoodListAdapter.qty == foodList.get(i).getServingQty()
+//                                        && FirestoreFoodListAdapter.unit.equals(foodList.get(i).getServingUnit())) {
+//                                    Picasso.get()
+//                                            .load(foodList.get(i).getPhoto().getHighres())
+//                                            .placeholder(R.mipmap.ic_launcher)
+//                                            .error(R.mipmap.ic_launcher)
+//                                            .into(foodItem);
+//
+//                                    //Save to float
+//                                    kcal = foodList.get(i).getNfCalories();
+//                                    fat = foodList.get(i).getNfTotalFat();
+//                                    protein = foodList.get(i).getNfProtein();
+//                                    carbs = foodList.get(i).getNfTotalCarbohydrate();
+//                                    servingWeightGrams = foodList.get(i).getServingWeightGrams();
+//                                    qty = String.valueOf(foodList.get(i).getServingQty());
+//
+//                                    quantityViewCustom.setQuantity(Integer.parseInt(qty));
+//
+//                                    //Get Serving Unit
+//                                    if (foodList.get(i).getServingUnit() == null) {
+//                                        spinnerList.add("Packet");
+//                                    } else {
+//                                        spinnerList.add(foodList.get(i).getServingUnit());
+//                                    }
+//
+//                                    //add value into list
+//                                    for (int r = 0; r < foodList.get(i).getAltMeasures().size(); r++) {
+//                                        spinnerList.add(foodList.get(i).getAltMeasures().get(r).getMeasure()); // Measure name
+//                                        servingWeightList.add(Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServingWeight())); // Measure value
+//
+//
+//                                        //add spinner to the map
+//                                        if (servingWeightList.isEmpty()) {
+//                                            allServingWeight.put("package", servingWeightGrams);
+//                                        } else {
+//                                            allServingWeight.put(foodList.get(i).getAltMeasures().get(r).getMeasure(), Float.valueOf(foodList.get(i).getAltMeasures().get(r).getServingWeight()));
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                            tvEnergy.setText(String.format(Locale.getDefault(), "%.0f", kcal));
+//                            tvFat.setText(String.format(Locale.getDefault(), "%.2f", fat));
+//                            tvProtein.setText(String.format(Locale.getDefault(), "%.2f", protein));
+//                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2f", carbs));
+//                            quantityViewCustom.setQuantity(Integer.parseInt(qty));
+//
+//                            addItemsOnSpinner();
+//                        }
+//                    }
+//                })
+//
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                });
     }
 
 

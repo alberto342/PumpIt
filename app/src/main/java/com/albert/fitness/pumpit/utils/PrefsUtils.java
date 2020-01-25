@@ -9,11 +9,12 @@ public class PrefsUtils {
     public static final String DEFAULT_PLAN = "default_plan";
     public static final String EXERCISE = "exercise";
     public static final String DEFAULT_EXERCISE = "defaultExercise";
-    public static final String PLAN_NAME = "planName";
     public static final String START_WORKOUT = "start_workout";
     public static final String SETTINGS_PREFERENCES_FILE = "fitness.albert.com.pumpit_preferences";
-    public static final String NUTRITION = "nutrition";
     public static final String ACTIVITY_LEVEL = "ACTIVITY_LEVEL";
+    public static final String HAVE_WORKOUT_EVENT = "have_workout_event";
+    public static final String HAVE_NUTRITION_EVENT = "have_nutrition_event";
+    public static final String DONE_EXERCISE = "done_exercise";
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor editor;
 

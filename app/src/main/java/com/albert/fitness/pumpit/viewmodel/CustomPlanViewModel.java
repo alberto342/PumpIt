@@ -172,6 +172,14 @@ public class CustomPlanViewModel extends AndroidViewModel {
         repository.updateTrackerExercise(trackerExercise);
     }
 
+    public void deleteFinishTrainingByFinishId(int finishId) {
+        repository.deleteFinishTrainingByFinishId(finishId);
+    }
+
+    public void deleteTrackerExerciseByTrackerId(int trackerId) {
+        repository.deleteTrackerExerciseByTrackerId(trackerId);
+    }
+
     public void deleteWorkoutPlan(WorkoutPlanObj plan) {
         repository.deletePlan(plan);
     }

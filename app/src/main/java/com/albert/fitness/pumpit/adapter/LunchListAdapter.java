@@ -104,10 +104,10 @@ public class LunchListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
-//    public void removeItem(int position) {
-//        foodsList.remove(position);
-//        notifyItemRemoved(position);
-//    }
+    public void removeItem(int position) {
+        nutritionItems.remove(position);
+        notifyItemRemoved(position);
+    }
 //
 //
 //    public void restoreItem(Foods item, int position) {

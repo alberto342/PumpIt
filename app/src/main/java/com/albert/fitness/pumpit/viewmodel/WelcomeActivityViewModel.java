@@ -28,22 +28,22 @@ public class WelcomeActivityViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Exercise>> getAllExercise() {
-        return allExercise = repository.allExercise();
+        return repository.allExercise();
     }
 
     public LiveData<List<ExerciseCategory>> getAllCategories() {
-        return allCategories=repository.getCategories();
+        return repository.getCategories();
     }
 
     public LiveData<Exercise> getExerciseById(int id) {
-        return exerciseById = repository.getExerciseById(id);
+        return  repository.getExerciseById(id);
     }
 
     public LiveData<List<Exercise>> getExerciseOfASelectedCategory(int categoryId) {
-        return  exerciseOfSelectedCategory=repository.getExercise(categoryId);
+        return  repository.getExercise(categoryId);
     }
 
     public LiveData<List<Exercise>> getExerciseOfASelectedSecondaryCategory(int categoryId) {
-        return secondaryCategory = repository.getExerciseBySecondaryCategory(categoryId);
+        return  repository.getExerciseBySecondaryCategory(categoryId);
     }
 }

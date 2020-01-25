@@ -1,55 +1,52 @@
 package com.albert.fitness.pumpit.workout;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.fragment.logsFragment.LogFragment;
-import com.albert.fitness.pumpit.utils.FireBaseInit;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.albert.fitness.pumpit.adapter.LogTrackerExerciseAdapter;
+import com.albert.fitness.pumpit.fragment.logsFragment.LogWorkoutFragment;
+import com.albert.fitness.pumpit.model.TrackerExercise;
+import com.albert.fitness.pumpit.utils.SwipeHelper;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import fitness.albert.com.pumpit.R;
 
-import com.albert.fitness.pumpit.model.FinishTraining;
-
 public class ShowLogExerciseActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final String TAG = "ShowLogExerciseActivity";
-    private LinearLayout container;
-    private TextView set, exerciseName;
-    private EditText reps, weight;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private RecyclerView recyclerView;
+    private LogTrackerExerciseAdapter trackerExerciseAdapter;
+    private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
+    private CustomPlanViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_log_exercise);
-
+        viewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
         setTitle("Log Exercise");
         initView();
         getExtra();
+        swipe();
     }
 
     private void initView() {
-        container = findViewById(R.id.contener_layout_log);
-        exerciseName = findViewById(R.id.log_show_exercise_name);
         ImageView save = findViewById(R.id.btn_save_logExercise);
         ImageView btnPlus = findViewById(R.id.btn_plus_log);
         ImageView btnMinus = findViewById(R.id.btn_minus_log);
+        recyclerView = findViewById(R.id.rv_log_tracker);
 
         save.setOnClickListener(this);
         btnPlus.setOnClickListener(this);
@@ -61,81 +58,91 @@ public class ShowLogExerciseActivity extends AppCompatActivity implements View.O
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_save_logExercise:
-                saveChangeIntoFb();
+                saveChange();
                 break;
             case R.id.btn_plus_log:
-                addLayoutSetsAndRep();
+                trackerExerciseList.add(new TrackerExercise(0, 0.0f));
+                initRecyclerView();
                 break;
             case R.id.btn_minus_log:
-                if (container.getChildCount() > 1) {
-                    container.removeViewAt(container.getChildCount() - 1);
+                if (trackerExerciseList.size() > 1) {
+                    trackerExerciseList.remove(trackerExerciseList.size() - 1);
+                    initRecyclerView();
                 }
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     private void getExtra() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            exerciseName.setText(extras.getString("exerciseName"));
+            this.setTitle(extras.getString("exerciseName"));
             int size = extras.getInt("trackerExercisesSize");
             for (int i = 0; i < size; i++) {
-                addLayoutSetsAndRep();
-
-                reps.setText(String.valueOf(extras.getInt("repNumber" + i)));
-                weight.setText(String.valueOf(extras.getFloat("weight" + i)));
-
-                Log.d(TAG, "reps: " + reps.getText());
+                int repNumber = extras.getInt("repNumber" + i);
+                float weight = extras.getFloat("weight" + i);
+                trackerExerciseList.add(new TrackerExercise(repNumber, weight));
+                initRecyclerView();
             }
         }
     }
 
-    @SuppressLint({"InflateParams", "SetTextI18n"})
-    private void addLayoutSetsAndRep() {
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.layout_log_sets_and_rep, null);
-        initLayoutReps(rowView);
-        container.addView(rowView, container.getChildCount() - 1);
-        set.setText("Set " + container.getChildCount());
-        Log.d(TAG, "Layout log added successfully");
-    }
-
-    private void initLayoutReps(View rowView) {
-        set = rowView.findViewById(R.id.tv_log_sets_num);
-        reps = rowView.findViewById(R.id.et_log_reps);
-        weight = rowView.findViewById(R.id.et_log_weight);
+    private void initRecyclerView() {
+        String TAG = "ShowLogExerciseActivity";
+        Log.d(TAG, "initRecyclerView: init FinishWorkout recyclerView" + recyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        trackerExerciseAdapter = new LogTrackerExerciseAdapter(trackerExerciseList);
+        recyclerView.setAdapter(trackerExerciseAdapter);
     }
 
 
-    // TODO: 2019-06-21 update fb
-
-    private void saveChangeIntoFb() {
-        final String[] docId = new String[1];
-
-        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-                .collection(LogFragment.date).whereEqualTo("exerciseName", exerciseName.getText().toString())
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+    private void swipe() {
+        new SwipeHelper(this, recyclerView) {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        docId[0] = document.getId();
-                        Log.d(TAG, "document getId " + document.getId() + " => " + document.getData());
-                    }
-                }
+            public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "Delete",
+                        0,
+                        // R.color.colorAccent,
+                        Color.parseColor("#d50000"),
+                        pos -> {
+                            trackerExerciseAdapter.deleteItem(pos);
+                            Log.d("iiii", "instantiateUnderlayButton: " + LogWorkoutFragment.finishIdList.get(pos));
+                           // viewModel.deleteFinishTrainingByFinishId(LogWorkoutFragment.finishIdList.get(pos));
+                        }
+                ));
             }
-        });
-
-//         DocumentReference doc = db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-//                .collection(UserRegister.getTodayDate()).document(docId[0]);
+        };
+    }
 
 
+    private void saveChange() {
+
+        for (int i = 0; i < trackerExerciseList.size(); i++) {
+            Log.d("222", "saveChange: " + trackerExerciseList.get(i).getTrackerId());
+
+            Log.d("222", "saveChange: " + trackerExerciseList.get(i).getWeight());
+
+        }
 
 
+//        for (int i = 0; i < trackerExerciseList.size(); i++) {
+//            if (trackerExerciseList.get(i).getTrackerId() == 0) {
+//                int id = trackerExerciseList.get(0).getTrackerId();
+//                trackerExerciseList.get(i).setTrackerId(id);
+//                viewModel.updateTracker(trackerExerciseList.get(i));
+//            } else {
+//                viewModel.addNewTracker(trackerExerciseList.get(i));
+//               // viewModel.updateTracker(trackerExerciseList.get(i));
+//            }
+//        }
+        finish();
+    }
 
-
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
     }
 }

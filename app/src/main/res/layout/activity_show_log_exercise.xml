@@ -7,29 +7,15 @@
     android:background="@color/background"
     tools:context="com.albert.fitness.pumpit.workout.ShowLogExerciseActivity">
 
-    <TextView
-        android:id="@+id/log_show_exercise_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="25dp"
-        android:hint="Exercise name"
-        android:textColor="@color/myBlue"
-        android:textColorHint="@color/gray"
-        android:textSize="18dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_save_logExercise"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/log_show_exercise_name">
+        app:layout_constraintTop_toTopOf="parent">
 
 
         <LinearLayout
@@ -43,6 +29,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/log_show_exercise_name">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_log_tracker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
 

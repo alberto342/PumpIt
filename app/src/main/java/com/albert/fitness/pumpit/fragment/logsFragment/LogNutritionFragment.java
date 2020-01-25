@@ -9,11 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,27 +21,35 @@ import com.albert.fitness.pumpit.adapter.BreakfastListAdapter;
 import com.albert.fitness.pumpit.adapter.DinnerListAdapter;
 import com.albert.fitness.pumpit.adapter.LunchListAdapter;
 import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
+import com.albert.fitness.pumpit.model.Event;
 import com.albert.fitness.pumpit.model.nutrition.Foods;
+import com.albert.fitness.pumpit.model.nutrition.room.QueryNutritionItem;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.utils.SwipeHelper;
+import com.albert.fitness.pumpit.viewmodel.NutritionViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import fitness.albert.com.pumpit.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class LogNutritionFragment extends Fragment {
 
     private final String TAG = "LogNutritionFragment";
     private RecyclerView rvBreakfast, rvLunch, rvDinner, rvSnacks;
-    private ArrayList<Foods> breakfastList = new ArrayList<>();
-    private ArrayList<Foods> lunchList = new ArrayList<>();
-    private ArrayList<Foods> dinnerList = new ArrayList<>();
-    private ArrayList<Foods> snacksList = new ArrayList<>();
-    private TextView tvBreakfast, tvLunch, tvDinner, tvSnacks;
+    private List<QueryNutritionItem> breakfastList = new ArrayList<>();
+    private List<QueryNutritionItem> lunchList = new ArrayList<>();
+    private List<QueryNutritionItem> dinnerList = new ArrayList<>();
+    private List<QueryNutritionItem> snacksList = new ArrayList<>();
+    //private TextView tvBreakfast, tvLunch, tvDinner, tvSnacks;
     private LinearLayout llBreakfast, llLunch, llDinner, llSnacks;
+    private NutritionViewModel viewModel;
+    private String date = LogFragment.date;
+    private boolean breakfastIsEmpty, lunchIsEmpty, dinnerIsEmpty, snacksIsEmpty;
+    private BreakfastListAdapter breakfastListAdapter;
+    private LunchListAdapter lunchListAdapter;
+    private SnacksListAdapter snacksListAdapter;
+    private DinnerListAdapter dinnerListAdapter;
 
 
     public LogNutritionFragment() {
@@ -57,15 +65,16 @@ public class LogNutritionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
         rvBreakfast = view.findViewById(R.id.rv_log_Breakfast);
         rvLunch = view.findViewById(R.id.rv_log_lunch);
         rvDinner = view.findViewById(R.id.rv_log_dinner);
         rvSnacks = view.findViewById(R.id.rv_log_snacks);
 
-        tvBreakfast = view.findViewById(R.id.tv_log_breakfast);
-        tvLunch = view.findViewById(R.id.tv_log_lunch);
-        tvDinner = view.findViewById(R.id.tv_log_dinner);
-        tvSnacks = view.findViewById(R.id.tv_log_snacks);
+//        tvBreakfast = view.findViewById(R.id.tv_log_breakfast);
+//        tvLunch = view.findViewById(R.id.tv_log_lunch);
+//        tvDinner = view.findViewById(R.id.tv_log_dinner);
+//        tvSnacks = view.findViewById(R.id.tv_log_snacks);
 
         llBreakfast = view.findViewById(R.id.breakfast_container);
         llDinner = view.findViewById(R.id.dinner_container);
@@ -78,200 +87,180 @@ public class LogNutritionFragment extends Fragment {
         rvDinner.setNestedScrollingEnabled(false);
         rvSnacks.setNestedScrollingEnabled(false);
 
-        getNutrition(LogFragment.date, Foods.BREAKFAST);
-        getNutrition(LogFragment.date, Foods.LUNCH);
-        getNutrition(LogFragment.date, Foods.DINNER);
-        getNutrition(LogFragment.date, Foods.SNACK);
+        getNutrition(Foods.BREAKFAST);
+        getNutrition(Foods.LUNCH);
+        getNutrition(Foods.DINNER);
+        getNutrition(Foods.SNACK);
 
-        swipe(rvBreakfast);
-        swipe(rvDinner);
-        swipe(rvLunch);
-        swipe(rvSnacks);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+        swipe(rvBreakfast,Foods.BREAKFAST);
+        swipe(rvDinner,Foods.LUNCH);
+        swipe(rvLunch,Foods.DINNER);
+        swipe(rvSnacks,Foods.SNACK);
     }
 
 
-    private void getNutrition(final String date, final String nutritionType) {
-
-
-
-//        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister()).collection(nutritionType)
-//                .document(date).collection(Foods.All_NUTRITION).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                progressBar.setVisibility(View.GONE);
-//
-//                if(task.getResult().isEmpty()) {
-//                    Foods foods = null;
-//                    getNutrition(nutritionType, false, foods);
-//                }
-//                if (task.isSuccessful() && task.getResult() != null) {
-//                    for (int i = 0; i < task.getResult().size(); i++) {
-//                        Foods foods = task.getResult().getDocuments().get(i).toObject(Foods.class);
-//                        getNutrition(nutritionType, true, foods);
-//                    }
-//                }
-//                Log.d(TAG, "Successfully receive data from fb");
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Log.i(TAG, "Filed receive data " + e);
-//            }
-//        });
+    private void getNutrition(final String nutritionType) {
+        viewModel.getNutritionItem(date, nutritionType)
+                .observe(this, nutritionItems -> {
+                    if (!nutritionItems.isEmpty()) {
+                        getNutrition(nutritionType, true, nutritionItems);
+                    } else {
+                        getNutrition(nutritionType, false, nutritionItems);
+                    }
+                });
     }
 
 
-    private void getNutrition(String nutritionType, boolean isOnFb, Foods foods) {
+    private void getNutrition(String nutritionType, boolean isNotEmpty, List<QueryNutritionItem> foods) {
         switch (nutritionType) {
             case Foods.BREAKFAST:
-                if (isOnFb) {
-                    breakfastList.add(foods);
+                if (isNotEmpty) {
+                    breakfastList.addAll(foods);
                     initBreakfastRecyclerView();
                     llBreakfast.setVisibility(View.VISIBLE);
                 } else {
                     llBreakfast.setVisibility(View.GONE);
+                    breakfastIsEmpty = true;
                 }
                 break;
             case Foods.LUNCH:
-                if (isOnFb) {
-                    lunchList.add(foods);
+                if (isNotEmpty) {
+                    lunchList.addAll(foods);
                     initLunchRecyclerView();
                     llLunch.setVisibility(View.VISIBLE);
                 } else {
                     llLunch.setVisibility(View.GONE);
+                    lunchIsEmpty = true;
                 }
                 break;
             case Foods.DINNER:
-                if (isOnFb) {
-                    dinnerList.add(foods);
+                if (isNotEmpty) {
+                    dinnerList.addAll(foods);
                     initDinnerRecyclerView();
                     llDinner.setVisibility(View.VISIBLE);
                 } else {
                     llDinner.setVisibility(View.GONE);
+                    dinnerIsEmpty = true;
                 }
                 break;
             case Foods.SNACK:
-                if (isOnFb) {
-                    snacksList.add(foods);
+                if (isNotEmpty) {
+                    snacksList.addAll(foods);
                     initSnacksRecyclerView();
                     llSnacks.setVisibility(View.VISIBLE);
                 } else {
                     llSnacks.setVisibility(View.GONE);
+                    snacksIsEmpty = true;
                 }
+        }
+
+        if (breakfastIsEmpty && lunchIsEmpty && dinnerIsEmpty && snacksIsEmpty) {
+            listIsEmpty();
         }
     }
 
     private void initBreakfastRecyclerView() {
-        BreakfastListAdapter breakfastListAdapter;
+
         Log.d(TAG, "initRecyclerView: init LogNutrition recyclerView" + breakfastList);
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvBreakfast.setLayoutManager(layoutManager);
-      //  breakfastListAdapter = new BreakfastListAdapter(getActivity(), breakfastList);
-       // rvBreakfast.setAdapter(breakfastListAdapter);
+        breakfastListAdapter = new BreakfastListAdapter(getActivity(), breakfastList);
+        rvBreakfast.setAdapter(breakfastListAdapter);
     }
 
     private void initLunchRecyclerView() {
-        LunchListAdapter lunchListAdapter;
+
         Log.d(TAG, "initRecyclerView: init LogNutrition recyclerView" + rvLunch);
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvLunch.setLayoutManager(layoutManager);
-//        lunchListAdapter = new LunchListAdapter(getActivity(), lunchList);
-//        rvLunch.setAdapter(lunchListAdapter);
+        lunchListAdapter = new LunchListAdapter(getActivity(), lunchList);
+        rvLunch.setAdapter(lunchListAdapter);
     }
 
 
     private void initDinnerRecyclerView() {
-        DinnerListAdapter dinnerListAdapter;
+
         Log.d(TAG, "initRecyclerView: init LogNutrition recyclerView" + dinnerList);
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvDinner.setLayoutManager(layoutManager);
-//        dinnerListAdapter = new DinnerListAdapter(getActivity(), dinnerList);
-//        rvDinner.setAdapter(dinnerListAdapter);
+        dinnerListAdapter = new DinnerListAdapter(getActivity(), dinnerList);
+        rvDinner.setAdapter(dinnerListAdapter);
     }
 
     private void initSnacksRecyclerView() {
-        SnacksListAdapter snacksListAdapter;
+
         Log.d(TAG, "initRecyclerView: init LogNutrition recyclerView" + snacksList);
         @SuppressLint("WrongConstant")
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvSnacks.setLayoutManager(layoutManager);
-//        snacksListAdapter = new SnacksListAdapter(getActivity(), snacksList);
-//        rvSnacks.setAdapter(snacksListAdapter);
+        snacksListAdapter = new SnacksListAdapter(getActivity(), snacksList);
+        rvSnacks.setAdapter(snacksListAdapter);
     }
 
 
-    private void swipe(RecyclerView recyclerView) {
+    private void swipe(RecyclerView recyclerView, String type) {
         new SwipeHelper(getContext(), recyclerView) {
             @Override
             public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
                 underlayButtons.add(new SwipeHelper.UnderlayButton(
                         "Delete",
                         0,
-
                         Color.parseColor("#d50000"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
-                                //    deleteItem(pos);
-                                //  deleteFromFb(pos);
-                               // delNutrition(Foods.BREAKFAST, breakfastList, pos);
-
-                            }
-                        }
+                        pos -> delNutrition(type, pos)
                 ));
                 underlayButtons.add(new SwipeHelper.UnderlayButton(
                         "Edit",
                         0,
                         Color.parseColor("#4caf50"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
+                        pos -> {
 
-                            }
                         }
                 ));
             }
         };
     }
 
-//    private void delNutrition(final String nutrition, ArrayList<Foods> foodsArrayList, int pos) {
-//        db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-//                .collection(nutrition).document(UserRegister.getTodayDate()).collection(Foods.All_NUTRITION)
-//                .whereEqualTo("food_name", foodsArrayList.get(pos).getFoodName())
-//                .whereEqualTo("serving_qty", foodsArrayList.get(pos).getServingQty()).get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            for (int i = 0; i < Objects.requireNonNull(task.getResult()).size(); i++) {
-//                                String docId = task.getResult().getDocuments().get(i).getId();
-//                                Log.d(TAG, "id: " + docId);
-//                                db.collection(Foods.NUTRITION).document(FireBaseInit.getEmailRegister())
-//                                        .collection(nutrition).document(UserRegister.getTodayDate())
-//                                        .collection(Foods.All_NUTRITION).document(docId)
-//                                        .delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void aVoid) {
-//                                        Log.i(TAG, "Success delete doc");
-//                                    }
-//                                });
-//                            }
-//                        }
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.i(TAG, "failed " + e.getMessage());
-//                    }
-//                });
-//    }
+
+    private void delNutrition(final String type, int pos) {
+        int logId = 0;
+        switch (type) {
+            case Foods.BREAKFAST:
+                logId = breakfastList.get(pos).getLogId();
+                breakfastListAdapter.removeItem(pos);
+                break;
+            case Foods.DINNER:
+                logId = dinnerList.get(pos).getLogId();
+                dinnerListAdapter.removeItem(pos);
+                break;
+            case Foods.LUNCH:
+                logId = lunchList.get(pos).getLogId();
+                lunchListAdapter.removeItem(pos);
+                break;
+            case Foods.SNACK:
+                logId = snacksList.get(pos).getLogId();
+                snacksListAdapter.removeItem(pos);
+        }
+        int finalLogId = logId;
+        viewModel.getFoodLogByLogId(logId)
+                .observe(this, foodLog -> {
+                    if (foodLog != null) {
+                        viewModel.deleteFoodLog(foodLog);
+                        Log.d(TAG, "onSwiped: Deleted successfully lodId: " + finalLogId);
+                    }
+                });
+
+    }
+    private void listIsEmpty() {
+        PrefsUtils prefsUtils = new PrefsUtils(getContext(), PrefsUtils.HAVE_WORKOUT_EVENT);
+        boolean haveWorkout = prefsUtils.getBoolean(date, false);
+        if(haveWorkout) {
+            Event.removeEvent(getContext());
+        }
+
+//        PrefsUtils p = new PrefsUtils(getContext(), PrefsUtils.HAVE_NUTRITION_EVENT);
+//        p.saveData(date, true);
+    }
 }

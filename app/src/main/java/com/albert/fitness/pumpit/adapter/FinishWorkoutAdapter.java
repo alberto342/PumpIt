@@ -1,6 +1,7 @@
 package com.albert.fitness.pumpit.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.helper.BitmapFromAssent;
 import com.albert.fitness.pumpit.model.Exercise;
+import com.albert.fitness.pumpit.workout.ShowLogExerciseActivity;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -86,22 +88,21 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         holder.itemView.setOnClickListener(v -> {
+                Intent i = new Intent(mContext, ShowLogExerciseActivity.class);
+                i.putExtra("exerciseName", exerciseList.get(position).getExerciseName());
+                i.putExtra("trackerExercisesSize", mapFinishWorkouts.size());
 
+                for(int p=0; p<mapFinishWorkouts.size(); p++) {
+                    if(mapFinishWorkouts.get(exerciseList.get(position).getExerciseName() + " rept " + p) != null) {
+                        int repNumber = (int) mapFinishWorkouts.get(exerciseList.get(position).getExerciseName() + " rept " + p);
+                        float weight = (float) mapFinishWorkouts.get(exerciseList.get(position).getExerciseName() + p);
 
-//                Intent i = new Intent(mContext, ShowLogExerciseActivity.class);
-//                i.putExtra("exerciseName", finishTrainingList.get(position).getExerciseName());
-//                i.putExtra("trackerExercisesSize", finishTrainingList.get(position).getTrackerExercises().size());
-//
-//                for(int p=0; p<finishTrainingList.get(position).getTrackerExercises().size(); p++) {
-//                    int repNumber =  finishTrainingList.get(position).getTrackerExercises().get(p).getRepNumber();
-//                    float weight = finishTrainingList.get(position).getTrackerExercises().get(p).getWeight();
-//
-//                    i.putExtra("repNumber" + p, repNumber);
-//                    i.putExtra("weight" + p, weight);
-//                }
-//                mContext.startActivity(i);
+                        i.putExtra("repNumber" + p, repNumber);
+                        i.putExtra("weight" + p, weight);
+                    }
+                }
+                mContext.startActivity(i);
         });
-
     }
 
 
@@ -111,10 +112,11 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
 
-//    public void removeItem(int position) {
-//        finishTrainingList.remove(position);
-//        notifyItemRemoved(position);
-//    }
+    public void removeItem(int position) {
+        exerciseList.remove(position);
+        notifyItemRemoved(position);
+    }
+
 
     @Override
     public long getItemId(int position) {

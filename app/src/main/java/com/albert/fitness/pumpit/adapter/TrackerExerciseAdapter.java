@@ -49,11 +49,8 @@ public class TrackerExerciseAdapter extends RecyclerView.Adapter<TrackerExercise
         holder.listenerReps.updatePosition(position);
 
         holder.tvCount.setText(String.valueOf(position+1));
-
-
         holder.edWight.setText(String.valueOf(trackerList.get(position).getWeight()));
         holder.edReps.setText(String.valueOf(trackerList.get(position).getRepsNumber()));
-
 
         if(trackerList.get(position).getWeight() == 0.0) {
             holder.edWight.setText("");

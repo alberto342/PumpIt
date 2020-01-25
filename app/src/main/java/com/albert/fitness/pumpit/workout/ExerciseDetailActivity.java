@@ -2,11 +2,9 @@ package com.albert.fitness.pumpit.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -69,28 +67,25 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
 
     private void setTheFragmentSwitch() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_exercise_nav);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                switch (item.getItemId()) {
-                    case R.id.nav_img_exercise:
-                        toolbar.setTitle(exerciseName);
-                        transaction.replace(R.id.container_workout_tracker, imgExerciseFragment).commit();
-                        return true;
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            switch (item.getItemId()) {
+                case R.id.nav_img_exercise:
+                    toolbar.setTitle(exerciseName);
+                    transaction.replace(R.id.container_workout_tracker, imgExerciseFragment).commit();
+                    return true;
 
-                    case R.id.nav_instructions:
-                        toolbar.setTitle("Instructions");
-                        transaction.replace(R.id.container_workout_tracker, instructionsExerciseFragment).commit();
-                        return true;
+                case R.id.nav_instructions:
+                    toolbar.setTitle("Instructions");
+                    transaction.replace(R.id.container_workout_tracker, instructionsExerciseFragment).commit();
+                    return true;
 
-                    case R.id.nav_set_peps:
-                        toolbar.setTitle("Workout Tracker");
-                        transaction.replace(R.id.container_workout_tracker, trackerExerciseFragment).commit();
-                        return true;
-                }
-                return true;
+                case R.id.nav_set_peps:
+                    toolbar.setTitle("Workout Tracker");
+                    transaction.replace(R.id.container_workout_tracker, trackerExerciseFragment).commit();
+                    return true;
             }
+            return true;
         });
     }
 
@@ -106,35 +101,5 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
                 isFavoriteSelected = false;
             }
         }
-    }
-
-
-    //method for save exercise and favorite, if selected, need to see if save button is click
-    private void saveDataIntoFb() {
-
-//        final PrefsUtils savePref = new PrefsUtils(this, "exercise");
-//        String getPlanId = savePref.getString("planName", "");
-//        List<Training> trainingList = new ArrayList<>();
-//
-//        Training training = new Training(id,"","","","","");
-
-//
-//        Training training = new Training(ExerciseAdapter.exerciseName, 0, 0, 20, ExerciseAdapter.exerciseImg, UserRegister.getTodayDate(), false, 5.6f);
-//
-//        db.collection(WorkoutPlans.WORKOUT_PLANS).document(FireBaseInit.getEmailRegister()).collection(Workout.WORKOUT_NAME).document(getPlanId).collection(Workout.WORKOUT_DAY_NAME).
-//                document(WorkoutAdapter.workoutDayName).collection(ExerciseAdapter.exerciseName)
-//                .add(trainingList).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentReference> task) {
-//                Log.d(TAG, "DocumentSnapshot successfully written!");
-//                savePref.removeSingle(ExerciseDetailActivity.this, "exercise", "planName");
-//            }
-//        })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.d(TAG, "Error writing document", e);
-//                    }
-//                });
     }
 }

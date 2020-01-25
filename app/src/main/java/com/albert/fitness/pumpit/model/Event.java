@@ -112,10 +112,16 @@ public class Event {
     }
 
     public static void saveEvent(Context context) {
-        PrefsUtils prefsUtils = new PrefsUtils();
-        prefsUtils.createSharedPreferencesFiles(context, Event.EVENT_CALENDER);
+        PrefsUtils prefsUtils = new PrefsUtils(context, EVENT_CALENDER);
+       // prefsUtils.createSharedPreferencesFiles(context, Event.EVENT_CALENDER);
         prefsUtils.saveData(receiveFullMonth() + " TEXT", "●");
         prefsUtils.saveData(receiveFullMonth() + " COLOR", -16711936);
+    }
+
+    public static void removeEvent(Context context) {
+        PrefsUtils prefsUtils = new PrefsUtils(context, EVENT_CALENDER);
+        prefsUtils.removeSingle(context, EVENT_CALENDER,receiveFullMonth() + " TEXT");
+        prefsUtils.removeSingle(context, EVENT_CALENDER,receiveFullMonth() + " COLOR");
     }
 
     private int maxDayInMonth(int month, int year) {

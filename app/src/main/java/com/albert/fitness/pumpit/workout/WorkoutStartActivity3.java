@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 
 import fitness.albert.com.pumpit.R;
 
-public class WorkoutStartActivity extends AppCompatActivity implements OnClickListener {
+public class WorkoutStartActivity3 extends AppCompatActivity implements OnClickListener {
 
     private final String TAG = "WorkoutStartActivity";
     private TextView tvExerciseName, tvTimerUp, tvExercisesLeft;
@@ -52,9 +52,9 @@ public class WorkoutStartActivity extends AppCompatActivity implements OnClickLi
     private long timeWhenStopped = 0;
     private Chronometer mChronometer;
     private boolean isPause, countDownTimerIsRunning, isKeyboardShowing;
-    private int countExercisesLeft = 1;
+    private int countAddSets = 0, countExercisesLeft = 1;
     private ArrayList<TrackerExercise> trackerExerciseList;
-    private ArrayList<Training> trainingList = new ArrayList<>();
+    private ArrayList<Training> trainingList;
     private ArrayList<Exercise> exerciseList = new ArrayList<>();
     private CustomPlanViewModel planViewModel;
     private WelcomeActivityViewModel activityViewModel;
@@ -85,32 +85,16 @@ public class WorkoutStartActivity extends AppCompatActivity implements OnClickLi
                 .observe(this, trainings -> {
                     if (!trainings.isEmpty()) {
 
-                        for (Map.Entry<String, ?> entry : prefsKeys.entrySet()) {
-                            if (entry.getValue().toString().equals("true")) {
-                                String stKey = entry.getKey();
-                                String[] parts = stKey.split(" ");
-                                int exId = Integer.parseInt(parts[1]);
-                                exerciseId.add(exId);
-                            }
+                        if (countExercisesLeft <= trainings.size()) {
+                            getTracker(trainings.get(countExercisesLeft - 1).getTrainingId());
+                            Log.d(TAG, "getTraining: " + trainings.get(countExercisesLeft - 1).getTrainingId());
                         }
+                        tvExercisesLeft.setText(countExercisesLeft + "/" + trainings.size());
 
-                        for(Training tr: trainings) {
-                            if (!exerciseId.contains(tr.getExerciseId())) {
-                                trainingList.add(tr);
-                            }
+                        trainingList = (ArrayList<Training>) trainings;
+                        for (Training t : trainings) {
+                            getExercise(t.getExerciseId());
                         }
-
-                        
-                        if (countExercisesLeft <= trainingList.size()) {
-                            getTracker(trainingList.get(countExercisesLeft - 1).getTrainingId());
-                            Log.d(TAG, "getTraining: " + trainingList.get(countExercisesLeft - 1).getTrainingId());
-                        }
-                        tvExercisesLeft.setText(countExercisesLeft + "/" + trainingList.size());
-
-                        for(Training tr: trainingList) {
-                            getExercise(tr.getExerciseId());
-                        }
-
                     }
                 });
     }
@@ -592,19 +576,54 @@ public class WorkoutStartActivity extends AppCompatActivity implements OnClickLi
     private void saveDoneExercise() {
         PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.DONE_EXERCISE);
         prefsUtils.saveData(Event.getTodayData() + " " + trainingList.get(countExercisesLeft - 1).getExerciseId(),true);
-
-        PrefsUtils saveExerciseData = new PrefsUtils(this, PrefsUtils.EXERCISE);
-        saveExerciseData.saveData("exercise_date", Event.getTodayData());
-        saveExerciseData.saveData("exercise_complete",countExercisesLeft);
     }
 
 
+    //add sets exercise
+//    @SuppressLint("InflateParams")
+//    public void onAddField(View v) {
+//        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        vRowView = inflater.inflate(R.layout.layout_start_workout_reps, null);
+//        initLayoutReps(vRowView);
+//
+//        container.addView(vRowView, container.getChildCount() - 1);
+//        tvCountReps.setText(String.valueOf(countAddSets + 1));
+//
+//        if (countAddSets < trackerExerciseList.size()) {
+//            etWeight.setHint(String.valueOf(trackerExerciseList.get(countAddSets).getWeight()));
+//            etReps.setHint(String.valueOf(trackerExerciseList.get(countAddSets).getRepsNumber()));
+//        }
+//
+//        getTraining();
+//
+//        countAddSets++;
+//
+//        ivIsFinish.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (finishIsOkSelected && setWeightAndReptIntoList()) {
+//                    ivIsFinish.setImageResource(R.mipmap.ic_ok_selected);
+//                    onAddField(findViewById(R.id.ll_container_reps));
+//                    countDownTimer(trainingList.get(0).getRestBetweenSet() * 1000);
+//                    finishIsOkSelected = false;
+//                } else {
+//                    ivIsFinish.setImageResource(R.mipmap.ic_ok);
+//                    finishIsOkSelected = true;
+//                    if (countDownTimer != null) {
+//                        countDownTimer.cancel();
+//                        countDownTimer.onFinish();
+//                    }
+//                }
+//            }
+//        });
+//    }
+
     private void whatFinished() {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are you sure you what to finish ?")
                 .setCancelable(false)
                 .setPositiveButton("Yes", (dialogInterface, i) -> {
-                    startActivity(new Intent(WorkoutStartActivity.this, FinisherWorkoutActivity.class));
+                    startActivity(new Intent(WorkoutStartActivity3.this, FinisherWorkoutActivity.class));
                     finish();
                 })
                 .setNegativeButton("No", (dialogInterface, i) -> {
@@ -618,7 +637,7 @@ public class WorkoutStartActivity extends AppCompatActivity implements OnClickLi
                     countDownTimer.start();
                     dialogInterface.cancel();
                 });
-        androidx.appcompat.app.AlertDialog alertDialog = builder.create();
+        AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
 }

@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,7 +23,6 @@ import com.albert.fitness.pumpit.adapter.SnacksListAdapter;
 import com.albert.fitness.pumpit.model.Event;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.model.nutrition.Foods;
-import com.albert.fitness.pumpit.model.nutrition.room.FoodLog;
 import com.albert.fitness.pumpit.model.nutrition.room.QueryAltMeasures;
 import com.albert.fitness.pumpit.model.nutrition.room.QueryNutritionItem;
 import com.albert.fitness.pumpit.model.nutrition.room.SumNutritionPojo;
@@ -161,31 +159,28 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         snacksContainer.setVisibility(View.GONE);
     }
 
+    @SuppressLint("LongLogTag")
     private void calAltMeasures(final String date, final String type, final RecyclerView recycler) {
-        viewModel.getAltMeasuresQtyAndWeight(date, type).observe(this, new Observer<List<QueryAltMeasures>>() {
-            @SuppressLint("LongLogTag")
-            @Override
-            public void onChanged(List<QueryAltMeasures> queryAltMeasures) {
-                float calAltMeasure = 1f;
-                if (!queryAltMeasures.isEmpty()) {
-                    for (QueryAltMeasures measures : queryAltMeasures) {
-                        if (measures.getMeasure().equals("g")) {
-                            try {
-                                calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() / 100;
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            try {
-                                float weight = measures.getServingWeight() * measures.getQty();
-                                calAltMeasure = weight / measures.getServingWeightGrams();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+        viewModel.getAltMeasuresQtyAndWeight(date, type).observe(this, queryAltMeasures -> {
+            float calAltMeasure = 1f;
+            if (!queryAltMeasures.isEmpty()) {
+                for (QueryAltMeasures measures : queryAltMeasures) {
+                    if (measures.getMeasure().equals("g")) {
+                        try {
+                            calAltMeasure = measures.getServingWeight() * measures.getQty() / measures.getServingWeightGrams() / 100;
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                        Log.d(TAG, "calAltMeasure: " + calAltMeasure);
-                        getNutrition(date, type, recycler, calAltMeasure);
+                    } else {
+                        try {
+                            float weight = measures.getServingWeight() * measures.getQty();
+                            calAltMeasure = weight / measures.getServingWeightGrams();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
+                    Log.d(TAG, "calAltMeasure: " + calAltMeasure);
+                    getNutrition(date, type, recycler, calAltMeasure);
                 }
             }
         });
@@ -197,50 +192,44 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         final int calculationGoal = user.thermicEffect(activityLevel);
 
         viewModel.getSumOfNutritionByDate(date)
-                .observe(this, new Observer<List<SumNutritionPojo>>() {
-                    @Override
-                    public void onChanged(List<SumNutritionPojo> nutrition) {
-                        if(!nutrition.isEmpty()) {
-                            for(SumNutritionPojo pojo : nutrition) {
-                                if(pojo.getMeasure().equals("g")) {
-                                    float result = 100/ pojo.getServingWeightGrams();
+                .observe(this, nutrition -> {
+                    if(!nutrition.isEmpty()) {
+                        for(SumNutritionPojo pojo : nutrition) {
+                            if(pojo.getMeasure().equals("g")) {
+                                float result = 100/ pojo.getServingWeightGrams();
 
-                                    carbs += pojo.getCarb() / 100 * pojo.getQty();
-                                    protein += pojo.getProtein() / 100 * pojo.getQty();
-                                    fat += pojo.getFat() / 100 * pojo.getQty();
+                                carbs += pojo.getCarb() / 100 * pojo.getQty();
+                                protein += pojo.getProtein() / 100 * pojo.getQty();
+                                fat += pojo.getFat() / 100 * pojo.getQty();
 
-                                } else {
-                                    carbs += pojo.getCarb() * pojo.getQty();
-                                    protein += pojo.getProtein() * pojo.getQty();
-                                    fat += pojo.getFat() * pojo.getQty();
-                                }
+                            } else {
+                                carbs += pojo.getCarb() * pojo.getQty();
+                                protein += pojo.getProtein() * pojo.getQty();
+                                fat += pojo.getFat() * pojo.getQty();
                             }
-
-
-                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
-                            tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
-                            tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
-
-                            updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-                            updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-                            updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
                         }
+
+
+                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
+                        tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
+                        tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
+
+                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
                     }
                 });
     }
 
     private void getMealByType(String date, final String type, final TextView totalMeal) {
         viewModel.getSumOfNutritionByDateAndMealType(date, type)
-                .observe(this, new Observer<SumNutritionPojo>() {
-                    @Override
-                    public void onChanged(SumNutritionPojo nutrition) {
-                        if (nutrition != null) {
-                            nutritionName = type;
+                .observe(this, nutrition -> {
+                    if (nutrition != null) {
+                        nutritionName = type;
 
-                            totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" +
-                                            " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ",
-                                    nutrition.getCalories(), nutrition.getCarb(), nutrition.getProtein(), nutrition.getFat()));
-                        }
+                        totalMeal.setText(String.format(Locale.US, "Total: %.2f" + " Kcal.  " + "%.2f" +
+                                        " Carbs.  " + "%.2f" + " Protein.  " + "%.2f" + " Fat.  ",
+                                nutrition.getCalories(), nutrition.getCarb(), nutrition.getProtein(), nutrition.getFat()));
                     }
                 });
     }
@@ -251,42 +240,39 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
         Log.d(TAG, "getNutrition: " + newCalAltMeasure);
 
         viewModel.getNutritionItem(date, type)
-                .observe(this, new Observer<List<QueryNutritionItem>>() {
-                    @Override
-                    public void onChanged(List<QueryNutritionItem> queryNutritionItems) {
-                        if (!queryNutritionItems.isEmpty()) {
-                            visibleNutrition(type);
-                            for (int i = 0; i < queryNutritionItems.size(); i++) {
+                .observe(this, queryNutritionItems -> {
+                    if (!queryNutritionItems.isEmpty()) {
+                        visibleNutrition(type);
+                        for (int i = 0; i < queryNutritionItems.size(); i++) {
 
-                                    float calories = queryNutritionItems.get(i).getCalories();
-                                    float protein = queryNutritionItems.get(i).getProtein();
-                                    float carbohydrate = queryNutritionItems.get(i).getTotalCarbohydrate();
+                                float calories = queryNutritionItems.get(i).getCalories();
+                                float protein = queryNutritionItems.get(i).getProtein();
+                                float carbohydrate = queryNutritionItems.get(i).getTotalCarbohydrate();
 
-                                    Log.d(TAG, "onChanged: cal " + calories + " pro " + protein);
+                                Log.d(TAG, "onChanged: cal " + calories + " pro " + protein);
 
-                                    queryNutritionItems.get(i).setCalories(calories * newCalAltMeasure);
-                                    queryNutritionItems.get(i).setProtein(protein * newCalAltMeasure);
-                                    queryNutritionItems.get(i).setTotalCarbohydrate(carbohydrate * newCalAltMeasure);
+                                queryNutritionItems.get(i).setCalories(calories * newCalAltMeasure);
+                                queryNutritionItems.get(i).setProtein(protein * newCalAltMeasure);
+                                queryNutritionItems.get(i).setTotalCarbohydrate(carbohydrate * newCalAltMeasure);
 
-                            }
-                            initRecyclerView(type, recyclerView, queryNutritionItems);
+                        }
+                        initRecyclerView(type, recyclerView, queryNutritionItems);
 
-                            switch (type) {
-                                case Foods.BREAKFAST:
-                                    getMealByType(date, type, tvTotalBreakfast);
-                                    break;
-                                case Foods.DINNER:
-                                    getMealByType(date, type, tvTotalDinner);
-                                    break;
-                                case Foods.LUNCH:
-                                    getMealByType(date, type, tvTotalLunch);
-                                    break;
-                                case Foods.SNACK:
-                                    getMealByType(date, type, tvTotalSnacks);
-                            }
-                            for (QueryNutritionItem i : queryNutritionItems) {
-                                Log.d(TAG, "get Nutrition name for adapter: " + i.getFoodName());
-                            }
+                        switch (type) {
+                            case Foods.BREAKFAST:
+                                getMealByType(date, type, tvTotalBreakfast);
+                                break;
+                            case Foods.DINNER:
+                                getMealByType(date, type, tvTotalDinner);
+                                break;
+                            case Foods.LUNCH:
+                                getMealByType(date, type, tvTotalLunch);
+                                break;
+                            case Foods.SNACK:
+                                getMealByType(date, type, tvTotalSnacks);
+                        }
+                        for (QueryNutritionItem i : queryNutritionItems) {
+                            Log.d(TAG, "get Nutrition name for adapter: " + i.getFoodName());
                         }
                     }
                 });
@@ -349,13 +335,10 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                 Log.d(TAG, "onSwiped: " + logId);
 
                 viewModel.getFoodLogByLogId(logId)
-                        .observe(ShowAllNutritionActivity.this, new Observer<FoodLog>() {
-                            @Override
-                            public void onChanged(FoodLog foodLog) {
-                                if (foodLog != null) {
-                                    viewModel.deleteFoodLog(foodLog);
-                                    Log.d(TAG, "onSwiped: Deleted successfully lodId" + logId);
-                                }
+                        .observe(ShowAllNutritionActivity.this, foodLog -> {
+                            if (foodLog != null) {
+                                viewModel.deleteFoodLog(foodLog);
+                                Log.d(TAG, "onSwiped: Deleted successfully lodId" + logId);
                             }
                         });
             }

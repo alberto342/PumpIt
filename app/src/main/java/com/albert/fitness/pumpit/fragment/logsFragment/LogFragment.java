@@ -45,7 +45,6 @@ public class LogFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initCalendar(view);
-
         calenderOnClick();
     }
 
@@ -72,13 +71,13 @@ public class LogFragment extends Fragment {
     private void calenderOnClick() {
         calenderEvent.initCalderItemClickCallback(dayContainerModel -> {
             String monthFromNum = monthAdded(dayContainerModel.getMonthNumber());
-
             if (dayContainerModel.getDay() < 10) {
                 date = "0" + dayContainerModel.getDay() + "-" + monthFromNum + "-" + dayContainerModel.getYear();
             } else {
                 date = dayContainerModel.getDay() + "-" + monthFromNum + "-" + dayContainerModel.getYear();
             }
             Log.d(TAG, "date: " + date);
+
             Objects.requireNonNull(getActivity()).startActivity(new Intent(getActivity(), LogTabActivity.class));
         });
         calenderEvent.setOnMonthChangedListener((calenderEvent, numMonth, month, year) -> {

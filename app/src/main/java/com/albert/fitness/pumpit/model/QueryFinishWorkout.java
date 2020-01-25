@@ -21,6 +21,10 @@ public class QueryFinishWorkout {
     @ColumnInfo(name = "reps_number")
     private int repsNumber;
     private float weight;
+    @ColumnInfo(name = "tracker_id")
+    private int trackerId;
+    @ColumnInfo(name = "finish_id")
+    private int finishId;
 
     public String getChronometer() {
         return chronometer;
@@ -92,5 +96,21 @@ public class QueryFinishWorkout {
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    public int getTrackerId() {
+        return trackerId;
+    }
+
+    public void setTrackerId(int trackerId) {
+        this.trackerId = trackerId;
+    }
+
+    public int getFinishId() {
+        return finishId;
+    }
+
+    public void setFinishId(int finishId) {
+        this.finishId = finishId;
     }
 }

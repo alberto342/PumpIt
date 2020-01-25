@@ -21,7 +21,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.albert.fitness.pumpit.model.Event;
@@ -114,34 +113,28 @@ public class TrackerExerciseFragment extends Fragment {
     }
 
     private void getTraining() {
-        planViewModel.getTrainingByWorkoutId(workoutId).observe(this, new Observer<List<Training>>() {
-            @Override
-            public void onChanged(List<Training> trainings) {
-                if (trainings.isEmpty()) {
-                    sizeOfTraining = 0;
-                } else {
-                    sizeOfTraining = trainings.size();
-                }
+        planViewModel.getTrainingByWorkoutId(workoutId).observe(this, trainings -> {
+            if (trainings.isEmpty()) {
+                sizeOfTraining = 0;
+            } else {
+                sizeOfTraining = trainings.size();
             }
         });
     }
 
     private void setTrackerExercise() {
-        btnAddTracker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (weight.getText().toString().isEmpty() && reps.getText().toString().isEmpty()) {
-                    setError(weight, "Enter weight");
-                    return;
-                }
-                if (reps.getText().toString().isEmpty()) {
-                    setError(reps, "Enter reps");
-                    return;
-                }
-                addNewView(weight.getText().toString(), reps.getText().toString());
-                weight.setText("");
-                reps.setText("");
+        btnAddTracker.setOnClickListener(v -> {
+            if (weight.getText().toString().isEmpty() && reps.getText().toString().isEmpty()) {
+                setError(weight, "Enter weight");
+                return;
             }
+            if (reps.getText().toString().isEmpty()) {
+                setError(reps, "Enter reps");
+                return;
+            }
+            addNewView(weight.getText().toString(), reps.getText().toString());
+            weight.setText("");
+            reps.setText("");
         });
     }
 
@@ -185,13 +178,10 @@ public class TrackerExerciseFragment extends Fragment {
         }
 
         ImageButton buttonRemove = newView.findViewById(R.id.iv_remove_tracker);
-        buttonRemove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((LinearLayout) newView.getParent()).removeView(newView);
-                trackerList.remove(newText);
-                trackerList.remove(newTex2);
-            }
+        buttonRemove.setOnClickListener(v -> {
+            ((LinearLayout) newView.getParent()).removeView(newView);
+            trackerList.remove(newText);
+            trackerList.remove(newTex2);
         });
         container.addView(newView);
         trackerList.add(newText);
@@ -243,33 +233,27 @@ public class TrackerExerciseFragment extends Fragment {
 
 
     private void getLastTraining() {
-        planViewModel.getLastId().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                if (integer != null && isInTraining) {
-                    //saveTracker(integer);
-                    prefsUtils.saveData("training_id", integer);
-                    trainingId = integer + 1;
-                    isInTraining = false;
-                } else if (prefsUtils.getInt("training_id", -1) == -1) {
-                    trainingId = 1;
-                } else {
-                    trainingId = prefsUtils.getInt("training_id", 1) + 1;
-                }
+        planViewModel.getLastId().observe(this, integer -> {
+            if (integer != null && isInTraining) {
+                //saveTracker(integer);
+                prefsUtils.saveData("training_id", integer);
+                trainingId = integer + 1;
+                isInTraining = false;
+            } else if (prefsUtils.getInt("training_id", -1) == -1) {
+                trainingId = 1;
+            } else {
+                trainingId = prefsUtils.getInt("training_id", 1) + 1;
             }
         });
     }
 
     private void saveTrackerFromStartWorkout(final Training training) {
-        planViewModel.getWorkoutByWorkoutDay(Event.getDayName()).observe(this, new Observer<WorkoutObj>() {
-            @Override
-            public void onChanged(WorkoutObj workoutObj) {
-                if (workoutObj == null) {
-                    createWorkoutDayName();
-                }
-                getWorkoutOfCurrentDayAndAddTraining(training);
-                goToStartWorkoutActivity();
+        planViewModel.getWorkoutByWorkoutDay(Event.getDayName()).observe(this, workoutObj -> {
+            if (workoutObj == null) {
+                createWorkoutDayName();
             }
+            getWorkoutOfCurrentDayAndAddTraining(training);
+            goToStartWorkoutActivity();
         });
     }
 
@@ -282,23 +266,17 @@ public class TrackerExerciseFragment extends Fragment {
     }
 
     private void getWorkoutOfCurrentDayAndAddTraining(final Training training) {
-        planViewModel.getWorkoutByWorkoutDay(Event.getDayName()).observe(this, new Observer<WorkoutObj>() {
-            @Override
-            public void onChanged(WorkoutObj workoutObj) {
-                if (workoutObj != null && createWorkout) {
-                    Log.d(TAG, "getWorkoutId: " + workoutObj.getWorkoutId());
-                    training.setWorkoutId(workoutObj.getWorkoutId());
+        planViewModel.getWorkoutByWorkoutDay(Event.getDayName()).observe(this, workoutObj -> {
+            if (workoutObj != null && createWorkout) {
+                Log.d(TAG, "getWorkoutId: " + workoutObj.getWorkoutId());
+                training.setWorkoutId(workoutObj.getWorkoutId());
 
-                    // executor = Executors.newFixedThreadPool(5);
-                    Executor myExecutor = Executors.newSingleThreadExecutor();
-                    myExecutor.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            planViewModel.addNewTrainingAndTracker(training, trackerExerciseList);
-                            createWorkout = false;
-                        }
-                    });
-                }
+                // executor = Executors.newFixedThreadPool(5);
+                Executor myExecutor = Executors.newSingleThreadExecutor();
+                myExecutor.execute(() -> {
+                    planViewModel.addNewTrainingAndTracker(training, trackerExerciseList);
+                    createWorkout = false;
+                });
             }
         });
     }

@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -65,35 +64,28 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     }
 
     private void loadAllExercise() {
-        welcomeActivityViewModel.getAllExercise().observe(this, new Observer<List<Exercise>>() {
-            @Override
-            public void onChanged(List<Exercise> exercises) {
-                exerciseList = (ArrayList<Exercise>) exercises;
-                initRecyclerView();
-            }
+        welcomeActivityViewModel.getAllExercise().observe(this, exercises -> {
+            exerciseList = (ArrayList<Exercise>) exercises;
+            initRecyclerView();
         });
     }
 
 
     private void loadExerciseByCategory(int category) {
-        welcomeActivityViewModel.getExerciseOfASelectedCategory(category).observe(this, new Observer<List<Exercise>>() {
-            @Override
-            public void onChanged(List<Exercise> exercises) {
-                exerciseList = (ArrayList<Exercise>) exercises;
-                initRecyclerView();
-            }
+        welcomeActivityViewModel.getExerciseOfASelectedCategory(category)
+                .observe(this, exercises -> {
+            exerciseList = (ArrayList<Exercise>) exercises;
+            initRecyclerView();
         });
     }
 
 
     private void loadExerciseBySecondaryCategory(int category) {
-        welcomeActivityViewModel.getExerciseOfASelectedSecondaryCategory(category).observe(this, new Observer<List<Exercise>>() {
-            @Override
-            public void onChanged(List<Exercise> exercises) {
-                exerciseList = (ArrayList<Exercise>) exercises;
-                initRecyclerView();
-            }
-        });
+        welcomeActivityViewModel.getExerciseOfASelectedSecondaryCategory(category)
+                .observe(this, exercises -> {
+                    exerciseList = (ArrayList<Exercise>) exercises;
+                    initRecyclerView();
+                });
     }
 
 
@@ -126,17 +118,13 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
         exerciseAdapter.setItems(exerciseList);
         mRecyclerView.setAdapter(exerciseAdapter);
         Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);
-        exerciseAdapter.setListener(new ExerciseAdapter.OnItemClickListener() {
-            @SuppressLint("LongLogTag")
-            @Override
-            public void onItemClick(Exercise item) {
-                Log.d(TAG, "Exercise position: " + item.getExerciseId());
-                Intent i = new Intent(ShowExerciseResultActivity.this, ExerciseDetailActivity.class);
-                i.putExtra("exerciseId", item.getExerciseId());
-                i.putExtra("exerciseName", item.getExerciseName());
-                i.putExtra("imgUrl", item.getImgName());
-                startActivity(i);
-            }
+        exerciseAdapter.setListener(item -> {
+            Log.d(TAG, "Exercise position: " + item.getExerciseId());
+            Intent i = new Intent(ShowExerciseResultActivity.this, ExerciseDetailActivity.class);
+            i.putExtra("exerciseId", item.getExerciseId());
+            i.putExtra("exerciseName", item.getExerciseName());
+            i.putExtra("imgUrl", item.getImgName());
+            startActivity(i);
         });
     }
 

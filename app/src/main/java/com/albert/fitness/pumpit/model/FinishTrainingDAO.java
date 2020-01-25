@@ -24,6 +24,9 @@ public interface FinishTrainingDAO {
     @Insert
     void insertFinishTrainingAndTracker(FinishTraining finishTraining, List<TrackerExercise> trackerExercises);
 
+    @Query("DELETE FROM finish_training_table WHERE finish_id ==:id")
+    void deleteFinishTrainingByFinishId(int id);
+
     @Query("SELECT * FROM finish_training_table")
     LiveData<List<FinishTraining>> getAllFinishTraining();
 
@@ -58,7 +61,8 @@ public interface FinishTrainingDAO {
 
 
     @Query("SELECT chr_total_training, total_calories_burned, time, exercise_id,rest_after_exercise, " +
-            "rest_between_set, size_of_rept, reps_number, weight " +
+            "rest_between_set, size_of_rept, reps_number, weight, tracker_exercise_table.tracker_id, " +
+            "finish_training_table.finish_id " +
             "FROM finish_training_table " +
             "INNER JOIN training_table ON finish_training_table.training_id = training_table.training_id " +
             "INNER JOIN tracker_exercise_table ON training_table.training_id = tracker_exercise_table.training_id " +
@@ -66,7 +70,10 @@ public interface FinishTrainingDAO {
             "ORDER BY exercise_id")
     LiveData<List<QueryFinishWorkout>> getFinishWorkout(String date);
 
-    @Query("SELECT chr_total_training, total_calories_burned, time, exercise_id,rest_after_exercise, rest_between_set, size_of_rept, reps_number, weight FROM finish_training_table " +
+    @Query("SELECT chr_total_training, total_calories_burned, time, exercise_id,rest_after_exercise, " +
+            "rest_between_set, size_of_rept, reps_number, weight, tracker_exercise_table.tracker_id, " +
+            "finish_training_table.finish_id " +
+            "FROM finish_training_table " +
             "INNER JOIN training_table ON finish_training_table.training_id = training_table.training_id " +
             "INNER JOIN tracker_exercise_table ON training_table.training_id = tracker_exercise_table.training_id " +
             "WHERE finish_training_table.date ==:date " +

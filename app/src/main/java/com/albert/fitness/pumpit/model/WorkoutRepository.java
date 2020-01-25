@@ -14,15 +14,14 @@ public class WorkoutRepository {
     private TrainingDAO trainingDAO;
     private TrackerExerciseDAO trackerExerciseDAO;
     private FinishTrainingDAO finishTrainingDAO;
-    private LiveData<List<WorkoutPlanObj>> workoutPlans;
-    private LiveData<List<WorkoutObj>> workouts;
-    private LiveData<List<Training>> training;
-    private LiveData<List<TrackerExercise>> trackerExercise;
-    private LiveData<List<FinishTraining>> finishTraining;
-    private Executor executor;
 
     public WorkoutRepository(Application application) {
-        executor = Executors.newFixedThreadPool(5);
+        //    private LiveData<List<WorkoutPlanObj>> workoutPlans;
+        //    private LiveData<List<WorkoutObj>> workouts;
+        //    private LiveData<List<Training>> training;
+        //    private LiveData<List<TrackerExercise>> trackerExercise;
+        //    private LiveData<List<FinishTraining>> finishTraining;
+        Executors.newFixedThreadPool(5);
         WorkoutDatabase workoutDatabase = WorkoutDatabase.getInstance(application);
         workoutDAO = workoutDatabase.workoutDAO();
         workoutPlanDAO = workoutDatabase.workoutPlanDAO();
@@ -132,161 +131,91 @@ public class WorkoutRepository {
 
     public void insertPlan(final WorkoutPlanObj plan) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                workoutPlanDAO.insert(plan);
-            }
-        });
+        myExecutor.execute(() -> workoutPlanDAO.insert(plan));
     }
 
     public void insertTraining(final Training training) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trainingDAO.insert(training);
-            }
-        });
+        myExecutor.execute(() -> trainingDAO.insert(training));
     }
 
     public void insertTrainingAndTracker(final Training training, final List<TrackerExercise> trackerExercises) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trainingDAO.insertTrainingAndTracker(training, trackerExercises);
-            }
-        });
+        myExecutor.execute(() -> trainingDAO.insertTrainingAndTracker(training, trackerExercises));
     }
 
     public void insertTrackerExercise(final TrackerExercise trackerExercise) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trackerExerciseDAO.insert(trackerExercise);
-            }
-        });
+        myExecutor.execute(() -> trackerExerciseDAO.insert(trackerExercise));
     }
 
     public void insertFinishTraining(final FinishTraining finishTraining) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                finishTrainingDAO.insert(finishTraining);
-            }
-        });
+        myExecutor.execute(() -> finishTrainingDAO.insert(finishTraining));
     }
 
     public void insertFinishTrainingAndTracker(final FinishTraining finishTraining, final List<TrackerExercise> trackerExercises) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                finishTrainingDAO.insertFinishTrainingAndTracker(finishTraining, trackerExercises);
-            }
-        });
+        myExecutor.execute(() -> finishTrainingDAO.insertFinishTrainingAndTracker(finishTraining, trackerExercises));
     }
 
     public void deletePlan(final WorkoutPlanObj plan) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                workoutPlanDAO.delete(plan);
-            }
-        });
+        myExecutor.execute(() -> workoutPlanDAO.delete(plan));
     }
 
     public void deleteWorkout(final WorkoutObj workout) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                workoutDAO.delete(workout);
-            }
-        });
+        myExecutor.execute(() -> workoutDAO.delete(workout));
     }
 
     public void deleteTraining(final Training training) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trainingDAO.delete(training);
-            }
-        });
+        myExecutor.execute(() -> trainingDAO.delete(training));
     }
 
     public void deleteTrackerExercise(final TrackerExercise trackerExercise) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trackerExerciseDAO.delete(trackerExercise);
-            }
-        });
+        myExecutor.execute(() -> trackerExerciseDAO.delete(trackerExercise));
     }
 
     public void deleteTrackerExerciseByTrainingId(final int trainingId) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trackerExerciseDAO.deleteTrackerExerciseByTrainingId(trainingId);
-            }
-        });
+        myExecutor.execute(() -> trackerExerciseDAO.deleteTrackerExerciseByTrainingId(trainingId));
+    }
+
+    public void deleteFinishTrainingByFinishId(final int finishId) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(() -> finishTrainingDAO.deleteFinishTrainingByFinishId(finishId));
+    }
+
+    public void deleteTrackerExerciseByTrackerId(final int trackerId) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(() -> trackerExerciseDAO.deleteTrackerExerciseByTrackerId(trackerId));
     }
 
     public void updatePlan(final WorkoutPlanObj plan) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                workoutPlanDAO.update(plan);
-            }
-        });
+        myExecutor.execute(() -> workoutPlanDAO.update(plan));
     }
 
     public void updateWorkout(final WorkoutObj workout) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                workoutDAO.update(workout);
-            }
-        });
+        myExecutor.execute(() -> workoutDAO.update(workout));
     }
 
     public void updateTraining(final Training training) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trainingDAO.update(training);
-            }
-        });
+        myExecutor.execute(() -> trainingDAO.update(training));
     }
 
     public void updateTrainingPosition(final int newPosition, final int position) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trainingDAO.updateTrainingPosition(newPosition, position);
-            }
-        });
+        myExecutor.execute(() -> trainingDAO.updateTrainingPosition(newPosition, position));
     }
 
     public void updateTrackerExercise(final TrackerExercise trackerExercise) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
-        myExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                trackerExerciseDAO.update(trackerExercise);
-            }
-        });
+        myExecutor.execute(() -> trackerExerciseDAO.update(trackerExercise));
     }
 }

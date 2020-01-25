@@ -16,8 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.adapter.FinishWorkoutAdapter;
+import com.albert.fitness.pumpit.model.Event;
 import com.albert.fitness.pumpit.model.Exercise;
 import com.albert.fitness.pumpit.model.QueryFinishWorkout;
+import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.utils.SwipeHelper;
 import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
@@ -41,6 +43,10 @@ public class LogWorkoutFragment extends Fragment {
     private WelcomeActivityViewModel welcomeActivityViewModel;
     private List<Exercise> exerciseList = new ArrayList<>();
     private Map<String, Object> mapFinishWorkouts = new HashMap<>();
+    private List<QueryFinishWorkout> queryFinishWorkoutsList = new ArrayList<>();
+    private FinishWorkoutAdapter finishWorkoutAdapter;
+    private String date = LogFragment.date;
+    public static List<Integer> finishIdList = new ArrayList<>();
 
     public LogWorkoutFragment() {
     }
@@ -72,21 +78,27 @@ public class LogWorkoutFragment extends Fragment {
 
     private void getWorkout() {
         Set<Integer> newExerciseId = new HashSet<>();
-        String date = LogFragment.date;
-
         customPlanViewModel.getFinishWorkout(date)
                 .observe(this, queryFinishWorkouts -> {
-                    for (QueryFinishWorkout finishWorkout : queryFinishWorkouts) {
-                        newExerciseId.add(finishWorkout.getExerciseId());
+                    if(queryFinishWorkouts.size() == 0) {
+                        listIsEmpty();
                     }
 
+                    queryFinishWorkoutsList.addAll(queryFinishWorkouts);
+                    for (QueryFinishWorkout finishWorkout : queryFinishWorkouts) {
+                        newExerciseId.add(finishWorkout.getExerciseId());
 
+                        finishIdList.add(finishWorkout.getFinishId());
+                        Log.d(TAG, "getWorkout: " + finishWorkout.getFinishId()); ////**** working
+
+
+                        //finishWorkout.getTrackerId()
+                    }
                     for (int exerciseId : newExerciseId) {
                         welcomeActivityViewModel.getExerciseById(exerciseId)
                                 .observe(this, exercise -> {
                                     if (exercise != null) {
                                         exerciseList.add(exercise);
-
                                         customPlanViewModel.getFinishWorkoutByDateAndExerciseId(date, exerciseId)
                                                 .observe(this, queryFinishWorkoutList -> {
                                                     if (!queryFinishWorkoutList.isEmpty()) {
@@ -107,7 +119,6 @@ public class LogWorkoutFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        FinishWorkoutAdapter finishWorkoutAdapter;
         Log.d(TAG, "initRecyclerView: init FinishWorkout recyclerView" + rvWorkout);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         rvWorkout.setLayoutManager(layoutManager);
@@ -126,20 +137,47 @@ public class LogWorkoutFragment extends Fragment {
                         // R.color.colorAccent,
                         Color.parseColor("#d50000"),
                         pos -> {
-                            //    deleteItem(pos);
-                            //  deleteFromFb(pos);
+                            deleteItem(pos);
+                            finishWorkoutAdapter.removeItem(pos);
                         }
                 ));
-                underlayButtons.add(new SwipeHelper.UnderlayButton(
-                        "Edit",
-                        0,
-                        //R.color.md_green_500,
-                        Color.parseColor("#4caf50"),
-                        pos -> {
-
-                        }
-                ));
+//                underlayButtons.add(new SwipeHelper.UnderlayButton(
+//                        "Edit",
+//                        0,
+//                        //R.color.md_green_500,
+//                        Color.parseColor("#4caf50"),
+//                        pos -> {
+//
+//                        }
+//                ));
             }
         };
+    }
+
+
+    private void deleteItem(int pos) {
+        int exerciseId = queryFinishWorkoutsList.get(pos).getExerciseId();
+        customPlanViewModel.getFinishWorkout(date)
+                .observe(this, queryFinishWorkoutList -> {
+                    if(!queryFinishWorkoutList.isEmpty()) {
+                        for(QueryFinishWorkout workout : queryFinishWorkoutList) {
+                            if(exerciseId == workout.getExerciseId()) {
+                                customPlanViewModel.deleteFinishTrainingByFinishId(workout.getFinishId());
+                                //customPlanViewModel.deleteTrackerExerciseByTrackerId(workout.getTrackerId());
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void listIsEmpty() {
+        PrefsUtils p = new PrefsUtils(getContext(), PrefsUtils.HAVE_WORKOUT_EVENT);
+        PrefsUtils prefsUtils = new PrefsUtils(getContext(), PrefsUtils.HAVE_NUTRITION_EVENT);
+        p.saveData(date, true);
+        boolean haveNutrition = prefsUtils.getBoolean(date, false);
+
+        if(haveNutrition) {
+            Event.removeEvent(getContext());
+        }
     }
 }

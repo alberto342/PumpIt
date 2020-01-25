@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.albert.fitness.pumpit.model.WorkoutPlanObj;
@@ -101,17 +100,14 @@ public class EditCustomPlanActivity extends AppCompatActivity implements View.On
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             int planId = extras.getInt("planId");
-            planViewModel.getPlan(planId).observe(this, new Observer<WorkoutPlanObj>() {
-                @Override
-                public void onChanged(WorkoutPlanObj workoutPlan) {
-                    Log.i(TAG, "getData: " + workoutPlan.getRoutineName());
-                    workoutPlanObj = workoutPlan;
+            planViewModel.getPlan(planId).observe(this, workoutPlan -> {
+                Log.i(TAG, "getData: " + workoutPlan.getRoutineName());
+                workoutPlanObj = workoutPlan;
 
-                    etRoutineName.setText(workoutPlan.getRoutineName());
-                    etRoutineDescription.setText(workoutPlan.getRoutineDescription());
-                    getDifficultyLevel(workoutPlan.getDifficultyLevel());
-                    getType(workoutPlan.getRoutineType());
-                }
+                etRoutineName.setText(workoutPlan.getRoutineName());
+                etRoutineDescription.setText(workoutPlan.getRoutineDescription());
+                getDifficultyLevel(workoutPlan.getDifficultyLevel());
+                getType(workoutPlan.getRoutineType());
             });
         }
     }

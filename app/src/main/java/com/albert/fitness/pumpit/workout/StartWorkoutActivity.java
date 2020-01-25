@@ -3,26 +3,23 @@ package com.albert.fitness.pumpit.workout;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +36,7 @@ import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import fitness.albert.com.pumpit.R;
 import fitness.albert.com.pumpit.databinding.ActivityStartWorkoutBinding;
@@ -65,10 +63,11 @@ public class StartWorkoutActivity extends AppCompatActivity {
         mRecyclerView = startWorkoutBinding.rvStartWorkout;
         init();
         planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
+        dateIsChange();
         getWorkout();
         checkIfHavePlans();
         setBtnStartWorkout();
-        swipe();
+        //swipe();
     }
 
 
@@ -79,6 +78,16 @@ public class StartWorkoutActivity extends AppCompatActivity {
         btnStartWorkout = findViewById(R.id.btn_start_workout);
         setTitle("Your exercises for today (" + getDayOfTheWeek() + ")");
         todayExercises.setText("Your exercises for today (" + getDayOfTheWeek() + ")");
+    }
+
+    private void dateIsChange() {
+        PrefsUtils p = new PrefsUtils(this, PrefsUtils.EXERCISE);
+        PrefsUtils prefDoneExercise = new PrefsUtils(this, PrefsUtils.DONE_EXERCISE);
+        String date = p.getString("exercise_date", "");
+
+        if(!date.equals(Event.getTodayData())) {
+            prefDoneExercise.removeAll(this, PrefsUtils.DONE_EXERCISE);
+        }
     }
 
     private void checkIfHavePlans() {
@@ -109,53 +118,62 @@ public class StartWorkoutActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("NewApi")
     private void getWorkout() {
-        planViewModel.getAllTrainingByDate(Event.getDayName()).observe(this, new Observer<List<Training>>() {
-            @Override
-            public void onChanged(List<Training> trainings) {
-                if (trainings.isEmpty()) {
-                    btnStartWorkout.setVisibility(View.INVISIBLE);
-                    emptyWorkout.setVisibility(View.VISIBLE);
-                } else {
-                    btnStartWorkout.setVisibility(View.VISIBLE);
-                    emptyWorkout.setVisibility(View.INVISIBLE);
-                    trainingList = trainings;
-                    for (Training t : trainings) {
-                        getExercise(t.getExerciseId());
-                    }
-                }
-            }
-        });
-    }
+        SharedPreferences prefs = this.getSharedPreferences(PrefsUtils.DONE_EXERCISE, Context.MODE_PRIVATE);
+        Map<String, ?> prefsKeys = prefs.getAll();
+        List<Integer> exerciseId = new ArrayList<>();
 
+        planViewModel.getAllTrainingByDate(Event.getDayName())
+                .observe(this, trainings -> {
+                    if (trainings.isEmpty()) {
+                        btnStartWorkout.setVisibility(View.INVISIBLE);
+                        emptyWorkout.setVisibility(View.VISIBLE);
+                    } else {
 
-    private void getExercise(final int exerciseId) {
-        WelcomeActivityViewModel activityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
-        activityViewModel.getExerciseById(exerciseId).observe(this, new Observer<Exercise>() {
-            @Override
-            public void onChanged(Exercise exercise) {
-                if (exercise != null) {
-                    exerciseList.add(new Exercise(exercise.getExerciseName(), exercise.getImgName()));
-                    initRecyclerView();
-                }
-            }
-        });
-    }
+                        // trainingList = trainings;
 
-    private void getTracker(final int i) {
-        planViewModel.getTrackerExerciseByTraining(trainingList.get(i).getTrainingId())
-                .observe(this, new Observer<List<TrackerExercise>>() {
-                    @Override
-                    public void onChanged(List<TrackerExercise> trackerExercises) {
-                        if (!trackerExercises.isEmpty()) {
-                            trackerExerciseList = trackerExercises;
-                            addLayoutRepsAndSets(i);
+                        for (Map.Entry<String, ?> entry : prefsKeys.entrySet()) {
+                            Log.d("map values", entry.getKey() + ": " +
+                                    entry.getValue().toString());
+
+                            if (entry.getValue().toString().equals("true")) {
+                                String stKey = entry.getKey();
+                                String[] parts = stKey.split(" ");
+                                int exId = Integer.parseInt(parts[1]);
+                                exerciseId.add(exId);
+                            }
+                        }
+                        for (Training tr : trainings) {
+                            if (!exerciseId.contains(tr.getExerciseId())) {
+                                trainingList.add(tr);
+                                getExercise(tr.getExerciseId());
+                            }
+                        }
+
+                        if(trainingList.size() > 0) {
+                            btnStartWorkout.setVisibility(View.VISIBLE);
+                            emptyWorkout.setVisibility(View.INVISIBLE);
+                        } else {
+                            btnStartWorkout.setVisibility(View.INVISIBLE);
+                            emptyWorkout.setVisibility(View.VISIBLE);
                         }
                     }
                 });
     }
 
-    // TODO: 2019-10-18 on deleted not the current exercise remove from the screen
+
+    private void getExercise(final int exerciseId) {
+        WelcomeActivityViewModel activityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
+        activityViewModel.getExerciseById(exerciseId)
+                .observe(this, exercise -> {
+                    if (exercise != null) {
+                        exerciseList.add(new Exercise(exercise.getExerciseName(), exercise.getImgName()));
+                        initRecyclerView();
+                    }
+                });
+    }
+
 
     private void swipe() {
         new SwipeHelper(this, mRecyclerView) {
@@ -165,82 +183,19 @@ public class StartWorkoutActivity extends AppCompatActivity {
                         "Delete",
                         0,
                         Color.parseColor("#d50000"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @SuppressLint("NewApi")
-                            @Override
-                            public void onClick(int pos) {
-                                planViewModel.deleteTraining(trainingList.get(pos));
-                                planViewModel.deleteTrackerExerciseByTrainingId(trainingList.get(pos).getTrainingId());
-                            }
+                        pos -> {
+                            planViewModel.deleteTraining(trainingList.get(pos));
+                            planViewModel.deleteTrackerExerciseByTrainingId(trainingList.get(pos).getTrainingId());
                         }
                 ));
-                underlayButtons.add(new SwipeHelper.UnderlayButton(
-                        "Edit",
-                        0,
-                        Color.parseColor("#4caf50"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
-                                getTracker(pos);
-                            }
-                        }
-                ));
+//                underlayButtons.add(new SwipeHelper.UnderlayButton(
+//                        "Edit",
+//                        0,
+//                        Color.parseColor("#4caf50"),
+//                        pos -> getTracker(pos)
+//                ));
             }
         };
-    }
-
-
-
-    private void addLayoutRepsAndSets(int position) {
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        @SuppressLint("InflateParams") final View dialogView = inflater.inflate(R.layout.dialog_recive_reps_and_sets, null);
-
-        ImageView btnDoneSetsReps = dialogView.findViewById(R.id.btn_done_edit_sets_reps);
-        ImageView btnCancel = dialogView.findViewById(R.id.iv_cancel_weight_reps);
-
-        for (int i = 0; i < trainingList.get(position).getSizeOfRept(); i++) {
-            addWeightAndSetIntoLayout(dialogView, i);
-        }
-
-        // TODO: 2019-10-17 check how to save this
-        btnDoneSetsReps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addWeightAndSetIntoLayout(dialogView, -1);
-                dialog.dismiss();
-            }
-        });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-        dialogBuilder.setView(dialogView);
-        dialog = dialogBuilder.create();
-        dialog.show();
-    }
-
-    private void addWeightAndSetIntoLayout(View view, final int i) {
-        LayoutInflater inf = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        @SuppressLint("InflateParams") final View rowView = inf.inflate(R.layout.layout_weight_and_reps, null);
-        final LinearLayout linearLayout = view.findViewById(R.id.linear_set_reps);
-        linearLayout.addView(rowView);
-
-        final EditText etWeight = view.findViewById(R.id.et_weight);
-        final EditText etReps = view.findViewById(R.id.et_reps);
-
-        final TrackerExercise trackerExercise = new TrackerExercise(trackerExerciseList.get(i).getRepsNumber(),
-                trackerExerciseList.get(i).getWeight(), trainingList.get(i).getTrainingId());
-        trackerExercise.setTrackerId(trackerExerciseList.get(i).getTrackerId());
-
-        if (i == -1) {
-            Log.d(TAG, "addWeightAndSetIntoLayout: " + etWeight.getText().toString());
-        } else {
-            etWeight.setText(String.valueOf(trackerExerciseList.get(i).getWeight()));
-            etReps.setText(String.valueOf(trackerExerciseList.get(i).getRepsNumber()));
-        }
     }
 
 
@@ -265,33 +220,10 @@ public class StartWorkoutActivity extends AppCompatActivity {
         return null;
     }
 
-//    private String getDayOfTheWeekBeWorkout(int getDay) {
-//        switch (getDay) {
-//            case 0:
-//                return "Day 1";
-//            case 1:
-//                return "Day 2";
-//            case 2:
-//                return "Day 3";
-//            case 3:
-//                return "Day 4";
-//            case 4:
-//                return "Day 5";
-//            case 5:
-//                return "Day 6";
-//            case 6:
-//                return "Day 7";
-//        }
-//        return "";
-//    }
-
     private void setBtnStartWorkout() {
-        btnStartWorkout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(StartWorkoutActivity.this, WorkoutStartActivity.class));
-            }
-        });
+        btnStartWorkout.setOnClickListener(v ->
+                startActivity(new Intent(StartWorkoutActivity.this, WorkoutStartActivity.class)));
+
     }
 
 
@@ -302,62 +234,77 @@ public class StartWorkoutActivity extends AppCompatActivity {
         trainingAdapter.setItems((ArrayList<Training>) trainingList);
         mRecyclerView.setAdapter(trainingAdapter);
         Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);
-        trainingAdapter.setListener(new TrainingAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(Training item, int i) {
 
-            }
+        trainingAdapter.setListener((item, i) -> {
+
         });
-//        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-//            @Override
-//            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-//                int from = viewHolder.getAdapterPosition();
-//                int to = target.getAdapterPosition();
-//                Collections.swap(trainingList, from, to);
-//                trainingAdapter.notifyItemMoved(from, to);
-//                return true;
-//            }
-//            @Override
-//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-//                planViewModel.deleteTraining(trainingList.get(viewHolder.getAdapterPosition()));
-//            }
-//        }).attachToRecyclerView(mRecyclerView);
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+            int dragFrom = -1;
+            int dragTo = -1;
+
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT,
+                        0);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                int from = viewHolder.getAdapterPosition();
+                int to = target.getAdapterPosition();
+
+                if (dragFrom == -1) {
+                    dragFrom = from;
+                }
+                dragTo = to;
+
+                trainingAdapter.notifyItemMoved(from, to);
+                return true;
+            }
+
+            private void reallyMoved(int from, int to) {
+                //planViewModel.updateTrainingPosition(from, to);
+                //planViewModel.updateTrainingPosition(to, from);
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                planViewModel.deleteTraining(trainingList.get(i));
+                planViewModel.deleteTrackerExerciseByTrainingId(trainingList.get(i).getTrainingId());
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return false;
+            }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+                    reallyMoved(dragFrom, dragTo);
+                }
+                dragFrom = dragTo = -1;
+            }
+        }).attachToRecyclerView(mRecyclerView);
     }
 
     private void alertDialogHavePlan() {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         builder.setMessage("Don't have any plansֿֿ, Do you want to add ?\n Note: if your not add plan your c'not add exercise !!!")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startActivity(new Intent(StartWorkoutActivity.this, CustomPlanActivity.class));
-                        finish();
-                    }
+                .setPositiveButton("Yes", (dialogInterface, i) -> {
+                    startActivity(new Intent(StartWorkoutActivity.this, CustomPlanActivity.class));
+                    finish();
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
+                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel());
         androidx.appcompat.app.AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
-//    private void initRecyclerView() {
-//        @SuppressLint("WrongConstant")
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//        mRecyclerView.setLayoutManager(layoutManager);
-//        trainingAdapter = new TrainingAdapter(this, trainingList, exerciseList);
-//        trainingAdapter.notifyDataSetChanged();
-//        mRecyclerView.setAdapter(trainingAdapter);
-//
-//        ItemTouchHelper.Callback callback =
-//                new SimpleItemTouchHelperCallback(trainingAdapter);
-//        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-//        touchHelper.attachToRecyclerView(mRecyclerView);
-//
-//        Log.d(TAG, "initRecyclerView: init recyclerView " + mRecyclerView);
-//    }
 }

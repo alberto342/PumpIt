@@ -1,7 +1,6 @@
 package com.albert.fitness.pumpit.adapter.new_adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -61,13 +60,10 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingAdapter.Traini
         private TrainingViewHolder(@NonNull ItemTrainingBinding listItemBinding) {
             super(listItemBinding.getRoot());
             this.listItemBinding = listItemBinding;
-            listItemBinding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int clickedPosition = getAdapterPosition();
-                    if (listener != null && clickedPosition != RecyclerView.NO_POSITION) {
-                        listener.onItemClick(items.get(clickedPosition), clickedPosition);
-                    }
+            listItemBinding.getRoot().setOnClickListener(v -> {
+                int clickedPosition = getAdapterPosition();
+                if (listener != null && clickedPosition != RecyclerView.NO_POSITION) {
+                    listener.onItemClick(items.get(clickedPosition), clickedPosition);
                 }
             });
         }

@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -39,8 +38,6 @@ public class TrainingActivity extends AppCompatActivity {
     private WelcomeActivityViewModel activityViewModel;
     private CustomPlanViewModel planViewModel;
 
-
-    // TODO: 2019-10-17 new with move for delete not remove exercise from the screen only on the database
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,17 +76,14 @@ public class TrainingActivity extends AppCompatActivity {
 
         Log.d(TAG, "getTraining id: " + id);
 
-        planViewModel.getTrainingByWorkoutId(id).observe(this, new Observer<List<Training>>() {
-            @Override
-            public void onChanged(List<Training> trainings) {
-                if (trainings.isEmpty()) {
-                    Log.d(TAG, "getTraining is empty");
-                } else {
-                    trainingList = trainings;
-                    for (Training t : trainings) {
-                        getExercise(t.getExerciseId());
-                        Log.d(TAG, "getTraining ExerciseId: " + t.getExerciseId());
-                    }
+        planViewModel.getTrainingByWorkoutId(id).observe(this, trainings -> {
+            if (trainings.isEmpty()) {
+                Log.d(TAG, "getTraining is empty");
+            } else {
+                trainingList = trainings;
+                for (Training t : trainings) {
+                    getExercise(t.getExerciseId());
+                    Log.d(TAG, "getTraining ExerciseId: " + t.getExerciseId());
                 }
             }
         });
@@ -97,14 +91,11 @@ public class TrainingActivity extends AppCompatActivity {
 
     private void getExercise(int exerciseId) {
         Log.d(TAG, "getExercise: " + exerciseId);
-        activityViewModel.getExerciseById(exerciseId).observe(this, new Observer<Exercise>() {
-            @Override
-            public void onChanged(Exercise exercise) {
-                if (exercise != null) {
-                    Log.d(TAG, "getExercise: " + exercise.getExerciseName());
-                    exerciseList.add(new Exercise(exercise.getExerciseName(), exercise.getImgName()));
-                    initRecyclerView();
-                }
+        activityViewModel.getExerciseById(exerciseId).observe(this, exercise -> {
+            if (exercise != null) {
+                Log.d(TAG, "getExercise: " + exercise.getExerciseName());
+                exerciseList.add(new Exercise(exercise.getExerciseName(), exercise.getImgName()));
+                initRecyclerView();
             }
         });
     }
@@ -120,15 +111,12 @@ public class TrainingActivity extends AppCompatActivity {
         trainingAdapter.setItems((ArrayList<Training>) trainingList);
         mRecyclerView.setAdapter(trainingAdapter);
         Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);
-        trainingAdapter.setListener(new TrainingAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(Training item, int i) {
-                Log.d(TAG, "onClick: " + exerciseList.get(i).getExerciseName());
-                Intent intent = new Intent(TrainingActivity.this, ShowExerciseImgActivity.class);
-                intent.putExtra("exerciseName", exerciseList.get(i).getExerciseName());
-                intent.putExtra("imgName", exerciseList.get(i).getImgName());
-                startActivity(intent);
-            }
+        trainingAdapter.setListener((item, i) -> {
+            Log.d(TAG, "onClick: " + exerciseList.get(i).getExerciseName());
+            Intent intent = new Intent(TrainingActivity.this, ShowExerciseImgActivity.class);
+            intent.putExtra("exerciseName", exerciseList.get(i).getExerciseName());
+            intent.putExtra("imgName", exerciseList.get(i).getImgName());
+            startActivity(intent);
         });
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override

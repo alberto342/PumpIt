@@ -25,17 +25,20 @@ import fitness.albert.com.pumpit.R;
 
 public class ShowLogExerciseActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "ShowLogExerciseActivity";
     private RecyclerView recyclerView;
     private LogTrackerExerciseAdapter trackerExerciseAdapter;
     private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
     private CustomPlanViewModel viewModel;
-
+    int trainingId;
+    public static boolean isShowLogExercise;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_log_exercise);
         viewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
+
         setTitle("Log Exercise");
         initView();
         getExtra();
@@ -78,10 +81,13 @@ public class ShowLogExerciseActivity extends AppCompatActivity implements View.O
         if (extras != null) {
             this.setTitle(extras.getString("exerciseName"));
             int size = extras.getInt("trackerExercisesSize");
+            trainingId = extras.getInt("trainingId");
             for (int i = 0; i < size; i++) {
                 int repNumber = extras.getInt("repNumber" + i);
                 float weight = extras.getFloat("weight" + i);
-                trackerExerciseList.add(new TrackerExercise(repNumber, weight));
+                if(repNumber > 0 && weight > 0.0) {
+                    trackerExerciseList.add(new TrackerExercise(repNumber, weight));
+                }
                 initRecyclerView();
             }
         }
@@ -107,9 +113,11 @@ public class ShowLogExerciseActivity extends AppCompatActivity implements View.O
                         // R.color.colorAccent,
                         Color.parseColor("#d50000"),
                         pos -> {
+                            if (pos < LogWorkoutFragment.finishIdList.size()) {
+                                Log.d(TAG, "instantiateUnderlayButton : Delete Finish Training: " + LogWorkoutFragment.finishIdList.get(pos));
+                                viewModel.deleteFinishTrainingByFinishId(LogWorkoutFragment.trackerIdList.get(pos));
+                            }
                             trackerExerciseAdapter.deleteItem(pos);
-                            Log.d("iiii", "instantiateUnderlayButton: " + LogWorkoutFragment.finishIdList.get(pos));
-                           // viewModel.deleteFinishTrainingByFinishId(LogWorkoutFragment.finishIdList.get(pos));
                         }
                 ));
             }
@@ -118,25 +126,21 @@ public class ShowLogExerciseActivity extends AppCompatActivity implements View.O
 
 
     private void saveChange() {
-
+        int finishId = LogWorkoutFragment.finishIdList.get(0);
         for (int i = 0; i < trackerExerciseList.size(); i++) {
-            Log.d("222", "saveChange: " + trackerExerciseList.get(i).getTrackerId());
-
-            Log.d("222", "saveChange: " + trackerExerciseList.get(i).getWeight());
-
+            trackerExerciseList.get(i).setTrainingId(trainingId);
+            trackerExerciseList.get(i).setFinishTrainingId(finishId);
+            if(i < LogWorkoutFragment.trackerIdList.size()) {
+                trackerExerciseList.get(i).setTrackerId(LogWorkoutFragment.trackerIdList.get(i));
+                viewModel.updateTracker(trackerExerciseList.get(i));
+            } else {
+                if(trackerExerciseList.get(i).getWeight() > 0.0 && trackerExerciseList.get(i).getRepsNumber() > 0) {
+                    viewModel.addNewTracker(trackerExerciseList.get(i));
+                }
+            }
         }
-
-
-//        for (int i = 0; i < trackerExerciseList.size(); i++) {
-//            if (trackerExerciseList.get(i).getTrackerId() == 0) {
-//                int id = trackerExerciseList.get(0).getTrackerId();
-//                trackerExerciseList.get(i).setTrackerId(id);
-//                viewModel.updateTracker(trackerExerciseList.get(i));
-//            } else {
-//                viewModel.addNewTracker(trackerExerciseList.get(i));
-//               // viewModel.updateTracker(trackerExerciseList.get(i));
-//            }
-//        }
+        Log.d(TAG, "saveChange: success saved tracker exercise: ");
+        isShowLogExercise = true;
         finish();
     }
 

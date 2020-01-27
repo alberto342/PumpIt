@@ -23,6 +23,7 @@ import com.albert.fitness.pumpit.utils.PrefsUtils;
 import com.albert.fitness.pumpit.utils.SwipeHelper;
 import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
+import com.albert.fitness.pumpit.workout.ShowLogExerciseActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,11 +47,12 @@ public class LogWorkoutFragment extends Fragment {
     private List<QueryFinishWorkout> queryFinishWorkoutsList = new ArrayList<>();
     private FinishWorkoutAdapter finishWorkoutAdapter;
     private String date = LogFragment.date;
+    public static List<Integer> trackerIdList = new ArrayList<>();
     public static List<Integer> finishIdList = new ArrayList<>();
+
 
     public LogWorkoutFragment() {
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -63,12 +65,27 @@ public class LogWorkoutFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         customPlanViewModel = ViewModelProviders.of(getActivity()).get(CustomPlanViewModel.class);
         welcomeActivityViewModel = ViewModelProviders.of(getActivity()).get(WelcomeActivityViewModel.class);
         init(view);
         getWorkout();
         swipe();
         Log.d(TAG, "date of exercise: " + LogFragment.date);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (ShowLogExerciseActivity.isShowLogExercise) {
+            ShowLogExerciseActivity.isShowLogExercise = false;
+            mapFinishWorkouts.clear();
+            queryFinishWorkoutsList.clear();
+            exerciseList.clear();
+            trackerIdList.clear();
+            finishIdList.clear();
+        }
     }
 
     private void init(View view) {
@@ -80,19 +97,17 @@ public class LogWorkoutFragment extends Fragment {
         Set<Integer> newExerciseId = new HashSet<>();
         customPlanViewModel.getFinishWorkout(date)
                 .observe(this, queryFinishWorkouts -> {
-                    if(queryFinishWorkouts.size() == 0) {
+                    if (queryFinishWorkouts.size() == 0) {
                         listIsEmpty();
                     }
-
                     queryFinishWorkoutsList.addAll(queryFinishWorkouts);
-                    for (QueryFinishWorkout finishWorkout : queryFinishWorkouts) {
-                        newExerciseId.add(finishWorkout.getExerciseId());
 
-                        finishIdList.add(finishWorkout.getFinishId());
-                        Log.d(TAG, "getWorkout: " + finishWorkout.getFinishId()); ////**** working
+                    for (int i = 0; i < queryFinishWorkouts.size(); i++) {
+                        newExerciseId.add(queryFinishWorkouts.get(i).getExerciseId());
 
-
-                        //finishWorkout.getTrackerId()
+                        finishIdList.add(queryFinishWorkouts.get(i).getFinishId());
+                        trackerIdList.add(queryFinishWorkouts.get(i).getTrackerId());
+                        mapFinishWorkouts.put("training id " + i, queryFinishWorkouts.get(i).getTrainingId());
                     }
                     for (int exerciseId : newExerciseId) {
                         welcomeActivityViewModel.getExerciseById(exerciseId)
@@ -159,9 +174,9 @@ public class LogWorkoutFragment extends Fragment {
         int exerciseId = queryFinishWorkoutsList.get(pos).getExerciseId();
         customPlanViewModel.getFinishWorkout(date)
                 .observe(this, queryFinishWorkoutList -> {
-                    if(!queryFinishWorkoutList.isEmpty()) {
-                        for(QueryFinishWorkout workout : queryFinishWorkoutList) {
-                            if(exerciseId == workout.getExerciseId()) {
+                    if (!queryFinishWorkoutList.isEmpty()) {
+                        for (QueryFinishWorkout workout : queryFinishWorkoutList) {
+                            if (exerciseId == workout.getExerciseId()) {
                                 customPlanViewModel.deleteFinishTrainingByFinishId(workout.getFinishId());
                                 //customPlanViewModel.deleteTrackerExerciseByTrackerId(workout.getTrackerId());
                             }
@@ -176,7 +191,7 @@ public class LogWorkoutFragment extends Fragment {
         p.saveData(date, true);
         boolean haveNutrition = prefsUtils.getBoolean(date, false);
 
-        if(haveNutrition) {
+        if (haveNutrition) {
             Event.removeEvent(getContext());
         }
     }

@@ -62,7 +62,7 @@ public interface FinishTrainingDAO {
 
     @Query("SELECT chr_total_training, total_calories_burned, time, exercise_id,rest_after_exercise, " +
             "rest_between_set, size_of_rept, reps_number, weight, tracker_exercise_table.tracker_id, " +
-            "finish_training_table.finish_id " +
+            "finish_training_table.finish_id, training_table.training_id " +
             "FROM finish_training_table " +
             "INNER JOIN training_table ON finish_training_table.training_id = training_table.training_id " +
             "INNER JOIN tracker_exercise_table ON training_table.training_id = tracker_exercise_table.training_id " +
@@ -72,7 +72,7 @@ public interface FinishTrainingDAO {
 
     @Query("SELECT chr_total_training, total_calories_burned, time, exercise_id,rest_after_exercise, " +
             "rest_between_set, size_of_rept, reps_number, weight, tracker_exercise_table.tracker_id, " +
-            "finish_training_table.finish_id " +
+            "finish_training_table.finish_id, training_table.training_id " +
             "FROM finish_training_table " +
             "INNER JOIN training_table ON finish_training_table.training_id = training_table.training_id " +
             "INNER JOIN tracker_exercise_table ON training_table.training_id = tracker_exercise_table.training_id " +

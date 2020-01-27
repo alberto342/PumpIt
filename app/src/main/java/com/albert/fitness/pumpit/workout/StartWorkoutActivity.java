@@ -85,7 +85,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
         PrefsUtils prefDoneExercise = new PrefsUtils(this, PrefsUtils.DONE_EXERCISE);
         String date = p.getString("exercise_date", "");
 
-        if(!date.equals(Event.getTodayData())) {
+        if (!date.equals(Event.getTodayData())) {
             prefDoneExercise.removeAll(this, PrefsUtils.DONE_EXERCISE);
         }
     }
@@ -151,7 +151,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
                             }
                         }
 
-                        if(trainingList.size() > 0) {
+                        if (trainingList.size() > 0) {
                             btnStartWorkout.setVisibility(View.VISIBLE);
                             emptyWorkout.setVisibility(View.INVISIBLE);
                         } else {

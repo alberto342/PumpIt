@@ -25,6 +25,8 @@ public class QueryFinishWorkout {
     private int trackerId;
     @ColumnInfo(name = "finish_id")
     private int finishId;
+    @ColumnInfo(name = "training_id")
+    private int trainingId;
 
     public String getChronometer() {
         return chronometer;
@@ -112,5 +114,13 @@ public class QueryFinishWorkout {
 
     public void setFinishId(int finishId) {
         this.finishId = finishId;
+    }
+
+    public int getTrainingId() {
+        return trainingId;
+    }
+
+    public void setTrainingId(int trainingId) {
+        this.trainingId = trainingId;
     }
 }

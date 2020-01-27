@@ -46,6 +46,7 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
         super.onBindViewHolder(holder, position, payloads);
+
     }
 
     @Override
@@ -54,6 +55,8 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     private void bindViews(final ViewHolder holder, final int position) {
+
+
         Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(mContext, exerciseList.get(position).getImgName());
 
         Glide.with(mContext)
@@ -91,6 +94,7 @@ public class FinishWorkoutAdapter extends RecyclerView.Adapter<RecyclerView.View
                 Intent i = new Intent(mContext, ShowLogExerciseActivity.class);
                 i.putExtra("exerciseName", exerciseList.get(position).getExerciseName());
                 i.putExtra("trackerExercisesSize", mapFinishWorkouts.size());
+                i.putExtra("trainingId", (int) mapFinishWorkouts.get("training id " + position));
 
                 for(int p=0; p<mapFinishWorkouts.size(); p++) {
                     if(mapFinishWorkouts.get(exerciseList.get(position).getExerciseName() + " rept " + p) != null) {

@@ -36,14 +36,31 @@ public class WelcomeActivityViewModel extends AndroidViewModel {
     }
 
     public LiveData<Exercise> getExerciseById(int id) {
-        return  repository.getExerciseById(id);
+        return repository.getExerciseById(id);
     }
 
     public LiveData<List<Exercise>> getExerciseOfASelectedCategory(int categoryId) {
-        return  repository.getExercise(categoryId);
+        return repository.getExercise(categoryId);
     }
 
     public LiveData<List<Exercise>> getExerciseOfASelectedSecondaryCategory(int categoryId) {
-        return  repository.getExerciseBySecondaryCategory(categoryId);
+        return repository.getExerciseBySecondaryCategory(categoryId);
+    }
+
+    public LiveData<List<Exercise>> getQueryAllExercise(String query) {
+        return repository.getQueryAllExercise(query);
+    }
+
+    public LiveData<List<Exercise>> getQueryExerciseList(String queryText, int id) {
+        return repository.getQueryExerciseList(queryText, id);
+    }
+
+    public  LiveData<List<Exercise>> getQueryBySecondaryCategory(String queryText, int id) {
+        return repository.getQueryBySecondaryCategory(queryText, id);
+    }
+
+
+    public void setExercise(Exercise exercise) {
+        repository.insertExercise(exercise);
     }
 }

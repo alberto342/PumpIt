@@ -747,6 +747,7 @@ public class ImageUtils {
             }
         } else {
             store_image(file, bitmap);
+            Log.i(TAG, "store_image: " + file);
         }
 
     }

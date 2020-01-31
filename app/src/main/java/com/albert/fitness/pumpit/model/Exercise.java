@@ -1,6 +1,7 @@
 package com.albert.fitness.pumpit.model;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
 import androidx.databinding.BindingAdapter;
@@ -54,12 +55,31 @@ public class Exercise {
         this.categoryId = categoryId;
     }
 
+    public Exercise(String exerciseName, String imgName, int categoryId, int secondaryCategoryId) {
+        this.exerciseName = exerciseName;
+        this.imgName = imgName;
+        this.categoryId = categoryId;
+        this.secondaryCategoryId = secondaryCategoryId;
+    }
+
     @BindingAdapter({"img_name"})
     public static void loadImage(ImageView view, String imageUrl) {
-        Bitmap bitmap = BitmapFromAssent.getBitmapFromAsset(view.getContext(), imageUrl);
+        Bitmap bitmap;
+
+        String charAtZero = Character.toString(imageUrl.charAt(0));
+        if(charAtZero.equals("/")) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            options.inSampleSize = 2;
+            options.inTempStorage = new byte[16 * 1024];
+             bitmap = BitmapFactory.decodeFile(imageUrl, options);
+        } else {
+            bitmap = BitmapFromAssent.getBitmapFromAsset(view.getContext(), imageUrl);
+        }
+
         Glide.with(view.getContext())
                 .load(bitmap)
-             //   .placeholder(R.drawable.loading)
+              //  .placeholder(R.drawable.loading)
                 .into(view);
     }
 

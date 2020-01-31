@@ -1,7 +1,7 @@
 package com.albert.fitness.pumpit.adapter.new_adapter;
 
+import android.os.Environment;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.albert.fitness.pumpit.model.Exercise;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,12 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
     @Override
     public void onBindViewHolder(@NonNull ExerciseViewHolder viewHolder, int i) {
         Exercise item = items.get(i);
+
+        if (item.getExerciseId() > 614) {
+            String baseDir = Environment.getExternalStorageDirectory().getParent() + "/0/Pumpit/ExercisePictures/";
+            File f = new File(baseDir + File.separator + item.getImgName());
+            item.setImgName(f.getPath());
+        }
         viewHolder.listItemBinding.setExercise(item);
     }
 
@@ -59,20 +66,16 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
     class ExerciseViewHolder extends RecyclerView.ViewHolder {
         private ExerciseListItemBinding listItemBinding;
 
-        public ExerciseViewHolder(@NonNull ExerciseListItemBinding listItemBinding) {
+        private ExerciseViewHolder(@NonNull ExerciseListItemBinding listItemBinding) {
             super(listItemBinding.getRoot());
             this.listItemBinding = listItemBinding;
-            listItemBinding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int clickedPosition = getAdapterPosition();
+            listItemBinding.getRoot().setOnClickListener(v -> {
+                int clickedPosition = getAdapterPosition();
 
-                    if (listener != null && clickedPosition != RecyclerView.NO_POSITION) {
-                        listener.onItemClick(items.get(clickedPosition));
-                    }
+                if (listener != null && clickedPosition != RecyclerView.NO_POSITION) {
+                    listener.onItemClick(items.get(clickedPosition));
                 }
             });
-
         }
 
     }
@@ -89,7 +92,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         ArrayList<Exercise> oldItemsList;
         ArrayList<Exercise> newItemList;
 
-        public ExerciseDiffCallback(ArrayList<Exercise> oldItemsList, ArrayList<Exercise> newItemList) {
+        private ExerciseDiffCallback(ArrayList<Exercise> oldItemsList, ArrayList<Exercise> newItemList) {
             this.oldItemsList = oldItemsList;
             this.newItemList = newItemList;
         }

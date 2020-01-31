@@ -2,6 +2,7 @@ package com.albert.fitness.pumpit.workout;
 
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,16 +14,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.albert.fitness.pumpit.adapter.NewTrackerExerciseAdapter;
 import com.albert.fitness.pumpit.model.Event;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.Training;
@@ -41,26 +41,27 @@ import java.util.concurrent.Executors;
 import fitness.albert.com.pumpit.R;
 
 
-public class TrackerExerciseFragment extends Fragment {
+public class TrackerExerciseFragment2 extends Fragment {
 
     private static final String TAG = "TrackerExerciseFragment";
+    private LinearLayout container;
     private CustomPlanViewModel planViewModel;
     private WelcomeActivityViewModel activityViewModel;
     private ArrayList<CharSequence> trackerList;
     private List<TrackerExercise> trackerExerciseList = new ArrayList<>();
-    private TextView tvWeight;
+    private List<Float> weightList = new ArrayList<>();
+    private List<Integer> repNumberList = new ArrayList<>();
     private EditText weight, reps, restBetweenSets, restAfterExercise;
     private Button btnAddTracker;
     private PrefsUtils prefsUtilsGetActivity, prefsUtils;
     private int trainingId, workoutId, sizeOfTraining, exerciseId;
-    private boolean isInTraining = true, createWorkout = true, isWeightGone;
-    private RecyclerView mRecyclerView;
+    private boolean isInTraining = true, createWorkout = true;
 
 
     // TODO: 2019-10-17 Need to add index_of_training
 
 
-    public TrackerExerciseFragment() {
+    public TrackerExerciseFragment2() {
 
 
     }
@@ -84,9 +85,8 @@ public class TrackerExerciseFragment extends Fragment {
         prefsUtils = new PrefsUtils(getActivity(), "exercise");
         workoutId = prefsUtils.getInt("workoutId", 0);
         init(view);
-        getCategories();
-        getLastTraining();
         setTrackerExercise();
+        getLastTraining();
         getTraining();
     }
 
@@ -95,9 +95,8 @@ public class TrackerExerciseFragment extends Fragment {
         trackerList = new ArrayList<>();
         weight = view.findViewById(R.id.et_set_weight);
         reps = view.findViewById(R.id.et_reps);
-        tvWeight = view.findViewById(R.id.tv_weight_tx);
         btnAddTracker = view.findViewById(R.id.btn_add_tracker);
-        mRecyclerView = view.findViewById(R.id.rv_tracker_exercise_ad);
+       // container = view.findViewById(R.id.container_tracker);
         restBetweenSets = view.findViewById(R.id.et_rest_between_sets);
         restAfterExercise = view.findViewById(R.id.et_sec_rest_after_exercise);
     }
@@ -123,36 +122,28 @@ public class TrackerExerciseFragment extends Fragment {
                         sizeOfTraining = 0;
                     } else {
                         sizeOfTraining = trainings.size();
+
+                        for(Training training: trainings) {
+                            getCategories(training.getExerciseId());
+                        }
                     }
                 });
     }
 
-    private void getCategories() {
-        activityViewModel.getExerciseById(exerciseId)
+    private void getCategories(int id) {
+        activityViewModel.getExerciseById(id)
                 .observe(this, exercise -> {
                     if (exercise != null) {
-                        if (exercise.getCategoryId() == 4 || exercise.getCategoryId() == 2) {
-                            weight.setVisibility(View.GONE);
-                            tvWeight.setVisibility(View.GONE);
-                            isWeightGone = true;
+                        if(exercise.getCategoryId() == 4) {
+
                         }
                     }
                 });
     }
 
     private void setTrackerExercise() {
-        final int[] iReps = new int[1];
-        final float[] fWeight = new float[1];
-
         btnAddTracker.setOnClickListener(v -> {
-            //set error
-            if (weight.getText().toString().isEmpty() && reps.getText().toString().isEmpty() && !isWeightGone) {
-                setError(weight, "Enter weight");
-                setError(reps, "Enter reps");
-                return;
-            }
-
-            if (weight.getText().toString().isEmpty() && !isWeightGone) {
+            if (weight.getText().toString().isEmpty() && reps.getText().toString().isEmpty()) {
                 setError(weight, "Enter weight");
                 return;
             }
@@ -160,42 +151,60 @@ public class TrackerExerciseFragment extends Fragment {
                 setError(reps, "Enter reps");
                 return;
             }
-
-            iReps[0] = Integer.parseInt(reps.getText().toString());
-            fWeight[0] = isWeightGone ? 0f : Float.valueOf(weight.getText().toString());
-
-            if (iReps[0] == 0) {
-                reps.setText("");
-                setError(reps, "0 Not acceptable");
-                return;
-            }
-
-            if (fWeight[0] == 0.0 && !isWeightGone) {
-                weight.setText("");
-                setError(weight, "0.0 Not acceptable");
-                return;
-            }
-
-            //add into list
-            trackerExerciseList.add(new TrackerExercise(iReps[0], fWeight[0]));
-            initRecyclerView();
+            addNewView(weight.getText().toString(), reps.getText().toString());
             weight.setText("");
             reps.setText("");
         });
     }
 
-    private void initRecyclerView() {
-        Log.d(TAG, "initRecyclerView " + trackerExerciseList);
-        @SuppressLint("WrongConstant")
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
-        NewTrackerExerciseAdapter exerciseAdapter = new NewTrackerExerciseAdapter(trackerExerciseList, isWeightGone);
-        mRecyclerView.setAdapter(exerciseAdapter);
-        exerciseAdapter.setOnItemClickListener(((position, v) -> {
-            if (v.getTag().equals(R.drawable.ic_delete_black)) {
-                exerciseAdapter.deleteItem(position);
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG, "onSaveInstanceState()");
+        outState.putCharSequenceArrayList("KEY_ITEMS", trackerList);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            Log.i(TAG, "onRestoreInstanceState()");
+            ArrayList<CharSequence> savedItemList = savedInstanceState.getCharSequenceArrayList("KEY_ITEMS");
+            if (savedItemList != null) {
+                for (CharSequence s : savedItemList) {
+                    addNewView(s, s);
+                }
             }
-        }));
+        }
+    }
+
+
+    //method to add tracker in the view page
+    private void addNewView(final CharSequence newText, final CharSequence newTex2) {
+        LayoutInflater layoutInflater = (LayoutInflater) Objects.requireNonNull(getActivity()).getBaseContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        @SuppressLint("InflateParams") final View newView = layoutInflater.inflate(R.layout.row_workout_tracker, null);
+        TextView tvWeight = newView.findViewById(R.id.tv_weight);
+        tvWeight.setText(newText);
+        TextView tvReps = newView.findViewById(R.id.tv_reps);
+        tvReps.setText(newTex2);
+        final TextView tvCount = newView.findViewById(R.id.tv_count);
+        if (trackerList.size() == 0) {
+            tvCount.setText(String.valueOf(1));
+        } else {
+            tvCount.setText(String.valueOf(trackerList.size() / 2 + 1));
+        }
+
+        ImageButton buttonRemove = newView.findViewById(R.id.iv_remove_tracker);
+        buttonRemove.setOnClickListener(v -> {
+            ((LinearLayout) newView.getParent()).removeView(newView);
+            trackerList.remove(newText);
+            trackerList.remove(newTex2);
+        });
+        container.addView(newView);
+        trackerList.add(newText);
+        trackerList.add(newTex2);
     }
 
 
@@ -204,12 +213,24 @@ public class TrackerExerciseFragment extends Fragment {
         String activity1 = prefsUtilsGetActivity.getString("activity", "");
         String activity2 = prefsUtilsGetActivity.getString("activity2", "");
 
+        for (int i = 0; i < trackerList.size(); i++) {
+            switch (i % 2) {
+                case 0:
+                    weightList.add(Float.valueOf(trackerList.get(i).toString()));
+                    break;
+                case 1:
+                    repNumberList.add(Integer.valueOf(trackerList.get(i).toString()));
+                    break;
+            }
+        }
+
         Training training = new Training(exerciseId, Integer.valueOf(restBetweenSets.getText().toString()),
                 Integer.valueOf(this.restAfterExercise.getText().toString()), trackerList.size() / 2,
                 UserRegister.getTodayDate(), sizeOfTraining, workoutId);
 
-        for (int i = 0; i < trackerExerciseList.size(); i++) {
-            trackerExerciseList.get(i).setTrainingId(trainingId);
+        for (int i = 0; i < weightList.size(); i++) {
+            TrackerExercise trackerExercise = new TrackerExercise(repNumberList.get(i), weightList.get(i), trainingId);
+            trackerExerciseList.add(trackerExercise);
         }
 
         if (activity1.equals("StartWorkoutActivity") && activity2.equals("ShowExerciseResultActivity")) {
@@ -246,14 +267,13 @@ public class TrackerExerciseFragment extends Fragment {
     }
 
     private void saveTrackerFromStartWorkout(final Training training) {
-        planViewModel.getWorkoutByWorkoutDay(Event.getDayName())
-                .observe(this, workoutObj -> {
-                    if (workoutObj == null) {
-                        createWorkoutDayName();
-                    }
-                    getWorkoutOfCurrentDayAndAddTraining(training);
-                    goToStartWorkoutActivity();
-                });
+        planViewModel.getWorkoutByWorkoutDay(Event.getDayName()).observe(this, workoutObj -> {
+            if (workoutObj == null) {
+                createWorkoutDayName();
+            }
+            getWorkoutOfCurrentDayAndAddTraining(training);
+            goToStartWorkoutActivity();
+        });
     }
 
     private void createWorkoutDayName() {

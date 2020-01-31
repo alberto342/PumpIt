@@ -24,4 +24,14 @@ public interface ExerciseDAO {
 
     @Query("SELECT * FROM exercise_table WHERE secondary_category_id == :categoryId")
     LiveData<List<Exercise>> getExerciseBySecondaryCategory(int categoryId);
+
+    @Query("SELECT * FROM exercise_table WHERE exercise_name LIKE :query")
+    LiveData<List<Exercise>> getQueryAllExercise(String query);
+
+    @Query("SELECT * FROM exercise_table WHERE exercise_name LIKE :queryText AND category_id == :id")
+    LiveData<List<Exercise>> getQueryExerciseList(String queryText, int id);
+
+
+    @Query("SELECT * FROM exercise_table WHERE exercise_name LIKE :queryText AND secondary_category_id == :id")
+    LiveData<List<Exercise>> getQueryBySecondaryCategory(String queryText, int id);
 }

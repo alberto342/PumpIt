@@ -41,30 +41,36 @@ public class ImgExerciseFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final String TAG = "ImgExerciseFragment";
+        String imgFile;
         ExerciseDetailActivity resultActivity = (ExerciseDetailActivity)getActivity();
         String getExerciseName = resultActivity.getExerciseName();
+        String charAtZero = Character.toString(getExerciseName.charAt(0));
 
         try {
-            String imgFile = "file:///android_asset/images/" + getExerciseName;
+            if(charAtZero.equals("/")) {
+                Glide.with(this)
+                        .load(getExerciseName)
+                        .into(ivExerciseImg);
+            } else {
+                imgFile = "file:///android_asset/images/" + getExerciseName;
+                Glide.with(this)
+                        .asGif()
+                        .load(imgFile)
 
-            Glide.with(this)
-                    .asGif()
-                    .load(imgFile)
+                        .listener(new RequestListener<GifDrawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
+                                return false;
+                            }
 
-                    .listener(new RequestListener<GifDrawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
-                            return false;
-                        }
+                            @Override
+                            public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
+                                return false;
+                            }
+                        })
 
-                        @Override
-                        public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
-                            return false;
-                        }
-                    })
-
-                    .into(ivExerciseImg);
-
+                        .into(ivExerciseImg);
+            }
             Log.d(TAG, "Img successfully loaded " + getExerciseName);
 
         } catch (Exception e) {

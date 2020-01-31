@@ -123,7 +123,7 @@
             android:layout_weight="1"
             android:ems="10"
             android:hint="kg"
-            android:inputType="number"
+            android:inputType="none|numberDecimal"
             android:textAlignment="center"
             android:textColorHint="@color/gray" />
 
@@ -168,7 +168,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/tv_weight_tx"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -212,11 +212,10 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="25dp">
 
-        <LinearLayout
-            android:id="@+id/container_tracker"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_tracker_exercise_ad"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:layout_height="wrap_content" />
     </ScrollView>
 
 

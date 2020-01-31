@@ -44,6 +44,26 @@ public class ExerciseRepository {
     }
 
     public LiveData<List<Exercise>> getExerciseBySecondaryCategory(int categoryId) {
-        return  exerciseObjDAO.getExerciseBySecondaryCategory(categoryId);
+        return exerciseObjDAO.getExerciseBySecondaryCategory(categoryId);
     }
+
+    public LiveData<List<Exercise>> getQueryAllExercise(String query) {
+        return exerciseObjDAO.getQueryAllExercise(query);
+    }
+
+    public LiveData<List<Exercise>> getQueryExerciseList(String queryText, int id) {
+        return exerciseObjDAO.getQueryExerciseList(queryText, id);
+    }
+
+    public  LiveData<List<Exercise>> getQueryBySecondaryCategory(String queryText, int id) {
+        return exerciseObjDAO.getQueryBySecondaryCategory(queryText, id);
+    }
+
+
+    public void insertExercise(Exercise exercise) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(() -> exerciseObjDAO.insert(exercise));
+    }
+
+
 }

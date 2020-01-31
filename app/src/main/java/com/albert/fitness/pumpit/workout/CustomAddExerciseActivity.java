@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,6 +14,11 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
+
+import com.albert.fitness.pumpit.helper.ImageUtils;
+import com.albert.fitness.pumpit.model.Exercise;
+import com.albert.fitness.pumpit.viewmodel.WelcomeActivityViewModel;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,35 +26,29 @@ import java.util.List;
 import java.util.Objects;
 
 import fitness.albert.com.pumpit.R;
-import com.albert.fitness.pumpit.helper.ImageUtils;
-import com.albert.fitness.pumpit.model.CustomExerciseName;
-import io.realm.Realm;
 
 public class CustomAddExerciseActivity extends AppCompatActivity implements ImageUtils.ImageAttachmentListener {
 
     private final String TAG = "CustomAddExerciseActivity";
-    private Realm realm;
     private EditText exerciseName, descriptionExercise;
     private Spinner spMuscleGroup, spMuscleGroup2;
     private ImageView imageViewLoad;
     private ImageUtils imageutils;
     private String imgName;
-    private String imgPatch;
+    private boolean isSecondaryCategory;
+    private int secondaryId = 0;
+    private int categoryId = 0;
+    private WelcomeActivityViewModel viewModel;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_add_exercise);
+        viewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
         imageutils = new ImageUtils(this);
         init();
         Objects.requireNonNull(getSupportActionBar()).hide();
-        //SETUP REEALM
-         realm = Realm.getDefaultInstance();
-
-//        RealmConfiguration config = new RealmConfiguration.Builder().name(CustomExerciseName.REALM_FILE_EXERCISE).deleteRealmIfMigrationNeeded().build();
-//        realm = Realm.getInstance(config);
-
         setSpinner();
     }
 
@@ -62,18 +60,10 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
         ImageView btnCreateExercise = findViewById(R.id.btn_create_my_exercise);
         imageViewLoad = findViewById(R.id.iv_loader_exercise);
 
-        btnCreateExercise.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveDateIntoRealm();
-            }
-        });
-        imageViewLoad.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (editTxtIsEmpty(exerciseName.getText().toString(), descriptionExercise.getText().toString())) {
-                    imageutils.imagepicker(1);
-                }
+        btnCreateExercise.setOnClickListener(v -> saveDate());
+        imageViewLoad.setOnClickListener(v -> {
+            if (editTxtIsEmpty(exerciseName.getText().toString(), descriptionExercise.getText().toString())) {
+                imageutils.imagepicker(1);
             }
         });
     }
@@ -106,20 +96,24 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
 
         String path = Environment.getExternalStorageDirectory() + File.separator + "Pumpit/ExercisePictures" + File.separator;
         imageutils.createImage(file, imgName, path, false);
-
-        imgPatch = path;
-
         imageutils.getImage(imgName, path);
-
-       // imageViewLoad.setImageBitmap(imageutils.getImage(imgName, path));
-
         Log.d(TAG, "Success img uploaded: " + path);
     }
 
 
-
     private void setSpinner() {
         List<String> muscleGroupList = new ArrayList<>();
+        Bundle extras = getIntent().getExtras();
+        String categoryType = "";
+        if (extras != null) {
+            categoryType = extras.getString("category", "");
+
+           if(!categoryType.isEmpty()) {
+               muscleGroupList.add(0, categoryType);
+               muscleGroupList.add(categoryType);
+           }
+        }
+
         muscleGroupList.add("Abs");
         muscleGroupList.add("Back");
         muscleGroupList.add("Biceps");
@@ -133,6 +127,12 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
         muscleGroupList.add("Triceps");
         muscleGroupList.add("Thigh");
 
+        for (int i = 0; i < muscleGroupList.size(); i++) {
+            if(muscleGroupList.get(i).equals(muscleGroupList.get(0))){
+                muscleGroupList.remove(i);
+            }
+        }
+
         ArrayAdapter<String> daysWeekAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, muscleGroupList);
         daysWeekAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -141,46 +141,21 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
     }
 
     @SuppressLint("LongLogTag")
-    private void saveDateIntoRealm() {
-        String exercise = exerciseName.getText().toString();
+    private void saveDate() {
+        String exerciseName = this.exerciseName.getText().toString();
         String exerciseDescription = descriptionExercise.getText().toString();
         String muscleGroup = spMuscleGroup.getSelectedItem().toString();
         String muscleGroup2 = spMuscleGroup2.getSelectedItem().toString();
 
+        getCategoryId(muscleGroup);
 
-        //spMuscleGroup.getSelectedItem().equals(AddExerciseActivity.categorySelected);
-        //spMuscleGroup2.getSelectedItem().equals(AddExerciseActivity.category2Selected);
-
-
-        final CustomExerciseName customExerciseName = new CustomExerciseName(exercise, muscleGroup, muscleGroup2, exerciseDescription, imgName, imgPatch);
-
-        if (editTxtIsEmpty(exercise, exerciseDescription)) {
-
-            realm.getSchema();
-
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(@NonNull Realm realm) {
-
-                    Number currentIdNum = realm.where(CustomExerciseName.class).max("id");
-                    int nextId;
-
-                    if(currentIdNum == null) {
-                        nextId = 1;
-                    } else {
-                        nextId = currentIdNum.intValue() + 1;
-                    }
-
-                    customExerciseName.setId(nextId);
-
-                    realm.insertOrUpdate(customExerciseName);
-
-                    Log.d(TAG,"Success saved into realm");
-                    startActivity(new Intent(CustomAddExerciseActivity.this, ShowExerciseResultActivity.class));
-                    finish();
-                }
-            });
+        if (categoryId != 0) {
+            viewModel.setExercise(new Exercise(exerciseName, imgName, categoryId, secondaryId));
         }
+
+        Log.d(TAG, "Success saved ");
+        //startActivity(new Intent(CustomAddExerciseActivity.this, ShowExerciseResultActivity.class));
+        finish();
     }
 
     private boolean editTxtIsEmpty(String exercise, String exerciseDescription) {
@@ -199,9 +174,47 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
         editText.setError(errorTxt);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        realm.close();
+    private void getCategoryId(String category) {
+        switch (category) {
+            case "Abs":
+                isSecondaryCategory = false;
+                categoryId = 1;
+            case "Back":
+                isSecondaryCategory = false;
+                categoryId = 8;
+            case "Biceps":
+                isSecondaryCategory = true;
+                categoryId = 6;
+                secondaryId = 2;
+            case "Cardio":
+                categoryId = 4;
+                isSecondaryCategory = false;
+            case "Calf":
+            case "Thigh":
+                isSecondaryCategory = true;
+                categoryId = 5;
+                secondaryId = 5;
+            case "Chest":
+                isSecondaryCategory = false;
+                categoryId = 7;
+            case "Forearm":
+                isSecondaryCategory = true;
+                secondaryId = 4;
+                categoryId = 6;
+            case "Glutes":
+                isSecondaryCategory = true;
+                secondaryId = 7;
+                categoryId = 5;
+            case "Shoulder":
+                isSecondaryCategory = false;
+                categoryId = 3;
+            case "Stretch":
+                isSecondaryCategory = false;
+                categoryId = 2;
+            case "Triceps":
+                isSecondaryCategory = true;
+                secondaryId = 3;
+                categoryId = 6;
+        }
     }
 }

@@ -37,10 +37,11 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingAdapter.Traini
 
     @Override
     public void onBindViewHolder(@NonNull TrainingViewHolder viewHolder, int i) {
-        Training item = items.get(i);
-        Exercise exercise = exerciseList.get(i);
-        viewHolder.listItemBinding.setTraining(item);
-        viewHolder.listItemBinding.setExercise(exercise);
+        if(i < exerciseList.size()) {
+            Exercise exercise = exerciseList.get(i);
+            viewHolder.listItemBinding.setExercise(exercise);
+        }
+        viewHolder.listItemBinding.setTraining(items.get(i));
     }
 
     @Override

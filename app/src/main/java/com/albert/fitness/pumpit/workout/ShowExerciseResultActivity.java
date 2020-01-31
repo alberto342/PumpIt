@@ -34,13 +34,14 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     private WelcomeActivityViewModel welcomeActivityViewModel;
     private ExerciseAdapter exerciseAdapter;
     private RecyclerView mRecyclerView;
+    int category, secondaryCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityShowExerciseResultBinding exerciseResultBinding =
                 DataBindingUtil.setContentView(this, R.layout.activity_show_exercise_result);
-        setTitle(getExerciseType());
+        setTitle(getExerciseType() + " Exercise");
         mRecyclerView = exerciseResultBinding.rvExerciseResult;
         pref();
         welcomeActivityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
@@ -50,8 +51,8 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     private void setUpLoadExercise() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            int category = extras.getInt("category");
-            int secondaryCategory = extras.getInt("category2");
+            category = extras.getInt("category");
+            secondaryCategory = extras.getInt("category2");
 
             if (category == 0) {
                 loadAllExercise();
@@ -74,9 +75,9 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     private void loadExerciseByCategory(int category) {
         welcomeActivityViewModel.getExerciseOfASelectedCategory(category)
                 .observe(this, exercises -> {
-            exerciseList = (ArrayList<Exercise>) exercises;
-            initRecyclerView();
-        });
+                    exerciseList = (ArrayList<Exercise>) exercises;
+                    initRecyclerView();
+                });
     }
 
 
@@ -92,7 +93,7 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     private String getExerciseType() {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            return extras.getString("exerciseType") + " Exercise";
+            return extras.getString("exerciseType");
         }
         return null;
     }
@@ -104,9 +105,6 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
             prefsUtils.saveData("activity2", "ShowExerciseResultActivity");
         }
     }
-
-
-
 
 
     @SuppressLint("LongLogTag")
@@ -128,37 +126,6 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
         });
     }
 
-
-
-
-
-
-    //   private void getCustomExercise() {
-    //SETUP REEALM
-//        RealmConfiguration config = new RealmConfiguration.Builder().name(CustomExerciseName.REALM_FILE_EXERCISE).deleteRealmIfMigrationNeeded().build();
-//        Realm realmExercise = Realm.getInstance(config);
-//
-//        String category = AddExerciseActivity.categorySelected;
-//
-//        RealmQuery<CustomExerciseName> query = realmExercise.where(CustomExerciseName.class);
-//
-//        query.equalTo("muscle_group", category);
-//
-//        RealmResults<CustomExerciseName> result = query.findAll();
-//
-//        List<CustomExerciseName> customExerciseNameList = new ArrayList<>(result);
-//
-//        RecyclerView recyclerView = findViewById(R.id.rv_custom_exercise);
-//        recyclerView.setHasFixedSize(true);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-//
-//        if (!customExerciseNameList.isEmpty()) {
-//            CustomExerciseAdapter customExerciseAdapter = new CustomExerciseAdapter(this, customExerciseNameList);
-//            recyclerView.setAdapter(customExerciseAdapter);
-//        }
-    //   }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_search_exercise, menu);
@@ -171,7 +138,10 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (R.id.menu_cus_add_exercise == item.getItemId()) {
-            startActivity(new Intent(this, CustomAddExerciseActivity.class));
+            Intent i = new Intent(this, CustomAddExerciseActivity.class);
+            i.putExtra("category", getExerciseType());
+            startActivity(i);
+            //startActivity(new Intent(this, CustomAddExerciseActivity.class));
         }
         return true;
     }
@@ -184,15 +154,35 @@ public class ShowExerciseResultActivity extends AppCompatActivity implements Sea
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        String userInput = newText.toLowerCase();
+
+        String searchText = "%" + newText + "%";
         List<Exercise> newList = new ArrayList<>();
 
-        for (Exercise name : exerciseList) {
-            if (name.getExerciseName().toLowerCase().contains(userInput)) {
-                newList.add(name);
-            }
+        if (category == 0) {
+            welcomeActivityViewModel.getQueryAllExercise(searchText)
+                    .observe(this, exercises -> {
+                        if (!exercises.isEmpty()) {
+                            newList.addAll(exercises);
+                            exerciseAdapter.updateList(newList);
+                        }
+                    });
+        } else if (secondaryCategory == 1) {
+            welcomeActivityViewModel.getQueryExerciseList(searchText, category)
+                    .observe(this, exercises -> {
+                        if (!exercises.isEmpty()) {
+                            newList.addAll(exercises);
+                            exerciseAdapter.updateList(newList);
+                        }
+                    });
+        } else {
+            welcomeActivityViewModel.getQueryBySecondaryCategory(searchText, secondaryCategory)
+                    .observe(this, exercises -> {
+                        if (!exercises.isEmpty()) {
+                            newList.addAll(exercises);
+                            exerciseAdapter.updateList(newList);
+                        }
+                    });
         }
-        exerciseAdapter.updateList(newList);
         return true;
     }
 

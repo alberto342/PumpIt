@@ -214,6 +214,11 @@ public class WorkoutRepository {
         myExecutor.execute(() -> trainingDAO.updateTrainingPosition(newPosition, position));
     }
 
+    public void updateTrainingRestExercise(int restBetweenSet, int restAfterExercise, int trainingId) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(() -> trainingDAO.updateTrainingRestExercise(restBetweenSet, restAfterExercise, trainingId));
+    }
+
     public void updateTrackerExercise(final TrackerExercise trackerExercise) {
         Executor myExecutor = Executors.newSingleThreadExecutor();
         myExecutor.execute(() -> trackerExerciseDAO.update(trackerExercise));

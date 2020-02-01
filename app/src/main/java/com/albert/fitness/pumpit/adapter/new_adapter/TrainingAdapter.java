@@ -22,9 +22,11 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingAdapter.Traini
     private OnItemClickListener listener;
     private ArrayList<Training> items = new ArrayList<>();
     private List<Exercise> exerciseList;
+    private List<Integer> setNumList;
 
-    public TrainingAdapter(List<Exercise> exerciseList) {
+    public TrainingAdapter(List<Exercise> exerciseList, List<Integer> setNumList) {
         this.exerciseList = exerciseList;
+        this.setNumList = setNumList;
     }
 
     @NonNull
@@ -41,7 +43,14 @@ public class TrainingAdapter extends RecyclerView.Adapter<TrainingAdapter.Traini
             Exercise exercise = exerciseList.get(i);
             viewHolder.listItemBinding.setExercise(exercise);
         }
+
+        if(i<setNumList.size()) {
+            viewHolder.listItemBinding.setSets(setNumList.get(i));
+        }
+
         viewHolder.listItemBinding.setTraining(items.get(i));
+
+
     }
 
     @Override

@@ -30,11 +30,12 @@ import fitness.albert.com.pumpit.databinding.ActivityTrainingBinding;
 
 public class TrainingActivity extends AppCompatActivity {
 
+    private final String TAG = "TrainingActivity";
     private RecyclerView mRecyclerView;
     private TrainingAdapter trainingAdapter;
     private List<Training> trainingList = new ArrayList<>();
-    private final String TAG = "TrainingActivity";
     private List<Exercise> exerciseList = new ArrayList<>();
+    private List<Integer> setNumList = new ArrayList<>();
     private WelcomeActivityViewModel activityViewModel;
     private CustomPlanViewModel planViewModel;
 
@@ -48,10 +49,7 @@ public class TrainingActivity extends AppCompatActivity {
         planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
         activityViewModel = ViewModelProviders.of(this).get(WelcomeActivityViewModel.class);
         getTraining();
-        //itemTouchHelper();
     }
-
-
 
 
     @Override
@@ -83,11 +81,22 @@ public class TrainingActivity extends AppCompatActivity {
                 trainingList = trainings;
                 for (Training t : trainings) {
                     getExercise(t.getExerciseId());
-                    Log.d(TAG, "getTraining ExerciseId: " + t.getExerciseId());
+                    getSizeOfTracker(t.getTrainingId());
                 }
             }
         });
     }
+
+    private void getSizeOfTracker(int trainingId) {
+        planViewModel.getTrackerExerciseByTraining(trainingId)
+                .observe(this, trackerExercises -> {
+                    if (!trackerExercises.isEmpty()) {
+                        Log.d(TAG, "trackerExercisesSize: " + trackerExercises.size());
+                        setNumList.add(trackerExercises.size());
+                    }
+                });
+    }
+
 
     private void getExercise(int exerciseId) {
         Log.d(TAG, "getExercise: " + exerciseId);
@@ -107,15 +116,20 @@ public class TrainingActivity extends AppCompatActivity {
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-        trainingAdapter = new TrainingAdapter(exerciseList);
+        trainingAdapter = new TrainingAdapter(exerciseList, setNumList);
         trainingAdapter.setItems((ArrayList<Training>) trainingList);
         mRecyclerView.setAdapter(trainingAdapter);
         Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);
         trainingAdapter.setListener((item, i) -> {
             Log.d(TAG, "onClick: " + exerciseList.get(i).getExerciseName());
-            Intent intent = new Intent(TrainingActivity.this, ShowExerciseImgActivity.class);
+
+            Intent intent = new Intent(TrainingActivity.this, EditTrackerExercise.class);
+            intent.putExtra("trainingId", item.getTrainingId());
             intent.putExtra("exerciseName", exerciseList.get(i).getExerciseName());
             intent.putExtra("imgName", exerciseList.get(i).getImgName());
+            intent.putExtra("exerciseId", item.getExerciseId());
+            intent.putExtra("restBetweenSet", item.getRestBetweenSet());
+            intent.putExtra("restAfterExercise", item.getRestAfterExercise());
             startActivity(intent);
         });
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -127,21 +141,11 @@ public class TrainingActivity extends AppCompatActivity {
                 trainingAdapter.notifyItemMoved(from, to);
                 return true;
             }
+
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
                 planViewModel.deleteTraining(trainingList.get(viewHolder.getAdapterPosition()));
             }
         }).attachToRecyclerView(mRecyclerView);
     }
-
-
-//    public void initRecyclerView() {
-//        @SuppressLint("WrongConstant")
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-//        mRecyclerView.setLayoutManager(layoutManager);
-//        trainingAdapter = new TrainingAdapter(this, trainingList, exerciseList);
-//        trainingAdapter.notifyDataSetChanged();
-//        mRecyclerView.setAdapter(trainingAdapter);
-//        Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);
-//    }
 }

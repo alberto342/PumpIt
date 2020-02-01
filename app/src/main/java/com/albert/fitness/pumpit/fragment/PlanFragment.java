@@ -7,11 +7,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +39,7 @@ import fitness.albert.com.pumpit.R;
 public class PlanFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
+    private ImageView btnAddPlan;
     private final String TAG = "PlanFragment";
     private List<WorkoutPlanObj> workoutPlansList;
     private WorkoutPlanAdapter planAdapter;
@@ -58,6 +57,7 @@ public class PlanFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_plan, container, false);
         mRecyclerView = view.findViewById(R.id.fr_rv_workout_plans);
+        btnAddPlan = view.findViewById(R.id.btn_add_plan);
         setHasOptionsMenu(true);
         swipe();
         return view;
@@ -80,35 +80,38 @@ public class PlanFragment extends Fragment {
                 }
             }
         });
+        btnAddPlan.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), CustomPlanActivity.class));
+        });
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main_add, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.add_plans) {
-            startActivity(new Intent(getActivity(), CustomPlanActivity.class));
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_main_add, menu);
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
+//
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        if (item.getItemId() == R.id.add_plans) {
+//            startActivity(new Intent(getActivity(), CustomPlanActivity.class));
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
 
     private void swipe() {

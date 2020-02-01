@@ -17,32 +17,13 @@
 <androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <EditTextPreference
-        app:key="name"
-        app:title="@string/full_name"
+        app:key="rest_between_sets"
+        app:title="Rest between sets"
         app:useSimpleSummaryProvider="true" />
 
-    <SwitchPreferenceCompat
-        app:key="is_male"
-        app:title="@string/gender"
-        app:summaryOff="@string/female"
-        app:summaryOn="@string/male" />
-
-
-    <Preference
-        app:fragment="com.albert.fitness.pumpit.fragment.profile.SettingsActivity$ProfileFragment"
-        app:key="date_of_birth"
-        app:title="@string/date_of_birth" />
-
-
-    <!--<EditTextPreference-->
-        <!--app:key="height"-->
-        <!--app:title="@string/height"-->
-        <!--app:useSimpleSummaryProvider="true" />-->
-
-
-
-
-
-
+    <EditTextPreference
+        app:key="rest_after_exercise"
+        app:title="Rest after exercise"
+        app:useSimpleSummaryProvider="true" />
 
 </androidx.preference.PreferenceScreen>

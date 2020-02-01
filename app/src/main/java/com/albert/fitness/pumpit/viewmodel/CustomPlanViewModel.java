@@ -168,6 +168,10 @@ public class CustomPlanViewModel extends AndroidViewModel {
         repository.updateTrainingPosition(newPosition, position);
     }
 
+    public void updateTrainingRestExercise(int restBetweenSet, int restAfterExercise, int trainingId) {
+        repository.updateTrainingRestExercise(restBetweenSet, restAfterExercise, trainingId);
+    }
+
     public void updateTracker(TrackerExercise trackerExercise) {
         repository.updateTrackerExercise(trackerExercise);
     }

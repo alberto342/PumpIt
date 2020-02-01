@@ -53,6 +53,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private AlertDialog dialog;
     private CustomPlanViewModel planViewModel;
     private TrainingAdapter trainingAdapter;
+    private List<Integer> setNumList = new ArrayList<>();
 
 
     @Override
@@ -148,6 +149,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
                             if (!exerciseId.contains(tr.getExerciseId())) {
                                 trainingList.add(tr);
                                 getExercise(tr.getExerciseId());
+                                getSizeOfTraining(tr.getTrainingId());
                             }
                         }
 
@@ -158,6 +160,15 @@ public class StartWorkoutActivity extends AppCompatActivity {
                             btnStartWorkout.setVisibility(View.INVISIBLE);
                             emptyWorkout.setVisibility(View.VISIBLE);
                         }
+                    }
+                });
+    }
+
+    private void getSizeOfTraining(int trainingId) {
+        planViewModel.getTrackerExerciseByTraining(trainingId)
+                .observe(this, trackerExercises -> {
+                    if (!trackerExercises.isEmpty()) {
+                        setNumList.add(trackerExercises.size());
                     }
                 });
     }
@@ -230,7 +241,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-        trainingAdapter = new TrainingAdapter(exerciseList);
+        trainingAdapter = new TrainingAdapter(exerciseList, setNumList);
         trainingAdapter.setItems((ArrayList<Training>) trainingList);
         mRecyclerView.setAdapter(trainingAdapter);
         Log.d(TAG, "initRecyclerView: init recyclerView" + mRecyclerView);

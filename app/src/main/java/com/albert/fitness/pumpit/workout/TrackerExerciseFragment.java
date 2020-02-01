@@ -84,6 +84,7 @@ public class TrackerExerciseFragment extends Fragment {
         prefsUtils = new PrefsUtils(getActivity(), "exercise");
         workoutId = prefsUtils.getInt("workoutId", 0);
         init(view);
+        getDefRestAfterAndBetweenExercise();
         getCategories();
         getLastTraining();
         setTrackerExercise();
@@ -100,6 +101,19 @@ public class TrackerExerciseFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.rv_tracker_exercise_ad);
         restBetweenSets = view.findViewById(R.id.et_rest_between_sets);
         restAfterExercise = view.findViewById(R.id.et_sec_rest_after_exercise);
+    }
+
+    private void getDefRestAfterAndBetweenExercise() {
+        PrefsUtils prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
+        String restBetweenSets = prefsUtils.getString("rest_between_sets", "");
+        String restAfterExercise = prefsUtils.getString("rest_after_exercise", "");
+
+        if(!restBetweenSets.isEmpty()) {
+            this.restBetweenSets.setText(restBetweenSets);
+        }
+        if(!restAfterExercise.isEmpty()) {
+            this.restAfterExercise.setText(restAfterExercise);
+        }
     }
 
     @Override
@@ -120,6 +134,7 @@ public class TrackerExerciseFragment extends Fragment {
         planViewModel.getTrainingByWorkoutId(workoutId)
                 .observe(this, trainings -> {
                     if (trainings.isEmpty()) {
+
                         sizeOfTraining = 0;
                     } else {
                         sizeOfTraining = trainings.size();

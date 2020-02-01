@@ -65,9 +65,12 @@ public class Exercise {
     @BindingAdapter({"img_name"})
     public static void loadImage(ImageView view, String imageUrl) {
         Bitmap bitmap;
+        String charAtZero = null;
+        if(!imageUrl.isEmpty()) {
+            charAtZero = Character.toString(imageUrl.charAt(0));
+        }
 
-        String charAtZero = Character.toString(imageUrl.charAt(0));
-        if(charAtZero.equals("/")) {
+        if(charAtZero != null && charAtZero.equals("/")) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             options.inSampleSize = 2;

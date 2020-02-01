@@ -2,7 +2,6 @@ package com.albert.fitness.pumpit.workout;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -154,13 +153,10 @@ public class CustomPlanActivity extends AppCompatActivity {
 //    }
 
     private void onClick() {
-        btnCreateWorkout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveData();
-               // startActivity(new Intent(CustomPlanActivity.this, PlanFragment.class));
-                finish();
-            }
+        btnCreateWorkout.setOnClickListener(v -> {
+            saveData();
+           // startActivity(new Intent(CustomPlanActivity.this, PlanFragment.class));
+            finish();
         });
     }
 

@@ -2,7 +2,6 @@ package com.albert.fitness.pumpit.workout;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,7 +47,6 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
     public static String workoutId;
     private int id;
 
-    // TODO: 2019-10-18 workoutId is null
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,21 +85,18 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         final PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
         final boolean isFirstTime = prefsUtils.getBoolean("first_time " + workoutId, true);
         if (id != -1 && size != -1) {
-            customPlanViewModel.getWorkoutNAmeOfASelectedPlan(id).observe(this, new Observer<List<WorkoutObj>>() {
-                @Override
-                public void onChanged(List<WorkoutObj> workout) {
-                    workoutList = workout;
-                    if (workout.isEmpty() && isFirstTime) {
-                        for (int i = 0; i <= size; i++) {
-                            int num = i + 1;
-                            WorkoutObj workoutObj = new WorkoutObj( "Day " + num,
-                                    "Workout " + num, UserRegister.getTodayDate(), id);
-                            customPlanViewModel.addNewWorkout(workoutObj);
-                            prefsUtils.saveData("first_time " + workoutId, false);
-                        }
+            customPlanViewModel.getWorkoutNAmeOfASelectedPlan(id).observe(this, workout -> {
+                workoutList = workout;
+                if (workout.isEmpty() && isFirstTime) {
+                    for (int i = 0; i <= size; i++) {
+                        int num = i + 1;
+                        WorkoutObj workoutObj = new WorkoutObj( "Day " + num,
+                                "Workout " + num, UserRegister.getTodayDate(), id);
+                        customPlanViewModel.addNewWorkout(workoutObj);
+                        prefsUtils.saveData("first_time " + workoutId, false);
                     }
-                    initRecyclerView();
                 }
+                initRecyclerView();
             });
         }
     }
@@ -220,37 +214,26 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
 
 
         if (i != -1) {
-            customPlanViewModel.getWorkoutById(workoutList.get(i).getWorkoutId()).observe(this, new Observer<WorkoutObj>() {
-                @Override
-                public void onChanged(WorkoutObj workoutObj) {
-                    workout[0] = workoutObj;
-                    workoutName.setText(workoutObj.getWorkoutDayName());
-                }
+            customPlanViewModel.getWorkoutById(workoutList.get(i).getWorkoutId()).observe(this, workoutObj -> {
+                workout[0] = workoutObj;
+                workoutName.setText(workoutObj.getWorkoutDayName());
             });
         }
 
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (workoutName.getText().toString().isEmpty()) {
-                    workoutName.setError("Please enter Workout Day Name");
-                } else if (i == -1) {
-                    saveDay(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString());
-                } else {
-                    updateItemIfExisting(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString(), workout[0]);
-                }
-                //Check if the day existing
+        save.setOnClickListener(v -> {
+            if (workoutName.getText().toString().isEmpty()) {
+                workoutName.setError("Please enter Workout Day Name");
+            } else if (i == -1) {
+                saveDay(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString());
+            } else {
+                updateItemIfExisting(workoutName.getText().toString(), pickWorkoutDay.getSelectedItem().toString(), workout[0]);
+            }
+            //Check if the day existing
 
 
-                dialog.dismiss();
-            }
+            dialog.dismiss();
         });
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        cancel.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
@@ -259,31 +242,10 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("The day already exists Please select another day")
                 .setCancelable(false)
-                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
+                .setNegativeButton("OK", (dialogInterface, i) -> dialogInterface.cancel());
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
-
-//    private void setupSwipeMenu() {
-//        new RecyclerViewSwipeHelper(this, mRecyclerView, this);
-//    }
-
-
-//    @Override
-//    public boolean showButton(int rowPosition, int buttonIndex) {
-//        return true;
-//    }
-//
-//    @Override
-//    public int buttonWidth() {
-//        return 0;
-//    }
 
 
     private void swipe() {
@@ -295,12 +257,9 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
                         0,
                         // R.color.colorAccent,
                         Color.parseColor("#d50000"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
-                                customPlanViewModel.deleteWorkout(workoutList.get(pos));
-                                deleteFromPref();
-                            }
+                        pos -> {
+                            customPlanViewModel.deleteWorkout(workoutList.get(pos));
+                            deleteFromPref();
                         }
                 ));
                 underlayButtons.add(new SwipeHelper.UnderlayButton(
@@ -308,12 +267,9 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
                         0,
                         //R.color.md_green_500,
                         Color.parseColor("#4caf50"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
-                                setEditLayout(pos);
-                                Log.d(TAG, "WorkoutDayName: " + workoutList.get(pos).getWorkoutDayName());
-                            }
+                        pos -> {
+                            setEditLayout(pos);
+                            Log.d(TAG, "WorkoutDayName: " + workoutList.get(pos).getWorkoutDayName());
                         }
                 ));
             }
@@ -391,14 +347,11 @@ public class WorkoutActivity extends AppCompatActivity implements View.OnClickLi
         WorkoutAdapter workoutAdapter = new WorkoutAdapter(this);
         workoutAdapter.setItems((ArrayList<WorkoutObj>) workoutList);
         mRecyclerView.setAdapter(workoutAdapter);
-        workoutAdapter.setListener(new WorkoutAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(WorkoutObj item) {
-                PrefsUtils prefsUtils = new PrefsUtils(WorkoutActivity.this, PrefsUtils.EXERCISE);
-                prefsUtils.saveData("workoutId", item.getWorkoutId());
-                startActivity(new Intent(WorkoutActivity.this, TrainingActivity.class));
-                finish();
-            }
+        workoutAdapter.setListener(item -> {
+            PrefsUtils prefsUtils = new PrefsUtils(WorkoutActivity.this, PrefsUtils.EXERCISE);
+            prefsUtils.saveData("workoutId", item.getWorkoutId());
+            startActivity(new Intent(WorkoutActivity.this, TrainingActivity.class));
+            finish();
         });
     }
 }

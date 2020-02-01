@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.albert.fitness.pumpit.fragment.logsFragment.LogTabActivity;
 import com.albert.fitness.pumpit.model.nutrition.room.QueryNutritionItem;
 import com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity;
 import com.albert.fitness.pumpit.nutrition.ShowDinnerActivity;
@@ -72,30 +73,32 @@ public class DinnerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         holder.tvProtein.setText(String.format(Locale.getDefault(), "%.2f Protein", nutritionItems.get(position).getProtein()));
         holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.itemView.setOnClickListener(v -> {
 
-                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
+            Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
-                foodName = nutritionItems.get(position).getFoodName();
+            foodName = nutritionItems.get(position).getFoodName();
 
-                String cotxt = mContext.toString();
-                String[] parts = cotxt.split("@");
-                String part1 = parts[0];
-
-                //refresh page
-                if (!part1.equals("LogTabActivity")) {
-                    mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
-                    ((ShowAllNutritionActivity) mContext).finish();
-                }
-
-                Intent i = new Intent(mContext, ShowDinnerActivity.class);
-                i.putExtra("logId", nutritionItems.get(position).getLogId());
-                i.putExtra("foodName", nutritionItems.get(position).getFoodName());
-                mContext.startActivity(i);
-                ((Activity) mContext).recreate();
+            if(mContext instanceof LogTabActivity) {
+                mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
+                ((LogTabActivity) mContext).finish();
             }
+
+//                String cotxt = mContext.toString();
+//                String[] parts = cotxt.split("@");
+//                String part1 = parts[0];
+//
+//                //refresh page
+//                if (!part1.equals("LogTabActivity")) {
+//                    mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
+//                    ((ShowAllNutritionActivity) mContext).finish();
+//                }
+
+            Intent i = new Intent(mContext, ShowDinnerActivity.class);
+            i.putExtra("logId", nutritionItems.get(position).getLogId());
+            i.putExtra("foodName", nutritionItems.get(position).getFoodName());
+            mContext.startActivity(i);
+            ((Activity) mContext).recreate();
         });
     }
 

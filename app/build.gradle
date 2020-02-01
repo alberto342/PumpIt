@@ -116,6 +116,9 @@ dependencies {
     //Switch button
     implementation 'com.nightonke:jellytogglebutton:1.0.2'
 
+    //graphview
+    implementation 'com.jjoe64:graphview:4.2.2'
+
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

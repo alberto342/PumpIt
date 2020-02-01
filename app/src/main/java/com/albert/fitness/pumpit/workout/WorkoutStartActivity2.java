@@ -527,7 +527,6 @@ public class WorkoutStartActivity2 extends AppCompatActivity implements OnClickL
     }
 
 
-    // TODO: 2019-10-19 calculation cal burned
     private void saveExercise() {
         PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.SETTINGS_PREFERENCES_FILE);
         float weight = prefsUtils.getFloat("weight", 1f);

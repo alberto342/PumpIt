@@ -6,6 +6,7 @@
     <string name="hint_email">Email</string>
     <string name="btn_reset_password">Reset password</string>
     <string name="btn_back">back</string>
+    <string name="package_name">com.albert.fitness.pumpit.fragment.profile</string>
 
     <string name="Search">Search...</string>
 
@@ -147,6 +148,7 @@
     <string name="account">Account</string>
     <string name="my_goal">My Goal</string>
     <string name="diary">Diary</string>
+    <string name="workout_tracker">Workout Tracker</string>
     <string name="water_tracker">Water Tracker</string>
     <string name="notification_settings">Notification Settings</string>
     <string name="units">Units</string>
@@ -155,6 +157,7 @@
     <string name="about_pumpit">About PumpIt</string>
     <string name="delete_account">Delete Account</string>
     <string name="log_out">Log Out</string>
+    <string name="full_name">Full Name</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="gender">Gender</string>
@@ -188,6 +191,7 @@
     <string name="routine_type">Routine Type</string>
     <string name="routine_description">Routine Description:</string>
     <string name="enter_a_description">Enter a description...</string>
+    <string name="title_activity_settings2">Settings</string>
 
 
 </resources>

@@ -49,9 +49,6 @@ import me.himanshusoni.quantityview.QuantityView;
 
 public class ShowFoodBeforeAddedActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
-
-    // TODO: 2019-07-09 on change quantity manuel its not show up
-
     private final String TAG = "ShowFoodBeforeAddedActivity";
     private QuantityView quantityViewCustom;
     private ProgressBar progressBar;

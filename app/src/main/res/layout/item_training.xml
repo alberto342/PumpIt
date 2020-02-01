@@ -9,6 +9,10 @@
         <variable
             name="exercise"
             type="com.albert.fitness.pumpit.model.Exercise" />
+        
+        <variable
+            name="sets"
+            type="Integer" />
     </data>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -71,7 +75,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:hint="set and rep"
-                            android:text="@{@string/num_of_sets(training.sizeOfRept)}"
+                            android:text="@{@string/num_of_sets(sets)}"
                             android:textColor="@color/gray"
                             android:textColorHint="@color/gray" />
 

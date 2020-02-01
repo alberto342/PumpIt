@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name="com.albert.fitness.pumpit.workout.EditTrackerExercise"></activity>
         <activity android:name="com.albert.fitness.pumpit.workout.ShowExerciseImgActivity" />
         <activity
             android:name="com.albert.fitness.pumpit.fragment.profile.SettingsActivity"
@@ -52,7 +53,6 @@
             android:name="com.albert.fitness.pumpit.nutrition.ShowBreakfastActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity" />
-        <activity android:name="com.albert.fitness.pumpit.nutrition.ShowItemFoodActivity" />
         <activity
             android:name="com.albert.fitness.pumpit.welcome.WelcomeActivity"
             android:label="@string/app_name"

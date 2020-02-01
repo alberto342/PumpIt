@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.albert.fitness.pumpit.fragment.logsFragment.LogTabActivity;
 import com.albert.fitness.pumpit.model.nutrition.room.QueryNutritionItem;
 import com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity;
 import com.albert.fitness.pumpit.nutrition.ShowBreakfastActivity;
@@ -65,52 +66,41 @@ public class BreakfastListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 .error(R.mipmap.ic_launcher)
                 .into(holder.ivImage);
 
-//        holder.tvFoodName.setText(nutritionItems.get(position).getFoodName());
-//        holder.tvCalories.setText(String.format(Locale.getDefault(), "%.2f Kcal,  %.2f Carbs", nutritionItems.get(position).getCalories(), nutritionItems.get(position).getTotalCarbohydrate()));
-//        holder.tvProtein.setText(String.format(Locale.getDefault(), "%.2f Protein", nutritionItems.get(position).getProtein()));
-//        holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
-//
-//            }
-//        });
-
-
         holder.tvFoodName.setText(nutritionItems.get(position).getFoodName());
         holder.tvCalories.setText(String.format(Locale.getDefault(), "%.2f Kcal,  %.2f Carbs", nutritionItems.get(position).getCalories(),
                 nutritionItems.get(position).getTotalCarbohydrate()));
         holder.tvProtein.setText(String.format(Locale.getDefault(), "%.2f Protein", nutritionItems.get(position).getProtein()));
         holder.tvServiceQty.setText("Qty: " + nutritionItems.get(position).getQty());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
+        holder.itemView.setOnClickListener(v -> {
+            Log.d(TAG, "onClick: clicked on: " + holder.tvFoodName.getText().toString());
 
-                foodName = holder.tvFoodName.getText().toString();
+            foodName = holder.tvFoodName.getText().toString();
 
-                String cotxt = mContext.toString();
-                String[] parts = cotxt.split("@");
-                String part1 = parts[0];
+//            String cotxt = mContext.toString();
+//            String[] parts = cotxt.split("@");
+//            String part1 = parts[0];
 
-                if (!part1.equals("LogTabActivity")) {
-                    mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
-                    ((ShowAllNutritionActivity) mContext).finish();
-                }
+            if(mContext instanceof LogTabActivity) {
+                mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
+                ((LogTabActivity) mContext).finish();
+            }
 
-                Intent i = new Intent(mContext, ShowBreakfastActivity.class);
-                i.putExtra("logId", nutritionItems.get(position).getLogId());
-                i.putExtra("foodName", nutritionItems.get(position).getFoodName());
-                mContext.startActivity(i);
+//            if (!part1.equals("LogTabActivity")) {
+//                mContext.startActivity(new Intent(mContext, ShowAllNutritionActivity.class));
+//                ((ShowAllNutritionActivity) mContext).finish();
+//            }
+
+            Intent i = new Intent(mContext, ShowBreakfastActivity.class);
+            i.putExtra("logId", nutritionItems.get(position).getLogId());
+            i.putExtra("foodName", nutritionItems.get(position).getFoodName());
+            mContext.startActivity(i);
 
 
-                ((Activity) mContext).recreate();
+            ((Activity) mContext).recreate();
 
 //                mContext.startActivity(new Intent(mContext, ShowBreakfastActivity.class));
 //                foodsList.clear();
 //                ((Activity) mContext).finish();
-            }
         });
     }
 

@@ -19,11 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.albert.fitness.pumpit.model.Event;
+import com.albert.fitness.pumpit.model.QueryFinishWorkout;
 import com.albert.fitness.pumpit.model.UserRegister;
 import com.albert.fitness.pumpit.model.nutrition.Foods;
 import com.albert.fitness.pumpit.model.nutrition.room.SumNutritionPojo;
@@ -31,6 +31,7 @@ import com.albert.fitness.pumpit.model.nutrition.room.WaterTracker;
 import com.albert.fitness.pumpit.nutrition.SearchFoodsActivity;
 import com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity;
 import com.albert.fitness.pumpit.utils.PrefsUtils;
+import com.albert.fitness.pumpit.viewmodel.CustomPlanViewModel;
 import com.albert.fitness.pumpit.viewmodel.NutritionViewModel;
 
 import java.util.ArrayList;
@@ -47,14 +48,14 @@ import fitness.albert.com.pumpit.R;
 public class NutritionFragment extends Fragment {
 
     private final String TAG = "NutritionFragment";
-    private TextView tvGoal, tvFood, tvExercise, tvRemaining, tvFat, tvProtien, tvCarbs;
-    private List<Foods> foodList = new ArrayList<>();
+    private TextView tvGoal, tvFood, tvRemaining, tvFat, tvProtien, tvCarbs, tvExercise;
     private PrefsUtils prefsUtils = new PrefsUtils();
     private UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs, waterMl, caloriesBurned = 0;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
     private int ly1ElementCount = 0, ly2ElementCount = 0, ly3ElementCount = 0, ly4ElementCount = 0;
     private NutritionViewModel viewModel;
+    private CustomPlanViewModel customPlanViewModel;
 
 
     public NutritionFragment() {
@@ -77,9 +78,9 @@ public class NutritionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
+        customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
         init(view);
-        getCaloriesBurned();
-
+        getCaloriesBurned(Event.getTodayData());
         getMeal(Event.getTodayData());
         datePicker(view);
         setViewDrink(view);
@@ -161,6 +162,7 @@ public class NutritionFragment extends Fragment {
                 }
                 Log.d(TAG, "Date Selected: " + newDate);
 
+                getCaloriesBurned(newDate);
                 getMeal(newDate);
                 progressdialog.hide();
             }
@@ -178,27 +180,24 @@ public class NutritionFragment extends Fragment {
 
 
     //Check meal selected
-    private View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            prefsUtils.createSharedPreferencesFiles(getActivity(), Foods.SHARED_PREFERENCES_FILE);
+    private View.OnClickListener onClickListener = v -> {
+        prefsUtils.createSharedPreferencesFiles(getActivity(), Foods.SHARED_PREFERENCES_FILE);
 
-            switch (v.getId()) {
-                case R.id.tv_details:
-                    startActivity(new Intent(getActivity(), ShowAllNutritionActivity.class));
-                    break;
-                case R.id.btn_add_dinner:
-                    saveMealToSP(true, false, false, false);
-                    break;
-                case R.id.btn_add_breakfast:
-                    saveMealToSP(false, true, false, false);
-                    break;
-                case R.id.btn_add_lunch:
-                    saveMealToSP(false, false, true, false);
-                    break;
-                case R.id.btn_add_snacks:
-                    saveMealToSP(false, false, false, true);
-            }
+        switch (v.getId()) {
+            case R.id.tv_details:
+                startActivity(new Intent(getActivity(), ShowAllNutritionActivity.class));
+                break;
+            case R.id.btn_add_dinner:
+                saveMealToSP(true, false, false, false);
+                break;
+            case R.id.btn_add_breakfast:
+                saveMealToSP(false, true, false, false);
+                break;
+            case R.id.btn_add_lunch:
+                saveMealToSP(false, false, true, false);
+                break;
+            case R.id.btn_add_snacks:
+                saveMealToSP(false, false, false, true);
         }
     };
 
@@ -212,30 +211,15 @@ public class NutritionFragment extends Fragment {
         Objects.requireNonNull(getActivity()).getFragmentManager().popBackStack();
     }
 
-    private void getCaloriesBurned() {
-        final int[] caloriesBurned = {0};
-//        db.collection(FinishTraining.TRAINING_LOG).document(FireBaseInit.getEmailRegister())
-//                .collection(UserRegister.getTodayDate()).get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if(task.isSuccessful() && task.getResult() != null) {
-//
-//                            for(int i=0; i<task.getResult().size(); i++) {
-//                                FinishTraining finishTraining = task.getResult().getDocuments().get(i).toObject(FinishTraining.class);
-//                                caloriesBurned[0] += finishTraining.getCaloriesBurned();
-//                            }
-//                            tvExercise.setText(String.valueOf(caloriesBurned[0]));
-//                            Log.d(TAG, "Calories Burned: " + caloriesBurned[0]);
-//                        }
-//
-//                    }
-//                }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Log.w(TAG, "onFailure: " + e);
-//            }
-//        });
+    private void getCaloriesBurned(String date) {
+        customPlanViewModel.getFinishWorkout(date).observe(this, queryFinishWorkoutList -> {
+            if(!queryFinishWorkoutList.isEmpty()) {
+                for(QueryFinishWorkout item : queryFinishWorkoutList) {
+                    caloriesBurned += item.getCaloriesBurned();
+                }
+                tvExercise.setText(String.valueOf(caloriesBurned));
+            }
+        });
     }
 
 
@@ -245,69 +229,35 @@ public class NutritionFragment extends Fragment {
         final int calculationGoal = user.thermicEffect(activityLevel);
 
         viewModel.getSumOfNutritionByDate(date)
-                .observe(this, new Observer<List<SumNutritionPojo>>() {
-                    @Override
-                    public void onChanged(List<SumNutritionPojo> nutrition) {
-                        if(!nutrition.isEmpty()) {
-                            for(SumNutritionPojo nutritionPojo : nutrition) {
-                                if(nutritionPojo.getMeasure().equals("g")) {
-                                     kcal += nutritionPojo.getCalories() / 100;
-                                     carbs += nutritionPojo.getCarb() / 100;
-                                     protein += nutritionPojo.getProtein() / 100;
-                                     fat += nutritionPojo.getFat() / 100;
-                                } else {
-                                    kcal += nutritionPojo.getCalories();
-                                    carbs += nutritionPojo.getCarb();
-                                    protein += nutritionPojo.getProtein();
-                                    fat += nutritionPojo.getFat();
-                                }
+                .observe(this, nutrition -> {
+                    if(!nutrition.isEmpty()) {
+                        for(SumNutritionPojo nutritionPojo : nutrition) {
+                            if(nutritionPojo.getMeasure().equals("g")) {
+                                 kcal += nutritionPojo.getCalories() / 100;
+                                 carbs += nutritionPojo.getCarb() / 100;
+                                 protein += nutritionPojo.getProtein() / 100;
+                                 fat += nutritionPojo.getFat() / 100;
+                            } else {
+                                kcal += nutritionPojo.getCalories();
+                                carbs += nutritionPojo.getCarb();
+                                protein += nutritionPojo.getProtein();
+                                fat += nutritionPojo.getFat();
                             }
-                            tvGoal.setText(String.valueOf(calculationGoal));
-                            tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
-                            tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
-                            tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
-                            tvFood.setText(String.format(Locale.getDefault(), "%.1f", kcal));
-
-                            float remaining = calculationGoal - kcal + caloriesBurned;
-                            tvRemaining.setText(String.format(Locale.getDefault(), "%.1f", remaining));
-
-                            updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-                            updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-                            updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
                         }
+                        tvGoal.setText(String.valueOf(calculationGoal));
+                        tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
+                        tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
+                        tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
+                        tvFood.setText(String.format(Locale.getDefault(), "%.1f", kcal));
+
+                        float remaining = calculationGoal - kcal + caloriesBurned;
+                        tvRemaining.setText(String.format(Locale.getDefault(), "%.1f", remaining));
+
+                        updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
+                        updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
+                        updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
                     }
                 });
-
-
-//        viewModel.getSumOfNutritionByDate(date)
-//                .observe(this, new Observer<SumNutritionPojo>() {
-//            @SuppressLint("SetTextI18n")
-//            @Override
-//            public void onChanged(SumNutritionPojo nutrition) {
-//                if(nutrition != null) {
-//
-//                    if(nutrition.getCalories() > 10000) {
-//                        kcal[0] = nutrition.getCalories() / 100;
-//                        carbs = nutrition.getCarb() / 100;
-//                        protein = nutrition.getProtein() / 100;
-//                        fat = nutrition.getFat() / 100;
-//                    }
-//
-//                    tvGoal.setText(String.valueOf(calculationGoal));
-//                    tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
-//                    tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
-//                    tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
-//                    tvFood.setText(String.format(Locale.getDefault(), "%.1f", kcal[0]));
-//
-//                    float remaining = calculationGoal - kcal[0] + caloriesBurned;
-//                    tvRemaining.setText(String.format(Locale.getDefault(), "%.1f", remaining));
-//
-//                    updateProgressColor(progressCarbs, carbs, calculationGoal / 2);
-//                    updateProgressColor(progressProtien, protein, calculationGoal * 20 / 100);
-//                    updateProgressColor(progressFat, fat, calculationGoal * 30 / 100);
-//                }
-//            }
-//        });
     }
 
     private void updateProgressColor(RoundCornerProgressBar roundCornerProgressBar, float nutrition, int calculationGoal) {
@@ -324,6 +274,7 @@ public class NutritionFragment extends Fragment {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private void setViewDrink(View rowView) {
         final TextView tvWaterMl = rowView.findViewById(R.id.tv_water_ml);
         final TableRow tableLayout1 = rowView.findViewById(R.id.tab_layout_1);
@@ -355,182 +306,147 @@ public class NutritionFragment extends Fragment {
         final boolean[] isRemovable2 = {true};
         final boolean[] isRemovable3 = {true};
 
-        addWater.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(View view) {
-                ImageView ivFullWater = new ImageView(getActivity());
-                ivFullWater.setImageResource(R.mipmap.full_water);
+        addWater.setOnClickListener(view -> {
+            ImageView ivFullWater = new ImageView(getActivity());
+            ivFullWater.setImageResource(R.mipmap.full_water);
 
-                Log.d(TAG, "onClick: add water " + ly1ElementCount);
+            Log.d(TAG, "onClick: add water " + ly1ElementCount);
 
-                if (ly1ElementCount < 6) {
-                    tableLayout1.addView(ivFullWater);
-                    ly1ElementCount++;
-                    waterMl += 0.25f;
+            if (ly1ElementCount < 6) {
+                tableLayout1.addView(ivFullWater);
+                ly1ElementCount++;
+                waterMl += 0.25f;
+            }
+
+            if (ly1ElementCount == 6) {
+                addWater.setImageResource(R.mipmap.full_water);
+                addWater2.setVisibility(View.VISIBLE);
+                isRemovable1[0] = false;
+            }
+
+            ivFullWater.setOnClickListener(view1 -> {
+                Log.d(TAG, "onClick: remove water " + ly1ElementCount);
+
+                if (ly1ElementCount >= 1 && ly1ElementCount <= 6 && isRemovable1[0]) {
+                    tableLayout1.removeViewAt(1);
+                    ly1ElementCount--;
+                    waterMl -= 0.25f;
                 }
+                tvWaterMl.setText(waterMl + " L");
+            });
+            tvWaterMl.setText(waterMl + " L");
+        });
+        addWater2.setOnClickListener(view -> {
+            Log.d(TAG, "onClick: add water 2: " + ly2ElementCount);
 
-                if (ly1ElementCount == 6) {
-                    addWater.setImageResource(R.mipmap.full_water);
+            ImageView ivFullWater = new ImageView(getActivity());
+            ivFullWater.setImageResource(R.mipmap.full_water);
+
+            if (ly2ElementCount < 6) {
+                tableLayout2.addView(ivFullWater);
+                ly2ElementCount++;
+                waterMl += 0.25f;
+                isRemovable1[0] = false;
+            }
+
+            if (ly2ElementCount == 6) {
+                addWater2.setImageResource(R.mipmap.full_water);
+                addWater3.setVisibility(View.VISIBLE);
+                isRemovable2[0] = false;
+            }
+
+            ivFullWater.setOnClickListener(view12 -> {
+                Log.d(TAG, "onClick: remove water 2: " + ly2ElementCount);
+
+                if (ly2ElementCount >= 1 && ly2ElementCount <= 6 && isRemovable2[0]) {
+                    tableLayout2.removeViewAt(1);
+                    ly2ElementCount--;
+                    waterMl -= 0.25f;
+                }
+                if (ly2ElementCount == 0) {
+                    isRemovable1[0] = true;
+                    addWater.setVisibility(View.VISIBLE);
+                    addWater.setImageResource(R.mipmap.add_water_icon);
+                    addWater2.setVisibility(View.GONE);
+                }
+                tvWaterMl.setText(waterMl + " L");
+            });
+            tvWaterMl.setText(waterMl + " L");
+        });
+        addWater3.setOnClickListener(view -> {
+
+            Log.d(TAG, "onClick: add water 3: " + ly3ElementCount);
+
+            ImageView ivFullWater = new ImageView(getActivity());
+            ivFullWater.setImageResource(R.mipmap.full_water);
+
+            if (ly3ElementCount < 6) {
+                tableLayout3.addView(ivFullWater);
+                ly3ElementCount++;
+                isRemovable2[0] = false;
+                waterMl += 0.25f;
+            }
+
+            if (ly3ElementCount == 6) {
+                addWater3.setImageResource(R.mipmap.full_water);
+                addWater4.setVisibility(View.VISIBLE);
+                isRemovable3[0] = false;
+            }
+            ivFullWater.setOnClickListener(view13 -> {
+                Log.d(TAG, "onClick: remove water 3: " + ly3ElementCount);
+                if (ly3ElementCount >= 1 && ly3ElementCount <= 6 && isRemovable3[0]) {
+                    tableLayout3.removeViewAt(1);
+                    ly3ElementCount--;
+                    waterMl -= 0.25f;
+                }
+                if (ly3ElementCount == 0) {
+                    isRemovable2[0] = true;
                     addWater2.setVisibility(View.VISIBLE);
-                    isRemovable1[0] = false;
+                    addWater2.setImageResource(R.mipmap.add_water_icon);
+                    addWater3.setVisibility(View.GONE);
                 }
-
-                ivFullWater.setOnClickListener(new View.OnClickListener() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onClick(View view) {
-                        Log.d(TAG, "onClick: remove water " + ly1ElementCount);
-
-                        if (ly1ElementCount >= 1 && ly1ElementCount <= 6 && isRemovable1[0]) {
-                            tableLayout1.removeViewAt(1);
-                            ly1ElementCount--;
-                            waterMl -= 0.25f;
-                        }
-                        tvWaterMl.setText(waterMl + " L");
-                    }
-                });
                 tvWaterMl.setText(waterMl + " L");
-            }
+            });
+            tvWaterMl.setText(waterMl + " L");
         });
-        addWater2.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "onClick: add water 2: " + ly2ElementCount);
+        addWater4.setOnClickListener(view -> {
+            Log.d(TAG, "onClick: add water 4: " + ly4ElementCount);
 
-                ImageView ivFullWater = new ImageView(getActivity());
-                ivFullWater.setImageResource(R.mipmap.full_water);
+            ImageView ivFullWater = new ImageView(getActivity());
+            ivFullWater.setImageResource(R.mipmap.full_water);
 
-                if (ly2ElementCount < 6) {
-                    tableLayout2.addView(ivFullWater);
-                    ly2ElementCount++;
-                    waterMl += 0.25f;
-                    isRemovable1[0] = false;
+            if (ly4ElementCount < 6) {
+                tableLayout4.addView(ivFullWater);
+                ly4ElementCount++;
+                isRemovable3[0] = false;
+                waterMl += 0.25f;
+            }
+            ivFullWater.setOnClickListener(view14 -> {
+                Log.d(TAG, "onClick: remove water 4: " + ly4ElementCount);
+                if (ly4ElementCount >= 1 && ly4ElementCount <= 6) {
+                    tableLayout4.removeViewAt(1);
+                    ly4ElementCount--;
+                    waterMl -= 0.25f;
                 }
-
-                if (ly2ElementCount == 6) {
-                    addWater2.setImageResource(R.mipmap.full_water);
+                if (ly4ElementCount == 0) {
+                    isRemovable3[0] = true;
                     addWater3.setVisibility(View.VISIBLE);
-                    isRemovable2[0] = false;
+                    addWater3.setImageResource(R.mipmap.add_water_icon);
+                    addWater4.setVisibility(View.GONE);
                 }
-
-                ivFullWater.setOnClickListener(new View.OnClickListener() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onClick(View view) {
-                        Log.d(TAG, "onClick: remove water 2: " + ly2ElementCount);
-
-                        if (ly2ElementCount >= 1 && ly2ElementCount <= 6 && isRemovable2[0]) {
-                            tableLayout2.removeViewAt(1);
-                            ly2ElementCount--;
-                            waterMl -= 0.25f;
-                        }
-                        if (ly2ElementCount == 0) {
-                            isRemovable1[0] = true;
-                            addWater.setVisibility(View.VISIBLE);
-                            addWater.setImageResource(R.mipmap.add_water_icon);
-                            addWater2.setVisibility(View.GONE);
-                        }
-                        tvWaterMl.setText(waterMl + " L");
-                    }
-                });
                 tvWaterMl.setText(waterMl + " L");
-            }
-        });
-        addWater3.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(View view) {
-
-                Log.d(TAG, "onClick: add water 3: " + ly3ElementCount);
-
-                ImageView ivFullWater = new ImageView(getActivity());
-                ivFullWater.setImageResource(R.mipmap.full_water);
-
-                if (ly3ElementCount < 6) {
-                    tableLayout3.addView(ivFullWater);
-                    ly3ElementCount++;
-                    isRemovable2[0] = false;
-                    waterMl += 0.25f;
-                }
-
-                if (ly3ElementCount == 6) {
-                    addWater3.setImageResource(R.mipmap.full_water);
-                    addWater4.setVisibility(View.VISIBLE);
-                    isRemovable3[0] = false;
-                }
-                ivFullWater.setOnClickListener(new View.OnClickListener() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onClick(View view) {
-                        Log.d(TAG, "onClick: remove water 3: " + ly3ElementCount);
-                        if (ly3ElementCount >= 1 && ly3ElementCount <= 6 && isRemovable3[0]) {
-                            tableLayout3.removeViewAt(1);
-                            ly3ElementCount--;
-                            waterMl -= 0.25f;
-                        }
-                        if (ly3ElementCount == 0) {
-                            isRemovable2[0] = true;
-                            addWater2.setVisibility(View.VISIBLE);
-                            addWater2.setImageResource(R.mipmap.add_water_icon);
-                            addWater3.setVisibility(View.GONE);
-                        }
-                        tvWaterMl.setText(waterMl + " L");
-                    }
-                });
-                tvWaterMl.setText(waterMl + " L");
-            }
-        });
-        addWater4.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "onClick: add water 4: " + ly4ElementCount);
-
-                ImageView ivFullWater = new ImageView(getActivity());
-                ivFullWater.setImageResource(R.mipmap.full_water);
-
-                if (ly4ElementCount < 6) {
-                    tableLayout4.addView(ivFullWater);
-                    ly4ElementCount++;
-                    isRemovable3[0] = false;
-                    waterMl += 0.25f;
-                }
-                ivFullWater.setOnClickListener(new View.OnClickListener() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onClick(View view) {
-                        Log.d(TAG, "onClick: remove water 4: " + ly4ElementCount);
-                        if (ly4ElementCount >= 1 && ly4ElementCount <= 6) {
-                            tableLayout4.removeViewAt(1);
-                            ly4ElementCount--;
-                            waterMl -= 0.25f;
-                        }
-                        if (ly4ElementCount == 0) {
-                            isRemovable3[0] = true;
-                            addWater3.setVisibility(View.VISIBLE);
-                            addWater3.setImageResource(R.mipmap.add_water_icon);
-                            addWater4.setVisibility(View.GONE);
-                        }
-                        tvWaterMl.setText(waterMl + " L");
-                    }
-                });
-                tvWaterMl.setText(waterMl + " L");
-            }
+            });
+            tvWaterMl.setText(waterMl + " L");
         });
     }
 
     private void waterTrackerSaved(final String waterQty) {
-        viewModel.getWaterTracker(Event.getTodayData()).observe(this, new Observer<WaterTracker>() {
-            @Override
-            public void onChanged(WaterTracker waterTracker) {
-                if(waterTracker != null) {
-                    waterTracker.setWaterQty(waterQty);
-                    viewModel.updateWaterTracker(waterTracker);
-                } else {
-                    viewModel.addNewWaterTracker(new WaterTracker(Event.getTodayData(), waterQty));
-                }
+        viewModel.getWaterTracker(Event.getTodayData()).observe(this, waterTracker -> {
+            if(waterTracker != null) {
+                waterTracker.setWaterQty(waterQty);
+                viewModel.updateWaterTracker(waterTracker);
+            } else {
+                viewModel.addNewWaterTracker(new WaterTracker(Event.getTodayData(), waterQty));
             }
         });
     }

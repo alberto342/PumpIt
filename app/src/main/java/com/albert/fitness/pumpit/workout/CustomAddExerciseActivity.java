@@ -34,11 +34,9 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
     private Spinner spMuscleGroup, spMuscleGroup2;
     private ImageView imageViewLoad;
     private ImageUtils imageutils;
-    private String imgName;
-    private boolean isSecondaryCategory;
-    private int secondaryId = 0;
-    private int categoryId = 0;
+    private int secondaryId = 0, categoryId = 0;
     private WelcomeActivityViewModel viewModel;
+    private String imgName;
 
 
     @Override
@@ -101,17 +99,17 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
     }
 
 
+    @SuppressLint("NewApi")
     private void setSpinner() {
         List<String> muscleGroupList = new ArrayList<>();
         Bundle extras = getIntent().getExtras();
-        String categoryType = "";
+        String categoryType;
         if (extras != null) {
             categoryType = extras.getString("category", "");
-
-           if(!categoryType.isEmpty()) {
-               muscleGroupList.add(0, categoryType);
-               muscleGroupList.add(categoryType);
-           }
+            if (!categoryType.isEmpty()) {
+                muscleGroupList.add(0, categoryType);
+                muscleGroupList.add(categoryType);
+            }
         }
 
         muscleGroupList.add("Abs");
@@ -128,7 +126,7 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
         muscleGroupList.add("Thigh");
 
         for (int i = 0; i < muscleGroupList.size(); i++) {
-            if(muscleGroupList.get(i).equals(muscleGroupList.get(0))){
+            if (muscleGroupList.get(i).equals(muscleGroupList.get(0))) {
                 muscleGroupList.remove(i);
             }
         }
@@ -143,9 +141,8 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
     @SuppressLint("LongLogTag")
     private void saveDate() {
         String exerciseName = this.exerciseName.getText().toString();
-        String exerciseDescription = descriptionExercise.getText().toString();
+        //String exerciseDescription = descriptionExercise.getText().toString();
         String muscleGroup = spMuscleGroup.getSelectedItem().toString();
-        String muscleGroup2 = spMuscleGroup2.getSelectedItem().toString();
 
         getCategoryId(muscleGroup);
 
@@ -177,42 +174,31 @@ public class CustomAddExerciseActivity extends AppCompatActivity implements Imag
     private void getCategoryId(String category) {
         switch (category) {
             case "Abs":
-                isSecondaryCategory = false;
                 categoryId = 1;
             case "Back":
-                isSecondaryCategory = false;
                 categoryId = 8;
             case "Biceps":
-                isSecondaryCategory = true;
                 categoryId = 6;
                 secondaryId = 2;
             case "Cardio":
                 categoryId = 4;
-                isSecondaryCategory = false;
             case "Calf":
             case "Thigh":
-                isSecondaryCategory = true;
                 categoryId = 5;
                 secondaryId = 5;
             case "Chest":
-                isSecondaryCategory = false;
                 categoryId = 7;
             case "Forearm":
-                isSecondaryCategory = true;
                 secondaryId = 4;
                 categoryId = 6;
             case "Glutes":
-                isSecondaryCategory = true;
                 secondaryId = 7;
                 categoryId = 5;
             case "Shoulder":
-                isSecondaryCategory = false;
                 categoryId = 3;
             case "Stretch":
-                isSecondaryCategory = false;
                 categoryId = 2;
             case "Triceps":
-                isSecondaryCategory = true;
                 secondaryId = 3;
                 categoryId = 6;
         }

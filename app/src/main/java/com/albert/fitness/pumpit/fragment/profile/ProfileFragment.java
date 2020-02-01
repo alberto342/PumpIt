@@ -3,6 +3,7 @@ package com.albert.fitness.pumpit.fragment.profile;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.albert.fitness.pumpit.helper.ImageUtils;
 import com.albert.fitness.pumpit.model.TDEECalculator;
@@ -36,7 +36,6 @@ import fitness.albert.com.pumpit.R;
 public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachmentListener {
 
     private String TAG = "ProfileFragment";
-    //private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private TextView tvName, tvBmi, tvMyWeigh, tvMyGoalWeight, tvBmiResult, tvBmiType;
     private ImageView profileImg, btnAccountSetting, btnProfile, btnMyGoals, btnDiary,
             btnWaterTracker, btnNotification, btnUnits, btnDataExport, btnHelp, btnAbout;
@@ -66,10 +65,10 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         imageutils = new ImageUtils(getActivity(), this, true);
         prefsUtils = new PrefsUtils(getContext(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
         initView(view);
+        getProfileImgIfExist();
         loadFromPrefs();
         imgProfileLoad();
         setHasOptionsMenu(true);
-        //clickOnBtn();
     }
 
     @Override
@@ -85,36 +84,16 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     }
 
     private void initView(View view) {
-
-
         tvName = view.findViewById(R.id.txt_name);
         tvBmi = view.findViewById(R.id.txt_bmi);
         tvMyWeigh = view.findViewById(R.id.my_weight);
         tvMyGoalWeight = view.findViewById(R.id.goal_weight);
         profileImg = view.findViewById(R.id.profile_pic);
         tvBmiType = view.findViewById(R.id.tv_bmi_type);
-
-        //tvBmiResult = view.findViewById(R.id.bmi_result);
-//        btnAccountSetting = view.findViewById(R.id.btn_account_setting);
-//        btnProfile = view.findViewById(R.id.btn_profile);
-//        btnMyGoals = view.findViewById(R.id.btn_my_goals);
-//        btnDiary = view.findViewById(R.id.btn_diary);
-//        btnWaterTracker = view.findViewById(R.id.btn_water_tracker);
-//        btnNotification = view.findViewById(R.id.btn_notification);
-//        btnUnits = view.findViewById(R.id.btn_units);
-//        btnDataExport = view.findViewById(R.id.btn_data_export);
-//        btnHelp = view.findViewById(R.id.btn_help);
-//        btnAbout = view.findViewById(R.id.btn_about);
-//        progressBar = view.findViewById(R.id.pb_profile);
     }
 
     private void imgProfileLoad() {
-        profileImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                imageutils.imagepicker(1);
-            }
-        });
+        profileImg.setOnClickListener(view -> imageutils.imagepicker(1));
     }
 
     @Override
@@ -133,73 +112,6 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     }
 
 
-//    private void clickOnBtn() {
-//        btnAccountSetting.setOnClickListener(onClickListener);
-//        btnProfile.setOnClickListener(onClickListener);
-//        btnMyGoals.setOnClickListener(onClickListener);
-//        btnDiary.setOnClickListener(onClickListener);
-//        btnWaterTracker.setOnClickListener(onClickListener);
-//        btnNotification.setOnClickListener(onClickListener);
-//        btnUnits.setOnClickListener(onClickListener);
-//        btnDataExport.setOnClickListener(onClickListener);
-//        btnHelp.setOnClickListener(onClickListener);
-//        btnAbout.setOnClickListener(onClickListener);
-//    }
-
-
-//    private View.OnClickListener onClickListener = new View.OnClickListener() {
-//
-//        @Override
-//        public void onClick(View v) {
-//            switch (v.getId()) {
-//                case R.id.btn_account_setting:
-//                    Fragment AccountFragment = new  SettingsActivity.AccountFragment();
-//                    loadFragment(AccountFragment);
-//                    break;
-//
-//                case R.id.btn_profile:
-//                    Fragment profileFragment = new ChangeProfileFragment();
-//                    loadFragment(profileFragment);
-//                    break;
-//
-//                case R.id.btn_my_goals:
-//                    Fragment myGoalsFragment = new ChangeMyGoalsFragment();
-//                    loadFragment(myGoalsFragment);
-//                    break;
-//
-//                case R.id.btn_diary:
-//                    Fragment diaryFragment = new ChangeDiaryFragment();
-//                    loadFragment(diaryFragment);
-//                    break;
-//
-//                case R.id.btn_water_tracker:
-//                    Fragment waterTrackerFragment = new WaterTrackerFragment();
-//                    loadFragment(waterTrackerFragment);
-//                    break;
-//
-//                case R.id.btn_notification:
-//                    break;
-//
-//                case R.id.btn_units:
-//                    Fragment unitsFragment = new UnitsFragment();
-//                    loadFragment(unitsFragment);
-//                    break;
-//
-//                case R.id.btn_data_export:
-//                    Fragment dataExportFragment = new DataExportFragment();
-//                    loadFragment(dataExportFragment);
-//                    break;
-//
-//                case R.id.btn_help:
-//                    break;
-//
-//                case R.id.btn_about:
-//                    break;
-//
-//            }
-//        }
-//    };
-
 
 
 
@@ -210,8 +122,6 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         float weight = prefsUtils.getFloat("weight", 0f);
         int height = prefsUtils.getInt("height", 0);
         String goal = prefsUtils.getString("goal_weight", "");
-        //boolean isMale = prefsUtils.getBoolean("is_male", false);
-
         tvMyGoalWeight.setText(goal.isEmpty() ? "Not Set Goal" : "Goal: " + goal + "kg");
 
         tvName.setText(fullName);
@@ -228,18 +138,7 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     }
 
 
-    private void saveIntoPrefs() {
-        prefsUtils.saveData("first_name", userRegister.getFirstName());
-        prefsUtils.saveData("lest_name", userRegister.getLestName());
-        prefsUtils.saveData("activity_level", userRegister.getActivityLevel());
-        prefsUtils.saveData("body_fat", userRegister.getBodyFat());
-        prefsUtils.saveData("fat_target", userRegister.getFatTarget());
-        prefsUtils.saveData("height", userRegister.getHeight());
-        prefsUtils.saveData("weight", userRegister.getWeight());
-        prefsUtils.saveData("program_select", userRegister.getMyProgram());
-        prefsUtils.saveData("is_male", userRegister.isMale());
-        prefsUtils.saveData("date_of_birth", userRegister.getDateOfBirth());
-    }
+
 
     private void checkFat() {
         //get Fat target
@@ -267,25 +166,6 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         imageutils.request_permission_result(requestCode, permissions, grantResults);
     }
 
-    private int convertingStringToInt(String txt) {
-        int myNum = 0;
-        try {
-            myNum = Integer.parseInt(txt);
-        } catch (NumberFormatException nfe) {
-            System.out.println("Could not parse " + nfe);
-        }
-        return myNum;
-    }
-
-
-    private void loadFragment(Fragment fragment) {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-
     @Override
     public void image_attachment(int from, String filename, Bitmap file, Uri uri) {
         String imgName = "profile_img.jpg";
@@ -293,5 +173,21 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         String path = Environment.getExternalStorageDirectory() + File.separator + "Pumpit/ExercisePictures" + File.separator;
         imageutils.createImage(file, imgName, path, false);
         imageutils.getImage(imgName, path);
+
+    }
+
+    private void getProfileImgIfExist() {
+        String baseDir = Environment.getExternalStorageDirectory().getParent() + "/0/Pumpit/ExercisePictures/";
+        File f = new File(baseDir + File.separator + "profile_img.jpg");
+
+        if(f.exists()) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            options.inSampleSize = 2;
+            options.inTempStorage = new byte[16 * 1024];
+            Bitmap bitmap = BitmapFactory.decodeFile(f.toString(), options);
+            profileImg.setImageBitmap(bitmap);
+            Log.d(TAG, "Success get Profile Img");
+        }
     }
 }

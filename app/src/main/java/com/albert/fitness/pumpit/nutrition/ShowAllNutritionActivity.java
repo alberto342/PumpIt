@@ -54,7 +54,7 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
     private UserRegister user = new UserRegister();
     private TextView tvCarbs, tvProtien, tvFat;
     private NutritionViewModel viewModel;
-    private float kcal=0, protein=0, fat=0, carbs=0;
+    private float kcal = 0, protein = 0, fat = 0, carbs = 0;
 
     @SuppressLint("LongLogTag")
     @Override
@@ -193,10 +193,10 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
 
         viewModel.getSumOfNutritionByDate(date)
                 .observe(this, nutrition -> {
-                    if(!nutrition.isEmpty()) {
-                        for(SumNutritionPojo pojo : nutrition) {
-                            if(pojo.getMeasure().equals("g")) {
-                                float result = 100/ pojo.getServingWeightGrams();
+                    if (!nutrition.isEmpty()) {
+                        for (SumNutritionPojo pojo : nutrition) {
+                            if (pojo.getMeasure().equals("g")) {
+                                float result = 100 / pojo.getServingWeightGrams();
 
                                 carbs += pojo.getCarb() / 100 * pojo.getQty();
                                 protein += pojo.getProtein() / 100 * pojo.getQty();
@@ -245,15 +245,15 @@ public class ShowAllNutritionActivity extends AppCompatActivity {
                         visibleNutrition(type);
                         for (int i = 0; i < queryNutritionItems.size(); i++) {
 
-                                float calories = queryNutritionItems.get(i).getCalories();
-                                float protein = queryNutritionItems.get(i).getProtein();
-                                float carbohydrate = queryNutritionItems.get(i).getTotalCarbohydrate();
+                            float calories = queryNutritionItems.get(i).getCalories();
+                            float protein = queryNutritionItems.get(i).getProtein();
+                            float carbohydrate = queryNutritionItems.get(i).getTotalCarbohydrate();
 
-                                Log.d(TAG, "onChanged: cal " + calories + " pro " + protein);
+                            Log.d(TAG, "onChanged: cal " + calories + " pro " + protein);
 
-                                queryNutritionItems.get(i).setCalories(calories * newCalAltMeasure);
-                                queryNutritionItems.get(i).setProtein(protein * newCalAltMeasure);
-                                queryNutritionItems.get(i).setTotalCarbohydrate(carbohydrate * newCalAltMeasure);
+                            queryNutritionItems.get(i).setCalories(calories * newCalAltMeasure);
+                            queryNutritionItems.get(i).setProtein(protein * newCalAltMeasure);
+                            queryNutritionItems.get(i).setTotalCarbohydrate(carbohydrate * newCalAltMeasure);
 
                         }
                         initRecyclerView(type, recyclerView, queryNutritionItems);

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/liner_weight_reps_set"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary">
+
+    <EditText
+        android:id="@+id/et_weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="Weight"
+        android:inputType="numberDecimal"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gray"
+        android:textSize="16dp" />
+
+    <EditText
+        android:id="@+id/et_reps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="Reps"
+        android:inputType="numberSigned"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gray"
+        android:textSize="16dp" />
+</LinearLayout>

@@ -3,9 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#000000</item>
-        <item name="colorPrimaryDark">#000000</item>
-        <item name="colorAccent">#3c4397</item>
+        <item name="colorPrimary">@color/colorDarkBlue</item>
+        <item name="colorPrimaryDark">@color/colorDarkBlue</item>
+        <item name="colorAccent">@color/myBlue</item>
         <!--<item name="colorAccent">@color/colorAccent</item>-->
     </style>
 
@@ -13,6 +13,71 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="NumberPickerText">  <item name="android:textSize">25dp</item> </style>
+    <style name="NumberPickerText">
+        <item name="android:textSize">25dp</item>
+    </style>
+
+
+    <!--Calender Style-->
+    <style name="CalenderViewCustom" parent="Theme.AppCompat">
+        <item name="colorAccent">@color/btn_register</item>
+        <item name="colorPrimary">@color/white</item>
+    </style>
+
+    <style name="CalenderViewDateCustomText" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:weekNumberColor">@color/white</item>
+    </style>
+
+    <style name="CalenderViewWeekCustomText" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <!--End Calender Style-->
+
+
+    <!--custom style-->
+    <style name="EditTextHint" parent="TextAppearance.AppCompat">
+        <item name="colorAccent">@android:color/white</item>
+        <item name="android:textColorHint">@color/colorPrimary</item>
+        <item name="colorControlNormal">@color/background</item>
+        <item name="colorControlActivated">@color/myBlue</item>
+        <item name="colorControlHighlight">@color/background</item>
+    </style>
+
+
+    <!--ToolBar Style-->
+    <style name="ToolBarStyle" parent="ToolBarStyle.Base" />
+
+    <style name="ToolBarStyle.Base" parent="">
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+    </style>
+
+    <style name="ToolBarStyle.Event" parent="ToolBarStyle">
+        <item name="titleTextAppearance">@style/TextAppearance.Widget.Event.Toolbar.Title</item>
+    </style>
+
+    <style name="TextAppearance.Widget.Event.Toolbar.Title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <!--Any text styling can be done here-->
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">25dp</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!--End ToolBar Style-->
+
+
+    <!-- Not ActionBar application theme. -->
+    <style name="AppThemeNotActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
 
 </resources>

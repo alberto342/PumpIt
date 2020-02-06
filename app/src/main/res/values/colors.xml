@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574b</color>
+    <color name="colorPrimary">#222426</color>
+    <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="background">#000000</color>
     <color name="colorDarkBlue">#3C4397</color>
@@ -9,19 +9,24 @@
     <color name="myBlue">#686DE0</color>
     <color name="input_login">#ffffff</color>
     <color name="input_login_hint">#962f513e</color>
-    <color name="btn_login_register">#961036be</color>
-    <color name="btn_register">#3c4397</color>
-    <color name="md_green_600">#43a047</color>
-    <color name="md_green_500">#4caf50</color>
-    <color name="md_white_1000">#ffffff</color>
+    <color name="btn_login_register">#C723C2E6</color>
+    <color name="btn_register">#3C4397</color>
+    <color name="md_green_600">#43A047</color>
+    <color name="md_green_500">#4CAF50</color>
+    <color name="md_white_1000">#FFFFFF</color>
     <color name="md_red_600">#E53935</color>
     <color name="md_red_500">#F44336</color>
-    <color name="yellow_dolly">#ffff7e</color>
-
-
-
-
-
-
-
+    <color name="yellow_dolly">#FFFF7E</color>
+    <color name="gray">#546E7A</color>
+    <color name="dark_blue">#042543</color>
+    <color name="light_green">#7ED321</color>
+    <color name="transparent_blue">#D93c4397</color>
+    <color name="azure">#2196F3</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="cyan">#0097A7</color>
+    <color name="orange">#FF9800</color>
+    <color name="red_700">#d32f2f</color>
+    <color name="red_800">#c62828</color>
+    <color name="red_900">#b71c1c</color>
+    <color name="pink">#e91e63</color>
 </resources>

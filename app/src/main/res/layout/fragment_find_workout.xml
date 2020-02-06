@@ -1,37 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    tools:context=".fragment.FindWorkoutFragment">
+    tools:context="com.albert.fitness.pumpit.fragment.FindWorkoutFragment">
 
-    <android.support.design.widget.TabLayout
+
+    <com.google.android.material.tabs.TabLayout
         android:id="@+id/tablayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabSelectedTextColor="@color/design_default_color_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tabIndicatorColor="@color/myBlue"
+        app:tabIndicatorGravity="bottom"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/myBlue"
         app:tabTextColor="@color/white">
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:id="@+id/tabOne"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="My Plans" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:id="@+id/tabTwo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Featured" />
 
-    </android.support.design.widget.TabLayout>
+    </com.google.android.material.tabs.TabLayout>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
-</LinearLayout>
+    <com.albert.fitness.pumpit.helper.NonSwipeableViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="always"
+        android:touchscreenBlocksFocus="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tablayout" />
+
+    <!--<android.support.v4.view.ViewPager-->
+    <!--android:id="@+id/view_pager"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_marginTop="8dp"-->
+    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior" />-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

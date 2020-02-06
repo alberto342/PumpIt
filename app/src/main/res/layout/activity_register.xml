@@ -1,105 +1,276 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Register.RegisterActivity">
+    android:background="@color/background"
+    tools:context="com.albert.fitness.pumpit.LoginActivity"
+    tools:layout_editor_absoluteY="25dp">
 
-    <ImageView
-        android:id="@+id/imageView17"
+    <Button
+        android:id="@+id/btn_set_date_of_birth"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@color/background" />
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/small_round"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/date_of_birth"
+        android:textColor="@color/white"
+        android:textIsSelectable="true"
+        app:layout_constraintBottom_toTopOf="@+id/guideline98"
+        app:layout_constraintEnd_toStartOf="@+id/guideline114"
+        app:layout_constraintStart_toStartOf="@+id/guideline44"
+        app:layout_constraintTop_toTopOf="@+id/guideline47" />
+
+    <Button
+        android:id="@+id/btn_set_height"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/small_round"
+        android:text="@string/height"
+        android:textColor="@color/white"
+        android:textIsSelectable="true"
+        app:layout_constraintBottom_toTopOf="@+id/guideline109"
+        app:layout_constraintEnd_toStartOf="@+id/guideline114"
+        app:layout_constraintStart_toStartOf="@+id/guideline44"
+        app:layout_constraintTop_toTopOf="@+id/guideline98" />
+
+    <Button
+        android:id="@+id/btn_set_weight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/small_round"
+        android:text="@string/weight"
+        android:textColor="@color/white"
+        android:textIsSelectable="true"
+        app:layout_constraintBottom_toTopOf="@+id/guideline113"
+        app:layout_constraintEnd_toStartOf="@+id/guideline114"
+        app:layout_constraintStart_toStartOf="@+id/guideline44"
+        app:layout_constraintTop_toTopOf="@+id/guideline109"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/btn_sign_up"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/round"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:text="@string/sign_up"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/guideline48"
+        app:layout_constraintEnd_toStartOf="@+id/guideline45"
+        app:layout_constraintStart_toStartOf="@+id/guideline44" />
+
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:ems="10"
+        android:hint="@string/your_full_name"
+        android:inputType="textEmailAddress|textPersonName"
+        android:textColor="@android:color/white"
+        android:textColorHint="@color/gray"
+        app:layout_constraintBottom_toTopOf="@+id/guideline40"
+        app:layout_constraintEnd_toStartOf="@+id/guideline45"
+        app:layout_constraintStart_toStartOf="@+id/guideline44"
+        app:layout_constraintTop_toTopOf="@+id/guideline39"
+        android:autofillHints="" tools:targetApi="o" />
+
+    <EditText
+        android:id="@+id/et_email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:ems="10"
+        android:foregroundTintMode="screen"
+        android:hint="@string/email_address"
+        android:inputType="textEmailAddress|textPersonName"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textColorHint="@color/gray"
+        app:layout_constraintBottom_toTopOf="@+id/guideline41"
+        app:layout_constraintEnd_toStartOf="@+id/guideline45"
+        app:layout_constraintStart_toStartOf="@+id/guideline44"
+        app:layout_constraintTop_toTopOf="@+id/guideline40"
+        android:autofillHints="" tools:targetApi="o" />
 
     <ImageView
-        android:id="@+id/imageView18"
+        android:id="@+id/imageView26"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline32"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.555"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView17"
-        app:srcCompat="@mipmap/man_woman_isolated" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline45"
+        app:layout_constraintStart_toStartOf="@+id/guideline44"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/sign_up" />
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline32"
+    <ProgressBar
+        android:id="@+id/pb_register"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="30dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline45"
+        app:layout_constraintStart_toStartOf="@+id/guideline44" />
+
+    <TextView
+        android:id="@+id/tv_date_of_birth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gray"
+        app:layout_constraintBottom_toTopOf="@+id/guideline98"
+        app:layout_constraintStart_toEndOf="@+id/btn_set_date_of_birth"
+        app:layout_constraintTop_toTopOf="@+id/guideline47" />
+
+    <TextView
+        android:id="@+id/tv_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gray"
+        app:layout_constraintBottom_toTopOf="@+id/guideline109"
+        app:layout_constraintStart_toStartOf="@+id/guideline114"
+        app:layout_constraintTop_toTopOf="@+id/guideline98" />
+
+    <TextView
+        android:id="@+id/tv_weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gray"
+        app:layout_constraintBottom_toTopOf="@+id/guideline113"
+        app:layout_constraintStart_toStartOf="@+id/guideline114"
+        app:layout_constraintTop_toTopOf="@+id/guideline109" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline114"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.35" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline39"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.10" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.20" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline41"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.30" />
 
-    <ImageView
-        android:id="@+id/imageView19"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline33"
-        app:srcCompat="@mipmap/fruits" />
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline33"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline47"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.75" />
+        app:layout_constraintGuide_percent="0.35" />
 
-    <ImageView
-        android:id="@+id/imageView20"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView23"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline32"
-        app:srcCompat="@mipmap/change_starts_here" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline34"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline98"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.54" />
+        app:layout_constraintGuide_percent="0.45" />
 
-    <ImageView
-        android:id="@+id/btn_email_register"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline109"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/btn_google_register"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline34"
-        app:srcCompat="@mipmap/btn_email_register" />
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.55" />
 
-    <ImageView
-        android:id="@+id/btn_google_register"
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline113"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/guideline33"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_email_register"
-        app:srcCompat="@mipmap/btn_google_register" />
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.65" />
 
-    <ImageView
-        android:id="@+id/imageView23"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline44"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.06" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline45"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline48"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="1" />
+
+
+    <com.nightonke.jellytogglebutton.JellyToggleButton
+        android:id="@+id/switch_is_male"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline34"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.505"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView20"
-        app:srcCompat="@mipmap/signup_text" />
-</android.support.constraint.ConstraintLayout>
+        app:jtbLeftBackgroundColor="@color/pink"
+        app:jtbLeftText="Male"
+        app:jtbLeftTextColor="@android:color/white"
+        app:jtbLeftTextSize="12sp"
+        app:jtbLeftThumbColor="@color/azure"
+        app:jtbRightBackgroundColor="@color/azure"
+        app:jtbRightText="Female"
+        app:jtbRightTextColor="@android:color/white"
+        app:jtbRightTextSize="12sp"
+        app:jtbRightThumbColor="@color/pink"
+        app:jtbTextMarginBottom="4dp"
+        app:jtbTextMarginCenter="4dp"
+        app:jtbTextMarginLeft="4dp"
+        app:jtbTextMarginRight="4dp"
+        app:jtbTextMarginTop="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline98"
+        app:layout_constraintEnd_toStartOf="@+id/guideline45"
+        app:layout_constraintTop_toTopOf="@+id/guideline47"
+        tools:ignore="MissingConstraints" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

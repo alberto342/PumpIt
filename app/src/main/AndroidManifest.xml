@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="fitness.albert.com.pumpit">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -11,11 +14,47 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".ShowAllNutritionActivity"></activity>
-        <activity android:name=".ShowItemFoodActivity" />
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name="com.albert.fitness.pumpit.workout.EditTrackerExercise"></activity>
+        <activity android:name="com.albert.fitness.pumpit.workout.ShowExerciseImgActivity" />
         <activity
-            android:name=".WelcomeActivities.WelcomeActivity"
+            android:name="com.albert.fitness.pumpit.fragment.profile.SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity android:name="com.albert.fitness.pumpit.welcome.RegisterActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.FinisherWorkoutActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.ShowLogExerciseActivity" />
+        <activity android:name="com.albert.fitness.pumpit.fragment.logsFragment.LogTabActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.CustomAddExerciseActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.ChangePlanActivity" />
+        <activity
+            android:name="com.albert.fitness.pumpit.workout.WorkoutStartActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="com.albert.fitness.pumpit.workout.StartWorkoutActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.FindWorkoutActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.EditCustomPlanActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.ExerciseLogsActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.TrainingActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.WorkoutActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.WorkoutChangePlansActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.CustomPlanActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.ShowExerciseResultActivity" />
+        <activity android:name="com.albert.fitness.pumpit.workout.ExerciseDetailActivity" />
+        <activity
+            android:name="com.albert.fitness.pumpit.nutrition.ShowSnackActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.albert.fitness.pumpit.nutrition.ShowLunchActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.albert.fitness.pumpit.nutrition.ShowDinnerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.albert.fitness.pumpit.nutrition.ShowBreakfastActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="com.albert.fitness.pumpit.nutrition.ShowAllNutritionActivity" />
+        <activity
+            android:name="com.albert.fitness.pumpit.welcome.WelcomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -25,47 +64,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FragmentNavigationActivity"
+            android:name="com.albert.fitness.pumpit.fragment.FragmentNavigationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.GoalActivity"
+            android:name="com.albert.fitness.pumpit.welcome.GoalActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.GenderActivity"
+            android:name="com.albert.fitness.pumpit.workout.AddExerciseActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.AgeActivity"
+            android:name="com.albert.fitness.pumpit.nutrition.SearchFoodsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WelcomeActivities.WeightActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".WelcomeActivities.HeightActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".WelcomeActivities.BodyFatActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".WelcomeActivities.FatTargetActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Register.RegisterActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".LoginActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".Register.EmailRegisterActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".AddExerciseActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".SearchFoodsActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ShowFoodBeforeAddedActivity"
-            android:screenOrientation="portrait" />
+            android:name="com.albert.fitness.pumpit.nutrition.ShowFoodBeforeAddedActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

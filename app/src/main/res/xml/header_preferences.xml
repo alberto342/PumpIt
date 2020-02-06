@@ -1,0 +1,64 @@
+
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$AccountFragment"
+        app:icon="@mipmap/ic_account_settings"
+        app:key="account_header"
+        app:title="@string/account" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$ProfileFragment"
+        app:icon="@mipmap/ic_profile"
+        app:key="profile_header"
+        app:title="@string/profile" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$MyGoalFragment"
+        app:icon="@mipmap/ic_chart_line"
+        app:key="my_goal_header"
+        app:title="@string/my_goal" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$DiaryFragment"
+        app:icon="@mipmap/ic_diary"
+        app:key="diary_header"
+        app:title="@string/diary" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$WaterTrackerFragment"
+        app:icon="@mipmap/ic_wather"
+        app:key="water_tracker_header"
+        app:title="@string/water_tracker" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$NotificationSettingsFragment"
+        app:icon="@mipmap/ic_bell"
+        app:key="notification_settings_header"
+        app:title="@string/notification_settings" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$UnitsFragment"
+        app:icon="@mipmap/ic_profiles_s"
+        app:key="units_header"
+        app:title="@string/units" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$DataExportFragment"
+        app:icon="@mipmap/ic_export"
+        app:key="data_export_header"
+        app:title="@string/data_export" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$HelpFragment"
+        app:icon="@mipmap/ic_help_circle"
+        app:key="help_faq_header"
+        app:title="@string/help_faq" />
+
+    <Preference
+        app:fragment="fitness.albert.com.pumpit.fragment.profile.SettingsActivity$AboutPumpItFragment"
+        app:icon="@mipmap/ic_alert_circle"
+        app:key="about_pumpit_header"
+        app:title="@string/about_pumpit" />
+
+</androidx.preference.PreferenceScreen>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <ImageView
+        android:id="@+id/iv_not_connection"
+        android:layout_width="match_parent"
+        android:layout_height="45dp" />
+
+    <TextView
+        android:id="@+id/textView73"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="45dp"
+        android:text="Whoops !"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="25dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_internet_connection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView73"
+        android:layout_marginTop="1dp"
+        android:text="No internet connection found.\n please check your internet settings."
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18dp" />
+
+    <ImageView
+        android:id="@+id/btn_try_again_connection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_internet_connection"
+        android:layout_marginTop="20dp"
+        android:paddingBottom="15dp"
+        android:src="@mipmap/btn_try_again" />
+
+</RelativeLayout>

@@ -53,7 +53,7 @@ public class NutritionFragment extends Fragment {
     private UserRegister user = new UserRegister();
     private float kcal, fat, protein, carbs, waterMl, caloriesBurned = 0;
     private RoundCornerProgressBar progressCarbs, progressProtien, progressFat;
-    private int ly1ElementCount = 0, ly2ElementCount = 0, ly3ElementCount = 0, ly4ElementCount = 0;
+    private int ly1ElementCount = 0, ly2ElementCount = 0, ly3ElementCount = 0, ly4ElementCount = 0, calculationGoal;
     private NutritionViewModel viewModel;
     private CustomPlanViewModel customPlanViewModel;
 
@@ -80,6 +80,7 @@ public class NutritionFragment extends Fragment {
         viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
         customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
         init(view);
+        getDataFromPerf();
         getCaloriesBurned(Event.getTodayData());
         getMeal(Event.getTodayData());
         datePicker(view);
@@ -125,6 +126,19 @@ public class NutritionFragment extends Fragment {
         btnAddLunch.setOnClickListener(onClickListener);
         btnAddDinner.setOnClickListener(onClickListener);
         tvDetails.setOnClickListener(onClickListener);
+    }
+
+    private void getDataFromPerf() {
+        PrefsUtils prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
+        String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
+        calculationGoal = user.thermicEffect(activityLevel);
+        String calGoal = prefsUtils.getString("calorie_goal", "");
+
+        if (calGoal.isEmpty()) {
+            tvGoal.setText(String.valueOf(calculationGoal));
+        } else {
+            tvGoal.setText(calGoal);
+        }
     }
 
     private void datePicker(View view) {
@@ -213,8 +227,8 @@ public class NutritionFragment extends Fragment {
 
     private void getCaloriesBurned(String date) {
         customPlanViewModel.getFinishWorkout(date).observe(this, queryFinishWorkoutList -> {
-            if(!queryFinishWorkoutList.isEmpty()) {
-                for(QueryFinishWorkout item : queryFinishWorkoutList) {
+            if (!queryFinishWorkoutList.isEmpty()) {
+                for (QueryFinishWorkout item : queryFinishWorkoutList) {
                     caloriesBurned += item.getCaloriesBurned();
                 }
                 tvExercise.setText(String.valueOf(caloriesBurned));
@@ -224,19 +238,15 @@ public class NutritionFragment extends Fragment {
 
 
     private void getMeal(String date) {
-        PrefsUtils prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
-        String activityLevel = prefsUtils.getString(PrefsUtils.ACTIVITY_LEVEL, "");
-        final int calculationGoal = user.thermicEffect(activityLevel);
-
         viewModel.getSumOfNutritionByDate(date)
                 .observe(this, nutrition -> {
-                    if(!nutrition.isEmpty()) {
-                        for(SumNutritionPojo nutritionPojo : nutrition) {
-                            if(nutritionPojo.getMeasure().equals("g")) {
-                                 kcal += nutritionPojo.getCalories() / 100;
-                                 carbs += nutritionPojo.getCarb() / 100;
-                                 protein += nutritionPojo.getProtein() / 100;
-                                 fat += nutritionPojo.getFat() / 100;
+                    if (!nutrition.isEmpty()) {
+                        for (SumNutritionPojo nutritionPojo : nutrition) {
+                            if (nutritionPojo.getMeasure().equals("g")) {
+                                kcal += nutritionPojo.getCalories() / 100;
+                                carbs += nutritionPojo.getCarb() / 100;
+                                protein += nutritionPojo.getProtein() / 100;
+                                fat += nutritionPojo.getFat() / 100;
                             } else {
                                 kcal += nutritionPojo.getCalories();
                                 carbs += nutritionPojo.getCarb();
@@ -244,7 +254,7 @@ public class NutritionFragment extends Fragment {
                                 fat += nutritionPojo.getFat();
                             }
                         }
-                        tvGoal.setText(String.valueOf(calculationGoal));
+
                         tvCarbs.setText(String.format(Locale.getDefault(), "%.2fg of %dg", carbs, calculationGoal / 2));
                         tvProtien.setText(String.format(Locale.getDefault(), "%.2fg of %dg", protein, calculationGoal * 20 / 100));
                         tvFat.setText(String.format(Locale.getDefault(), "%.2fg of %dg", fat, calculationGoal * 30 / 100));
@@ -442,7 +452,7 @@ public class NutritionFragment extends Fragment {
 
     private void waterTrackerSaved(final String waterQty) {
         viewModel.getWaterTracker(Event.getTodayData()).observe(this, waterTracker -> {
-            if(waterTracker != null) {
+            if (waterTracker != null) {
                 waterTracker.setWaterQty(waterQty);
                 viewModel.updateWaterTracker(waterTracker);
             } else {

@@ -29,30 +29,32 @@
 
     <!--</android.support.constraint.ConstraintLayout>-->
 
-    <ImageView
-        android:id="@+id/iv_add_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_star_white" />
 
     <FrameLayout
         android:id="@+id/container_workout_tracker"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="15dp"
         android:orientation="vertical"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/bottom_exercise_nav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_add_favorite">
+        app:layout_constraintTop_toTopOf="parent">
 
     </FrameLayout>
+
+    <ImageView
+        android:id="@+id/iv_add_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_star_white" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_exercise_nav"

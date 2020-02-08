@@ -76,12 +76,12 @@ public class ExerciseDetailActivity extends AppCompatActivity implements View.On
                     return true;
 
                 case R.id.nav_instructions:
-                    toolbar.setTitle("Instructions");
+                    //toolbar.setTitle("Instructions");
                     transaction.replace(R.id.container_workout_tracker, instructionsExerciseFragment).commit();
                     return true;
 
                 case R.id.nav_set_peps:
-                    toolbar.setTitle("Workout Tracker");
+                   // toolbar.setTitle("Workout Tracker");
                     transaction.replace(R.id.container_workout_tracker, trackerExerciseFragment).commit();
                     return true;
             }

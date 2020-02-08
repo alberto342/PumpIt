@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import com.albert.fitness.pumpit.model.FinishTraining;
 import com.albert.fitness.pumpit.model.QueryFinishWorkout;
 import com.albert.fitness.pumpit.model.QueryLogWorkout;
+import com.albert.fitness.pumpit.model.SumOfTrackerExercise;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.Training;
 import com.albert.fitness.pumpit.model.WorkoutObj;
@@ -106,6 +107,10 @@ public class CustomPlanViewModel extends AndroidViewModel {
 
     public LiveData<List<QueryFinishWorkout>> getFinishWorkoutByDateAndExerciseId(String date, int id) {
         return repository.getFinishWorkoutByDateAndExerciseId(date, id);
+    }
+
+    public  LiveData<SumOfTrackerExercise> getFinishWorkoutSum(String date) {
+        return repository.getFinishWorkoutSum(date);
     }
 
     public LiveData<Integer> getMaxIdFromFinishTraining() {

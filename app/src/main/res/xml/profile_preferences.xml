@@ -29,7 +29,7 @@
 
 
     <Preference
-        app:fragment="com.albert.fitness.pumpit.fragment.profile.SettingsActivity$ProfileFragment"
+        app:fragment="com.albert.fitness.pumpit.fragment.profile.ChangeDateFragment"
         app:key="date_of_birth"
         app:title="@string/date_of_birth" />
 

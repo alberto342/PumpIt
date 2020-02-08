@@ -37,7 +37,7 @@ import fitness.albert.com.pumpit.R;
 public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
     private TextView tvExerciseName, tvWorkoutComplete, tvEmptyExercise;
-    private ImageView ivFindWorkout, btnStartWorkout;
+    private ImageView ivFindWorkout, btnStartWorkout, ivFitness;
     private PrefsUtils prefsUtils;
     private int exComplete = 0;
     private CustomPlanViewModel customPlanViewModel;
@@ -59,6 +59,7 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
         setToolBar();
         init(view);
         prefsUtils = new PrefsUtils(getActivity(), PrefsUtils.EXERCISE);
+        setFitnessImg();
         checkIfDateIsChange();
         customPlanViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
 
@@ -115,7 +116,21 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
         tvWorkoutComplete = view.findViewById(R.id.workout_complate);
         tvExerciseName = view.findViewById(R.id.workout_name);
         btnStartWorkout = view.findViewById(R.id.btn_workout);
+        ivFindWorkout = view.findViewById(R.id.hd_fitness_pic);
     }
+
+    private void setFitnessImg() {
+        PrefsUtils p = new PrefsUtils(getContext(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
+       boolean isMale =  p.getBoolean("is_male", false);
+
+       if(isMale) {
+           ivFindWorkout.setImageResource(R.mipmap.hd_men_fitness);
+       } else {
+           ivFindWorkout.setImageResource(R.mipmap.hd_female_fitness);
+       }
+
+    }
+
 
 
     @Override
@@ -135,15 +150,22 @@ public class WorkoutFragment extends Fragment implements View.OnClickListener {
 
     private void getAllTrainingByDate() {
         exComplete = prefsUtils.getInt("exercise_complete", 0);
+       // Set<Integer>exerciseId = new HashSet<>();
         customPlanViewModel.getAllTrainingByDate(Event.getDayName()).observe(this, new Observer<List<Training>>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<Training> trainings) {
+
                 if (trainings.isEmpty()) {
                     haveExercise(false);
                 } else {
                     haveExercise(true);
-                    tvWorkoutComplete.setText(exComplete + "/" + trainings.size() + " Workout complete");
+
+                    if(exComplete > trainings.size()) {
+                        tvWorkoutComplete.setText("Successfully all exercises complete!");
+                    } else {
+                        tvWorkoutComplete.setText(exComplete + "/" + trainings.size() + " Workout complete");
+                    }
                 }
             }
         });

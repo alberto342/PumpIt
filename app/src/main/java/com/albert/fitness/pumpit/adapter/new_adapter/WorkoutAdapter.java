@@ -58,10 +58,13 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutO
                     viewHolder.listItemBinding.setTrainingSize(0);
                     viewHolder.listItemBinding.setTotalTime(0);
                 } else {
+
+                    // TODO: 2020-02-08 need to fix calculation of exercise time
+
                     viewHolder.listItemBinding.setTrainingSize(trainings.size());
 
                     //Calculation total training
-                    int totalTimeTraining = 0;
+                    int totalTimeTraining;
                     int countRestAfterExercise = 0;
                     int countRestBetweenSet = 0;
                     int sizeOfRept = 0;
@@ -76,7 +79,7 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.WorkoutO
                     float totalResetAfterExercise = countRestAfterExercise / 60;
                     float totalRestBetweenSet = countRestBetweenSet / 60;
 
-                    totalTimeTraining += (exerciseTime * sizeOfRept) + (totalRestBetweenSet * sizeOfRept) + totalResetAfterExercise;
+                    totalTimeTraining = (int) ((exerciseTime * sizeOfRept) + (totalRestBetweenSet * sizeOfRept) + totalResetAfterExercise);
                     viewHolder.listItemBinding.setTotalTime(totalTimeTraining);
                 }
             }

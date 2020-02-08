@@ -38,6 +38,7 @@ public class TrainingActivity extends AppCompatActivity {
     private List<Integer> setNumList = new ArrayList<>();
     private WelcomeActivityViewModel activityViewModel;
     private CustomPlanViewModel planViewModel;
+    private PrefsUtils prefsUtils;
 
 
     @Override
@@ -69,10 +70,10 @@ public class TrainingActivity extends AppCompatActivity {
     }
 
     private void getTraining() {
-        PrefsUtils prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
+        prefsUtils = new PrefsUtils(this, PrefsUtils.EXERCISE);
         int id = prefsUtils.getInt("workoutId", 0);
 
-        Log.d(TAG, "getTraining id: " + id);
+        Log.d(TAG, "getWorkoutId id: " + id);
 
         planViewModel.getTrainingByWorkoutId(id).observe(this, trainings -> {
             if (trainings.isEmpty()) {
@@ -144,6 +145,7 @@ public class TrainingActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                prefsUtils.saveData("training_id", trainingList.get(viewHolder.getAdapterPosition()).getTrainingId());
                 planViewModel.deleteTraining(trainingList.get(viewHolder.getAdapterPosition()));
             }
         }).attachToRecyclerView(mRecyclerView);

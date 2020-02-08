@@ -2,6 +2,8 @@ package com.albert.fitness.pumpit.model;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.NonNull;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -266,6 +268,7 @@ public class UserRegister {
     }
 
 
+    @NonNull
     @Override
     public String toString() {
         return "UserRegister{" +

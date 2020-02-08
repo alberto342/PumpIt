@@ -2,6 +2,7 @@ package com.albert.fitness.pumpit.model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.databinding.BindingAdapter;
@@ -66,9 +67,16 @@ public class Exercise {
     public static void loadImage(ImageView view, String imageUrl) {
         Bitmap bitmap;
         String charAtZero = null;
-        if(!imageUrl.isEmpty()) {
+
+        try{
             charAtZero = Character.toString(imageUrl.charAt(0));
+        } catch (Exception e) {
+            Log.i("exerciseObj", "loadImage error: " + e.getMessage());
         }
+
+//        if(!imageUrl.isEmpty()) {
+//            charAtZero = Character.toString(imageUrl.charAt(0));
+//        }
 
         if(charAtZero != null && charAtZero.equals("/")) {
             BitmapFactory.Options options = new BitmapFactory.Options();

@@ -9,9 +9,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -38,7 +35,7 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     private String TAG = "ProfileFragment";
     private TextView tvName, tvBmi, tvMyWeigh, tvMyGoalWeight, tvBmiResult, tvBmiType;
     private ImageView profileImg, btnAccountSetting, btnProfile, btnMyGoals, btnDiary,
-            btnWaterTracker, btnNotification, btnUnits, btnDataExport, btnHelp, btnAbout;
+            btnWaterTracker, btnNotification, btnUnits, btnDataExport, btnHelp, btnAbout, btnSettings;
     private ProgressBar progressBar;
     private UserRegister userRegister = new UserRegister();
     private PrefsUtils prefsUtils;
@@ -55,7 +52,7 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile4, container, false);
+        return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
     @Override
@@ -65,6 +62,7 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         imageutils = new ImageUtils(getActivity(), this, true);
         prefsUtils = new PrefsUtils(getContext(), PrefsUtils.SETTINGS_PREFERENCES_FILE);
         initView(view);
+        setBtnSettings();
         getProfileImgIfExist();
         loadFromPrefs();
         imgProfileLoad();
@@ -74,16 +72,17 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
     @Override
     public void onResume() {
         super.onResume();
-        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
     private void initView(View view) {
+        btnSettings = view.findViewById(R.id.btn_profile_settings);
         tvName = view.findViewById(R.id.txt_name);
         tvBmi = view.findViewById(R.id.txt_bmi);
         tvMyWeigh = view.findViewById(R.id.my_weight);
@@ -96,19 +95,26 @@ public class ProfileFragment extends Fragment implements ImageUtils.ImageAttachm
         profileImg.setOnClickListener(view -> imageutils.imagepicker(1));
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_setting, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_setting, menu);
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        if (item.getItemId() == R.id.m_setting) {
+//            startActivity(new Intent(getActivity(), SettingsActivity.class));
+//            Log.d(TAG, "onOptionsItemSelected:  Menu selected");
+//        }
+//        return true;
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.m_setting) {
+    private void setBtnSettings() {
+        btnSettings.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), SettingsActivity.class));
             Log.d(TAG, "onOptionsItemSelected:  Menu selected");
-        }
-        return true;
+        });
     }
 
 

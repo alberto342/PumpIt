@@ -81,4 +81,11 @@ public interface FinishTrainingDAO {
             "ORDER BY exercise_id")
     LiveData<List<QueryFinishWorkout>> getFinishWorkoutByDateAndExerciseId(String date, int id);
 
+    @Query("SELECT SUM(weight * reps_number) AS sum_weight_reps, SUM(rest_between_set) AS sum_rest " +
+            "FROM finish_training_table INNER JOIN training_table " +
+            "ON finish_training_table.training_id = training_table.training_id " +
+            "INNER JOIN tracker_exercise_table " +
+            "ON training_table.training_id = tracker_exercise_table.training_id " +
+            "WHERE finish_training_table.date ==:date ORDER BY exercise_id ")
+    LiveData<SumOfTrackerExercise> getFinishWorkoutSum(String date);
 }

@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.albert.fitness.pumpit.fragment.FragmentNavigationActivity;
 import com.albert.fitness.pumpit.model.Event;
-import com.albert.fitness.pumpit.model.QueryFinishWorkout;
 import com.albert.fitness.pumpit.model.TDEECalculator;
 import com.albert.fitness.pumpit.model.TrackerExercise;
 import com.albert.fitness.pumpit.model.UserRegister;
@@ -41,7 +40,9 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
         setTitle("Finished Workout");
         planViewModel = ViewModelProviders.of(this).get(CustomPlanViewModel.class);
         initView();
+
         updateTrackerExercise();
+        getSumOfWeight();
         getRecord();
     }
 
@@ -89,8 +90,6 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void getRecord() {
         PrefsUtils prefsUtils = new PrefsUtils(FinisherWorkoutActivity.this, PrefsUtils.EXERCISE);
-        final float[] totalWeight = {0};
-        final int[] totalRestBetweenSet = {0};
         planViewModel.getFinishWorkout(Event.getTodayData())
                 .observe(this, queryFinishWorkouts -> {
                     if (!queryFinishWorkouts.isEmpty()) {
@@ -98,19 +97,23 @@ public class FinisherWorkoutActivity extends AppCompatActivity {
 
                         tvCompleteExercise.setText(String.valueOf(queryFinishWorkouts.size()));
                         tvTrainingRecord.setText(queryFinishWorkouts.get(queryFinishWorkouts.size() - 1).getChronometer());
-
-                        for (QueryFinishWorkout workout : queryFinishWorkouts) {
-                            totalWeight[0] += workout.getWeight();
-                            totalRestBetweenSet[0] += workout.getRestBetweenSet();
-                        }
-
-                        tvTotalWeightCmp.setText(totalWeight[0] + " kg");
-                        tvRest.setText(intIntoChronometer(totalRestBetweenSet[0] * 1000));
+                        prefsUtils.saveData("exercise_complete",queryFinishWorkouts.size());
 
                         totalTimeWaste();
                         totalActual();
                     }
                 });
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void getSumOfWeight() {
+        planViewModel.getFinishWorkoutSum(Event.getTodayData())
+               .observe(this, sumOfTrackerExercise -> {
+                   if(sumOfTrackerExercise != null) {
+                       tvTotalWeightCmp.setText(sumOfTrackerExercise.getSumWeightAndReps() + " kg");
+                       tvRest.setText(intIntoChronometer(sumOfTrackerExercise.getSumRest() * 1000));
+                   }
+               });
     }
 
 

@@ -108,6 +108,10 @@ public class WorkoutRepository {
         return finishTrainingDAO.getFinishWorkoutByDateAndExerciseId(date, id);
     }
 
+    public LiveData<SumOfTrackerExercise> getFinishWorkoutSum(String date){
+        return finishTrainingDAO.getFinishWorkoutSum(date);
+    }
+
     public LiveData<List<Integer>> getExerciseIdByDate(String date) {
         return finishTrainingDAO.getExerciseIdByDate(date);
     }

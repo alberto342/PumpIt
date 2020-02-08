@@ -108,10 +108,10 @@ public class TrackerExerciseFragment extends Fragment {
         String restBetweenSets = prefsUtils.getString("rest_between_sets", "");
         String restAfterExercise = prefsUtils.getString("rest_after_exercise", "");
 
-        if(!restBetweenSets.isEmpty()) {
+        if (!restBetweenSets.isEmpty()) {
             this.restBetweenSets.setText(restBetweenSets);
         }
-        if(!restAfterExercise.isEmpty()) {
+        if (!restAfterExercise.isEmpty()) {
             this.restAfterExercise.setText(restAfterExercise);
         }
     }
@@ -134,7 +134,6 @@ public class TrackerExerciseFragment extends Fragment {
         planViewModel.getTrainingByWorkoutId(workoutId)
                 .observe(this, trainings -> {
                     if (trainings.isEmpty()) {
-
                         sizeOfTraining = 0;
                     } else {
                         sizeOfTraining = trainings.size();
@@ -225,6 +224,7 @@ public class TrackerExerciseFragment extends Fragment {
 
         for (int i = 0; i < trackerExerciseList.size(); i++) {
             trackerExerciseList.get(i).setTrainingId(trainingId);
+            Log.d(TAG, "setData: " + trainingId); ////<<<>>><<<>>>>
         }
 
         if (activity1.equals("StartWorkoutActivity") && activity2.equals("ShowExerciseResultActivity")) {
@@ -236,12 +236,42 @@ public class TrackerExerciseFragment extends Fragment {
 
 
     private void saveTraining(final Training training) {
-        planViewModel.addNewTrainingAndTracker(training, trackerExerciseList);
+        planViewModel.addNewTraining(training);
+
+        getMaxId();
+
+        for (int i = 0; i < trackerExerciseList.size(); i++) {
+            trackerExerciseList.get(i).setTrainingId(trainingId);
+            planViewModel.addNewTracker(trackerExerciseList.get(i));
+        }
+
+
+
+
+
+
+
+       // planViewModel.addNewTrainingAndTracker(training, trackerExerciseList);
+        updateIndexOfTraining(); ///////<-------------------->
         Log.d(TAG, "onComplete: success saved  workout tracker");
         Intent intent = new Intent(getActivity(), TrainingActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         Objects.requireNonNull(getActivity()).finish();
+    }
+
+    private void getMaxId() {
+        planViewModel.getLastId().observe(this, maxTrainingId -> {
+            if(maxTrainingId != null) {
+                trainingId = maxTrainingId + 1;
+                prefsUtils.saveData("training_id", maxTrainingId);
+
+            } else {
+                trainingId = 1;
+                prefsUtils.saveData("training_id", 1);
+            }
+            Log.d(TAG, "getMaxId: " + maxTrainingId);
+        });
     }
 
 
@@ -266,7 +296,9 @@ public class TrackerExerciseFragment extends Fragment {
                     if (workoutObj == null) {
                         createWorkoutDayName();
                     }
+
                     getWorkoutOfCurrentDayAndAddTraining(training);
+                    updateIndexOfTraining();
                     goToStartWorkoutActivity();
                 });
     }
@@ -284,13 +316,38 @@ public class TrackerExerciseFragment extends Fragment {
             if (workoutObj != null && createWorkout) {
                 Log.d(TAG, "getWorkoutId: " + workoutObj.getWorkoutId());
                 training.setWorkoutId(workoutObj.getWorkoutId());
+                getMaxId();
+
+                planViewModel.addNewTraining(training);
+                getMaxId();
+
+                for (int i = 0; i < trackerExerciseList.size(); i++) {
+                    trackerExerciseList.get(i).setTrainingId(trainingId);
+                    planViewModel.addNewTracker(trackerExerciseList.get(i));
+                }
 
                 // executor = Executors.newFixedThreadPool(5);
                 Executor myExecutor = Executors.newSingleThreadExecutor();
                 myExecutor.execute(() -> {
-                    planViewModel.addNewTrainingAndTracker(training, trackerExerciseList);
+
+
+
+
+
+                    //planViewModel.addNewTrainingAndTracker(training, trackerExerciseList);
                     createWorkout = false;
                 });
+            }
+        });
+    }
+
+    private void updateIndexOfTraining() {
+        planViewModel.getAllTrainingByDate(Event.getTodayData()).observe(this, trainings -> {
+            if (!trainings.isEmpty()) {
+                for (int i = 0; i < trainings.size(); i++) {
+                    trainings.get(i).setIndexOfTraining(0);
+                    planViewModel.updateTraining(trainings.get(i));
+                }
             }
         });
     }

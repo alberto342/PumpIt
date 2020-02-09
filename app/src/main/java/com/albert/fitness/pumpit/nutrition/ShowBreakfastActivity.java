@@ -2,6 +2,7 @@ package com.albert.fitness.pumpit.nutrition;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -45,7 +46,7 @@ import me.himanshusoni.quantityview.QuantityView;
 public class ShowBreakfastActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
     private final String TAG = "ShowBreakfastActivity";
-    private Spinner spinnerServingUnit;
+    private Spinner spinnerServingUnit, spMealType;
     private String spinnerSelectedItem, oldServingUnit;
     private QuantityView quantityViewCustom;
     private TextView tvEnergy, tvCarbs, tvProtein, tvFat, tvAllNutrition, tvFoodName, tvGroupTag;
@@ -74,6 +75,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setSpMealType();
         getData();
         initCollapsingToolbar();
     }
@@ -81,6 +83,7 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
 
     private void init() {
         spinnerServingUnit = findViewById(R.id.spinner_serving);
+        spMealType = findViewById(R.id.sp_meal_type);
         tvEnergy = findViewById(R.id.tv_energy_item);
         tvCarbs = findViewById(R.id.tv_carbs_item);
         tvProtein = findViewById(R.id.tv_protein_item);
@@ -258,6 +261,40 @@ public class ShowBreakfastActivity extends AppCompatActivity implements Quantity
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setSpMealType() {
+        Resources res = getResources();
+        String[] myMeal = res.getStringArray(R.array.meal_type);
+        final String[] replaceFrom = new String[1];
+//        replaceFrom[0] = myMeal[0];
+//        myMeal[0] = myMeal[1];
+//        myMeal[1] = replaceFrom[0];
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
+                R.layout.custom_spinner_item, myMeal);
+        //android.R.layout.simple_spinner_item,
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spMealType.setAdapter(dataAdapter);
+
+        spMealType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String spSelected = spMealType.getItemAtPosition(position).toString();
+                foodLogs.setEatType(spSelected);
+                viewModel.updateFoodLogEatTypeByLogId(spSelected, foodLogs.getLogId());
+                replaceFrom[0] = myMeal[0];
+                myMeal[0] = spSelected;
+                myMeal[position] = replaceFrom[0];
+
+                Log.d(TAG, "spMeal onItemSelected success update foodLogs");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 

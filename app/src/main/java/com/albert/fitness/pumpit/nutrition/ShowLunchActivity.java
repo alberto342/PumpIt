@@ -1,6 +1,7 @@
 package com.albert.fitness.pumpit.nutrition;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -44,7 +45,7 @@ import me.himanshusoni.quantityview.QuantityView;
 public class ShowLunchActivity extends AppCompatActivity implements QuantityView.OnQuantityChangeListener {
 
     private final String TAG = "ShowLunchActivity";
-    private Spinner spinnerServingUnit;
+    private Spinner spinnerServingUnit, spMealType;
     private String spinnerSelectedItem, oldServingUnit;
     private QuantityView quantityViewCustom;
     private TextView tvEnergy, tvCarbs, tvProtein, tvFat, tvAllNutrition, tvFoodName, tvGroupTag;
@@ -74,6 +75,8 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        setSpMealType();
+
         getData();
 
         initCollapsingToolbar();
@@ -81,6 +84,7 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
 
     private void init() {
         spinnerServingUnit = findViewById(R.id.spinner_serving);
+        spMealType = findViewById(R.id.sp_meal_type);
         tvEnergy = findViewById(R.id.tv_energy_item);
         tvCarbs = findViewById(R.id.tv_carbs_item);
         tvProtein = findViewById(R.id.tv_protein_item);
@@ -139,93 +143,88 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
             int logId = bundle.getInt("logId");
 
             viewModel.getFoodLogByLogId(logId)
-                    .observe(this, new Observer<FoodLog>() {
-                        @Override
-                        public void onChanged(final FoodLog foodLog) {
-                            foodLogs = foodLog;
-                            int altMeasureId = foodLog.getAltMeasuresId();
+                    .observe(this, foodLog -> {
+                        foodLogs = foodLog;
+                        int altMeasureId = foodLog.getAltMeasuresId();
 
-                            viewModel.getAltMeasuresById(altMeasureId)
-                                    .observe(ShowLunchActivity.this, new Observer<AltMeasures>() {
-                                        @Override
-                                        public void onChanged(AltMeasures altMeasures) {
-                                            oldServingUnit = altMeasures.getMeasure();
+                        viewModel.getAltMeasuresById(altMeasureId)
+                                .observe(ShowLunchActivity.this, new Observer<AltMeasures>() {
+                                    @Override
+                                    public void onChanged(AltMeasures altMeasures) {
+                                        oldServingUnit = altMeasures.getMeasure();
 
-                                            spinnerList.add(oldServingUnit == null ? "packet" : oldServingUnit);
-                                            changeDataView();
-                                            quantityViewCustom.setQuantity(foodLog.getQty());
-                                            firstQty = foodLog.getQty();
-                                            addItemsOnSpinner();
+                                        spinnerList.add(oldServingUnit == null ? "packet" : oldServingUnit);
+                                        changeDataView();
+                                        quantityViewCustom.setQuantity(foodLog.getQty());
+                                        firstQty = foodLog.getQty();
+                                        addItemsOnSpinner();
+                                    }
+                                });
+
+                        viewModel.getNutritionByFoodId(foodLog.getFoodId())
+                                .observe(ShowLunchActivity.this, new Observer<Nutrition>() {
+                                    @Override
+                                    public void onChanged(Nutrition nutrition) {
+                                        kcal = nutrition.getNfCalories();
+                                        fat = nutrition.getNfTotalFat();
+                                        protein = nutrition.getNfProtein();
+                                        carbs = nutrition.getNfTotalCarbohydrate();
+                                        servingWeightGrams = nutrition.getServingWeightGrams();
+                                        //  oldServingUnit = nutrition.getServingUnit();
+                                    }
+                                });
+
+                        viewModel.getFullNutritiionByFoodId(foodLog.getFoodId())
+                                .observe(ShowLunchActivity.this, new Observer<List<FullNutrition>>() {
+                                    @Override
+                                    public void onChanged(List<FullNutrition> nutrition) {
+                                        for (FullNutrition n : nutrition) {
+                                            atterId.add(n.getAtterId());
+                                            values.add(n.getValue());
+
+                                            FullNutrients fullNutrients = new FullNutrients(n.getAtterId(), n.getValue());
+                                            allFoods.add(fullNutrients.getNutrients(n.getAtterId()));
                                         }
-                                    });
+                                    }
+                                });
 
-                            viewModel.getNutritionByFoodId(foodLog.getFoodId())
-                                    .observe(ShowLunchActivity.this, new Observer<Nutrition>() {
-                                        @Override
-                                        public void onChanged(Nutrition nutrition) {
-                                            kcal = nutrition.getNfCalories();
-                                            fat = nutrition.getNfTotalFat();
-                                            protein = nutrition.getNfProtein();
-                                            carbs = nutrition.getNfTotalCarbohydrate();
-                                            servingWeightGrams = nutrition.getServingWeightGrams();
-                                            //  oldServingUnit = nutrition.getServingUnit();
-
-                                        }
-                                    });
-
-                            viewModel.getFullNutritiionByFoodId(foodLog.getFoodId())
-                                    .observe(ShowLunchActivity.this, new Observer<List<FullNutrition>>() {
-                                        @Override
-                                        public void onChanged(List<FullNutrition> nutrition) {
-                                            for (FullNutrition n : nutrition) {
-                                                atterId.add(n.getAtterId());
-                                                values.add(n.getValue());
-
-                                                FullNutrients fullNutrients = new FullNutrients(n.getAtterId(), n.getValue());
-                                                allFoods.add(fullNutrients.getNutrients(n.getAtterId()));
-                                            }
-                                        }
-                                    });
-
-                            viewModel.getAltMeasuresByFoodId(foodLog.getFoodId())
-                                    .observe(ShowLunchActivity.this, new Observer<List<AltMeasures>>() {
-                                        @Override
-                                        public void onChanged(List<AltMeasures> altMeasures) {
-                                            if (!altMeasures.isEmpty()) {
-                                                for (AltMeasures measures : altMeasures) {
-                                                    if (measures.getMeasure().isEmpty()) {
-                                                        spinnerList.add("Packet");
-                                                    }
-                                                    spinnerList.add(measures.getMeasure());
-                                                    servingWeightList.add(measures.getServingWeight());
-
-                                                    //add spinner to the map
-                                                    allServingWeight.put(measures.getMeasure(), measures.getServingWeight());
+                        viewModel.getAltMeasuresByFoodId(foodLog.getFoodId())
+                                .observe(ShowLunchActivity.this, new Observer<List<AltMeasures>>() {
+                                    @Override
+                                    public void onChanged(List<AltMeasures> altMeasures) {
+                                        if (!altMeasures.isEmpty()) {
+                                            for (AltMeasures measures : altMeasures) {
+                                                if (measures.getMeasure().isEmpty()) {
+                                                    spinnerList.add("Packet");
                                                 }
+                                                spinnerList.add(measures.getMeasure());
+                                                servingWeightList.add(measures.getServingWeight());
+
+                                                //add spinner to the map
+                                                allServingWeight.put(measures.getMeasure(), measures.getServingWeight());
                                             }
                                         }
-                                    });
-
-                            viewModel.getPhotoByFoodId(foodLog.getFoodId())
-                                    .observe(ShowLunchActivity.this, new Observer<Photo>() {
-                                        @Override
-                                        public void onChanged(Photo photo) {
-                                            Picasso.get()
-                                                    .load(photo.getHighres())
-                                                    .placeholder(R.mipmap.ic_launcher)
-                                                    .error(R.mipmap.ic_launcher)
-                                                    .into(foodItem);
-                                        }
-                                    });
-                            viewModel.getTagsByFoodId(foodLog.getFoodId())
-                                    .observe(ShowLunchActivity.this, new Observer<com.albert.fitness.pumpit.model.nutrition.room.Tags>() {
-                                        @Override
-                                        public void onChanged(com.albert.fitness.pumpit.model.nutrition.room.Tags tags) {
-                                            int foodGroup = tags.getFoodGroup();
-                                            tvGroupTag.setText(Tags.foodGroup(foodGroup));
-                                        }
-                                    });
-                        }
+                                    }
+                                });
+                        viewModel.getPhotoByFoodId(foodLog.getFoodId())
+                                .observe(ShowLunchActivity.this, new Observer<Photo>() {
+                                    @Override
+                                    public void onChanged(Photo photo) {
+                                        Picasso.get()
+                                                .load(photo.getHighres())
+                                                .placeholder(R.mipmap.ic_launcher)
+                                                .error(R.mipmap.ic_launcher)
+                                                .into(foodItem);
+                                    }
+                                });
+                        viewModel.getTagsByFoodId(foodLog.getFoodId())
+                                .observe(ShowLunchActivity.this, new Observer<com.albert.fitness.pumpit.model.nutrition.room.Tags>() {
+                                    @Override
+                                    public void onChanged(com.albert.fitness.pumpit.model.nutrition.room.Tags tags) {
+                                        int foodGroup = tags.getFoodGroup();
+                                        tvGroupTag.setText(Tags.foodGroup(foodGroup));
+                                    }
+                                });
                     });
         }
 
@@ -275,11 +274,44 @@ public class ShowLunchActivity extends AppCompatActivity implements QuantityView
             }
         }
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, spinnerList);
+                R.layout.custom_spinner_item, spinnerList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerServingUnit.setAdapter(dataAdapter);
-
         onItemSelectedListener();
+    }
+
+    private void setSpMealType() {
+        Resources res = getResources();
+        String[] myMeal = res.getStringArray(R.array.meal_type);
+        final String[] replaceFrom = new String[1];
+        replaceFrom[0] = myMeal[0];
+        myMeal[0] = myMeal[1];
+        myMeal[1] = replaceFrom[0];
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
+                R.layout.custom_spinner_item, myMeal);
+        //android.R.layout.simple_spinner_item,
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spMealType.setAdapter(dataAdapter);
+
+        spMealType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String spSelected = spMealType.getItemAtPosition(position).toString();
+                foodLogs.setEatType(spSelected);
+                viewModel.updateFoodLogEatTypeByLogId(spSelected, foodLogs.getLogId());
+                replaceFrom[0] = myMeal[0];
+                myMeal[0] = spSelected;
+                myMeal[position] = replaceFrom[0];
+
+                Log.d(TAG, "spMeal onItemSelected success update foodLogs");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     //Wen user change the spinner selection

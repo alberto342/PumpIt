@@ -159,7 +159,6 @@ public class NutritionRepository {
         return mFoodsDAO.getNutritionItem(date, type);
     }
 
-
     public void insertAllNutrition(final List<FoodsObj> foodsObj,
                                    final List<Nutrition> nutritionList,
                                    final List<FullNutrition> fullNutritionList,
@@ -452,5 +451,10 @@ public class NutritionRepository {
                 foodLogDAO.update(foodLog);
             }
         });
+    }
+
+    public void updateFoodLogEatTypeByLogId(String type, int logId) {
+        Executor myExecutor = Executors.newSingleThreadExecutor();
+        myExecutor.execute(() -> foodLogDAO.updateFoodLogEatTypeByLogId(type, logId));
     }
 }

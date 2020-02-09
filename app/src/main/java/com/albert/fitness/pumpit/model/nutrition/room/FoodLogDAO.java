@@ -21,6 +21,9 @@ public interface FoodLogDAO {
     @Delete
     void delete(FoodLog item);
 
+    @Query("UPDATE food_log_table SET eat_type=:type WHERE log_id =:logId")
+    void updateFoodLogEatTypeByLogId(String type, int logId);
+
     @Query("SELECT * FROM food_log_table")
     LiveData<List<FoodLog>> getAllFoodLog();
 

@@ -55,7 +55,8 @@ public class SearchFoodsActivity extends AppCompatActivity {
 
     private String TAG = "SearchFoodsActivity";
     public static ArrayList<Foods> mListItem = new ArrayList<>();
-//    private ArrayList<Common> commonArrayList = new ArrayList<>();
+    private PrefsUtils prefsUtils = new PrefsUtils();
+    //    private ArrayList<Common> commonArrayList = new ArrayList<>();
 //    CommonListAdapter commonListAdapter;
     FoodListAdapter foodListAdapter;
     RecyclerView rvList;
@@ -73,8 +74,8 @@ public class SearchFoodsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_foods);
         viewModel = ViewModelProviders.of(this).get(NutritionViewModel.class);
+        prefsUtils = new PrefsUtils(this, "suggestions");
         getLastFoodId();
-
         //checkPermission();
         Objects.requireNonNull(getSupportActionBar()).hide();
         api = Global.initRetrofit();
@@ -88,6 +89,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
         rvList = findViewById(R.id.rvList);
         btnSaveAllFood = findViewById(R.id.btn_save_all_food);
         searchBar = findViewById(R.id.food_search_bar);
+        loadSuggestions();
         //   searchBar.setCardViewElevation(25);
         pb = findViewById(R.id.pb_search_food);
         rvList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -190,6 +192,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
                 if (response.body() != null) {
                     if (response.body().getFoods().size() > 0) {
                         tvEmpty.setVisibility(View.GONE);
+                        searchBar.setText("");
 
                         if (response.body().getFoods().size() > 1) {
                             btnSaveAllFood.setVisibility(View.VISIBLE);
@@ -204,6 +207,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
                         Toast.makeText(SearchFoodsActivity.this, R.string.no_data_found, Toast.LENGTH_SHORT);
                     }
                 }
+
             }
 
             @Override
@@ -257,7 +261,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
                             @Override
                             public void onChanged(Integer id) {
                                 if (id == null) {
-                                   saveNutrition(foods);
+                                    saveNutrition(foods);
                                 } else {
                                     Log.d(TAG, "Save Food: NOT SAVING FoodNameExisting + id: " + id);
                                     getAltMeasuresId(id, foods);
@@ -313,7 +317,7 @@ public class SearchFoodsActivity extends AppCompatActivity {
         }
 
         viewModel.addNewAllNutrition(foodsObjList, nutritionList, fullNutritionList, altMeasuresList, photoList, tagsList);
-       // getAltMeasuresId(foodId, foods);
+        // getAltMeasuresId(foodId, foods);
         foodId++;
 
         Event.saveEvent(this);
@@ -386,4 +390,36 @@ public class SearchFoodsActivity extends AppCompatActivity {
             foods.setFoodName(mListItem.get(i).getFoodName());
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.d(TAG, "onBackPressed searchBar LastSuggestions: " + searchBar.getLastSuggestions());
+        int size = searchBar.getLastSuggestions().size();
+        prefsUtils.saveData("suggestionsSize", size);
+        for (int i = 0; i < size; i++) {
+            prefsUtils.saveData("k" + i, searchBar.getLastSuggestions().get(i).toString());
+        }
+    }
+
+    private void loadSuggestions() {
+        List<String> lastSearches = new ArrayList<>();
+        //if(searchBar.getLastSuggestions() != null) {
+
+        int size = prefsUtils.getInt("suggestionsSize", -1);
+
+        if(size != -1) {
+            for (int i = 0; i < size; i++) {
+                if (!prefsUtils.getString("k" + i, "").isEmpty()) {
+                    lastSearches.add(prefsUtils.getString("k" + i, ""));
+                }
+            }
+        }
+        searchBar.setLastSuggestions(lastSearches);
+
+//        if (lastSearches.size() > 0) {
+//            searchBar.setLastSuggestions(lastSearches);
+//        }
+    }
+    // }
 }

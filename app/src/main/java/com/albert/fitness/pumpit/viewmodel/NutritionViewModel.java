@@ -218,6 +218,10 @@ public class NutritionViewModel extends AndroidViewModel {
         repository.updateFoodLog(foodLog);
     }
 
+    public void updateFoodLogEatTypeByLogId(String type, int logId) {
+        repository.updateFoodLogEatTypeByLogId(type, logId);
+    }
+
     public void updateWaterTracker(WaterTracker waterTracker) {
         repository.updateWaterTracker(waterTracker);
     }
